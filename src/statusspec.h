@@ -23,8 +23,8 @@
 #include "vfuncs.h"
 #include "icvar.h"
 
-#define PLUGIN_DESC "StatusSpec v0.2"
-#define SHORT_DESC "StatusSpec v0.2"
+#define PLUGIN_DESC "StatusSpec v0.3"
+#define SHORT_DESC "StatusSpec v0.3"
 
 #define SCALED(normalValue) pScheme->GetProportionalScaledValue(normalValue)
 
