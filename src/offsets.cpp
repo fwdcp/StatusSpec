@@ -25,7 +25,7 @@ void WSOffsets::PrepareOffsets() {
 	WSOffsets::pCTFPlayer__m_iTeamNum = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "m_iTeamNum");
 	WSOffsets::pCTFPlayer__m_nPlayerCond = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCond");
 	WSOffsets::pCTFPlayer___condition_bits = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "_condition_bits");
-	WSOffsets::pCTFPlayer__m_nPlayerCondEx = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "_condition_bits");
+	WSOffsets::pCTFPlayer__m_nPlayerCondEx = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCondEx");
 	WSOffsets::pCTFPlayer__m_nPlayerCondEx2 = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCondEx2");
 }
 
