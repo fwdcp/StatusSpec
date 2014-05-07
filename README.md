@@ -3,8 +3,13 @@ StatusSpec
 
 a client plugin that shows certain player statuses via icons next to a tournament HUD
 
+![screenshot](http://cloud-3.steampowered.com/ugc/3296944113103557748/0A2F0965D6085C0BA1CE1B85C44D673F0F78E2FC/)
+
 Changelog
 ---------
+
+**0.3.0**
+* scale HUD positioning values automatically
 
 **0.2.0**
 * added Vaccinator resistances/Ubers, Soldier banners, Jarate, Mad Milk, bleeding, and on fire icons to display
@@ -35,3 +40,9 @@ CVars
 * **statusspec_icons_red_bg_green** - green value of the icon background for RED players
 * **statusspec_icons_red_bg_blue** - blue value of the icon background for RED players
 * **statusspec_icons_red_bg_alpha** - alpha value of the icon background for RED players
+
+Thanks
+------
+**bluee** - for the inspiration to do this project and for a lot of code reused from his [AdvSpec project](https://github.com/MattMcNam/advspec)
+
+**SourceMod Development Team** - for the information on how to get TF2 player conditions
