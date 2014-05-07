@@ -210,3 +210,8 @@ UpgradeLog*.htm
 
 # Microsoft Fakes
 FakesAssemblies/
+
+# More project files we don't want
+*.sln
+*.vcxproj
+*.vcxproj.filters
