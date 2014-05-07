@@ -1,0 +1,7 @@
+"UnlitGeneric"
+{
+	"$basetexture" "vgui/replay/thumbnails/defense_buff_explosion_blue"
+	"$translucent" 1
+	"$ignorez" 1
+	"$vertexcolor" 1
+}
