@@ -66,6 +66,26 @@ ConVar icons_red_bg_alpha("statusspec_icons_red_bg_alpha", "127", 0, "alpha valu
 
 void (__fastcall *origPaintTraverse)(void* thisptr, int edx, VPANEL, bool, bool);
 
+bool CheckCondition(uint32_t conditions[3], int condition) {
+	if (condition < 32) {
+		if (conditions[0] & (1 << condition)) {
+			return true;
+		}
+	}
+	else if (condition < 64) {
+		if (conditions[1] & (1 << (condition - 32))) {
+			return true;
+		}
+	}
+	else if (condition < 96) {
+		if (conditions[2] & (1 << (condition - 64))) {
+			return true;
+		}
+	}
+	
+	return false;
+}
+
 void UpdateEntities() {
 	int iEntCount = pEntityList->GetHighestEntityIndex();
 	IClientEntity *cEntity;
@@ -92,14 +112,12 @@ void UpdateEntities() {
 		}
 		
 		int j = playerInfo.size();
-		playerInfo.push_back(player_t());
-		
-		uint64_t playerCondExAdj = playerCondEx;
-		playerCondExAdj <<= 32;
+		playerInfo.push_back(Player());
 		
 		playerInfo[j].team = team;
-		playerInfo[j].lower = playerCond|condBits|playerCondExAdj;
-		playerInfo[j].upper = playerCondEx2;
+		playerInfo[j].conditions[0] = playerCond|condBits;
+		playerInfo[j].conditions[1] = playerCondEx;
+		playerInfo[j].conditions[2] = playerCondEx2;
 	}
 }
 
@@ -164,7 +182,7 @@ void __fastcall hookedPaintTraverse( vgui::IPanel *thisPtr, int edx,  VPANEL vgu
 				
 				int iIcons = 0;
 				
-				if (playerInfo[i].lower & TFCOND_LOWER_UBERCHARGED) {
+				if (CheckCondition(playerInfo[i].conditions, TFCond_Ubercharged)) {
 					pSurface->DrawSetTexture(m_iTextureUbercharged);
 					pSurface->DrawSetColor(255, 255, 255, 255);
 					
@@ -186,7 +204,7 @@ void __fastcall hookedPaintTraverse( vgui::IPanel *thisPtr, int edx,  VPANEL vgu
 					continue;
 				}
 				
-				if (playerInfo[i].lower & TFCOND_LOWER_KRITZKRIEGED) {
+				if (CheckCondition(playerInfo[i].conditions, TFCond_Kritzkrieged)) {
 					pSurface->DrawSetTexture(m_iTextureCritBoosted);
 					pSurface->DrawSetColor(255, 255, 255, 255);
 					
@@ -208,9 +226,307 @@ void __fastcall hookedPaintTraverse( vgui::IPanel *thisPtr, int edx,  VPANEL vgu
 					continue;
 				}
 				
-				if (playerInfo[i].lower & (TFCOND_LOWER_MARKEDFORDEATH | TFCOND_LOWER_MARKEDFORDEATHSILENT)) {
+				if (CheckCondition(playerInfo[i].conditions, TFCond_UberBulletResist)) {
+					if (playerInfo[i].team == TEAM_RED) {
+						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize) + 1;
+						iY = iRedYBase + (iRedPlayers * iRedYDelta) + 1;
+						pSurface->DrawSetTexture(m_iTextureResistShieldRed);
+						pSurface->DrawSetColor(255, 255, 255, 255);
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+						pSurface->DrawSetTexture(m_iTextureBulletResistRed);
+						pSurface->DrawSetColor(255, 255, 255, 255);
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+					}
+					else if (playerInfo[i].team == TEAM_BLU) {
+						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize) + 1;
+						iY = iBluYBase + (iBluPlayers * iBluYDelta) + 1;
+						pSurface->DrawSetTexture(m_iTextureResistShieldBlu);
+						pSurface->DrawSetColor(255, 255, 255, 255);
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+						pSurface->DrawSetTexture(m_iTextureBulletResistBlu);
+						pSurface->DrawSetColor(255, 255, 255, 255);
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+					}
+					
+					iIcons++;
+				}
+				else if (CheckCondition(playerInfo[i].conditions, TFCond_SmallBulletResist)) {
+					if (playerInfo[i].team == TEAM_RED) {
+						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize) + 1;
+						iY = iRedYBase + (iRedPlayers * iRedYDelta) + 1;
+						pSurface->DrawSetTexture(m_iTextureBulletResistRed);
+						pSurface->DrawSetColor(255, 255, 255, 255);
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+					}
+					else if (playerInfo[i].team == TEAM_BLU) {
+						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize) + 1;
+						iY = iBluYBase + (iBluPlayers * iBluYDelta) + 1;
+						pSurface->DrawSetTexture(m_iTextureBulletResistBlu);
+						pSurface->DrawSetColor(255, 255, 255, 255);
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+					}
+					
+					iIcons++;
+				}
+				
+				if (iIcons >= iMaxIcons) {
+					continue;
+				}
+				
+				if (CheckCondition(playerInfo[i].conditions, TFCond_UberBlastResist)) {
+					if (playerInfo[i].team == TEAM_RED) {
+						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize) + 1;
+						iY = iRedYBase + (iRedPlayers * iRedYDelta) + 1;
+						pSurface->DrawSetTexture(m_iTextureResistShieldRed);
+						pSurface->DrawSetColor(255, 255, 255, 255);
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+						pSurface->DrawSetTexture(m_iTextureBlastResistRed);
+						pSurface->DrawSetColor(255, 255, 255, 255);
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+					}
+					else if (playerInfo[i].team == TEAM_BLU) {
+						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize) + 1;
+						iY = iBluYBase + (iBluPlayers * iBluYDelta) + 1;
+						pSurface->DrawSetTexture(m_iTextureResistShieldBlu);
+						pSurface->DrawSetColor(255, 255, 255, 255);
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+						pSurface->DrawSetTexture(m_iTextureBlastResistBlu);
+						pSurface->DrawSetColor(255, 255, 255, 255);
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+					}
+					
+					iIcons++;
+				}
+				else if (CheckCondition(playerInfo[i].conditions, TFCond_SmallBlastResist)) {
+					if (playerInfo[i].team == TEAM_RED) {
+						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize) + 1;
+						iY = iRedYBase + (iRedPlayers * iRedYDelta) + 1;
+						pSurface->DrawSetTexture(m_iTextureBlastResistRed);
+						pSurface->DrawSetColor(255, 255, 255, 255);
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+					}
+					else if (playerInfo[i].team == TEAM_BLU) {
+						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize) + 1;
+						iY = iBluYBase + (iBluPlayers * iBluYDelta) + 1;
+						pSurface->DrawSetTexture(m_iTextureBlastResistBlu);
+						pSurface->DrawSetColor(255, 255, 255, 255);
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+					}
+					
+					iIcons++;
+				}
+				
+				if (iIcons >= iMaxIcons) {
+					continue;
+				}
+				
+				if (CheckCondition(playerInfo[i].conditions, TFCond_UberFireResist)) {
+					if (playerInfo[i].team == TEAM_RED) {
+						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize) + 1;
+						iY = iRedYBase + (iRedPlayers * iRedYDelta) + 1;
+						pSurface->DrawSetTexture(m_iTextureResistShieldRed);
+						pSurface->DrawSetColor(255, 255, 255, 255);
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+						pSurface->DrawSetTexture(m_iTextureFireResistRed);
+						pSurface->DrawSetColor(255, 255, 255, 255);
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+					}
+					else if (playerInfo[i].team == TEAM_BLU) {
+						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize) + 1;
+						iY = iBluYBase + (iBluPlayers * iBluYDelta) + 1;
+						pSurface->DrawSetTexture(m_iTextureResistShieldBlu);
+						pSurface->DrawSetColor(255, 255, 255, 255);
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+						pSurface->DrawSetTexture(m_iTextureFireResistBlu);
+						pSurface->DrawSetColor(255, 255, 255, 255);
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+					}
+					
+					iIcons++;
+				}
+				else if (CheckCondition(playerInfo[i].conditions, TFCond_SmallFireResist)) {
+					if (playerInfo[i].team == TEAM_RED) {
+						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize) + 1;
+						iY = iRedYBase + (iRedPlayers * iRedYDelta) + 1;
+						pSurface->DrawSetTexture(m_iTextureFireResistRed);
+						pSurface->DrawSetColor(255, 255, 255, 255);
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+					}
+					else if (playerInfo[i].team == TEAM_BLU) {
+						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize) + 1;
+						iY = iBluYBase + (iBluPlayers * iBluYDelta) + 1;
+						pSurface->DrawSetTexture(m_iTextureFireResistBlu);
+						pSurface->DrawSetColor(255, 255, 255, 255);
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+					}
+					
+					iIcons++;
+				}
+				
+				if (iIcons >= iMaxIcons) {
+					continue;
+				}
+				
+				if (CheckCondition(playerInfo[i].conditions, TFCond_Buffed)) {
+					if (playerInfo[i].team == TEAM_RED) {
+						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize) + 1;
+						iY = iRedYBase + (iRedPlayers * iRedYDelta) + 1;
+						pSurface->DrawSetTexture(m_iTextureBuffBannerRed);
+						pSurface->DrawSetColor(255, 255, 255, 255);
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+					}
+					else if (playerInfo[i].team == TEAM_BLU) {
+						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize) + 1;
+						iY = iBluYBase + (iBluPlayers * iBluYDelta) + 1;
+						pSurface->DrawSetTexture(m_iTextureBuffBannerBlu);
+						pSurface->DrawSetColor(255, 255, 255, 255);
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+					}
+					
+					iIcons++;
+				}
+				
+				if (iIcons >= iMaxIcons) {
+					continue;
+				}
+				
+				if (CheckCondition(playerInfo[i].conditions, TFCond_DefenseBuffed)) {
+					if (playerInfo[i].team == TEAM_RED) {
+						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize) + 1;
+						iY = iRedYBase + (iRedPlayers * iRedYDelta) + 1;
+						pSurface->DrawSetTexture(m_iTextureBattalionsBackupRed);
+						pSurface->DrawSetColor(255, 255, 255, 255);
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+					}
+					else if (playerInfo[i].team == TEAM_BLU) {
+						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize) + 1;
+						iY = iBluYBase + (iBluPlayers * iBluYDelta) + 1;
+						pSurface->DrawSetTexture(m_iTextureBattalionsBackupBlu);
+						pSurface->DrawSetColor(255, 255, 255, 255);
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+					}
+					
+					iIcons++;
+				}
+				
+				if (iIcons >= iMaxIcons) {
+					continue;
+				}
+				
+				if (CheckCondition(playerInfo[i].conditions, TFCond_RegenBuffed)) {
+					if (playerInfo[i].team == TEAM_RED) {
+						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize) + 1;
+						iY = iRedYBase + (iRedPlayers * iRedYDelta) + 1;
+						pSurface->DrawSetTexture(m_iTextureConcherorRed);
+						pSurface->DrawSetColor(255, 255, 255, 255);
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+					}
+					else if (playerInfo[i].team == TEAM_BLU) {
+						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize) + 1;
+						iY = iBluYBase + (iBluPlayers * iBluYDelta) + 1;
+						pSurface->DrawSetTexture(m_iTextureConcherorBlu);
+						pSurface->DrawSetColor(255, 255, 255, 255);
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+					}
+					
+					iIcons++;
+				}
+				
+				if (iIcons >= iMaxIcons) {
+					continue;
+				}
+				
+				if (CheckCondition(playerInfo[i].conditions, TFCond_Jarated)) {
+					pSurface->DrawSetTexture(m_iTextureJarated);
+					pSurface->DrawSetColor(255, 255, 255, 255);
+					
+					if (playerInfo[i].team == TEAM_RED) {
+						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize) + 1;
+						iY = iRedYBase + (iRedPlayers * iRedYDelta) + 1;
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+					}
+					else if (playerInfo[i].team == TEAM_BLU) {
+						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize) + 1;
+						iY = iBluYBase + (iBluPlayers * iBluYDelta) + 1;
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+					}
+					
+					iIcons++;
+				}
+				
+				if (iIcons >= iMaxIcons) {
+					continue;
+				}
+				
+				if (CheckCondition(playerInfo[i].conditions, TFCond_Milked)) {
+					pSurface->DrawSetTexture(m_iTextureMilked);
+					pSurface->DrawSetColor(255, 255, 255, 255);
+					
+					if (playerInfo[i].team == TEAM_RED) {
+						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize) + 1;
+						iY = iRedYBase + (iRedPlayers * iRedYDelta) + 1;
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+					}
+					else if (playerInfo[i].team == TEAM_BLU) {
+						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize) + 1;
+						iY = iBluYBase + (iBluPlayers * iBluYDelta) + 1;
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+					}
+					
+					iIcons++;
+				}
+				
+				if (iIcons >= iMaxIcons) {
+					continue;
+				}
+				
+				if (CheckCondition(playerInfo[i].conditions, TFCond_MarkedForDeath) || CheckCondition(playerInfo[i].conditions, TFCond_MarkedForDeathSilent)) {
 					pSurface->DrawSetTexture(m_iTextureMarkedForDeath);
 					pSurface->DrawSetColor(255, 255, 255, 255);
+					
+					if (playerInfo[i].team == TEAM_RED) {
+						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize) + 1;
+						iY = iRedYBase + (iRedPlayers * iRedYDelta) + 1;
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+					}
+					else if (playerInfo[i].team == TEAM_BLU) {
+						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize) + 1;
+						iY = iBluYBase + (iBluPlayers * iBluYDelta) + 1;
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+					}
+					
+					iIcons++;
+				}
+				
+				if (iIcons >= iMaxIcons) {
+					continue;
+				}
+				
+				if (CheckCondition(playerInfo[i].conditions, TFCond_Bleeding)) {
+					pSurface->DrawSetTexture(m_iTextureBleeding);
+					pSurface->DrawSetColor(255, 0, 0, 255);
+					
+					if (playerInfo[i].team == TEAM_RED) {
+						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize) + 1;
+						iY = iRedYBase + (iRedPlayers * iRedYDelta) + 1;
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+					}
+					else if (playerInfo[i].team == TEAM_BLU) {
+						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize) + 1;
+						iY = iBluYBase + (iBluPlayers * iBluYDelta) + 1;
+						pSurface->DrawTexturedRect(iX, iY, iX + iIconSize, iY + iIconSize);
+					}
+					
+					iIcons++;
+				}
+				
+				if (iIcons >= iMaxIcons) {
+					continue;
+				}
+				
+				if (CheckCondition(playerInfo[i].conditions, TFCond_OnFire)) {
+					pSurface->DrawSetTexture(m_iTextureOnFire);
+					pSurface->DrawSetColor(255, 0, 0, 255);
 					
 					if (playerInfo[i].team == TEAM_RED) {
 						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize) + 1;
@@ -271,11 +587,48 @@ bool StatusSpecPlugin::Load( CreateInterfaceFn interfaceFactory, CreateInterface
 	m_font = 0;
 	
 	m_iTextureUbercharged = pSurface->CreateNewTextureID();
-	pSurface->DrawSetTextureFile(m_iTextureUbercharged, "vgui/replay/thumbnails/ubercharge", 0, false);
 	m_iTextureCritBoosted = pSurface->CreateNewTextureID();
-	pSurface->DrawSetTextureFile(m_iTextureCritBoosted, "vgui/replay/thumbnails/critboost", 0, false);
+	m_iTextureResistShieldRed = pSurface->CreateNewTextureID();
+	m_iTextureResistShieldBlu = pSurface->CreateNewTextureID();
+	m_iTextureBulletResistRed = pSurface->CreateNewTextureID();
+	m_iTextureBlastResistRed = pSurface->CreateNewTextureID();
+	m_iTextureFireResistRed = pSurface->CreateNewTextureID();
+	m_iTextureBulletResistBlu = pSurface->CreateNewTextureID();
+	m_iTextureBlastResistBlu = pSurface->CreateNewTextureID();
+	m_iTextureFireResistBlu = pSurface->CreateNewTextureID();
+	m_iTextureBuffBannerRed = pSurface->CreateNewTextureID();
+	m_iTextureBuffBannerBlu = pSurface->CreateNewTextureID();
+	m_iTextureBattalionsBackupRed = pSurface->CreateNewTextureID();
+	m_iTextureBattalionsBackupBlu = pSurface->CreateNewTextureID();
+	m_iTextureConcherorRed = pSurface->CreateNewTextureID();
+	m_iTextureConcherorBlu = pSurface->CreateNewTextureID();
+	m_iTextureJarated = pSurface->CreateNewTextureID();
+	m_iTextureMilked = pSurface->CreateNewTextureID();
 	m_iTextureMarkedForDeath = pSurface->CreateNewTextureID();
-	pSurface->DrawSetTextureFile(m_iTextureMarkedForDeath, "vgui/marked_for_death", 0, false);
+	m_iTextureBleeding = pSurface->CreateNewTextureID();
+	m_iTextureOnFire = pSurface->CreateNewTextureID();
+	
+	pSurface->DrawSetTextureFile(m_iTextureUbercharged, TEXTURE_UBERCHARGEICON, 0, false);
+	pSurface->DrawSetTextureFile(m_iTextureCritBoosted, TEXTURE_CRITBOOSTICON, 0, false);
+	pSurface->DrawSetTextureFile(m_iTextureResistShieldRed, TEXTURE_RESISTSHIELDRED, 0, false);
+	pSurface->DrawSetTextureFile(m_iTextureResistShieldBlu, TEXTURE_RESISTSHIELDBLU, 0, false);
+	pSurface->DrawSetTextureFile(m_iTextureBulletResistRed, TEXTURE_BULLETRESISTRED, 0, false);
+	pSurface->DrawSetTextureFile(m_iTextureBlastResistRed, TEXTURE_BLASTRESISTRED, 0, false);
+	pSurface->DrawSetTextureFile(m_iTextureFireResistRed, TEXTURE_FIRERESISTRED, 0, false);
+	pSurface->DrawSetTextureFile(m_iTextureBulletResistBlu, TEXTURE_BULLETRESISTBLU, 0, false);
+	pSurface->DrawSetTextureFile(m_iTextureBlastResistBlu, TEXTURE_BLASTRESISTBLU, 0, false);
+	pSurface->DrawSetTextureFile(m_iTextureFireResistBlu, TEXTURE_FIRERESISTBLU, 0, false);
+	pSurface->DrawSetTextureFile(m_iTextureBuffBannerRed, TEXTURE_BUFFBANNERRED, 0, false);
+	pSurface->DrawSetTextureFile(m_iTextureBuffBannerBlu, TEXTURE_BUFFBANNERBLU, 0, false);
+	pSurface->DrawSetTextureFile(m_iTextureBattalionsBackupRed, TEXTURE_BATTALIONSBACKUPRED, 0, false);
+	pSurface->DrawSetTextureFile(m_iTextureBattalionsBackupBlu, TEXTURE_BATTALIONSBACKUPBLU, 0, false);
+	pSurface->DrawSetTextureFile(m_iTextureConcherorRed, TEXTURE_CONCHERORRED, 0, false);
+	pSurface->DrawSetTextureFile(m_iTextureConcherorBlu, TEXTURE_CONCHERORBLU, 0, false);
+	pSurface->DrawSetTextureFile(m_iTextureJarated, TEXTURE_JARATE, 0, false);
+	pSurface->DrawSetTextureFile(m_iTextureMilked, TEXTURE_MADMILK, 0, false);
+	pSurface->DrawSetTextureFile(m_iTextureMarkedForDeath, TEXTURE_MARKEDFORDEATH, 0, false);
+	pSurface->DrawSetTextureFile(m_iTextureBleeding, TEXTURE_BLEEDING, 0, false);
+	pSurface->DrawSetTextureFile(m_iTextureOnFire, TEXTURE_ONFIRE, 0, false);
 
 	//Hook PaintTraverse
 	origPaintTraverse = (void (__fastcall *)(void *, int, VPANEL, bool, bool))
