@@ -26,7 +26,7 @@ CVars
 * **statusspec_icons_max** - max number of icons to be rendered
 * **statusspec_icons_blu_x_base** - x-coordinate of the first BLU player
 * **statusspec_icons_blu_x_delta** - amount to move in x-direction for next BLU player
-* **statusspec_icons_blu_y_base"** - y-coordinate of the first BLU player
+* **statusspec_icons_blu_y_base** - y-coordinate of the first BLU player
 * **statusspec_icons_blu_y_delta** - amount to move in y-direction for next BLU player
 * **statusspec_icons_blu_bg_red** - red value of the icon background for BLU players
 * **statusspec_icons_blu_bg_green** - green value of the icon background for BLU players
