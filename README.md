@@ -8,6 +8,9 @@ a client plugin that shows certain player statuses via icons next to a tournamen
 Changelog
 ---------
 
+**0.4.0**
+* added option (enabled by default) to have icon backgrounds adjust with icons rather than be static
+
 **0.3.0**
 * scale HUD positioning values automatically
 
@@ -19,9 +22,13 @@ Changelog
 * Uber, Kritz, marked for death status icons
 * many CVars for customizing appearance
 
-CVars
+Usage
 -----
+This plugin is not signed, and therefore will not load unless TF2 is loaded with the "-insecure" flag.
+
+### CVars
 * **statusspec_icons_enabled** - enable status icons
+* **statusspec_icons_bg_dynamic** - dynamically move the background color with the icons
 * **statusspec_icons_size** - square size of status icons
 * **statusspec_icons_max** - max number of icons to be rendered
 * **statusspec_icons_blu_x_base** - x-coordinate of the first BLU player
