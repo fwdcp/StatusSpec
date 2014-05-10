@@ -132,30 +132,30 @@ void __fastcall hookedPaintTraverse( vgui::IPanel *thisPtr, int edx,  VPANEL vgu
 	if (pEngineClient->IsDrawingLoadingImage() || !pEngineClient->IsInGame() || !pEngineClient->IsConnected() || pEngineClient->Con_IsVisible( ))
 		return;
 	
-	const char* panelName = pPanel->GetName(vguiPanel);
+	const char* panelName = g_pVGuiPanel->GetName(vguiPanel);
 	if (panelName[0] == 'M' && panelName[3] == 'S' && panelName[9] == 'T' && panelName[12] == 'P') {
 		if (icons_enabled.GetBool()) {
 			bool bDynamic = icons_dynamic.GetBool();
-			int iSize = pScheme->GetProportionalScaledValue(icons_size.GetInt());
+			int iSize = g_pVGuiSchemeManager->GetProportionalScaledValue(icons_size.GetInt());
 			int iMaxIcons = icons_max.GetInt();
-			int iBluXBase = pScheme->GetProportionalScaledValue(icons_blu_x_base.GetInt());
-			int iBluXDelta = pScheme->GetProportionalScaledValue(icons_blu_x_delta.GetInt());
-			int iBluYBase = pScheme->GetProportionalScaledValue(icons_blu_y_base.GetInt());
-			int iBluYDelta = pScheme->GetProportionalScaledValue(icons_blu_y_delta.GetInt());
+			int iBluXBase = g_pVGuiSchemeManager->GetProportionalScaledValue(icons_blu_x_base.GetInt());
+			int iBluXDelta = g_pVGuiSchemeManager->GetProportionalScaledValue(icons_blu_x_delta.GetInt());
+			int iBluYBase = g_pVGuiSchemeManager->GetProportionalScaledValue(icons_blu_y_base.GetInt());
+			int iBluYDelta = g_pVGuiSchemeManager->GetProportionalScaledValue(icons_blu_y_delta.GetInt());
 			int iBluBGRed = icons_blu_bg_red.GetInt();
 			int iBluBGGreen = icons_blu_bg_green.GetInt();
 			int iBluBGBlue = icons_blu_bg_blue.GetInt();
 			int iBluBGAlpha = icons_blu_bg_alpha.GetInt();
-			int iRedXBase = pScheme->GetProportionalScaledValue(icons_red_x_base.GetInt());
-			int iRedXDelta = pScheme->GetProportionalScaledValue(icons_red_x_delta.GetInt());
-			int iRedYBase = pScheme->GetProportionalScaledValue(icons_red_y_base.GetInt());
-			int iRedYDelta = pScheme->GetProportionalScaledValue(icons_red_y_delta.GetInt());
+			int iRedXBase = g_pVGuiSchemeManager->GetProportionalScaledValue(icons_red_x_base.GetInt());
+			int iRedXDelta = g_pVGuiSchemeManager->GetProportionalScaledValue(icons_red_x_delta.GetInt());
+			int iRedYBase = g_pVGuiSchemeManager->GetProportionalScaledValue(icons_red_y_base.GetInt());
+			int iRedYDelta = g_pVGuiSchemeManager->GetProportionalScaledValue(icons_red_y_delta.GetInt());
 			int iRedBGRed = icons_red_bg_red.GetInt();
 			int iRedBGGreen = icons_red_bg_green.GetInt();
 			int iRedBGBlue = icons_red_bg_blue.GetInt();
 			int iRedBGAlpha = icons_red_bg_alpha.GetInt();
 			
-			int iSpacing = pScheme->GetProportionalScaledValue(1);
+			int iSpacing = g_pVGuiSchemeManager->GetProportionalScaledValue(1);
 			int iIconSize = iSize - (2 * iSpacing);
 			int iBarSize = iSize * iMaxIcons;
 			
@@ -173,8 +173,8 @@ void __fastcall hookedPaintTraverse( vgui::IPanel *thisPtr, int edx,  VPANEL vgu
 					if (!bDynamic) {
 						iX = iRedXBase + (iRedPlayers * iRedXDelta);
 						iY = iRedYBase + (iRedPlayers * iRedYDelta);
-						pSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-						pSurface->DrawFilledRect(iX, iY, iX + iBarSize, iY + iSize);
+						g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
+						g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iBarSize, iY + iSize);
 					}
 				}
 				else if (playerInfo[i].team == TEAM_BLU) {
@@ -183,8 +183,8 @@ void __fastcall hookedPaintTraverse( vgui::IPanel *thisPtr, int edx,  VPANEL vgu
 					if (!bDynamic) {
 						iX = iBluXBase + (iBluPlayers * iBluXDelta);
 						iY = iBluYBase + (iBluPlayers * iBluYDelta);
-						pSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-						pSurface->DrawFilledRect(iX, iY, iX + iBarSize, iY + iSize);
+						g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
+						g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iBarSize, iY + iSize);
 					}
 				}
 				else {
@@ -198,22 +198,22 @@ void __fastcall hookedPaintTraverse( vgui::IPanel *thisPtr, int edx,  VPANEL vgu
 						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
 						iY = iRedYBase + (iRedPlayers * iRedYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
 					}
 					else if (playerInfo[i].team == TEAM_BLU) {
 						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
 						iY = iBluYBase + (iBluPlayers * iBluYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
 					}
 					
-					pSurface->DrawSetTexture(m_iTextureUbercharged);
-					pSurface->DrawSetColor(255, 255, 255, 255);
-					pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+					g_pVGuiSurface->DrawSetTexture(m_iTextureUbercharged);
+					g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+					g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
 					
 					iIcons++;
 				}
@@ -227,22 +227,22 @@ void __fastcall hookedPaintTraverse( vgui::IPanel *thisPtr, int edx,  VPANEL vgu
 						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
 						iY = iRedYBase + (iRedPlayers * iRedYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
 					}
 					else if (playerInfo[i].team == TEAM_BLU) {
 						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
 						iY = iBluYBase + (iBluPlayers * iBluYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
 					}
 					
-					pSurface->DrawSetTexture(m_iTextureCritBoosted);
-					pSurface->DrawSetColor(255, 255, 255, 255);
-					pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+					g_pVGuiSurface->DrawSetTexture(m_iTextureCritBoosted);
+					g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+					g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
 					
 					iIcons++;
 				}
@@ -256,29 +256,29 @@ void __fastcall hookedPaintTraverse( vgui::IPanel *thisPtr, int edx,  VPANEL vgu
 						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
 						iY = iRedYBase + (iRedPlayers * iRedYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
-						pSurface->DrawSetTexture(m_iTextureResistShieldRed);
-						pSurface->DrawSetColor(255, 255, 255, 255);
-						pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-						pSurface->DrawSetTexture(m_iTextureBulletResistRed);
-						pSurface->DrawSetColor(255, 255, 255, 255);
-						pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+						g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldRed);
+						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+						g_pVGuiSurface->DrawSetTexture(m_iTextureBulletResistRed);
+						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
 					}
 					else if (playerInfo[i].team == TEAM_BLU) {
 						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
 						iY = iBluYBase + (iBluPlayers * iBluYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
-						pSurface->DrawSetTexture(m_iTextureResistShieldBlu);
-						pSurface->DrawSetColor(255, 255, 255, 255);
-						pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-						pSurface->DrawSetTexture(m_iTextureBulletResistBlu);
-						pSurface->DrawSetColor(255, 255, 255, 255);
-						pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+						g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldBlu);
+						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+						g_pVGuiSurface->DrawSetTexture(m_iTextureBulletResistBlu);
+						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
 					}
 					
 					iIcons++;
@@ -288,23 +288,23 @@ void __fastcall hookedPaintTraverse( vgui::IPanel *thisPtr, int edx,  VPANEL vgu
 						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
 						iY = iRedYBase + (iRedPlayers * iRedYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
-						pSurface->DrawSetTexture(m_iTextureBulletResistRed);
-						pSurface->DrawSetColor(255, 255, 255, 255);
-						pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+						g_pVGuiSurface->DrawSetTexture(m_iTextureBulletResistRed);
+						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
 					}
 					else if (playerInfo[i].team == TEAM_BLU) {
 						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
 						iY = iBluYBase + (iBluPlayers * iBluYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
-						pSurface->DrawSetTexture(m_iTextureBulletResistBlu);
-						pSurface->DrawSetColor(255, 255, 255, 255);
-						pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+						g_pVGuiSurface->DrawSetTexture(m_iTextureBulletResistBlu);
+						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
 					}
 					
 					iIcons++;
@@ -319,29 +319,29 @@ void __fastcall hookedPaintTraverse( vgui::IPanel *thisPtr, int edx,  VPANEL vgu
 						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
 						iY = iRedYBase + (iRedPlayers * iRedYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
-						pSurface->DrawSetTexture(m_iTextureResistShieldRed);
-						pSurface->DrawSetColor(255, 255, 255, 255);
-						pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-						pSurface->DrawSetTexture(m_iTextureBlastResistRed);
-						pSurface->DrawSetColor(255, 255, 255, 255);
-						pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+						g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldRed);
+						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+						g_pVGuiSurface->DrawSetTexture(m_iTextureBlastResistRed);
+						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
 					}
 					else if (playerInfo[i].team == TEAM_BLU) {
 						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
 						iY = iBluYBase + (iBluPlayers * iBluYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
-						pSurface->DrawSetTexture(m_iTextureResistShieldBlu);
-						pSurface->DrawSetColor(255, 255, 255, 255);
-						pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-						pSurface->DrawSetTexture(m_iTextureBlastResistBlu);
-						pSurface->DrawSetColor(255, 255, 255, 255);
-						pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+						g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldBlu);
+						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+						g_pVGuiSurface->DrawSetTexture(m_iTextureBlastResistBlu);
+						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
 					}
 					
 					iIcons++;
@@ -351,23 +351,23 @@ void __fastcall hookedPaintTraverse( vgui::IPanel *thisPtr, int edx,  VPANEL vgu
 						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
 						iY = iRedYBase + (iRedPlayers * iRedYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
-						pSurface->DrawSetTexture(m_iTextureBlastResistRed);
-						pSurface->DrawSetColor(255, 255, 255, 255);
-						pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+						g_pVGuiSurface->DrawSetTexture(m_iTextureBlastResistRed);
+						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
 					}
 					else if (playerInfo[i].team == TEAM_BLU) {
 						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
 						iY = iBluYBase + (iBluPlayers * iBluYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
-						pSurface->DrawSetTexture(m_iTextureBlastResistBlu);
-						pSurface->DrawSetColor(255, 255, 255, 255);
-						pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+						g_pVGuiSurface->DrawSetTexture(m_iTextureBlastResistBlu);
+						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
 					}
 					
 					iIcons++;
@@ -382,29 +382,29 @@ void __fastcall hookedPaintTraverse( vgui::IPanel *thisPtr, int edx,  VPANEL vgu
 						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
 						iY = iRedYBase + (iRedPlayers * iRedYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
-						pSurface->DrawSetTexture(m_iTextureResistShieldRed);
-						pSurface->DrawSetColor(255, 255, 255, 255);
-						pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-						pSurface->DrawSetTexture(m_iTextureFireResistRed);
-						pSurface->DrawSetColor(255, 255, 255, 255);
-						pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+						g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldRed);
+						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+						g_pVGuiSurface->DrawSetTexture(m_iTextureFireResistRed);
+						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
 					}
 					else if (playerInfo[i].team == TEAM_BLU) {
 						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
 						iY = iBluYBase + (iBluPlayers * iBluYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
-						pSurface->DrawSetTexture(m_iTextureResistShieldBlu);
-						pSurface->DrawSetColor(255, 255, 255, 255);
-						pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-						pSurface->DrawSetTexture(m_iTextureFireResistBlu);
-						pSurface->DrawSetColor(255, 255, 255, 255);
-						pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+						g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldBlu);
+						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+						g_pVGuiSurface->DrawSetTexture(m_iTextureFireResistBlu);
+						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
 					}
 					
 					iIcons++;
@@ -414,23 +414,23 @@ void __fastcall hookedPaintTraverse( vgui::IPanel *thisPtr, int edx,  VPANEL vgu
 						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
 						iY = iRedYBase + (iRedPlayers * iRedYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
-						pSurface->DrawSetTexture(m_iTextureFireResistRed);
-						pSurface->DrawSetColor(255, 255, 255, 255);
-						pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+						g_pVGuiSurface->DrawSetTexture(m_iTextureFireResistRed);
+						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
 					}
 					else if (playerInfo[i].team == TEAM_BLU) {
 						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
 						iY = iBluYBase + (iBluPlayers * iBluYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
-						pSurface->DrawSetTexture(m_iTextureFireResistBlu);
-						pSurface->DrawSetColor(255, 255, 255, 255);
-						pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+						g_pVGuiSurface->DrawSetTexture(m_iTextureFireResistBlu);
+						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
 					}
 					
 					iIcons++;
@@ -445,23 +445,23 @@ void __fastcall hookedPaintTraverse( vgui::IPanel *thisPtr, int edx,  VPANEL vgu
 						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
 						iY = iRedYBase + (iRedPlayers * iRedYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
-						pSurface->DrawSetTexture(m_iTextureBuffBannerRed);
+						g_pVGuiSurface->DrawSetTexture(m_iTextureBuffBannerRed);
 					}
 					else if (playerInfo[i].team == TEAM_BLU) {
 						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
 						iY = iBluYBase + (iBluPlayers * iBluYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
-						pSurface->DrawSetTexture(m_iTextureBuffBannerBlu);
+						g_pVGuiSurface->DrawSetTexture(m_iTextureBuffBannerBlu);
 					}
 					
-					pSurface->DrawSetColor(255, 255, 255, 255);
-					pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+					g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+					g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
 					
 					iIcons++;
 				}
@@ -475,23 +475,23 @@ void __fastcall hookedPaintTraverse( vgui::IPanel *thisPtr, int edx,  VPANEL vgu
 						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
 						iY = iRedYBase + (iRedPlayers * iRedYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
-						pSurface->DrawSetTexture(m_iTextureBattalionsBackupRed);
+						g_pVGuiSurface->DrawSetTexture(m_iTextureBattalionsBackupRed);
 					}
 					else if (playerInfo[i].team == TEAM_BLU) {
 						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
 						iY = iBluYBase + (iBluPlayers * iBluYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
-						pSurface->DrawSetTexture(m_iTextureBattalionsBackupBlu);
+						g_pVGuiSurface->DrawSetTexture(m_iTextureBattalionsBackupBlu);
 					}
 					
-					pSurface->DrawSetColor(255, 255, 255, 255);
-					pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+					g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+					g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
 					
 					iIcons++;
 				}
@@ -505,23 +505,23 @@ void __fastcall hookedPaintTraverse( vgui::IPanel *thisPtr, int edx,  VPANEL vgu
 						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
 						iY = iRedYBase + (iRedPlayers * iRedYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
-						pSurface->DrawSetTexture(m_iTextureConcherorRed);
+						g_pVGuiSurface->DrawSetTexture(m_iTextureConcherorRed);
 					}
 					else if (playerInfo[i].team == TEAM_BLU) {
 						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
 						iY = iBluYBase + (iBluPlayers * iBluYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
-						pSurface->DrawSetTexture(m_iTextureConcherorBlu);
+						g_pVGuiSurface->DrawSetTexture(m_iTextureConcherorBlu);
 					}
 					
-					pSurface->DrawSetColor(255, 255, 255, 255);
-					pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+					g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+					g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
 					
 					iIcons++;
 				}
@@ -535,22 +535,22 @@ void __fastcall hookedPaintTraverse( vgui::IPanel *thisPtr, int edx,  VPANEL vgu
 						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
 						iY = iRedYBase + (iRedPlayers * iRedYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
 					}
 					else if (playerInfo[i].team == TEAM_BLU) {
 						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
 						iY = iBluYBase + (iBluPlayers * iBluYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
 					}
 					
-					pSurface->DrawSetTexture(m_iTextureJarated);
-					pSurface->DrawSetColor(255, 255, 255, 255);
-					pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+					g_pVGuiSurface->DrawSetTexture(m_iTextureJarated);
+					g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+					g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
 					
 					iIcons++;
 				}
@@ -564,22 +564,22 @@ void __fastcall hookedPaintTraverse( vgui::IPanel *thisPtr, int edx,  VPANEL vgu
 						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
 						iY = iRedYBase + (iRedPlayers * iRedYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
 					}
 					else if (playerInfo[i].team == TEAM_BLU) {
 						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
 						iY = iBluYBase + (iBluPlayers * iBluYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
 					}
 					
-					pSurface->DrawSetTexture(m_iTextureMilked);
-					pSurface->DrawSetColor(255, 255, 255, 255);
-					pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+					g_pVGuiSurface->DrawSetTexture(m_iTextureMilked);
+					g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+					g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
 					
 					iIcons++;
 				}
@@ -593,22 +593,22 @@ void __fastcall hookedPaintTraverse( vgui::IPanel *thisPtr, int edx,  VPANEL vgu
 						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
 						iY = iRedYBase + (iRedPlayers * iRedYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
 					}
 					else if (playerInfo[i].team == TEAM_BLU) {
 						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
 						iY = iBluYBase + (iBluPlayers * iBluYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
 					}
 					
-					pSurface->DrawSetTexture(m_iTextureMarkedForDeath);
-					pSurface->DrawSetColor(255, 255, 255, 255);
-					pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+					g_pVGuiSurface->DrawSetTexture(m_iTextureMarkedForDeath);
+					g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+					g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
 					
 					iIcons++;
 				}
@@ -622,22 +622,22 @@ void __fastcall hookedPaintTraverse( vgui::IPanel *thisPtr, int edx,  VPANEL vgu
 						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
 						iY = iRedYBase + (iRedPlayers * iRedYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
 					}
 					else if (playerInfo[i].team == TEAM_BLU) {
 						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
 						iY = iBluYBase + (iBluPlayers * iBluYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
 					}
 					
-					pSurface->DrawSetTexture(m_iTextureBleeding);
-					pSurface->DrawSetColor(255, 255, 255, 255);
-					pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+					g_pVGuiSurface->DrawSetTexture(m_iTextureBleeding);
+					g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+					g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
 					
 					iIcons++;
 				}
@@ -651,22 +651,22 @@ void __fastcall hookedPaintTraverse( vgui::IPanel *thisPtr, int edx,  VPANEL vgu
 						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
 						iY = iRedYBase + (iRedPlayers * iRedYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
 					}
 					else if (playerInfo[i].team == TEAM_BLU) {
 						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
 						iY = iBluYBase + (iBluPlayers * iBluYDelta);
 						if (bDynamic) {
-							pSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							pSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
+							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
+							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
 						}
 					}
 					
-					pSurface->DrawSetTexture(m_iTextureOnFire);
-					pSurface->DrawSetColor(255, 255, 255, 255);
-					pSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
+					g_pVGuiSurface->DrawSetTexture(m_iTextureOnFire);
+					g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+					g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
 					
 					iIcons++;
 				}
@@ -696,83 +696,78 @@ bool StatusSpecPlugin::Load( CreateInterfaceFn interfaceFactory, CreateInterface
 	ConnectTier1Libraries( &interfaceFactory, 1 );
 	ConnectTier2Libraries( &interfaceFactory, 1 );
 	ConnectTier3Libraries( &interfaceFactory, 1 );
-
+	
 	void* hmClient = GetHandleOfModule("client");
-	CreateInterfaceFn pfnClient = (CreateInterfaceFn) GetFuncAddress(hmClient, "CreateInterface");
-	pClient     = (IBaseClientDLL*)    pfnClient("VClient017", NULL);
-	pEntityList = (IClientEntityList*) pfnClient("VClientEntityList003", NULL);
-
-	void* hmEngine = GetHandleOfModule("engine");
-	CreateInterfaceFn pfnEngine = (CreateInterfaceFn) GetFuncAddress(hmEngine, "CreateInterface");
-	pEngineClient = (IVEngineClient*) pfnEngine("VEngineClient013", NULL);
-
-	void* hmVGUI2          = GetHandleOfModule("vgui2");
-	void* hmVGUIMatSurface = GetHandleOfModule("vguimatsurface");
-	CreateInterfaceFn pfnVGUI2          = (CreateInterfaceFn) GetFuncAddress(hmVGUI2, "CreateInterface");
-	CreateInterfaceFn pfnVGUIMatSurface = (CreateInterfaceFn) GetFuncAddress(hmVGUIMatSurface, "CreateInterface");
-
-	pPanel   = (vgui::IPanel*)   pfnVGUI2("VGUI_Panel009", NULL);
-	pScheme  = (vgui::ISchemeManager*) pfnVGUI2("VGUI_Scheme010", NULL);
-	pSurface = (vgui::ISurface*) pfnVGUIMatSurface("VGUI_Surface030", NULL);
-
+	CreateInterfaceFn clientFactory = (CreateInterfaceFn) GetFuncAddress(hmClient, "CreateInterface");
+	pClient     = (IBaseClientDLL*) clientFactory(CLIENT_DLL_INTERFACE_VERSION, NULL);
+	pEntityList = (IClientEntityList*) clientFactory(VCLIENTENTITYLIST_INTERFACE_VERSION, NULL);
+	
+	pEngineClient = (IVEngineClient*) interfaceFactory(VENGINE_CLIENT_INTERFACE_VERSION, NULL);
+	
+	if (!(pClient && pEntityList && pEngineClient && g_pVGuiPanel && g_pVGuiSchemeManager && g_pVGuiSurface))
+	{
+		Warning("Unable to load required libraries for %s!", PLUGIN_DESC);
+		return false;
+	}
+	
 	m_font = 0;
 	
-	m_iTextureUbercharged = pSurface->CreateNewTextureID();
-	m_iTextureCritBoosted = pSurface->CreateNewTextureID();
-	m_iTextureResistShieldRed = pSurface->CreateNewTextureID();
-	m_iTextureResistShieldBlu = pSurface->CreateNewTextureID();
-	m_iTextureBulletResistRed = pSurface->CreateNewTextureID();
-	m_iTextureBlastResistRed = pSurface->CreateNewTextureID();
-	m_iTextureFireResistRed = pSurface->CreateNewTextureID();
-	m_iTextureBulletResistBlu = pSurface->CreateNewTextureID();
-	m_iTextureBlastResistBlu = pSurface->CreateNewTextureID();
-	m_iTextureFireResistBlu = pSurface->CreateNewTextureID();
-	m_iTextureBuffBannerRed = pSurface->CreateNewTextureID();
-	m_iTextureBuffBannerBlu = pSurface->CreateNewTextureID();
-	m_iTextureBattalionsBackupRed = pSurface->CreateNewTextureID();
-	m_iTextureBattalionsBackupBlu = pSurface->CreateNewTextureID();
-	m_iTextureConcherorRed = pSurface->CreateNewTextureID();
-	m_iTextureConcherorBlu = pSurface->CreateNewTextureID();
-	m_iTextureJarated = pSurface->CreateNewTextureID();
-	m_iTextureMilked = pSurface->CreateNewTextureID();
-	m_iTextureMarkedForDeath = pSurface->CreateNewTextureID();
-	m_iTextureBleeding = pSurface->CreateNewTextureID();
-	m_iTextureOnFire = pSurface->CreateNewTextureID();
+	m_iTextureUbercharged = g_pVGuiSurface->CreateNewTextureID();
+	m_iTextureCritBoosted = g_pVGuiSurface->CreateNewTextureID();
+	m_iTextureResistShieldRed = g_pVGuiSurface->CreateNewTextureID();
+	m_iTextureResistShieldBlu = g_pVGuiSurface->CreateNewTextureID();
+	m_iTextureBulletResistRed = g_pVGuiSurface->CreateNewTextureID();
+	m_iTextureBlastResistRed = g_pVGuiSurface->CreateNewTextureID();
+	m_iTextureFireResistRed = g_pVGuiSurface->CreateNewTextureID();
+	m_iTextureBulletResistBlu = g_pVGuiSurface->CreateNewTextureID();
+	m_iTextureBlastResistBlu = g_pVGuiSurface->CreateNewTextureID();
+	m_iTextureFireResistBlu = g_pVGuiSurface->CreateNewTextureID();
+	m_iTextureBuffBannerRed = g_pVGuiSurface->CreateNewTextureID();
+	m_iTextureBuffBannerBlu = g_pVGuiSurface->CreateNewTextureID();
+	m_iTextureBattalionsBackupRed = g_pVGuiSurface->CreateNewTextureID();
+	m_iTextureBattalionsBackupBlu = g_pVGuiSurface->CreateNewTextureID();
+	m_iTextureConcherorRed = g_pVGuiSurface->CreateNewTextureID();
+	m_iTextureConcherorBlu = g_pVGuiSurface->CreateNewTextureID();
+	m_iTextureJarated = g_pVGuiSurface->CreateNewTextureID();
+	m_iTextureMilked = g_pVGuiSurface->CreateNewTextureID();
+	m_iTextureMarkedForDeath = g_pVGuiSurface->CreateNewTextureID();
+	m_iTextureBleeding = g_pVGuiSurface->CreateNewTextureID();
+	m_iTextureOnFire = g_pVGuiSurface->CreateNewTextureID();
 	
-	pSurface->DrawSetTextureFile(m_iTextureUbercharged, TEXTURE_UBERCHARGEICON, 0, false);
-	pSurface->DrawSetTextureFile(m_iTextureCritBoosted, TEXTURE_CRITBOOSTICON, 0, false);
-	pSurface->DrawSetTextureFile(m_iTextureResistShieldRed, TEXTURE_RESISTSHIELDRED, 0, false);
-	pSurface->DrawSetTextureFile(m_iTextureResistShieldBlu, TEXTURE_RESISTSHIELDBLU, 0, false);
-	pSurface->DrawSetTextureFile(m_iTextureBulletResistRed, TEXTURE_BULLETRESISTRED, 0, false);
-	pSurface->DrawSetTextureFile(m_iTextureBlastResistRed, TEXTURE_BLASTRESISTRED, 0, false);
-	pSurface->DrawSetTextureFile(m_iTextureFireResistRed, TEXTURE_FIRERESISTRED, 0, false);
-	pSurface->DrawSetTextureFile(m_iTextureBulletResistBlu, TEXTURE_BULLETRESISTBLU, 0, false);
-	pSurface->DrawSetTextureFile(m_iTextureBlastResistBlu, TEXTURE_BLASTRESISTBLU, 0, false);
-	pSurface->DrawSetTextureFile(m_iTextureFireResistBlu, TEXTURE_FIRERESISTBLU, 0, false);
-	pSurface->DrawSetTextureFile(m_iTextureBuffBannerRed, TEXTURE_BUFFBANNERRED, 0, false);
-	pSurface->DrawSetTextureFile(m_iTextureBuffBannerBlu, TEXTURE_BUFFBANNERBLU, 0, false);
-	pSurface->DrawSetTextureFile(m_iTextureBattalionsBackupRed, TEXTURE_BATTALIONSBACKUPRED, 0, false);
-	pSurface->DrawSetTextureFile(m_iTextureBattalionsBackupBlu, TEXTURE_BATTALIONSBACKUPBLU, 0, false);
-	pSurface->DrawSetTextureFile(m_iTextureConcherorRed, TEXTURE_CONCHERORRED, 0, false);
-	pSurface->DrawSetTextureFile(m_iTextureConcherorBlu, TEXTURE_CONCHERORBLU, 0, false);
-	pSurface->DrawSetTextureFile(m_iTextureJarated, TEXTURE_JARATE, 0, false);
-	pSurface->DrawSetTextureFile(m_iTextureMilked, TEXTURE_MADMILK, 0, false);
-	pSurface->DrawSetTextureFile(m_iTextureMarkedForDeath, TEXTURE_MARKEDFORDEATH, 0, false);
-	pSurface->DrawSetTextureFile(m_iTextureBleeding, TEXTURE_BLEEDING, 0, false);
-	pSurface->DrawSetTextureFile(m_iTextureOnFire, TEXTURE_ONFIRE, 0, false);
-
-	//Hook PaintTraverse
+	g_pVGuiSurface->DrawSetTextureFile(m_iTextureUbercharged, TEXTURE_UBERCHARGEICON, 0, false);
+	g_pVGuiSurface->DrawSetTextureFile(m_iTextureCritBoosted, TEXTURE_CRITBOOSTICON, 0, false);
+	g_pVGuiSurface->DrawSetTextureFile(m_iTextureResistShieldRed, TEXTURE_RESISTSHIELDRED, 0, false);
+	g_pVGuiSurface->DrawSetTextureFile(m_iTextureResistShieldBlu, TEXTURE_RESISTSHIELDBLU, 0, false);
+	g_pVGuiSurface->DrawSetTextureFile(m_iTextureBulletResistRed, TEXTURE_BULLETRESISTRED, 0, false);
+	g_pVGuiSurface->DrawSetTextureFile(m_iTextureBlastResistRed, TEXTURE_BLASTRESISTRED, 0, false);
+	g_pVGuiSurface->DrawSetTextureFile(m_iTextureFireResistRed, TEXTURE_FIRERESISTRED, 0, false);
+	g_pVGuiSurface->DrawSetTextureFile(m_iTextureBulletResistBlu, TEXTURE_BULLETRESISTBLU, 0, false);
+	g_pVGuiSurface->DrawSetTextureFile(m_iTextureBlastResistBlu, TEXTURE_BLASTRESISTBLU, 0, false);
+	g_pVGuiSurface->DrawSetTextureFile(m_iTextureFireResistBlu, TEXTURE_FIRERESISTBLU, 0, false);
+	g_pVGuiSurface->DrawSetTextureFile(m_iTextureBuffBannerRed, TEXTURE_BUFFBANNERRED, 0, false);
+	g_pVGuiSurface->DrawSetTextureFile(m_iTextureBuffBannerBlu, TEXTURE_BUFFBANNERBLU, 0, false);
+	g_pVGuiSurface->DrawSetTextureFile(m_iTextureBattalionsBackupRed, TEXTURE_BATTALIONSBACKUPRED, 0, false);
+	g_pVGuiSurface->DrawSetTextureFile(m_iTextureBattalionsBackupBlu, TEXTURE_BATTALIONSBACKUPBLU, 0, false);
+	g_pVGuiSurface->DrawSetTextureFile(m_iTextureConcherorRed, TEXTURE_CONCHERORRED, 0, false);
+	g_pVGuiSurface->DrawSetTextureFile(m_iTextureConcherorBlu, TEXTURE_CONCHERORBLU, 0, false);
+	g_pVGuiSurface->DrawSetTextureFile(m_iTextureJarated, TEXTURE_JARATE, 0, false);
+	g_pVGuiSurface->DrawSetTextureFile(m_iTextureMilked, TEXTURE_MADMILK, 0, false);
+	g_pVGuiSurface->DrawSetTextureFile(m_iTextureMarkedForDeath, TEXTURE_MARKEDFORDEATH, 0, false);
+	g_pVGuiSurface->DrawSetTextureFile(m_iTextureBleeding, TEXTURE_BLEEDING, 0, false);
+	g_pVGuiSurface->DrawSetTextureFile(m_iTextureOnFire, TEXTURE_ONFIRE, 0, false);
+	
+	// hook PaintTraverse
 	origPaintTraverse = (void (__fastcall *)(void *, int, VPANEL, bool, bool))
-	HookVFunc(*(DWORD**)pPanel, Index_PaintTraverse, (DWORD*) &hookedPaintTraverse);
-
-	// Get offsets
+	HookVFunc(*(DWORD**)g_pVGuiPanel, Index_PaintTraverse, (DWORD*) &hookedPaintTraverse);
+	
+	// get offsets
 	WSOffsets::PrepareOffsets();
-
-	//Everything seems ok!
-	Msg("%s loaded!\n", PLUGIN_DESC);
-
-	//Register cvars
+	
+	// register CVars
 	ConVar_Register( 0 );
+	
+	// ready to go
+	Msg("%s loaded!\n", PLUGIN_DESC);
 	return true;
 }
 
