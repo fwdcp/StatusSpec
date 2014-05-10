@@ -1,0 +1,4 @@
+$Project "statusspec"
+{
+	"utils\StatusSpec\statusspec.vpc" [$WIN32||$POSIX]
+}

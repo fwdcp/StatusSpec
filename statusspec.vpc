@@ -1,0 +1,48 @@
+//-----------------------------------------------------------------------------
+//	statusspec.vpc
+//
+//	Project Script
+//-----------------------------------------------------------------------------
+
+$Macro SRCDIR		"../.."
+$Macro OUTBINDIR	"./addons"
+
+$Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
+
+$Configuration
+{
+	$Compiler
+	{
+		$AdditionalIncludeDirectories		"$BASE,$SRCDIR\game\client,$SRCDIR\game\shared,$SRCDIR\public"
+		$PreprocessorDefinitions			"$BASE;statusspecONLY;_MBCS"
+	}
+
+	$Linker
+	{
+		$AdditionalDependencies				"$BASE odbc32.lib odbccp32.lib"
+	}
+}
+
+$Project "StatusSpec"
+{
+	$Folder	"Source Files"
+	{
+		$File	"src\statusspec.cpp"
+		$File	"src\offsets.cpp"
+		$File	"src\vfuncs.cpp"
+	}
+	
+	$Folder	"Header Files"
+	{
+		$File	"src\statusspec.h"
+		$File	"src\offsets.h"
+		$File	"src\vfuncs.h"
+	}
+	
+	$Folder	"Link Libraries"
+	{
+		$Lib tier1
+		$Lib tier2
+		$Lib tier3
+	}
+}
