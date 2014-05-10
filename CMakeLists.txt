@@ -84,17 +84,17 @@ if(UNIX) # Common Unix settings
 		set(LINKER_FLAGS "${CFLAGS} ${GCC_ExtraLinkerFlags} ${OptimizerLevel} -Wl,--build-id -shared -Wl,--no-undefined -Wl,-Map,$(@:.so=).map -static-libgcc -Wl,--start-group -Wl,--end-group -lm -ldl -lpthread -l:ld-linux.so.2")
 	endif()
 else() # Windows
-	# Force use of static libs
+	# Force use of dynamic libs
 	# Credit SteveL & brofield on StackOverflow
 	foreach(flag_var CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINOFO)
-		string(REGEX REPLACE "/MT" "/MD" ${flag_var} "${${flag_var}}")
+		string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
 	endforeach()
 	
 	add_definitions(/D_CRT_SECURE_NO_DEPRECATE /D_CRT_SECURE_NO_WARNINGS /D_CRT_NONSTDC_NO_DEPRECATE)
 	set(COMPILER_FLAGS "/EHsc /DR- /W3 /nologo /Zi /TP")
 	set(LINKER_FLAGS "/MACHINE:X86 /subsystem:windows /NODEFAULTLIB:libc /NODEFAULTLIB:libcd")
-	set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:libcmt")
-	set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /NODEFAULTLIB:libcmt")
+	set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:libcmtd")
+	set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /NODEFAULTLIB:libcmtd")
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILER_FLAGS}")
