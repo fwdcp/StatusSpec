@@ -694,6 +694,8 @@ StatusSpecPlugin::~StatusSpecPlugin()
 bool StatusSpecPlugin::Load( CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory )
 {
 	ConnectTier1Libraries( &interfaceFactory, 1 );
+	ConnectTier2Libraries( &interfaceFactory, 1 );
+	ConnectTier3Libraries( &interfaceFactory, 1 );
 
 	void* hmClient = GetHandleOfModule("client");
 	CreateInterfaceFn pfnClient = (CreateInterfaceFn) GetFuncAddress(hmClient, "CreateInterface");
@@ -777,6 +779,8 @@ bool StatusSpecPlugin::Load( CreateInterfaceFn interfaceFactory, CreateInterface
 void StatusSpecPlugin::Unload( void )
 {
 	ConVar_Unregister( );
+	DisconnectTier3Libraries();
+	DisconnectTier2Libraries();
 	DisconnectTier1Libraries();
 }
 

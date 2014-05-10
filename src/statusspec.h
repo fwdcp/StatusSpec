@@ -15,7 +15,7 @@
 
 #include "stdafx.h"
 
-#include "tier1/tier1.h"
+#include "tier3/tier3.h"
 #include "engine/iserverplugin.h"
 #include "igameevents.h"
 
