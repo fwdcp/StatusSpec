@@ -15,7 +15,4 @@ Building
 -  
 **Windows**  
 `cmake -DHL2SDK=c:\path\to\source-sdk-2013\mp\src -G "Visual Studio 10" ..`  
-Then open in Visual Studio/C++ Express and build. Note the `\mp\src` in the SDK path!  
-  
-Open advspec properties, then in `Linker -> Input -> Ignore Specific Default Libraries`, change `libcmt`, to `libcmtd`  
-Do this for Debug and Release.
+Then open in Visual Studio/C++ Express and build. Note the `\mp\src` in the SDK path!
