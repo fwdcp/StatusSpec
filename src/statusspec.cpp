@@ -780,24 +780,24 @@ void StatusSpecPlugin::Unload( void )
 }
 
 void StatusSpecPlugin::FireGameEvent( KeyValues * event ) {}
-void StatusSpecPlugin::Pause( void ){}
-void StatusSpecPlugin::UnPause( void ){}
-const char *StatusSpecPlugin::GetPluginDescription( void ){return PLUGIN_DESC;}
-void StatusSpecPlugin::LevelInit( char const *pMapName ){}
-void StatusSpecPlugin::ServerActivate( edict_t *pEdictList, int edictCount, int clientMax ){}
-void StatusSpecPlugin::GameFrame( bool simulating ){}
-void StatusSpecPlugin::LevelShutdown( void ){}
-void StatusSpecPlugin::ClientActive( edict_t *pEntity ){}
-void StatusSpecPlugin::ClientDisconnect( edict_t *pEntity ){}
-void StatusSpecPlugin::ClientPutInServer( edict_t *pEntity, char const *playername ){}
-void StatusSpecPlugin::SetCommandClient( int index ){}
-void StatusSpecPlugin::ClientSettingsChanged( edict_t *pEdict ){}
-PLUGIN_RESULT StatusSpecPlugin::ClientConnect( bool *bAllowConnect, edict_t *pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen ){return PLUGIN_CONTINUE;}
-PLUGIN_RESULT StatusSpecPlugin::ClientCommand( edict_t *pEntity, const CCommand &args ){return PLUGIN_CONTINUE;}
-PLUGIN_RESULT StatusSpecPlugin::NetworkIDValidated( const char *pszUserName, const char *pszNetworkID ){return PLUGIN_CONTINUE;}
-void StatusSpecPlugin::OnQueryCvarValueFinished( QueryCvarCookie_t iCookie, edict_t *pPlayerEntity, EQueryCvarValueStatus eStatus, const char *pCvarName, const char *pCvarValue ){}
-void StatusSpecPlugin::OnEdictAllocated( edict_t *edict ){}
-void StatusSpecPlugin::OnEdictFreed( const edict_t *edict ){}
+void StatusSpecPlugin::Pause( void ) {}
+void StatusSpecPlugin::UnPause( void ) {}
+const char *StatusSpecPlugin::GetPluginDescription( void ) { return PLUGIN_DESC; }
+void StatusSpecPlugin::LevelInit( char const *pMapName ) {}
+void StatusSpecPlugin::ServerActivate( edict_t *pEdictList, int edictCount, int clientMax ) {}
+void StatusSpecPlugin::GameFrame( bool simulating ) {}
+void StatusSpecPlugin::LevelShutdown( void ) {}
+void StatusSpecPlugin::ClientActive( edict_t *pEntity ) {}
+void StatusSpecPlugin::ClientDisconnect( edict_t *pEntity ) {}
+void StatusSpecPlugin::ClientPutInServer( edict_t *pEntity, char const *playername ) {}
+void StatusSpecPlugin::SetCommandClient( int index ) {}
+void StatusSpecPlugin::ClientSettingsChanged( edict_t *pEdict ) {}
+PLUGIN_RESULT StatusSpecPlugin::ClientConnect( bool *bAllowConnect, edict_t *pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen ) { return PLUGIN_CONTINUE; }
+PLUGIN_RESULT StatusSpecPlugin::ClientCommand( edict_t *pEntity, const CCommand &args ) { return PLUGIN_CONTINUE; }
+PLUGIN_RESULT StatusSpecPlugin::NetworkIDValidated( const char *pszUserName, const char *pszNetworkID ) { return PLUGIN_CONTINUE; }
+void StatusSpecPlugin::OnQueryCvarValueFinished( QueryCvarCookie_t iCookie, edict_t *pPlayerEntity, EQueryCvarValueStatus eStatus, const char *pCvarName, const char *pCvarValue ) {}
+void StatusSpecPlugin::OnEdictAllocated( edict_t *edict ) {}
+void StatusSpecPlugin::OnEdictFreed( const edict_t *edict ) {}
 
 static void icons_enabled_change(IConVar *var, const char *pOldValue, float flOldValue) {
 	UpdateEntities();
