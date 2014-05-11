@@ -44,6 +44,7 @@ IGameResources* GetGameResources() {
 }
 
 static void icons_enabled_change(IConVar *var, const char *pOldValue, float flOldValue);
+ConVar force_refresh_specgui("statusspec_force_refresh_specgui", "0", 0, "whether to force the specgui to refresh");
 ConVar icons_enabled("statusspec_icons_enabled", "0", 0, "enable status icons", icons_enabled_change);
 ConVar icons_dynamic("statusspec_icons_bg_dynamic", "1", 0, "dynamically move the background color with the icons");
 ConVar icons_size("statusspec_icons_size", "15", 0, "square size of status icons");
@@ -133,7 +134,14 @@ void __fastcall hookedPaintTraverse( vgui::IPanel *thisPtr, int edx,  VPANEL vgu
 		return;
 	
 	const char* panelName = g_pVGuiPanel->GetName(vguiPanel);
-	if (panelName[0] == 'M' && panelName[3] == 'S' && panelName[9] == 'T' && panelName[12] == 'P') {
+	if (strcmp(panelName, "specgui") == 0) {
+		specguiPanel = g_pVGui->PanelToHandle(vguiPanel);
+	}
+	else if (panelName[0] == 'M' && panelName[3] == 'S' && panelName[9] == 'T' && panelName[12] == 'P') {
+		if (force_refresh_specgui.GetBool() && specguiPanel) {
+			g_pVGuiPanel->SendMessage(g_pVGui->HandleToPanel(specguiPanel), performlayoutCommand, g_pVGui->HandleToPanel(specguiPanel));
+		}
+		
 		if (icons_enabled.GetBool()) {
 			bool bDynamic = icons_dynamic.GetBool();
 			int iSize = g_pVGuiSchemeManager->GetProportionalScaledValue(icons_size.GetInt());
@@ -704,13 +712,11 @@ bool StatusSpecPlugin::Load( CreateInterfaceFn interfaceFactory, CreateInterface
 	
 	pEngineClient = (IVEngineClient*) interfaceFactory(VENGINE_CLIENT_INTERFACE_VERSION, NULL);
 	
-	if (!(pClient && pEntityList && pEngineClient && g_pVGuiPanel && g_pVGuiSchemeManager && g_pVGuiSurface))
+	if (!(pClient && pEntityList && pEngineClient && g_pVGuiPanel && g_pVGuiSchemeManager && g_pVGuiSurface && g_pVGui))
 	{
 		Warning("Unable to load required libraries for %s!", PLUGIN_DESC);
 		return false;
 	}
-	
-	m_font = 0;
 	
 	m_iTextureUbercharged = g_pVGuiSurface->CreateNewTextureID();
 	m_iTextureCritBoosted = g_pVGuiSurface->CreateNewTextureID();
@@ -755,6 +761,8 @@ bool StatusSpecPlugin::Load( CreateInterfaceFn interfaceFactory, CreateInterface
 	g_pVGuiSurface->DrawSetTextureFile(m_iTextureMarkedForDeath, TEXTURE_MARKEDFORDEATH, 0, false);
 	g_pVGuiSurface->DrawSetTextureFile(m_iTextureBleeding, TEXTURE_BLEEDING, 0, false);
 	g_pVGuiSurface->DrawSetTextureFile(m_iTextureOnFire, TEXTURE_ONFIRE, 0, false);
+	
+	performlayoutCommand = new KeyValues("Command", "Command", "performlayout");
 	
 	// hook PaintTraverse
 	origPaintTraverse = (void (__fastcall *)(void *, int, VPANEL, bool, bool))
