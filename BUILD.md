@@ -1,9 +1,9 @@
-Building AdvSpec plugin
-==============================
+Building StatusSpec plugin
+==========================
 
 Notice
 ------
-AdvSpec is not yet available for Linux & OS X.
+StatusSpec is not yet available for Linux & OS X.
 
 Requirements
 ------------
