@@ -18,10 +18,12 @@
 #include "tier3/tier3.h"
 #include "engine/iserverplugin.h"
 #include "igameevents.h"
+#include "icvar.h"
+#include "filesystem.h"
+#include "KeyValues.h"
 
 #include "offsets.h"
 #include "vfuncs.h"
-#include "icvar.h"
 
 #define PLUGIN_DESC "StatusSpec v0.4"
 #define SHORT_DESC "StatusSpec v0.4"
@@ -164,12 +166,6 @@ IClientEntityList* pEntityList;
 
 // engine.dll
 IVEngineClient *pEngineClient;
-
-// vgui2.dll
-vgui::IPanel* pPanel;
-vgui::ISurface* pSurface;
-vgui::ISchemeManager* pScheme;
-vgui::HFont m_font;
 
 int m_iTextureUbercharged;
 int m_iTextureCritBoosted;
