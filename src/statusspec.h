@@ -19,7 +19,6 @@
 #include "engine/iserverplugin.h"
 #include "igameevents.h"
 #include "icvar.h"
-#include "filesystem.h"
 #include "KeyValues.h"
 
 #include "offsets.h"
