@@ -24,8 +24,8 @@
 #include "offsets.h"
 #include "vfuncs.h"
 
-#define PLUGIN_DESC "StatusSpec v0.4"
-#define SHORT_DESC "StatusSpec v0.4"
+#define PLUGIN_DESC "StatusSpec v0.5"
+#define SHORT_DESC "StatusSpec v0.5"
 
 #define SCALED(normalValue) pScheme->GetProportionalScaledValue(normalValue)
 
