@@ -8,6 +8,9 @@ a client plugin that shows certain player statuses via icons next to a tournamen
 Changelog
 ---------
 
+**0.5.0**
+* added option to force refreshing of spectator GUI (partially to fully fixes post-pause issues, YMMV)
+
 **0.4.0**
 * added option (enabled by default) to have icon backgrounds adjust with icons rather than be static
 
@@ -27,6 +30,7 @@ Usage
 This plugin is not signed, and therefore will not load unless TF2 is loaded with the "-insecure" flag.
 
 ### CVars
+* **statusspec_force_refresh_specgui** - whether to force the specgui to refresh
 * **statusspec_icons_enabled** - enable status icons
 * **statusspec_icons_bg_dynamic** - dynamically move the background color with the icons
 * **statusspec_icons_size** - square size of status icons
