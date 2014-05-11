@@ -12,18 +12,10 @@
 #include "offsets.h"
 
 int WSOffsets::pCTFPlayer__m_iTeamNum = 0;
-int WSOffsets::pCTFPlayer__m_iClass = 0;
 int WSOffsets::pCTFPlayer__m_nPlayerCond = 0;
 int WSOffsets::pCTFPlayer___condition_bits = 0;
 int WSOffsets::pCTFPlayer__m_nPlayerCondEx = 0;
 int WSOffsets::pCTFPlayer__m_nPlayerCondEx2 = 0;
-int WSOffsets::pCTFPlayer__m_hMyWeapons__0 = 0;
-int WSOffsets::pCTFPlayer__m_hMyWeapons__1 = 0;
-int WSOffsets::pCTFPlayer__m_hMyWeapons__2 = 0;
-int WSOffsets::pCTFPlayer__m_hMyWeapons__3 = 0;
-int WSOffsets::pCTFPlayer__m_hMyWeapons__4 = 0;
-int WSOffsets::pCTFPlayer__m_hMyWeapons__5 = 0;
-int WSOffsets::pCBaseCombatWeapon__m_iItemDefinitionIndex = 0;
 
 //=================================================================================
 // Find the offsets for all stored NetVars
@@ -31,18 +23,10 @@ int WSOffsets::pCBaseCombatWeapon__m_iItemDefinitionIndex = 0;
 //=================================================================================
 void WSOffsets::PrepareOffsets() {
 	WSOffsets::pCTFPlayer__m_iTeamNum = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "m_iTeamNum");
-	WSOffsets::pCTFPlayer__m_iClass = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "m_iClass");
 	WSOffsets::pCTFPlayer__m_nPlayerCond = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCond");
 	WSOffsets::pCTFPlayer___condition_bits = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "_condition_bits");
 	WSOffsets::pCTFPlayer__m_nPlayerCondEx = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCondEx");
 	WSOffsets::pCTFPlayer__m_nPlayerCondEx2 = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCondEx2");
-	WSOffsets::pCTFPlayer__m_hMyWeapons__0 = WSOffsets::FindOffsetOfArrayEnt("CTFPlayer", "m_hMyWeapons", 0);
-	WSOffsets::pCTFPlayer__m_hMyWeapons__1 = WSOffsets::FindOffsetOfArrayEnt("CTFPlayer", "m_hMyWeapons", 1);
-	WSOffsets::pCTFPlayer__m_hMyWeapons__2 = WSOffsets::FindOffsetOfArrayEnt("CTFPlayer", "m_hMyWeapons", 2);
-	WSOffsets::pCTFPlayer__m_hMyWeapons__3 = WSOffsets::FindOffsetOfArrayEnt("CTFPlayer", "m_hMyWeapons", 3);
-	WSOffsets::pCTFPlayer__m_hMyWeapons__4 = WSOffsets::FindOffsetOfArrayEnt("CTFPlayer", "m_hMyWeapons", 4);
-	WSOffsets::pCTFPlayer__m_hMyWeapons__5 = WSOffsets::FindOffsetOfArrayEnt("CTFPlayer", "m_hMyWeapons", 5);
-	WSOffsets::pCBaseCombatWeapon__m_iItemDefinitionIndex = WSOffsets::FindOffsetOfClassProp("CBaseCombatWeapon", "m_iItemDefinitionIndex");
 }
 
 //=================================================================================

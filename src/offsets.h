@@ -20,18 +20,10 @@ extern IBaseClientDLL *pClient;
 class WSOffsets {
 public:
 	static int pCTFPlayer__m_iTeamNum;
-	static int pCTFPlayer__m_iClass;
 	static int pCTFPlayer__m_nPlayerCond;
 	static int pCTFPlayer___condition_bits;
 	static int pCTFPlayer__m_nPlayerCondEx;
 	static int pCTFPlayer__m_nPlayerCondEx2;
-	static int pCTFPlayer__m_hMyWeapons__0;
-	static int pCTFPlayer__m_hMyWeapons__1;
-	static int pCTFPlayer__m_hMyWeapons__2;
-	static int pCTFPlayer__m_hMyWeapons__3;
-	static int pCTFPlayer__m_hMyWeapons__4;
-	static int pCTFPlayer__m_hMyWeapons__5;
-	static int pCBaseCombatWeapon__m_iItemDefinitionIndex;
 
 	static void PrepareOffsets();
 	static int FindOffsetOfClassProp(const char *className, const char *propName);
