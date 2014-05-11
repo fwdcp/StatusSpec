@@ -10,37 +10,38 @@
 
 #include "statusspec.h"
 
-inline bool DataCompare( const BYTE* pData, const BYTE* bSig, const char* szMask )
+inline bool DataCompare(const BYTE* pData, const BYTE* bSig, const char* szMask)
 {
-    for( ; *szMask; ++szMask, ++pData, ++bSig)
-    {
-        if( *szMask == 'x' && *pData != *bSig)
-            return false;
-    }
+	for (; *szMask; ++szMask, ++pData, ++bSig)
+	{
+		if (*szMask == 'x' && *pData != *bSig)
+			return false;
+	}
 	
-    return ( *szMask ) == NULL;
+	return (*szMask) == NULL;
 }
 
 // Finds a pattern at the specified address
-inline DWORD FindPattern ( DWORD dwAddress, DWORD dwSize, BYTE* pbSig, const char* szMask )
+inline DWORD FindPattern(DWORD dwAddress, DWORD dwSize, BYTE* pbSig, const char* szMask)
 {
-    for( DWORD i = NULL; i < dwSize; i++ )
-    {
-        if( DataCompare( (BYTE*) ( dwAddress + i ), pbSig, szMask ) )
-            return (DWORD)( dwAddress + i );
-    }
-    return 0;
+	for (DWORD i = NULL; i < dwSize; i++)
+	{
+		if (DataCompare((BYTE*) (dwAddress + i), pbSig, szMask))
+			return (DWORD) (dwAddress + i);
+	}
+	
+	return 0;
 }
 
 IGameResources* GetGameResources() {
 	//IGameResources* res;
-    static DWORD funcadd = NULL;
-    if( !funcadd )
-        funcadd = FindPattern( (DWORD) GetHandleOfModule( _T("client") ), 0x2680C6, (PBYTE) "\xA1\x00\x00\x00\x00\x85\xC0\x74\x06\x05", "x????xxxxx" );
-        
-    typedef IGameResources* (*GGR_t) (void);
-    GGR_t GGR = (GGR_t) funcadd;
-    return GGR();
+	static DWORD funcadd = NULL;
+	if (!funcadd)
+		funcadd = FindPattern((DWORD) GetHandleOfModule(_T("client")), 0x2680C6, (PBYTE) "\xA1\x00\x00\x00\x00\x85\xC0\x74\x06\x05", "x????xxxxx");
+		
+	typedef IGameResources* (*GGR_t) (void);
+	GGR_t GGR = (GGR_t) funcadd;
+	return GGR();
 }
 
 static void icons_enabled_change(IConVar *var, const char *pOldValue, float flOldValue);
@@ -66,7 +67,7 @@ ConVar icons_red_bg_green("statusspec_icons_red_bg_green", "92", 0, "green value
 ConVar icons_red_bg_blue("statusspec_icons_red_bg_blue", "77", 0, "blue value of the icon background for RED players");
 ConVar icons_red_bg_alpha("statusspec_icons_red_bg_alpha", "127", 0, "alpha value of the icon background for RED players");
 
-void (__fastcall *origPaintTraverse)(void* thisptr, int edx, VPANEL, bool, bool);
+void (__fastcall *origPaintTraverse)(void* thisptr, int edx, vgui::VPANEL, bool, bool);
 
 bool CheckCondition(uint32_t conditions[3], int condition) {
 	if (condition < 32) {
@@ -96,7 +97,7 @@ void UpdateEntities() {
 
 	for (int i = 0; i < iEntCount; i++) {
 		cEntity = pEntityList->GetClientEntity(i);
-
+		
 		// Ensure valid player entity
 		if (cEntity == NULL || !(GetGameResources()->IsConnected(i))) {
 			continue;
@@ -123,14 +124,14 @@ void UpdateEntities() {
 	}
 }
 
-void __fastcall hookedPaintTraverse( vgui::IPanel *thisPtr, int edx,  VPANEL vguiPanel, bool forceRepaint, bool allowForce = true ) {
+void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
 	if (icons_enabled.GetBool()) {
 		UpdateEntities();
 	}
 	
 	origPaintTraverse(thisPtr, edx, vguiPanel, forceRepaint, allowForce);
 
-	if (pEngineClient->IsDrawingLoadingImage() || !pEngineClient->IsInGame() || !pEngineClient->IsConnected() || pEngineClient->Con_IsVisible( ))
+	if (pEngineClient->IsDrawingLoadingImage() || !pEngineClient->IsInGame() || !pEngineClient->IsConnected() || pEngineClient->Con_IsVisible())
 		return;
 	
 	const char* panelName = g_pVGuiPanel->GetName(vguiPanel);
@@ -689,7 +690,7 @@ void __fastcall hookedPaintTraverse( vgui::IPanel *thisPtr, int edx,  VPANEL vgu
 
 // The plugin is a static singleton that is exported as an interface
 StatusSpecPlugin g_StatusSpecPlugin;
-EXPOSE_SINGLE_INTERFACE_GLOBALVAR(StatusSpecPlugin, IServerPluginCallbacks, INTERFACEVERSION_ISERVERPLUGINCALLBACKS, g_StatusSpecPlugin );
+EXPOSE_SINGLE_INTERFACE_GLOBALVAR(StatusSpecPlugin, IServerPluginCallbacks, INTERFACEVERSION_ISERVERPLUGINCALLBACKS, g_StatusSpecPlugin);
 
 StatusSpecPlugin::StatusSpecPlugin()
 {
@@ -699,15 +700,15 @@ StatusSpecPlugin::~StatusSpecPlugin()
 {
 }
 
-bool StatusSpecPlugin::Load( CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory )
+bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory)
 {
-	ConnectTier1Libraries( &interfaceFactory, 1 );
-	ConnectTier2Libraries( &interfaceFactory, 1 );
-	ConnectTier3Libraries( &interfaceFactory, 1 );
+	ConnectTier1Libraries(&interfaceFactory, 1);
+	ConnectTier2Libraries(&interfaceFactory, 1);
+	ConnectTier3Libraries(&interfaceFactory, 1);
 	
 	void* hmClient = GetHandleOfModule("client");
 	CreateInterfaceFn clientFactory = (CreateInterfaceFn) GetFuncAddress(hmClient, "CreateInterface");
-	pClient     = (IBaseClientDLL*) clientFactory(CLIENT_DLL_INTERFACE_VERSION, NULL);
+	pClient	 = (IBaseClientDLL*) clientFactory(CLIENT_DLL_INTERFACE_VERSION, NULL);
 	pEntityList = (IClientEntityList*) clientFactory(VCLIENTENTITYLIST_INTERFACE_VERSION, NULL);
 	
 	pEngineClient = (IVEngineClient*) interfaceFactory(VENGINE_CLIENT_INTERFACE_VERSION, NULL);
@@ -765,48 +766,65 @@ bool StatusSpecPlugin::Load( CreateInterfaceFn interfaceFactory, CreateInterface
 	performlayoutCommand = new KeyValues("Command", "Command", "performlayout");
 	
 	// hook PaintTraverse
-	origPaintTraverse = (void (__fastcall *)(void *, int, VPANEL, bool, bool))
+	origPaintTraverse = (void (__fastcall *)(void *, int, vgui::VPANEL, bool, bool))
 	HookVFunc(*(DWORD**)g_pVGuiPanel, Index_PaintTraverse, (DWORD*) &hookedPaintTraverse);
 	
 	// get offsets
 	WSOffsets::PrepareOffsets();
 	
 	// register CVars
-	ConVar_Register( 0 );
+	ConVar_Register(0);
 	
 	// ready to go
 	Msg("%s loaded!\n", PLUGIN_DESC);
 	return true;
 }
 
-void StatusSpecPlugin::Unload( void )
+void StatusSpecPlugin::Unload(void)
 {
-	ConVar_Unregister( );
+	ConVar_Unregister();
 	DisconnectTier3Libraries();
 	DisconnectTier2Libraries();
 	DisconnectTier1Libraries();
 }
 
-void StatusSpecPlugin::FireGameEvent( KeyValues * event ) {}
-void StatusSpecPlugin::Pause( void ) {}
-void StatusSpecPlugin::UnPause( void ) {}
-const char *StatusSpecPlugin::GetPluginDescription( void ) { return PLUGIN_DESC; }
-void StatusSpecPlugin::LevelInit( char const *pMapName ) {}
-void StatusSpecPlugin::ServerActivate( edict_t *pEdictList, int edictCount, int clientMax ) {}
-void StatusSpecPlugin::GameFrame( bool simulating ) {}
-void StatusSpecPlugin::LevelShutdown( void ) {}
-void StatusSpecPlugin::ClientActive( edict_t *pEntity ) {}
-void StatusSpecPlugin::ClientDisconnect( edict_t *pEntity ) {}
-void StatusSpecPlugin::ClientPutInServer( edict_t *pEntity, char const *playername ) {}
-void StatusSpecPlugin::SetCommandClient( int index ) {}
-void StatusSpecPlugin::ClientSettingsChanged( edict_t *pEdict ) {}
-PLUGIN_RESULT StatusSpecPlugin::ClientConnect( bool *bAllowConnect, edict_t *pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen ) { return PLUGIN_CONTINUE; }
-PLUGIN_RESULT StatusSpecPlugin::ClientCommand( edict_t *pEntity, const CCommand &args ) { return PLUGIN_CONTINUE; }
-PLUGIN_RESULT StatusSpecPlugin::NetworkIDValidated( const char *pszUserName, const char *pszNetworkID ) { return PLUGIN_CONTINUE; }
-void StatusSpecPlugin::OnQueryCvarValueFinished( QueryCvarCookie_t iCookie, edict_t *pPlayerEntity, EQueryCvarValueStatus eStatus, const char *pCvarName, const char *pCvarValue ) {}
-void StatusSpecPlugin::OnEdictAllocated( edict_t *edict ) {}
-void StatusSpecPlugin::OnEdictFreed( const edict_t *edict ) {}
+void StatusSpecPlugin::FireGameEvent(KeyValues * event) { KeyValuesDumpAsDevMsg(event); }
+void StatusSpecPlugin::Pause(void) {}
+void StatusSpecPlugin::UnPause(void) {}
+const char *StatusSpecPlugin::GetPluginDescription(void) { return PLUGIN_DESC; }
+void StatusSpecPlugin::LevelInit(char const *pMapName) {}
+void StatusSpecPlugin::ServerActivate(edict_t *pEdictList, int edictCount, int clientMax) {}
+void StatusSpecPlugin::GameFrame(bool simulating) {}
+void StatusSpecPlugin::LevelShutdown(void) {}
+void StatusSpecPlugin::ClientActive(edict_t *pEntity) {}
+void StatusSpecPlugin::ClientDisconnect(edict_t *pEntity) {}
+void StatusSpecPlugin::ClientPutInServer(edict_t *pEntity, char const *playername) {}
+void StatusSpecPlugin::SetCommandClient(int index) {}
+void StatusSpecPlugin::ClientSettingsChanged(edict_t *pEdict) {}
+PLUGIN_RESULT StatusSpecPlugin::ClientConnect(bool *bAllowConnect, edict_t *pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen) { return PLUGIN_CONTINUE; }
+PLUGIN_RESULT StatusSpecPlugin::ClientCommand(edict_t *pEntity, const CCommand &args) { return PLUGIN_CONTINUE; }
+PLUGIN_RESULT StatusSpecPlugin::NetworkIDValidated(const char *pszUserName, const char *pszNetworkID) { return PLUGIN_CONTINUE; }
+void StatusSpecPlugin::OnQueryCvarValueFinished(QueryCvarCookie_t iCookie, edict_t *pPlayerEntity, EQueryCvarValueStatus eStatus, const char *pCvarName, const char *pCvarValue) {}
+void StatusSpecPlugin::OnEdictAllocated(edict_t *edict) {}
+void StatusSpecPlugin::OnEdictFreed(const edict_t *edict) {}
 
 static void icons_enabled_change(IConVar *var, const char *pOldValue, float flOldValue) {
 	UpdateEntities();
+}
+
+CON_COMMAND(statusspec_debug_player_list, "gets a player list with entity and team numbers")
+{
+	int iEntCount = pEntityList->GetHighestEntityIndex();
+	IClientEntity *cEntity;
+	
+	for (int i = 0; i < iEntCount; i++) {
+		cEntity = pEntityList->GetClientEntity(i);
+
+		// Ensure valid player entity
+		if (cEntity == NULL || !(GetGameResources()->IsConnected(i))) {
+			continue;
+		}
+		
+		Msg("Client %i: %s, team %i\n", i, GetGameResources()->GetPlayerName(i), GetGameResources()->GetTeam(i));
+	}
 }

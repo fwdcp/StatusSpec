@@ -157,8 +157,6 @@ enum TFCond
 
 //class CBaseCombatCharacter;
 class C_BaseCombatWeapon;
-typedef unsigned int VPANEL;
-typedef unsigned long HPanel;
 typedef CHandle<C_BaseEntity> EHANDLE;
 
 // client.dll
@@ -191,7 +189,7 @@ int m_iTextureBleeding;
 int m_iTextureOnFire;
 
 KeyValues *performlayoutCommand;
-HPanel specguiPanel;
+vgui::HPanel specguiPanel;
 
 typedef struct Player {
 	int team;
