@@ -44,29 +44,11 @@ IGameResources* GetGameResources() {
 	return GGR();
 }
 
-static void icons_enabled_change(IConVar *var, const char *pOldValue, float flOldValue);
-ConVar force_refresh_specgui("statusspec_force_refresh_specgui", "0", 0, "whether to force the specgui to refresh");
-ConVar icons_enabled("statusspec_icons_enabled", "0", 0, "enable status icons", icons_enabled_change);
-ConVar icons_dynamic("statusspec_icons_bg_dynamic", "1", 0, "dynamically move the background color with the icons");
-ConVar icons_size("statusspec_icons_size", "15", 0, "square size of status icons");
-ConVar icons_max("statusspec_icons_max", "5", 0, "max number of icons to be rendered");
-ConVar icons_blu_x_base("statusspec_icons_blu_x_base", "160", 0, "x-coordinate of the first BLU player");
-ConVar icons_blu_x_delta("statusspec_icons_blu_x_delta", "0", 0, "amount to move in x-direction for next BLU player");
-ConVar icons_blu_y_base("statusspec_icons_blu_y_base", "221", 0, "y-coordinate of the first BLU player");
-ConVar icons_blu_y_delta("statusspec_icons_blu_y_delta", "-15", 0, "amount to move in y-direction for next BLU player");
-ConVar icons_blu_bg_red("statusspec_icons_blu_bg_red", "104", 0, "red value of the icon background for BLU players");
-ConVar icons_blu_bg_green("statusspec_icons_blu_bg_green", "124", 0, "green value of the icon background for BLU players");
-ConVar icons_blu_bg_blue("statusspec_icons_blu_bg_blue", "155", 0, "blue value of the icon background for BLU players");
-ConVar icons_blu_bg_alpha("statusspec_icons_blu_bg_alpha", "127", 0, "alpha value of the icon background for BLU players");
-ConVar icons_red_x_base("statusspec_icons_red_x_base", "160", 0, "x-coordinate of the first RED player");
-ConVar icons_red_x_delta("statusspec_icons_red_x_delta", "0", 0, "amount to move in x-direction for next RED player");
-ConVar icons_red_y_base("statusspec_icons_red_y_base", "241", 0, "y-coordinate of the first RED player");
-ConVar icons_red_y_delta("statusspec_icons_red_y_delta", "15", 0, "amount to move in y-direction for next RED player");
-ConVar icons_red_bg_red("statusspec_icons_red_bg_red", "180", 0, "red value of the icon background for RED players");
-ConVar icons_red_bg_green("statusspec_icons_red_bg_green", "92", 0, "green value of the icon background for RED players");
-ConVar icons_red_bg_blue("statusspec_icons_red_bg_blue", "77", 0, "blue value of the icon background for RED players");
-ConVar icons_red_bg_alpha("statusspec_icons_red_bg_alpha", "127", 0, "alpha value of the icon background for RED players");
+ConVar force_refresh_specgui("statusspec_force_specgui_refresh", "0", 0, "whether to force the spectator GUI to refresh");
+ConVar status_icons_enabled("statusspec_status_icons_enabled", "0", 0, "enable status icons");
+ConVar status_icons_max("statusspec_status_icons_max", "5", 0, "max number of status icons to be rendered");
 
+void (__fastcall *origSendMessage)(void* thisptr, int edx, vgui::VPANEL, KeyValues *, vgui::VPANEL);
 void (__fastcall *origPaintTraverse)(void* thisptr, int edx, vgui::VPANEL, bool, bool);
 
 bool CheckCondition(uint32_t conditions[3], int condition) {
@@ -114,18 +96,41 @@ void UpdateEntities() {
 			continue;
 		}
 		
-		int j = playerInfo.size();
-		playerInfo.push_back(Player());
-		
-		playerInfo[j].team = team;
-		playerInfo[j].conditions[0] = playerCond|condBits;
-		playerInfo[j].conditions[1] = playerCondEx;
-		playerInfo[j].conditions[2] = playerCondEx2;
+		playerInfo[i].team = team;
+		playerInfo[i].conditions[0] = playerCond|condBits;
+		playerInfo[i].conditions[1] = playerCondEx;
+		playerInfo[i].conditions[2] = playerCondEx2;
 	}
 }
 
+void __fastcall hookedSendMessage(vgui::IPanel *thisPtr, int edx, vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel) {
+	origSendMessage(thisPtr, edx, vguiPanel, params, ifromPanel);
+	
+	const char *ifromPanelName = g_pVGuiPanel->GetName(ifromPanel);
+	
+	if (ifromPanelName[0] == 'p' && ifromPanelName[1] == 'l' && ifromPanelName[2] == 'a' && ifromPanelName[3] == 'y' && ifromPanelName[4] == 'e' && ifromPanelName[5] == 'r' && ifromPanelName[6] == 'p' && ifromPanelName[7] == 'a' && ifromPanelName[8] == 'n' && ifromPanelName[9] == 'e' && ifromPanelName[10] == 'l' && strcmp(params->GetName(), "DialogVariables") == 0) {
+		const char *playerName = params->GetString("playername");
+		
+		int iEntCount = pEntityList->GetHighestEntityIndex();
+		IClientEntity *cEntity;
+		
+		for (int i = 0; i < iEntCount; i++) {
+			cEntity = pEntityList->GetClientEntity(i);
+			
+			if (cEntity == NULL || !(GetGameResources()->IsConnected(i))) {
+				continue;
+			}
+			
+			if (strcmp(playerName, GetGameResources()->GetPlayerName(i)) == 0) {
+				playerPanels[g_pVGuiPanel->GetName(ifromPanel)] = i;
+				break;
+			}
+		}
+	}
+}
+	
 void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
-	if (icons_enabled.GetBool()) {
+	if (status_icons_enabled.GetBool()) {
 		UpdateEntities();
 	}
 	
@@ -138,552 +143,389 @@ void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL
 	if (strcmp(panelName, "specgui") == 0) {
 		specguiPanel = g_pVGui->PanelToHandle(vguiPanel);
 	}
+	else if (strcmp(panelName, "statusicons") == 0) {
+		vgui::VPANEL playerPanel = g_pVGuiPanel->GetParent(vguiPanel);
+		int iconsWide, iconsTall, playerWide, playerTall;
+		
+		g_pVGuiPanel->GetSize(vguiPanel, iconsWide, iconsTall);
+		g_pVGuiPanel->GetSize(playerPanel, playerWide, playerTall);
+		
+		playerWide -= iconsWide;
+		iconsWide -= iconsWide;
+		
+		int iconSize = iconsTall;
+		int icons = 0;
+		int maxIcons = status_icons_max.GetInt();
+		
+		g_pVGuiPanel->SetSize(vguiPanel, iconsWide, iconsTall);
+		g_pVGuiPanel->SetSize(playerPanel, playerWide, playerTall);
+		
+		if (!status_icons_enabled.GetBool()) {
+			return;
+		}
+		
+		const char *playerPanelName = g_pVGuiPanel->GetName(playerPanel);
+		
+		if (playerPanels.find(playerPanelName) == playerPanels.end()) {
+			return;
+		}
+		
+		int i = playerPanels[playerPanelName];
+		
+		if (CheckCondition(playerInfo[i].conditions, TFCond_Ubercharged)) {
+			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
+			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
+			
+			g_pVGuiSurface->DrawSetTexture(m_iTextureUbercharged);
+			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+			
+			playerWide += iconSize;
+			iconsWide += iconSize;
+			
+			icons++;
+		}
+		
+		if (icons >= maxIcons) {
+			return;
+		}
+		
+		if (CheckCondition(playerInfo[i].conditions, TFCond_Kritzkrieged)) {
+			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
+			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
+			
+			g_pVGuiSurface->DrawSetTexture(m_iTextureCritBoosted);
+			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+			
+			playerWide += iconSize;
+			iconsWide += iconSize;
+			
+			icons++;
+		}
+		
+		if (icons >= maxIcons) {
+			return;
+		}
+		
+		if (CheckCondition(playerInfo[i].conditions, TFCond_UberBulletResist)) {
+			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
+			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
+			
+			if (playerInfo[i].team == TEAM_RED) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldRed);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+				g_pVGuiSurface->DrawSetTexture(m_iTextureBulletResistRed);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+			}
+			else if (playerInfo[i].team == TEAM_BLU) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldBlu);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+				g_pVGuiSurface->DrawSetTexture(m_iTextureBulletResistBlu);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+			}
+			
+			playerWide += iconSize;
+			iconsWide += iconSize;
+			
+			icons++;
+		}
+		else if (CheckCondition(playerInfo[i].conditions, TFCond_SmallBulletResist)) {
+			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
+			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
+			
+			if (playerInfo[i].team == TEAM_RED) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureBulletResistRed);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+			}
+			else if (playerInfo[i].team == TEAM_BLU) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureBulletResistBlu);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+			}
+			
+			playerWide += iconSize;
+			iconsWide += iconSize;
+			
+			icons++;
+		}
+		
+		if (icons >= maxIcons) {
+			return;
+		}
+		
+		if (CheckCondition(playerInfo[i].conditions, TFCond_UberBlastResist)) {
+			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
+			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
+			
+			if (playerInfo[i].team == TEAM_RED) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldRed);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+				g_pVGuiSurface->DrawSetTexture(m_iTextureBlastResistRed);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+			}
+			else if (playerInfo[i].team == TEAM_BLU) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldBlu);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+				g_pVGuiSurface->DrawSetTexture(m_iTextureBlastResistBlu);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+			}
+			
+			playerWide += iconSize;
+			iconsWide += iconSize;
+			
+			icons++;
+		}
+		else if (CheckCondition(playerInfo[i].conditions, TFCond_SmallBlastResist)) {
+			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
+			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
+			
+			if (playerInfo[i].team == TEAM_RED) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureBlastResistRed);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+			}
+			else if (playerInfo[i].team == TEAM_BLU) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureBlastResistBlu);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+			}
+			
+			playerWide += iconSize;
+			iconsWide += iconSize;
+			
+			icons++;
+		}
+		
+		if (icons >= maxIcons) {
+			return;
+		}
+		
+		if (CheckCondition(playerInfo[i].conditions, TFCond_UberFireResist)) {
+			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
+			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
+			
+			if (playerInfo[i].team == TEAM_RED) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldRed);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+				g_pVGuiSurface->DrawSetTexture(m_iTextureFireResistRed);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+			}
+			else if (playerInfo[i].team == TEAM_BLU) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldBlu);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+				g_pVGuiSurface->DrawSetTexture(m_iTextureFireResistBlu);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+			}
+			
+			playerWide += iconSize;
+			iconsWide += iconSize;
+			
+			icons++;
+		}
+		else if (CheckCondition(playerInfo[i].conditions, TFCond_SmallFireResist)) {
+			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
+			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
+			
+			if (playerInfo[i].team == TEAM_RED) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureFireResistRed);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+			}
+			else if (playerInfo[i].team == TEAM_BLU) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureFireResistBlu);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+			}
+			
+			playerWide += iconSize;
+			iconsWide += iconSize;
+			
+			icons++;
+		}
+		
+		if (icons >= maxIcons) {
+			return;
+		}
+		
+		if (CheckCondition(playerInfo[i].conditions, TFCond_Buffed)) {
+			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
+			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
+			
+			if (playerInfo[i].team == TEAM_RED) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureBuffBannerRed);
+			}
+			else if (playerInfo[i].team == TEAM_BLU) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureBuffBannerBlu);
+			}
+			
+			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+			
+			playerWide += iconSize;
+			iconsWide += iconSize;
+			
+			icons++;
+		}
+		
+		if (icons >= maxIcons) {
+			return;
+		}
+		
+		if (CheckCondition(playerInfo[i].conditions, TFCond_DefenseBuffed)) {
+			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
+			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
+			
+			if (playerInfo[i].team == TEAM_RED) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureBattalionsBackupRed);
+			}
+			else if (playerInfo[i].team == TEAM_BLU) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureBattalionsBackupBlu);
+			}
+			
+			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+			
+			playerWide += iconSize;
+			iconsWide += iconSize;
+			
+			icons++;
+		}
+		
+		if (icons >= maxIcons) {
+			return;
+		}
+		
+		if (CheckCondition(playerInfo[i].conditions, TFCond_RegenBuffed)) {
+			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
+			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
+			
+			if (playerInfo[i].team == TEAM_RED) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureConcherorRed);
+			}
+			else if (playerInfo[i].team == TEAM_BLU) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureConcherorBlu);
+			}
+			
+			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+			
+			playerWide += iconSize;
+			iconsWide += iconSize;
+			
+			icons++;
+		}
+		
+		if (icons >= maxIcons) {
+			return;
+		}
+		
+		if (CheckCondition(playerInfo[i].conditions, TFCond_Jarated)) {
+			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
+			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
+			
+			g_pVGuiSurface->DrawSetTexture(m_iTextureJarated);
+			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+			
+			playerWide += iconSize;
+			iconsWide += iconSize;
+			
+			icons++;
+		}
+		
+		if (icons >= maxIcons) {
+			return;
+		}
+		
+		if (CheckCondition(playerInfo[i].conditions, TFCond_Milked)) {
+			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
+			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
+			
+			g_pVGuiSurface->DrawSetTexture(m_iTextureMilked);
+			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+			
+			playerWide += iconSize;
+			iconsWide += iconSize;
+			
+			icons++;
+		}
+		
+		if (icons >= maxIcons) {
+			return;
+		}
+		
+		if (CheckCondition(playerInfo[i].conditions, TFCond_MarkedForDeath) || CheckCondition(playerInfo[i].conditions, TFCond_MarkedForDeathSilent)) {
+			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
+			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
+			
+			g_pVGuiSurface->DrawSetTexture(m_iTextureMarkedForDeath);
+			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+			
+			playerWide += iconSize;
+			iconsWide += iconSize;
+			
+			icons++;
+		}
+		
+		if (icons >= maxIcons) {
+			return;
+		}
+		
+		if (CheckCondition(playerInfo[i].conditions, TFCond_Bleeding)) {
+			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
+			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
+			
+			g_pVGuiSurface->DrawSetTexture(m_iTextureBleeding);
+			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+			
+			playerWide += iconSize;
+			iconsWide += iconSize;
+			
+			icons++;
+		}
+		
+		if (icons >= maxIcons) {
+			return;
+		}
+		
+		if (CheckCondition(playerInfo[i].conditions, TFCond_OnFire)) {
+			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
+			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
+			
+			g_pVGuiSurface->DrawSetTexture(m_iTextureOnFire);
+			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
+			
+			playerWide += iconSize;
+			iconsWide += iconSize;
+			
+			icons++;
+		}
+		
+		if (icons >= maxIcons) {
+			return;
+		}
+	}
 	else if (panelName[0] == 'M' && panelName[3] == 'S' && panelName[9] == 'T' && panelName[12] == 'P') {
 		if (force_refresh_specgui.GetBool() && specguiPanel) {
 			g_pVGuiPanel->SendMessage(g_pVGui->HandleToPanel(specguiPanel), performlayoutCommand, g_pVGui->HandleToPanel(specguiPanel));
-		}
-		
-		if (icons_enabled.GetBool()) {
-			bool bDynamic = icons_dynamic.GetBool();
-			int iSize = g_pVGuiSchemeManager->GetProportionalScaledValue(icons_size.GetInt());
-			int iMaxIcons = icons_max.GetInt();
-			int iBluXBase = g_pVGuiSchemeManager->GetProportionalScaledValue(icons_blu_x_base.GetInt());
-			int iBluXDelta = g_pVGuiSchemeManager->GetProportionalScaledValue(icons_blu_x_delta.GetInt());
-			int iBluYBase = g_pVGuiSchemeManager->GetProportionalScaledValue(icons_blu_y_base.GetInt());
-			int iBluYDelta = g_pVGuiSchemeManager->GetProportionalScaledValue(icons_blu_y_delta.GetInt());
-			int iBluBGRed = icons_blu_bg_red.GetInt();
-			int iBluBGGreen = icons_blu_bg_green.GetInt();
-			int iBluBGBlue = icons_blu_bg_blue.GetInt();
-			int iBluBGAlpha = icons_blu_bg_alpha.GetInt();
-			int iRedXBase = g_pVGuiSchemeManager->GetProportionalScaledValue(icons_red_x_base.GetInt());
-			int iRedXDelta = g_pVGuiSchemeManager->GetProportionalScaledValue(icons_red_x_delta.GetInt());
-			int iRedYBase = g_pVGuiSchemeManager->GetProportionalScaledValue(icons_red_y_base.GetInt());
-			int iRedYDelta = g_pVGuiSchemeManager->GetProportionalScaledValue(icons_red_y_delta.GetInt());
-			int iRedBGRed = icons_red_bg_red.GetInt();
-			int iRedBGGreen = icons_red_bg_green.GetInt();
-			int iRedBGBlue = icons_red_bg_blue.GetInt();
-			int iRedBGAlpha = icons_red_bg_alpha.GetInt();
-			
-			int iSpacing = g_pVGuiSchemeManager->GetProportionalScaledValue(1);
-			int iIconSize = iSize - (2 * iSpacing);
-			int iBarSize = iSize * iMaxIcons;
-			
-			int iPlayerCount = playerInfo.size();
-			int iRedPlayers = -1;
-			int iBluPlayers = -1;
-			
-			for (int i = 0; i < iPlayerCount; i++) {
-				int iX = 0;
-				int iY = 0;
-				
-				if (playerInfo[i].team == TEAM_RED) {
-					iRedPlayers++;
-					
-					if (!bDynamic) {
-						iX = iRedXBase + (iRedPlayers * iRedXDelta);
-						iY = iRedYBase + (iRedPlayers * iRedYDelta);
-						g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-						g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iBarSize, iY + iSize);
-					}
-				}
-				else if (playerInfo[i].team == TEAM_BLU) {
-					iBluPlayers++;
-					
-					if (!bDynamic) {
-						iX = iBluXBase + (iBluPlayers * iBluXDelta);
-						iY = iBluYBase + (iBluPlayers * iBluYDelta);
-						g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-						g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iBarSize, iY + iSize);
-					}
-				}
-				else {
-					continue;
-				}
-				
-				int iIcons = 0;
-				
-				if (CheckCondition(playerInfo[i].conditions, TFCond_Ubercharged)) {
-					if (playerInfo[i].team == TEAM_RED) {
-						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
-						iY = iRedYBase + (iRedPlayers * iRedYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-					}
-					else if (playerInfo[i].team == TEAM_BLU) {
-						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
-						iY = iBluYBase + (iBluPlayers * iBluYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-					}
-					
-					g_pVGuiSurface->DrawSetTexture(m_iTextureUbercharged);
-					g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-					g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-					
-					iIcons++;
-				}
-				
-				if (iIcons >= iMaxIcons) {
-					continue;
-				}
-				
-				if (CheckCondition(playerInfo[i].conditions, TFCond_Kritzkrieged)) {
-					if (playerInfo[i].team == TEAM_RED) {
-						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
-						iY = iRedYBase + (iRedPlayers * iRedYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-					}
-					else if (playerInfo[i].team == TEAM_BLU) {
-						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
-						iY = iBluYBase + (iBluPlayers * iBluYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-					}
-					
-					g_pVGuiSurface->DrawSetTexture(m_iTextureCritBoosted);
-					g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-					g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-					
-					iIcons++;
-				}
-				
-				if (iIcons >= iMaxIcons) {
-					continue;
-				}
-				
-				if (CheckCondition(playerInfo[i].conditions, TFCond_UberBulletResist)) {
-					if (playerInfo[i].team == TEAM_RED) {
-						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
-						iY = iRedYBase + (iRedPlayers * iRedYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-						g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldRed);
-						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-						g_pVGuiSurface->DrawSetTexture(m_iTextureBulletResistRed);
-						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-					}
-					else if (playerInfo[i].team == TEAM_BLU) {
-						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
-						iY = iBluYBase + (iBluPlayers * iBluYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-						g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldBlu);
-						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-						g_pVGuiSurface->DrawSetTexture(m_iTextureBulletResistBlu);
-						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-					}
-					
-					iIcons++;
-				}
-				else if (CheckCondition(playerInfo[i].conditions, TFCond_SmallBulletResist)) {
-					if (playerInfo[i].team == TEAM_RED) {
-						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
-						iY = iRedYBase + (iRedPlayers * iRedYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-						g_pVGuiSurface->DrawSetTexture(m_iTextureBulletResistRed);
-						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-					}
-					else if (playerInfo[i].team == TEAM_BLU) {
-						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
-						iY = iBluYBase + (iBluPlayers * iBluYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-						g_pVGuiSurface->DrawSetTexture(m_iTextureBulletResistBlu);
-						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-					}
-					
-					iIcons++;
-				}
-				
-				if (iIcons >= iMaxIcons) {
-					continue;
-				}
-				
-				if (CheckCondition(playerInfo[i].conditions, TFCond_UberBlastResist)) {
-					if (playerInfo[i].team == TEAM_RED) {
-						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
-						iY = iRedYBase + (iRedPlayers * iRedYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-						g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldRed);
-						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-						g_pVGuiSurface->DrawSetTexture(m_iTextureBlastResistRed);
-						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-					}
-					else if (playerInfo[i].team == TEAM_BLU) {
-						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
-						iY = iBluYBase + (iBluPlayers * iBluYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-						g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldBlu);
-						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-						g_pVGuiSurface->DrawSetTexture(m_iTextureBlastResistBlu);
-						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-					}
-					
-					iIcons++;
-				}
-				else if (CheckCondition(playerInfo[i].conditions, TFCond_SmallBlastResist)) {
-					if (playerInfo[i].team == TEAM_RED) {
-						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
-						iY = iRedYBase + (iRedPlayers * iRedYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-						g_pVGuiSurface->DrawSetTexture(m_iTextureBlastResistRed);
-						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-					}
-					else if (playerInfo[i].team == TEAM_BLU) {
-						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
-						iY = iBluYBase + (iBluPlayers * iBluYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-						g_pVGuiSurface->DrawSetTexture(m_iTextureBlastResistBlu);
-						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-					}
-					
-					iIcons++;
-				}
-				
-				if (iIcons >= iMaxIcons) {
-					continue;
-				}
-				
-				if (CheckCondition(playerInfo[i].conditions, TFCond_UberFireResist)) {
-					if (playerInfo[i].team == TEAM_RED) {
-						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
-						iY = iRedYBase + (iRedPlayers * iRedYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-						g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldRed);
-						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-						g_pVGuiSurface->DrawSetTexture(m_iTextureFireResistRed);
-						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-					}
-					else if (playerInfo[i].team == TEAM_BLU) {
-						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
-						iY = iBluYBase + (iBluPlayers * iBluYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-						g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldBlu);
-						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-						g_pVGuiSurface->DrawSetTexture(m_iTextureFireResistBlu);
-						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-					}
-					
-					iIcons++;
-				}
-				else if (CheckCondition(playerInfo[i].conditions, TFCond_SmallFireResist)) {
-					if (playerInfo[i].team == TEAM_RED) {
-						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
-						iY = iRedYBase + (iRedPlayers * iRedYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-						g_pVGuiSurface->DrawSetTexture(m_iTextureFireResistRed);
-						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-					}
-					else if (playerInfo[i].team == TEAM_BLU) {
-						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
-						iY = iBluYBase + (iBluPlayers * iBluYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-						g_pVGuiSurface->DrawSetTexture(m_iTextureFireResistBlu);
-						g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-						g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-					}
-					
-					iIcons++;
-				}
-				
-				if (iIcons >= iMaxIcons) {
-					continue;
-				}
-				
-				if (CheckCondition(playerInfo[i].conditions, TFCond_Buffed)) {
-					if (playerInfo[i].team == TEAM_RED) {
-						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
-						iY = iRedYBase + (iRedPlayers * iRedYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-						g_pVGuiSurface->DrawSetTexture(m_iTextureBuffBannerRed);
-					}
-					else if (playerInfo[i].team == TEAM_BLU) {
-						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
-						iY = iBluYBase + (iBluPlayers * iBluYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-						g_pVGuiSurface->DrawSetTexture(m_iTextureBuffBannerBlu);
-					}
-					
-					g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-					g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-					
-					iIcons++;
-				}
-				
-				if (iIcons >= iMaxIcons) {
-					continue;
-				}
-				
-				if (CheckCondition(playerInfo[i].conditions, TFCond_DefenseBuffed)) {
-					if (playerInfo[i].team == TEAM_RED) {
-						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
-						iY = iRedYBase + (iRedPlayers * iRedYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-						g_pVGuiSurface->DrawSetTexture(m_iTextureBattalionsBackupRed);
-					}
-					else if (playerInfo[i].team == TEAM_BLU) {
-						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
-						iY = iBluYBase + (iBluPlayers * iBluYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-						g_pVGuiSurface->DrawSetTexture(m_iTextureBattalionsBackupBlu);
-					}
-					
-					g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-					g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-					
-					iIcons++;
-				}
-				
-				if (iIcons >= iMaxIcons) {
-					continue;
-				}
-				
-				if (CheckCondition(playerInfo[i].conditions, TFCond_RegenBuffed)) {
-					if (playerInfo[i].team == TEAM_RED) {
-						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
-						iY = iRedYBase + (iRedPlayers * iRedYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-						g_pVGuiSurface->DrawSetTexture(m_iTextureConcherorRed);
-					}
-					else if (playerInfo[i].team == TEAM_BLU) {
-						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
-						iY = iBluYBase + (iBluPlayers * iBluYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-						g_pVGuiSurface->DrawSetTexture(m_iTextureConcherorBlu);
-					}
-					
-					g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-					g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-					
-					iIcons++;
-				}
-				
-				if (iIcons >= iMaxIcons) {
-					continue;
-				}
-				
-				if (CheckCondition(playerInfo[i].conditions, TFCond_Jarated)) {
-					if (playerInfo[i].team == TEAM_RED) {
-						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
-						iY = iRedYBase + (iRedPlayers * iRedYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-					}
-					else if (playerInfo[i].team == TEAM_BLU) {
-						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
-						iY = iBluYBase + (iBluPlayers * iBluYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-					}
-					
-					g_pVGuiSurface->DrawSetTexture(m_iTextureJarated);
-					g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-					g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-					
-					iIcons++;
-				}
-				
-				if (iIcons >= iMaxIcons) {
-					continue;
-				}
-				
-				if (CheckCondition(playerInfo[i].conditions, TFCond_Milked)) {
-					if (playerInfo[i].team == TEAM_RED) {
-						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
-						iY = iRedYBase + (iRedPlayers * iRedYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-					}
-					else if (playerInfo[i].team == TEAM_BLU) {
-						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
-						iY = iBluYBase + (iBluPlayers * iBluYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-					}
-					
-					g_pVGuiSurface->DrawSetTexture(m_iTextureMilked);
-					g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-					g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-					
-					iIcons++;
-				}
-				
-				if (iIcons >= iMaxIcons) {
-					continue;
-				}
-				
-				if (CheckCondition(playerInfo[i].conditions, TFCond_MarkedForDeath) || CheckCondition(playerInfo[i].conditions, TFCond_MarkedForDeathSilent)) {
-					if (playerInfo[i].team == TEAM_RED) {
-						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
-						iY = iRedYBase + (iRedPlayers * iRedYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-					}
-					else if (playerInfo[i].team == TEAM_BLU) {
-						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
-						iY = iBluYBase + (iBluPlayers * iBluYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-					}
-					
-					g_pVGuiSurface->DrawSetTexture(m_iTextureMarkedForDeath);
-					g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-					g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-					
-					iIcons++;
-				}
-				
-				if (iIcons >= iMaxIcons) {
-					continue;
-				}
-				
-				if (CheckCondition(playerInfo[i].conditions, TFCond_Bleeding)) {
-					if (playerInfo[i].team == TEAM_RED) {
-						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
-						iY = iRedYBase + (iRedPlayers * iRedYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-					}
-					else if (playerInfo[i].team == TEAM_BLU) {
-						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
-						iY = iBluYBase + (iBluPlayers * iBluYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-					}
-					
-					g_pVGuiSurface->DrawSetTexture(m_iTextureBleeding);
-					g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-					g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-					
-					iIcons++;
-				}
-				
-				if (iIcons >= iMaxIcons) {
-					continue;
-				}
-				
-				if (CheckCondition(playerInfo[i].conditions, TFCond_OnFire)) {
-					if (playerInfo[i].team == TEAM_RED) {
-						iX = iRedXBase + (iRedPlayers * iRedXDelta) + (iIcons * iSize);
-						iY = iRedYBase + (iRedPlayers * iRedYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iRedBGRed, iRedBGGreen, iRedBGBlue, iRedBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-					}
-					else if (playerInfo[i].team == TEAM_BLU) {
-						iX = iBluXBase + (iBluPlayers * iBluXDelta) + (iIcons * iSize);
-						iY = iBluYBase + (iBluPlayers * iBluYDelta);
-						if (bDynamic) {
-							g_pVGuiSurface->DrawSetColor(iBluBGRed, iBluBGGreen, iBluBGBlue, iBluBGAlpha);
-							g_pVGuiSurface->DrawFilledRect(iX, iY, iX + iSize, iY + iSize);
-						}
-					}
-					
-					g_pVGuiSurface->DrawSetTexture(m_iTextureOnFire);
-					g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-					g_pVGuiSurface->DrawTexturedRect(iX + iSpacing, iY + iSpacing, iX + iIconSize, iY + iIconSize);
-					
-					iIcons++;
-				}
-				
-				if (iIcons >= iMaxIcons) {
-					continue;
-				}
-			}
 		}
 	}
 }
@@ -765,6 +607,10 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	
 	performlayoutCommand = new KeyValues("Command", "Command", "performlayout");
 	
+	// hook SendMessage
+	origSendMessage = (void (__fastcall *)(void *, int, vgui::VPANEL, KeyValues *, vgui::VPANEL))
+	HookVFunc(*(DWORD**)g_pVGuiPanel, Index_SendMessage, (DWORD*) &hookedSendMessage);
+	
 	// hook PaintTraverse
 	origPaintTraverse = (void (__fastcall *)(void *, int, vgui::VPANEL, bool, bool))
 	HookVFunc(*(DWORD**)g_pVGuiPanel, Index_PaintTraverse, (DWORD*) &hookedPaintTraverse);
@@ -788,7 +634,7 @@ void StatusSpecPlugin::Unload(void)
 	DisconnectTier1Libraries();
 }
 
-void StatusSpecPlugin::FireGameEvent(KeyValues * event) { KeyValuesDumpAsDevMsg(event); }
+void StatusSpecPlugin::FireGameEvent(KeyValues *event) {}
 void StatusSpecPlugin::Pause(void) {}
 void StatusSpecPlugin::UnPause(void) {}
 const char *StatusSpecPlugin::GetPluginDescription(void) { return PLUGIN_DESC; }
@@ -807,24 +653,3 @@ PLUGIN_RESULT StatusSpecPlugin::NetworkIDValidated(const char *pszUserName, cons
 void StatusSpecPlugin::OnQueryCvarValueFinished(QueryCvarCookie_t iCookie, edict_t *pPlayerEntity, EQueryCvarValueStatus eStatus, const char *pCvarName, const char *pCvarValue) {}
 void StatusSpecPlugin::OnEdictAllocated(edict_t *edict) {}
 void StatusSpecPlugin::OnEdictFreed(const edict_t *edict) {}
-
-static void icons_enabled_change(IConVar *var, const char *pOldValue, float flOldValue) {
-	UpdateEntities();
-}
-
-CON_COMMAND(statusspec_debug_player_list, "gets a player list with entity and team numbers")
-{
-	int iEntCount = pEntityList->GetHighestEntityIndex();
-	IClientEntity *cEntity;
-	
-	for (int i = 0; i < iEntCount; i++) {
-		cEntity = pEntityList->GetClientEntity(i);
-
-		// Ensure valid player entity
-		if (cEntity == NULL || !(GetGameResources()->IsConnected(i))) {
-			continue;
-		}
-		
-		Msg("Client %i: %s, team %i\n", i, GetGameResources()->GetPlayerName(i), GetGameResources()->GetTeam(i));
-	}
-}

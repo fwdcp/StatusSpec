@@ -3,10 +3,13 @@ StatusSpec
 
 a client plugin that shows certain player statuses via icons next to a tournament HUD
 
-![screenshot](http://cloud-3.steampowered.com/ugc/3296944113103557748/0A2F0965D6085C0BA1CE1B85C44D673F0F78E2FC/)
+![screenshot](http://cloud-3.steampowered.com/ugc/3296944182337081425/381C3EAEAD980236654DF6199422E235C1F98891/)
 
 Changelog
 ---------
+
+**0.6.0**
+* implement status icons as part of spectator GUI
 
 **0.5.0**
 * added option to force refreshing of spectator GUI (partially to fully fixes post-pause issues, YMMV)
@@ -30,27 +33,28 @@ Usage
 This plugin is not signed, and therefore will not load unless TF2 is loaded with the "-insecure" flag.
 
 ### CVars
-* **statusspec_force_refresh_specgui** - whether to force the specgui to refresh
-* **statusspec_icons_enabled** - enable status icons
-* **statusspec_icons_bg_dynamic** - dynamically move the background color with the icons
-* **statusspec_icons_size** - square size of status icons
-* **statusspec_icons_max** - max number of icons to be rendered
-* **statusspec_icons_blu_x_base** - x-coordinate of the first BLU player
-* **statusspec_icons_blu_x_delta** - amount to move in x-direction for next BLU player
-* **statusspec_icons_blu_y_base** - y-coordinate of the first BLU player
-* **statusspec_icons_blu_y_delta** - amount to move in y-direction for next BLU player
-* **statusspec_icons_blu_bg_red** - red value of the icon background for BLU players
-* **statusspec_icons_blu_bg_green** - green value of the icon background for BLU players
-* **statusspec_icons_blu_bg_blue** - blue value of the icon background for BLU players
-* **statusspec_icons_blu_bg_alpha** - alpha value of the icon background for BLU players
-* **statusspec_icons_red_x_base** - x-coordinate of the first RED player
-* **statusspec_icons_red_x_delta** - amount to move in x-direction for next RED player
-* **statusspec_icons_red_y_base** - y-coordinate of the first RED player
-* **statusspec_icons_red_y_delta** - amount to move in y-direction for next RED player
-* **statusspec_icons_red_bg_red** - red value of the icon background for RED players
-* **statusspec_icons_red_bg_green** - green value of the icon background for RED players
-* **statusspec_icons_red_bg_blue** - blue value of the icon background for RED players
-* **statusspec_icons_red_bg_alpha** - alpha value of the icon background for RED players
+* `statusspec_force_refresh_specgui` - whether to force the spectator GUI to refresh
+* `statusspec_status_icons_enabled` - enable status icons
+* `statusspec_status_icons_max` - max number of status icons to be rendered
+
+### UI Resource Files
+
+#### Status Icons
+To enable status icons, add something similar to the following section within the `playerpanels_kv` section of the `specgui` section in `Resource/UI/SpectatorTournament.res`. The icons will appear on the right of `xpos` set with height and width `tall`, and the player panel will also be expanded to accommodate these icons.
+```
+"statusicons"
+{
+	"ControlName"	"Panel"
+	"fieldName"		"statusicons"
+	"xpos"			"160"
+	"ypos"			"0"
+	"zpos"			"8"
+	"wide"			"0"
+	"tall"			"15"
+	"visible"		"1"
+	"enabled"		"1"
+}
+```
 
 Thanks
 ------

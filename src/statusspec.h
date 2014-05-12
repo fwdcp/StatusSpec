@@ -24,10 +24,8 @@
 #include "offsets.h"
 #include "vfuncs.h"
 
-#define PLUGIN_DESC "StatusSpec v0.5"
-#define SHORT_DESC "StatusSpec v0.5"
-
-#define SCALED(normalValue) pScheme->GetProportionalScaledValue(normalValue)
+#define PLUGIN_DESC "StatusSpec v0.6"
+#define SHORT_DESC "StatusSpec v0.6"
 
 #define TEAM_RED 2
 #define TEAM_BLU 3
@@ -154,6 +152,7 @@ enum TFCond
 
 #include "stdint.h"
 #include "vector"
+#include "map"
 
 //class CBaseCombatCharacter;
 class C_BaseCombatWeapon;
@@ -196,7 +195,9 @@ typedef struct Player {
     uint32_t conditions[3];
 } Player;
 
-std::vector<Player> playerInfo;
+std::map<const char*, int> playerPanels;
+std::map<int, Player> playerInfo;
+std::string playerPanelName = "playerpanel";
 
 #define Round(x) ((x)>=0?(int)((x)+0.5):(int)((x)-0.5))
 

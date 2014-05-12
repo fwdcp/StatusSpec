@@ -21,10 +21,12 @@ class WSEmptyClass {};
 
 #if defined (_POSIX) // client.dylib
 enum vfuncIndices {
+	Index_SendMessage = 39,
 	Index_PaintTraverse = 42
 };
 #else // client.dll
 enum vfuncIndices {
+	Index_SendMessage = 38,
 	Index_PaintTraverse = 41
 };
 #endif
