@@ -36,7 +36,7 @@ void WSOffsets::PrepareOffsets() {
 //=================================================================================
 int WSOffsets::FindOffsetOfClassProp(const char *className, const char *propName) {
 	//ServerClass *sc = serverGameDLL->GetAllServerClasses();
-	ClientClass *sc = pClient->GetAllClasses();
+	ClientClass *sc = g_pClientDll->GetAllClasses();
 	while (sc) {
 		if (Q_strcmp(sc->GetName(), className) == 0) {
 			//SendTable *sTable = sc->m_pTable;
@@ -55,7 +55,7 @@ int WSOffsets::FindOffsetOfClassProp(const char *className, const char *propName
 }
 
 int WSOffsets::FindOffsetOfArrayEnt(const char *classname, const char *arrayName, int element) {
-	ClientClass *cc = pClient->GetAllClasses();
+	ClientClass *cc = g_pClientDll->GetAllClasses();
 	while (cc) {
 		if (Q_strcmp(cc->GetName(), classname) == 0) {
 			RecvTable *rTable = cc->m_pRecvTable;
@@ -89,7 +89,7 @@ bool WSOffsets::CrawlForPropOffset(RecvTable *sTable, const char *propName, int 
 		//Check if it is an array, don't care for these atm so skip them
 		bool isArray = false;
 		if (sChildTable && sChildTable->GetNumProps() > 0) {
-			if (   !strcmp(sChildTable->GetProp(0)->GetName(), "000")
+			if (!strcmp(sChildTable->GetProp(0)->GetName(), "000")
 				|| !strcmp(sChildTable->GetProp(0)->GetName(), "lengthproxy"))
 				isArray = true;
 		}
@@ -135,7 +135,7 @@ bool WSOffsets::CrawlForArrayEnt(RecvTable *sTable, const char *propName, int el
 		//Check if it is an array, don't care for these atm so skip them
 		bool isArray = false;
 		if (sChildTable && sChildTable->GetNumProps() > 0) {
-			if (   !strcmp(sChildTable->GetProp(0)->GetName(), "000")
+			if (!strcmp(sChildTable->GetProp(0)->GetName(), "000")
 				|| !strcmp(sChildTable->GetProp(0)->GetName(), "lengthproxy"))
 				isArray = true;
 		}

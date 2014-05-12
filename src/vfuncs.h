@@ -9,13 +9,9 @@
  *
  */
 
-#ifndef VFUNCS_H
-#define VFUNCS_H
+#pragma once
 
 #define CLIENT_DLL
-
-#include "tier0/platform.h"
-#include "cbase.h"
 
 class WSEmptyClass {};
 
@@ -31,7 +27,7 @@ enum vfuncIndices {
 };
 #endif
 
-#if !defined( _POSIX )
+#ifndef _POSIX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #else
@@ -40,5 +36,3 @@ enum vfuncIndices {
 #endif
 
 extern DWORD *HookVFunc(DWORD *vtable, int index, DWORD *newFunction);
-
-#endif

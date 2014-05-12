@@ -8,7 +8,7 @@
 #ifndef _POSIX
 //#include "targetver.h"
 
-#define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
 // Windows Header Files:
 #include <windows.h>
 #else
@@ -34,11 +34,3 @@ typedef BYTE *PBYTE;
 #include <cstring>
 #include <cstdio>
 #include <cstdlib>
-
-#ifdef _POSIX
-#define GetFuncAddress(pAddress, szFunction) dlsym(pAddress, szFunction)
-#define GetHandleOfModule(szModuleName) dlopen(szModuleName".so", RTLD_NOLOAD)
-#else
-#define GetFuncAddress(pAddress, szFunction) ::GetProcAddress((HMODULE)pAddress, szFunction)
-#define GetHandleOfModule(szModuleName) GetModuleHandleA(szModuleName".dll")
-#endif

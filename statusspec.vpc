@@ -28,6 +28,7 @@ $Project "StatusSpec"
 	$Folder	"Source Files"
 	{
 		$File	"src\statusspec.cpp"
+		$File	"src\ifaces.cpp"
 		$File	"src\offsets.cpp"
 		$File	"src\vfuncs.cpp"
 	}
@@ -35,6 +36,7 @@ $Project "StatusSpec"
 	$Folder	"Header Files"
 	{
 		$File	"src\statusspec.h"
+		$File	"src\ifaces.h"
 		$File	"src\offsets.h"
 		$File	"src\vfuncs.h"
 	}

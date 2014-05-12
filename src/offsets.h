@@ -9,13 +9,12 @@
  *
  */
 
-#ifndef OFFSETS_H
-#define OFFSETS_H
+#pragma once
+
+#include "ifaces.h"
 
 #include "cdll_client_int.h"
 #include "client_class.h"
-
-extern IBaseClientDLL *pClient;
 
 class WSOffsets {
 public:
@@ -34,6 +33,4 @@ private:
 	static bool CrawlForArrayEnt(RecvTable *sTable, const char *propName, int element, int &offset);
 };
 
-#define MakePtr( cast, ptr, addValue ) (cast)( (unsigned long)(ptr) + (unsigned long)(addValue))
-
-#endif
+#define MakePtr(cast, ptr, addValue) (cast)((unsigned long) (ptr) + (unsigned long) (addValue))

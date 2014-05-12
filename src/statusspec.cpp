@@ -2,47 +2,13 @@
  *  statusspec.cpp
  *  StatusSpec project
  *  
- *  Copyright (c) 2013 thesupremecommander
+ *  Copyright (c) 2014 thesupremecommander
  *  BSD 2-Clause License
  *  http://opensource.org/licenses/BSD-2-Clause
  *
  */
 
 #include "statusspec.h"
-
-inline bool DataCompare(const BYTE* pData, const BYTE* bSig, const char* szMask)
-{
-	for (; *szMask; ++szMask, ++pData, ++bSig)
-	{
-		if (*szMask == 'x' && *pData != *bSig)
-			return false;
-	}
-	
-	return (*szMask) == NULL;
-}
-
-// Finds a pattern at the specified address
-inline DWORD FindPattern(DWORD dwAddress, DWORD dwSize, BYTE* pbSig, const char* szMask)
-{
-	for (DWORD i = NULL; i < dwSize; i++)
-	{
-		if (DataCompare((BYTE*) (dwAddress + i), pbSig, szMask))
-			return (DWORD) (dwAddress + i);
-	}
-	
-	return 0;
-}
-
-IGameResources* GetGameResources() {
-	//IGameResources* res;
-	static DWORD funcadd = NULL;
-	if (!funcadd)
-		funcadd = FindPattern((DWORD) GetHandleOfModule(_T("client")), 0x2680C6, (PBYTE) "\xA1\x00\x00\x00\x00\x85\xC0\x74\x06\x05", "x????xxxxx");
-		
-	typedef IGameResources* (*GGR_t) (void);
-	GGR_t GGR = (GGR_t) funcadd;
-	return GGR();
-}
 
 ConVar force_refresh_specgui("statusspec_force_specgui_refresh", "0", 0, "whether to force the spectator GUI to refresh");
 ConVar status_icons_enabled("statusspec_status_icons_enabled", "0", 0, "enable status icons");
@@ -72,16 +38,16 @@ bool CheckCondition(uint32_t conditions[3], int condition) {
 }
 
 void UpdateEntities() {
-	int iEntCount = pEntityList->GetHighestEntityIndex();
+	int iEntCount = g_pClientEntityList->GetHighestEntityIndex();
 	IClientEntity *cEntity;
 	
 	playerInfo.clear();
 
 	for (int i = 0; i < iEntCount; i++) {
-		cEntity = pEntityList->GetClientEntity(i);
+		cEntity = g_pClientEntityList->GetClientEntity(i);
 		
 		// Ensure valid player entity
-		if (cEntity == NULL || !(GetGameResources()->IsConnected(i))) {
+		if (cEntity == NULL || !(g_pGameResources->IsConnected(i))) {
 			continue;
 		}
 		
@@ -111,17 +77,17 @@ void __fastcall hookedSendMessage(vgui::IPanel *thisPtr, int edx, vgui::VPANEL v
 	if (ifromPanelName[0] == 'p' && ifromPanelName[1] == 'l' && ifromPanelName[2] == 'a' && ifromPanelName[3] == 'y' && ifromPanelName[4] == 'e' && ifromPanelName[5] == 'r' && ifromPanelName[6] == 'p' && ifromPanelName[7] == 'a' && ifromPanelName[8] == 'n' && ifromPanelName[9] == 'e' && ifromPanelName[10] == 'l' && strcmp(params->GetName(), "DialogVariables") == 0) {
 		const char *playerName = params->GetString("playername");
 		
-		int iEntCount = pEntityList->GetHighestEntityIndex();
+		int iEntCount = g_pClientEntityList->GetHighestEntityIndex();
 		IClientEntity *cEntity;
 		
 		for (int i = 0; i < iEntCount; i++) {
-			cEntity = pEntityList->GetClientEntity(i);
+			cEntity = g_pClientEntityList->GetClientEntity(i);
 			
-			if (cEntity == NULL || !(GetGameResources()->IsConnected(i))) {
+			if (cEntity == NULL || !(g_pGameResources->IsConnected(i))) {
 				continue;
 			}
 			
-			if (strcmp(playerName, GetGameResources()->GetPlayerName(i)) == 0) {
+			if (strcmp(playerName, g_pGameResources->GetPlayerName(i)) == 0) {
 				playerPanels[g_pVGuiPanel->GetName(ifromPanel)] = i;
 				break;
 			}
@@ -136,7 +102,7 @@ void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL
 	
 	origPaintTraverse(thisPtr, edx, vguiPanel, forceRepaint, allowForce);
 
-	if (pEngineClient->IsDrawingLoadingImage() || !pEngineClient->IsInGame() || !pEngineClient->IsConnected() || pEngineClient->Con_IsVisible())
+	if (g_pEngineClient->IsDrawingLoadingImage() || !g_pEngineClient->IsInGame() || !g_pEngineClient->IsConnected() || g_pEngineClient->Con_IsVisible())
 		return;
 	
 	const char* panelName = g_pVGuiPanel->GetName(vguiPanel);
@@ -544,18 +510,7 @@ StatusSpecPlugin::~StatusSpecPlugin()
 
 bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory)
 {
-	ConnectTier1Libraries(&interfaceFactory, 1);
-	ConnectTier2Libraries(&interfaceFactory, 1);
-	ConnectTier3Libraries(&interfaceFactory, 1);
-	
-	void* hmClient = GetHandleOfModule("client");
-	CreateInterfaceFn clientFactory = (CreateInterfaceFn) GetFuncAddress(hmClient, "CreateInterface");
-	pClient	 = (IBaseClientDLL*) clientFactory(CLIENT_DLL_INTERFACE_VERSION, NULL);
-	pEntityList = (IClientEntityList*) clientFactory(VCLIENTENTITYLIST_INTERFACE_VERSION, NULL);
-	
-	pEngineClient = (IVEngineClient*) interfaceFactory(VENGINE_CLIENT_INTERFACE_VERSION, NULL);
-	
-	if (!(pClient && pEntityList && pEngineClient && g_pVGuiPanel && g_pVGuiSchemeManager && g_pVGuiSurface && g_pVGui))
+	if (!LoadInterfaces(interfaceFactory, gameServerFactory))
 	{
 		Warning("Unable to load required libraries for %s!", PLUGIN_DESC);
 		return false;
@@ -629,12 +584,9 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 void StatusSpecPlugin::Unload(void)
 {
 	ConVar_Unregister();
-	DisconnectTier3Libraries();
-	DisconnectTier2Libraries();
-	DisconnectTier1Libraries();
+	UnloadInterfaces();
 }
 
-void StatusSpecPlugin::FireGameEvent(KeyValues *event) {}
 void StatusSpecPlugin::Pause(void) {}
 void StatusSpecPlugin::UnPause(void) {}
 const char *StatusSpecPlugin::GetPluginDescription(void) { return PLUGIN_DESC; }
