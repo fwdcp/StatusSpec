@@ -36,10 +36,10 @@
 
 bool LoadInterfaces(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory);
 void UnloadInterfaces();
+IGameResources* GameResources();
 
 extern CDllDemandLoader clientModule;
 
 extern IBaseClientDLL* g_pClientDll;
 extern IClientEntityList* g_pClientEntityList;
 extern IVEngineClient* g_pEngineClient;
-extern IGameResources* g_pGameResources;

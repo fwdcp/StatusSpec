@@ -47,7 +47,7 @@ void UpdateEntities() {
 		cEntity = g_pClientEntityList->GetClientEntity(i);
 		
 		// Ensure valid player entity
-		if (cEntity == NULL || !(g_pGameResources->IsConnected(i))) {
+		if (cEntity == NULL || !(GameResources()->IsConnected(i))) {
 			continue;
 		}
 		
@@ -83,11 +83,11 @@ void __fastcall hookedSendMessage(vgui::IPanel *thisPtr, int edx, vgui::VPANEL v
 		for (int i = 0; i < iEntCount; i++) {
 			cEntity = g_pClientEntityList->GetClientEntity(i);
 			
-			if (cEntity == NULL || !(g_pGameResources->IsConnected(i))) {
+			if (cEntity == NULL || !(GameResources()->IsConnected(i))) {
 				continue;
 			}
 			
-			if (strcmp(playerName, g_pGameResources->GetPlayerName(i)) == 0) {
+			if (strcmp(playerName, GameResources()->GetPlayerName(i)) == 0) {
 				playerPanels[g_pVGuiPanel->GetName(ifromPanel)] = i;
 				break;
 			}

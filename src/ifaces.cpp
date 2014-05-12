@@ -21,7 +21,6 @@ CDllDemandLoader clientModule = NULL;
 IBaseClientDLL* g_pClientDll;
 IClientEntityList* g_pClientEntityList;
 IVEngineClient* g_pEngineClient;
-IGameResources* g_pGameResources;
 
 inline bool DataCompare(const BYTE* pData, const BYTE* bSig, const char* szMask)
 {
@@ -45,6 +44,15 @@ inline DWORD FindPattern(DWORD dwAddress, DWORD dwSize, BYTE* pbSig, const char*
 	return 0;
 }
 
+IGameResources* GameResources() {
+	static DWORD funcadd = NULL;
+	if (!funcadd)
+		funcadd = FindPattern((DWORD) GetHandleOfModule(_T("client")), 0x2680C6, (PBYTE) "\xA1\x00\x00\x00\x00\x85\xC0\x74\x06\x05", "x????xxxxx");
+	typedef IGameResources* (*GGR_t) (void);
+	GGR_t GGR = (GGR_t) funcadd;
+	return GGR();
+}
+
 bool LoadInterfaces(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory) {
 	ConnectTier1Libraries(&interfaceFactory, 1);
 	ConnectTier2Libraries(&interfaceFactory, 1);
@@ -59,20 +67,12 @@ bool LoadInterfaces(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameSe
 	#endif;
 	CreateInterfaceFn gameClientFactory = clientModule.GetFactory();
 	
-	static DWORD funcadd = NULL;
-	if (!funcadd)
-		funcadd = FindPattern((DWORD) GetHandleOfModule(_T("client")), 0x2680C6, (PBYTE) "\xA1\x00\x00\x00\x00\x85\xC0\x74\x06\x05", "x????xxxxx");
-	typedef IGameResources* (*GGR_t) (void);
-	GGR_t GGR = (GGR_t) funcadd;
-	IGameResources* g_pGameResources = GGR();
-	
 	IBaseClientDLL* g_pClientDll = (IBaseClientDLL*) gameClientFactory(CLIENT_DLL_INTERFACE_VERSION, NULL);
 	IClientEntityList* g_pClientEntityList = (IClientEntityList*) gameClientFactory(VCLIENTENTITYLIST_INTERFACE_VERSION, NULL);
 
 	CheckPointerAndWarn(g_pClientDll, IBaseClientDLL);
 	CheckPointerAndWarn(g_pClientEntityList, IClientEntityList);
 	CheckPointerAndWarn(g_pEngineClient, IVEngineClient);
-	CheckPointerAndWarn(g_pGameResources, IGameResources);
 	CheckPointerAndWarn(g_pVGuiSurface, vgui::ISurface);
 	CheckPointerAndWarn(g_pVGui, vgui::IVGui);
 	CheckPointerAndWarn(g_pVGuiPanel, vgui::IPanel);
