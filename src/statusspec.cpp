@@ -516,6 +516,8 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 		return false;
 	}
 	
+	itemSchema = new ItemSchema();
+	
 	m_iTextureUbercharged = g_pVGuiSurface->CreateNewTextureID();
 	m_iTextureCritBoosted = g_pVGuiSurface->CreateNewTextureID();
 	m_iTextureResistShieldRed = g_pVGuiSurface->CreateNewTextureID();

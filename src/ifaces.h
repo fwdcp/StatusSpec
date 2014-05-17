@@ -25,6 +25,8 @@
 #include "vgui/IScheme.h"
 #include "vgui/ISurface.h"
 #include "igameresources.h"
+#include "KeyValues.h"
+#include "filesystem.h"
 
 #ifdef _POSIX
 #define GetFuncAddress(pAddress, szFunction) dlsym(pAddress, szFunction)

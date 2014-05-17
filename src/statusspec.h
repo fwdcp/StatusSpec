@@ -19,6 +19,7 @@
 #include "ifaces.h"
 #include "offsets.h"
 #include "vfuncs.h"
+#include "itemschema.h"
 
 #define PLUGIN_DESC "StatusSpec v0.6"
 #define SHORT_DESC "StatusSpec v0.6"
@@ -165,6 +166,8 @@ typedef struct Player {
 std::map<const char*, int> playerPanels;
 std::map<int, Player> playerInfo;
 std::string playerPanelName = "playerpanel";
+
+ItemSchema *itemSchema;
 
 #define Round(x) ((x)>=0?(int)((x)+0.5):(int)((x)-0.5))
 

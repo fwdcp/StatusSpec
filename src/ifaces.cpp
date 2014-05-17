@@ -77,6 +77,7 @@ bool LoadInterfaces(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameSe
 	CheckPointerAndWarn(g_pVGui, vgui::IVGui);
 	CheckPointerAndWarn(g_pVGuiPanel, vgui::IPanel);
 	CheckPointerAndWarn(g_pVGuiSchemeManager, vgui::ISchemeManager);
+	CheckPointerAndWarn(g_pFullFileSystem, IFileSystem);
 	
 	return true;
 }
