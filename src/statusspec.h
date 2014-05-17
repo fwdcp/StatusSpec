@@ -12,9 +12,10 @@
 
 #include "stdafx.h"
 
-#include "stdint.h"
-#include "vector"
-#include "map"
+#include <cstdint>
+#include <vector>
+#include <map>
+#include <string>
 
 #include "ifaces.h"
 #include "offsets.h"
@@ -163,7 +164,7 @@ typedef struct Player {
 	uint32_t conditions[3];
 } Player;
 
-std::map<const char*, int> playerPanels;
+std::map<std::string, int> playerPanels;
 std::map<int, Player> playerInfo;
 std::string playerPanelName = "playerpanel";
 

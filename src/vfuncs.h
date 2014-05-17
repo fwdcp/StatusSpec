@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include "stdafx.h"
+
 #define CLIENT_DLL
 
 class WSEmptyClass {};

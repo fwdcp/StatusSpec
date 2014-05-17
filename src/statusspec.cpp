@@ -74,7 +74,7 @@ void __fastcall hookedSendMessage(vgui::IPanel *thisPtr, int edx, vgui::VPANEL v
 	
 	const char *ifromPanelName = g_pVGuiPanel->GetName(ifromPanel);
 	
-	if (ifromPanelName[0] == 'p' && ifromPanelName[1] == 'l' && ifromPanelName[2] == 'a' && ifromPanelName[3] == 'y' && ifromPanelName[4] == 'e' && ifromPanelName[5] == 'r' && ifromPanelName[6] == 'p' && ifromPanelName[7] == 'a' && ifromPanelName[8] == 'n' && ifromPanelName[9] == 'e' && ifromPanelName[10] == 'l' && strcmp(params->GetName(), "DialogVariables") == 0) {
+	if (playerPanelName.compare(0, 11, ifromPanelName, 0, 11) && strcmp(params->GetName(), "DialogVariables") == 0) {
 		const char *playerName = params->GetString("playername");
 		
 		int iEntCount = g_pClientEntityList->GetHighestEntityIndex();
