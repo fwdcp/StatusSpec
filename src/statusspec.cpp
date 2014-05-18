@@ -38,16 +38,16 @@ bool CheckCondition(uint32_t conditions[3], int condition) {
 }
 
 void UpdateEntities() {
-	int iEntCount = g_pClientEntityList->GetHighestEntityIndex();
+	int iEntCount = Interfaces::pClientEntityList->GetHighestEntityIndex();
 	IClientEntity *cEntity;
 	
 	playerInfo.clear();
 
 	for (int i = 0; i < iEntCount; i++) {
-		cEntity = g_pClientEntityList->GetClientEntity(i);
+		cEntity = Interfaces::pClientEntityList->GetClientEntity(i);
 		
 		// Ensure valid player entity
-		if (cEntity == NULL || !(GameResources()->IsConnected(i))) {
+		if (cEntity == NULL || !(Interfaces::GetGameResources()->IsConnected(i))) {
 			continue;
 		}
 		
@@ -77,17 +77,17 @@ void __fastcall hookedSendMessage(vgui::IPanel *thisPtr, int edx, vgui::VPANEL v
 	if (playerPanelName.compare(0, 11, ifromPanelName, 0, 11) && strcmp(params->GetName(), "DialogVariables") == 0) {
 		const char *playerName = params->GetString("playername");
 		
-		int iEntCount = g_pClientEntityList->GetHighestEntityIndex();
+		int iEntCount = Interfaces::pClientEntityList->GetHighestEntityIndex();
 		IClientEntity *cEntity;
 		
 		for (int i = 0; i < iEntCount; i++) {
-			cEntity = g_pClientEntityList->GetClientEntity(i);
+			cEntity = Interfaces::pClientEntityList->GetClientEntity(i);
 			
-			if (cEntity == NULL || !(GameResources()->IsConnected(i))) {
+			if (cEntity == NULL || !(Interfaces::GetGameResources()->IsConnected(i))) {
 				continue;
 			}
 			
-			if (strcmp(playerName, GameResources()->GetPlayerName(i)) == 0) {
+			if (strcmp(playerName, Interfaces::GetGameResources()->GetPlayerName(i)) == 0) {
 				playerPanels[g_pVGuiPanel->GetName(ifromPanel)] = i;
 				break;
 			}
@@ -102,7 +102,7 @@ void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL
 	
 	origPaintTraverse(thisPtr, edx, vguiPanel, forceRepaint, allowForce);
 
-	if (g_pEngineClient->IsDrawingLoadingImage() || !g_pEngineClient->IsInGame() || !g_pEngineClient->IsConnected() || g_pEngineClient->Con_IsVisible())
+	if (Interfaces::pEngineClient->IsDrawingLoadingImage() || !Interfaces::pEngineClient->IsInGame() || !Interfaces::pEngineClient->IsConnected() || Interfaces::pEngineClient->Con_IsVisible())
 		return;
 	
 	const char* panelName = g_pVGuiPanel->GetName(vguiPanel);
@@ -510,11 +510,13 @@ StatusSpecPlugin::~StatusSpecPlugin()
 
 bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory)
 {
-	if (!LoadInterfaces(interfaceFactory, gameServerFactory))
+	if (!Interfaces::Load(interfaceFactory, gameServerFactory))
 	{
 		Warning("Unable to load required libraries for %s!", PLUGIN_DESC);
 		return false;
 	}
+	
+	DevMsg("Engine client %p, client DLL %p, VGUI %p\n", Interfaces::pEngineClient, Interfaces::pClientDLL, g_pVGui);
 	
 	itemSchema = new ItemSchema();
 	
@@ -586,7 +588,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 void StatusSpecPlugin::Unload(void)
 {
 	ConVar_Unregister();
-	UnloadInterfaces();
+	Interfaces::Unload();
 }
 
 void StatusSpecPlugin::Pause(void) {}

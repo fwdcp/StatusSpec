@@ -16,11 +16,10 @@
 		return false; \
 	}
 
-CDllDemandLoader clientModule = NULL;
-
-IBaseClientDLL* g_pClientDll;
-IClientEntityList* g_pClientEntityList;
-IVEngineClient* g_pEngineClient;
+IBaseClientDLL* Interfaces::pClientDLL = NULL;
+IClientEntityList* Interfaces::pClientEntityList = NULL;
+IVEngineClient* Interfaces::pEngineClient = NULL;
+CDllDemandLoader *Interfaces::pClientModule = NULL;
 
 inline bool DataCompare(const BYTE* pData, const BYTE* bSig, const char* szMask)
 {
@@ -44,7 +43,7 @@ inline DWORD FindPattern(DWORD dwAddress, DWORD dwSize, BYTE* pbSig, const char*
 	return 0;
 }
 
-IGameResources* GameResources() {
+IGameResources* Interfaces::GetGameResources() {
 	static DWORD funcadd = NULL;
 	if (!funcadd)
 		funcadd = FindPattern((DWORD) GetHandleOfModule(_T("client")), 0x2680C6, (PBYTE) "\xA1\x00\x00\x00\x00\x85\xC0\x74\x06\x05", "x????xxxxx");
@@ -53,44 +52,46 @@ IGameResources* GameResources() {
 	return GGR();
 }
 
-bool LoadInterfaces(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory) {
+bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory) {
 	ConnectTier1Libraries(&interfaceFactory, 1);
 	ConnectTier2Libraries(&interfaceFactory, 1);
 	ConnectTier3Libraries(&interfaceFactory, 1);
 	
-	IVEngineClient* g_pEngineClient = (IVEngineClient*) interfaceFactory(VENGINE_CLIENT_INTERFACE_VERSION, NULL);
+	pEngineClient = (IVEngineClient*) interfaceFactory(VENGINE_CLIENT_INTERFACE_VERSION, NULL);
 	
 	#ifdef _POSIX
-	CDllDemandLoader clientModule = CDllDemandLoader("tf/bin/client.so");
+	pClientModule = new CDllDemandLoader("tf/bin/client.so");
 	#else
-	CDllDemandLoader clientModule = CDllDemandLoader("tf/bin/client.dll");
-	#endif;
-	CreateInterfaceFn gameClientFactory = clientModule.GetFactory();
+	pClientModule = new CDllDemandLoader("tf/bin/client.dll");
+	#endif
+	CreateInterfaceFn gameClientFactory = pClientModule->GetFactory();
 	
-	IBaseClientDLL* g_pClientDll = (IBaseClientDLL*) gameClientFactory(CLIENT_DLL_INTERFACE_VERSION, NULL);
-	IClientEntityList* g_pClientEntityList = (IClientEntityList*) gameClientFactory(VCLIENTENTITYLIST_INTERFACE_VERSION, NULL);
-
-	CheckPointerAndWarn(g_pClientDll, IBaseClientDLL);
-	CheckPointerAndWarn(g_pClientEntityList, IClientEntityList);
-	CheckPointerAndWarn(g_pEngineClient, IVEngineClient);
+	pClientDLL = (IBaseClientDLL*) gameClientFactory(CLIENT_DLL_INTERFACE_VERSION, NULL);
+	pClientEntityList = (IClientEntityList*) gameClientFactory(VCLIENTENTITYLIST_INTERFACE_VERSION, NULL);
+	
+	CheckPointerAndWarn(pClientDLL, IBaseClientDLL);
+	CheckPointerAndWarn(pClientEntityList, IClientEntityList);
+	CheckPointerAndWarn(pEngineClient, IVEngineClient);
 	CheckPointerAndWarn(g_pVGuiSurface, vgui::ISurface);
 	CheckPointerAndWarn(g_pVGui, vgui::IVGui);
 	CheckPointerAndWarn(g_pVGuiPanel, vgui::IPanel);
 	CheckPointerAndWarn(g_pVGuiSchemeManager, vgui::ISchemeManager);
 	CheckPointerAndWarn(g_pFullFileSystem, IFileSystem);
 	
+	DevMsg("Engine client %p, client DLL %p, VGUI %p\n", pEngineClient, pClientDLL, g_pVGui);
+	
 	return true;
 }
 
-void UnloadInterfaces() {
+void Interfaces::Unload() {
 	DisconnectTier3Libraries();
 	DisconnectTier2Libraries();
 	DisconnectTier1Libraries();
 	
-	clientModule.Unload();
-	clientModule = NULL;
+	pClientModule->Unload();
+	pClientModule = NULL;
 	
-	g_pClientDll = NULL;
-	g_pClientEntityList = NULL;
-	g_pEngineClient = NULL;
+	pClientDLL = NULL;
+	pClientEntityList = NULL;
+	pEngineClient = NULL;
 }

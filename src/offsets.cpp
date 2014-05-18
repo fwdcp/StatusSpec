@@ -36,11 +36,11 @@ void WSOffsets::PrepareOffsets() {
 //=================================================================================
 int WSOffsets::FindOffsetOfClassProp(const char *className, const char *propName) {
 	//ServerClass *sc = serverGameDLL->GetAllServerClasses();
-	ClientClass *sc = g_pClientDll->GetAllClasses();
-	while (sc) {
-		if (Q_strcmp(sc->GetName(), className) == 0) {
+	ClientClass *cc = Interfaces::pClientDLL->GetAllClasses();
+	while (cc) {
+		if (Q_strcmp(cc->GetName(), className) == 0) {
 			//SendTable *sTable = sc->m_pTable;
-			RecvTable *sTable = sc->m_pRecvTable;
+			RecvTable *sTable = cc->m_pRecvTable;
 			if (sTable) {
 				int offset = 0;
 				bool found = WSOffsets::CrawlForPropOffset(sTable, propName, offset);
@@ -49,13 +49,13 @@ int WSOffsets::FindOffsetOfClassProp(const char *className, const char *propName
 				return offset;
 			}
 		}
-		sc = sc->m_pNext;
+		cc = cc->m_pNext;
 	}
 	return 0;
 }
 
 int WSOffsets::FindOffsetOfArrayEnt(const char *classname, const char *arrayName, int element) {
-	ClientClass *cc = g_pClientDll->GetAllClasses();
+	ClientClass *cc = Interfaces::pClientDLL->GetAllClasses();
 	while (cc) {
 		if (Q_strcmp(cc->GetName(), classname) == 0) {
 			RecvTable *rTable = cc->m_pRecvTable;

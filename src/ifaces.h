@@ -36,12 +36,14 @@
 #define GetHandleOfModule(szModuleName) GetModuleHandleA(szModuleName".dll")
 #endif
 
-bool LoadInterfaces(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory);
-void UnloadInterfaces();
-IGameResources* GameResources();
-
-extern CDllDemandLoader clientModule;
-
-extern IBaseClientDLL* g_pClientDll;
-extern IClientEntityList* g_pClientEntityList;
-extern IVEngineClient* g_pEngineClient;
+class Interfaces {
+	public:
+		static bool Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory);
+		static void Unload();
+		static IBaseClientDLL* pClientDLL;
+		static IClientEntityList* pClientEntityList;
+		static IVEngineClient* pEngineClient;
+		static IGameResources* GetGameResources();
+	private:
+		static CDllDemandLoader *pClientModule;
+};
