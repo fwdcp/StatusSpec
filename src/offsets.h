@@ -16,6 +16,8 @@
 #include "cdll_client_int.h"
 #include "client_class.h"
 
+#define MAX_WEAPONS 48
+
 class WSOffsets {
 public:
 	static int pCTFPlayer__m_iTeamNum;
@@ -23,6 +25,8 @@ public:
 	static int pCTFPlayer___condition_bits;
 	static int pCTFPlayer__m_nPlayerCondEx;
 	static int pCTFPlayer__m_nPlayerCondEx2;
+	static int pCTFPlayer__m_hMyWeapons[MAX_WEAPONS];
+	static int pCTFPlayer__m_hMyWearables;
 	static int pCEconEntity__m_iItemDefinitionIndex;
 
 	static void PrepareOffsets();
