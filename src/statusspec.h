@@ -162,6 +162,14 @@ vgui::HPanel specguiPanel;
 typedef struct Player {
 	int team;
 	uint32_t conditions[3];
+	int primary;
+	int secondary;
+	int melee;
+	int pda;
+	int pda2;
+	int building;
+	int cosmetic[3];
+	int action;
 } Player;
 
 std::map<std::string, int> playerPanels;

@@ -46,26 +46,63 @@ void UpdateEntities() {
 	for (int i = 0; i < iEntCount; i++) {
 		cEntity = Interfaces::pClientEntityList->GetClientEntity(i);
 		
-		// Ensure valid player entity
-		if (cEntity == NULL || !(Interfaces::GetGameResources()->IsConnected(i))) {
+		if (!cEntity) {
 			continue;
 		}
 		
-		// get our stuff directly from entity data
-		int team = *MakePtr(int*, cEntity, WSOffsets::pCTFPlayer__m_iTeamNum);
-		uint32_t playerCond = *MakePtr(uint32_t*, cEntity, WSOffsets::pCTFPlayer__m_nPlayerCond);
-		uint32_t condBits = *MakePtr(uint32_t*, cEntity, WSOffsets::pCTFPlayer___condition_bits);
-		uint32_t playerCondEx = *MakePtr(uint32_t*, cEntity, WSOffsets::pCTFPlayer__m_nPlayerCondEx);
-		uint32_t playerCondEx2 = *MakePtr(uint32_t*, cEntity, WSOffsets::pCTFPlayer__m_nPlayerCondEx2);
-		
-		if (team != TEAM_RED && team != TEAM_BLU) {
-			continue;
+		if (WSOffsets::CheckClassBaseclass(cEntity->GetClientClass(), "DT_EconEntity")) {
+			unsigned int client = reinterpret_cast<CHandle<C_BaseEntity>*>((char *) cEntity + WSOffsets::pCEconEntity__m_hOwnerEntity)->GetEntryIndex();
+			
+			int itemDefinitionIndex = *MakePtr(int*, cEntity, WSOffsets::pCEconEntity__m_iItemDefinitionIndex);
+			
+			const char *itemType = itemSchema->GetItemKeyValue(itemDefinitionIndex, "item_slot");
+			
+			if (strcmp(itemType, "primary") == 0) {
+				playerInfo[client].primary = itemDefinitionIndex;
+			}
+			else if (strcmp(itemType, "secondary") == 0) {
+				playerInfo[client].secondary = itemDefinitionIndex;
+			}
+			else if (strcmp(itemType, "melee") == 0) {
+				playerInfo[client].melee = itemDefinitionIndex;
+			}
+			else if (strcmp(itemType, "pda") == 0) {
+				playerInfo[client].pda = itemDefinitionIndex;
+			}
+			else if (strcmp(itemType, "pda2") == 0) {
+				playerInfo[client].pda2 = itemDefinitionIndex;
+			}
+			else if (strcmp(itemType, "building") == 0) {
+				playerInfo[client].building = itemDefinitionIndex;
+			}
+			else if (strcmp(itemType, "head") == 0 || strcmp(itemType, "misc") == 0) {
+				for (int slot = 0; slot < 3; slot++) {
+					if (!playerInfo[client].cosmetic[slot]) {
+						playerInfo[client].cosmetic[slot] = itemDefinitionIndex;
+						break;
+					}
+				}
+			}
+			else if (strcmp(itemType, "action") == 0) {
+				playerInfo[client].action = itemDefinitionIndex;
+			}
 		}
-		
-		playerInfo[i].team = team;
-		playerInfo[i].conditions[0] = playerCond|condBits;
-		playerInfo[i].conditions[1] = playerCondEx;
-		playerInfo[i].conditions[2] = playerCondEx2;
+		else if (Interfaces::GetGameResources()->IsConnected(i)) {
+			int team = *MakePtr(int*, cEntity, WSOffsets::pCTFPlayer__m_iTeamNum);
+			uint32_t playerCond = *MakePtr(uint32_t*, cEntity, WSOffsets::pCTFPlayer__m_nPlayerCond);
+			uint32_t condBits = *MakePtr(uint32_t*, cEntity, WSOffsets::pCTFPlayer___condition_bits);
+			uint32_t playerCondEx = *MakePtr(uint32_t*, cEntity, WSOffsets::pCTFPlayer__m_nPlayerCondEx);
+			uint32_t playerCondEx2 = *MakePtr(uint32_t*, cEntity, WSOffsets::pCTFPlayer__m_nPlayerCondEx2);
+			
+			if (team != TEAM_RED && team != TEAM_BLU) {
+				continue;
+			}
+			
+			playerInfo[i].team = team;
+			playerInfo[i].conditions[0] = playerCond|condBits;
+			playerInfo[i].conditions[1] = playerCondEx;
+			playerInfo[i].conditions[2] = playerCondEx2;
+		}
 	}
 }
 
