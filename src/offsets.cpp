@@ -16,8 +16,7 @@ int WSOffsets::pCTFPlayer__m_nPlayerCond = 0;
 int WSOffsets::pCTFPlayer___condition_bits = 0;
 int WSOffsets::pCTFPlayer__m_nPlayerCondEx = 0;
 int WSOffsets::pCTFPlayer__m_nPlayerCondEx2 = 0;
-int WSOffsets::pCTFPlayer__m_hMyWeapons[MAX_WEAPONS] = {};
-int WSOffsets::pCTFPlayer__m_hMyWearables = 0;
+int WSOffsets::pCEconEntity__m_hOwnerEntity = 0;
 int WSOffsets::pCEconEntity__m_iItemDefinitionIndex = 0;
 
 //=================================================================================
@@ -30,10 +29,7 @@ void WSOffsets::PrepareOffsets() {
 	WSOffsets::pCTFPlayer___condition_bits = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "_condition_bits");
 	WSOffsets::pCTFPlayer__m_nPlayerCondEx = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCondEx");
 	WSOffsets::pCTFPlayer__m_nPlayerCondEx2 = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCondEx2");
-	for (int i = 0; i < MAX_WEAPONS; i++) {
-		WSOffsets::pCTFPlayer__m_hMyWeapons[i] = WSOffsets::FindOffsetOfArrayEnt("CTFPlayer", "m_hMyWeapons", i);
-	}
-	WSOffsets::pCTFPlayer__m_hMyWearables = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "m_hMyWearables");
+	WSOffsets::pCEconEntity__m_hOwnerEntity = WSOffsets::FindOffsetOfClassProp("CEconEntity", "m_hOwnerEntity");
 	WSOffsets::pCEconEntity__m_iItemDefinitionIndex = WSOffsets::FindOffsetOfClassProp("CEconEntity", "m_iItemDefinitionIndex");
 }
 
