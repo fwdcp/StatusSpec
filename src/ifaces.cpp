@@ -78,8 +78,6 @@ bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 	CheckPointerAndWarn(g_pVGuiSchemeManager, vgui::ISchemeManager);
 	CheckPointerAndWarn(g_pFullFileSystem, IFileSystem);
 	
-	DevMsg("Engine client %p, client DLL %p, VGUI %p\n", pEngineClient, pClientDLL, g_pVGui);
-	
 	return true;
 }
 

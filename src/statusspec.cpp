@@ -516,8 +516,6 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 		return false;
 	}
 	
-	DevMsg("Engine client %p, client DLL %p, VGUI %p\n", Interfaces::pEngineClient, Interfaces::pClientDLL, g_pVGui);
-	
 	itemSchema = new ItemSchema();
 	
 	m_iTextureUbercharged = g_pVGuiSurface->CreateNewTextureID();
