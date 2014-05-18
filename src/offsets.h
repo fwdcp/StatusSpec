@@ -23,6 +23,7 @@ public:
 	static int pCTFPlayer___condition_bits;
 	static int pCTFPlayer__m_nPlayerCondEx;
 	static int pCTFPlayer__m_nPlayerCondEx2;
+	static int pCEconEntity__m_iItemDefinitionIndex;
 
 	static void PrepareOffsets();
 	static int FindOffsetOfClassProp(const char *className, const char *propName);

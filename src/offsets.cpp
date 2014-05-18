@@ -16,6 +16,7 @@ int WSOffsets::pCTFPlayer__m_nPlayerCond = 0;
 int WSOffsets::pCTFPlayer___condition_bits = 0;
 int WSOffsets::pCTFPlayer__m_nPlayerCondEx = 0;
 int WSOffsets::pCTFPlayer__m_nPlayerCondEx2 = 0;
+int WSOffsets::pCEconEntity__m_iItemDefinitionIndex = 0;
 
 //=================================================================================
 // Find the offsets for all stored NetVars
@@ -27,6 +28,7 @@ void WSOffsets::PrepareOffsets() {
 	WSOffsets::pCTFPlayer___condition_bits = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "_condition_bits");
 	WSOffsets::pCTFPlayer__m_nPlayerCondEx = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCondEx");
 	WSOffsets::pCTFPlayer__m_nPlayerCondEx2 = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCondEx2");
+	WSOffsets::pCEconEntity__m_iItemDefinitionIndex = WSOffsets::FindOffsetOfClassProp("CEconEntity", "m_iItemDefinitionIndex");
 }
 
 //=================================================================================
