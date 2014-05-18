@@ -86,6 +86,11 @@ void UpdateEntities() {
 			else if (strcmp(itemType, "action") == 0) {
 				playerInfo[client].action = itemDefinitionIndex;
 			}
+			
+			if (m_iTextureItemIcon.find(itemDefinitionIndex) == m_iTextureItemIcon.end()) {
+				m_iTextureItemIcon[itemDefinitionIndex] = g_pVGuiSurface->CreateNewTextureID();
+				g_pVGuiSurface->DrawSetTextureFile(m_iTextureItemIcon[itemDefinitionIndex], itemSchema->GetItemKeyValue(itemDefinitionIndex, "image_inventory"), 0, false);
+			}
 		}
 		else if (Interfaces::GetGameResources()->IsConnected(i)) {
 			int team = *MakePtr(int*, cEntity, WSOffsets::pCTFPlayer__m_iTeamNum);

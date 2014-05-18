@@ -155,6 +155,7 @@ int m_iTextureMilked;
 int m_iTextureMarkedForDeath;
 int m_iTextureBleeding;
 int m_iTextureOnFire;
+std::map<int, int> m_iTextureItemIcon;
 
 KeyValues *performlayoutCommand;
 vgui::HPanel specguiPanel;
