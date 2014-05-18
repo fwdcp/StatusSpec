@@ -183,3 +183,34 @@ bool WSOffsets::CrawlForArrayEnt(RecvTable *sTable, const char *propName, int el
 	}
 	return false;
 }
+
+inline bool CheckBaseclass(RecvTable *sTable, const char *baseclassDataTableName) {
+	if (strcmp(sTable->GetName(), baseclassDataTableName) == 0) {
+		return true;
+	}
+	
+	for (int i = 0; i < sTable->GetNumProps(); i++) {
+		RecvProp *sProp = sTable->GetProp(i);
+		
+		if (strcmp(sProp->GetName(), "baseclass") != 0) {
+			continue;
+		}
+
+		RecvTable *sChildTable = sProp->GetDataTable();
+		if (sChildTable) {
+			return CheckBaseclass(sChildTable, baseclassDataTableName);
+		}
+	}
+	
+	return false;
+}
+
+bool WSOffsets::CheckClassBaseclass(ClientClass *clientClass, const char *baseclassDataTableName) {
+	RecvTable *sTable = clientClass->m_pRecvTable;
+	
+	if (sTable) {
+		return CheckBaseclass(sTable, baseclassDataTableName);
+	}
+	
+	return false;
+}

@@ -31,6 +31,7 @@ public:
 	static void PrepareOffsets();
 	static int FindOffsetOfClassProp(const char *className, const char *propName);
 	static int FindOffsetOfArrayEnt(const char *classname, const char *arrayName, int element);
+	static bool CheckClassBaseclass(ClientClass *clientClass, const char *baseclassDataTableName);
 
 private:
 	static bool CrawlForPropOffset(RecvTable *sTable, const char *propName, int &offset);
