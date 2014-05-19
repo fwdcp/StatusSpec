@@ -76,10 +76,10 @@ void UpdateEntities() {
 			std::fill(playerInfo[i].cosmetic, playerInfo[i].cosmetic + MAX_COSMETIC_SLOTS, -1);
 			playerInfo[i].action = -1;
 		}
-		else if (WSOffsets::CheckClassBaseclass(cEntity->GetClientClass(), "DT_EconEntity")) {
-			unsigned int player = reinterpret_cast<CHandle<C_BaseEntity>*>((char *) cEntity + WSOffsets::pCEconEntity__m_hOwnerEntity)->GetEntryIndex();
+		else if (loadout_icons_enabled.GetBool() && WSOffsets::CheckClassBaseclass(cEntity->GetClientClass(), "DT_EconEntity")) {
+			int player = reinterpret_cast<CHandle<C_BaseEntity>*>((char *) cEntity + WSOffsets::pCEconEntity__m_hOwnerEntity)->GetEntryIndex();
 			IClientEntity *playerEntity = Interfaces::pClientEntityList->GetClientEntity(player);
-			unsigned int activeWeapon = reinterpret_cast<CHandle<C_BaseEntity>*>((char *) playerEntity + WSOffsets::pCTFPlayer__m_hActiveWeapon)->GetEntryIndex();
+			int activeWeapon = reinterpret_cast<CHandle<C_BaseEntity>*>((char *) playerEntity + WSOffsets::pCTFPlayer__m_hActiveWeapon)->GetEntryIndex();
 			
 			int itemDefinitionIndex = *MakePtr(int*, cEntity, WSOffsets::pCEconEntity__m_iItemDefinitionIndex);
 			
@@ -132,7 +132,7 @@ void __fastcall hookedSendMessage(vgui::IPanel *thisPtr, int edx, vgui::VPANEL v
 	
 	const char *ifromPanelName = g_pVGuiPanel->GetName(ifromPanel);
 	
-	if (playerPanelName.compare(0, 11, ifromPanelName, 0, 11) && strcmp(params->GetName(), "DialogVariables") == 0) {
+	if (playerPanelName.compare(0, 11, ifromPanelName, 0, 11) == 0 && strcmp(params->GetName(), "DialogVariables") == 0) {
 		const char *playerName = params->GetString("playername");
 		
 		int iEntCount = Interfaces::pClientEntityList->GetHighestEntityIndex();
@@ -154,7 +154,9 @@ void __fastcall hookedSendMessage(vgui::IPanel *thisPtr, int edx, vgui::VPANEL v
 }
 	
 void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
-	if (status_icons_enabled.GetBool()) {
+	const char* panelName = g_pVGuiPanel->GetName(vguiPanel);
+
+	if (strcmp(panelName, "MatSystemTopPanel") == 0 && (status_icons_enabled.GetBool() || loadout_icons_enabled.GetBool())) {
 		UpdateEntities();
 	}
 	
@@ -163,7 +165,6 @@ void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL
 	if (Interfaces::pEngineClient->IsDrawingLoadingImage() || !Interfaces::pEngineClient->IsInGame() || !Interfaces::pEngineClient->IsConnected() || Interfaces::pEngineClient->Con_IsVisible())
 		return;
 	
-	const char* panelName = g_pVGuiPanel->GetName(vguiPanel);
 	if (strcmp(panelName, "specgui") == 0) {
 		specguiPanel = g_pVGui->PanelToHandle(vguiPanel);
 	}
@@ -547,7 +548,7 @@ void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL
 			return;
 		}
 	}
-	else if (panelName[0] == 'M' && panelName[3] == 'S' && panelName[9] == 'T' && panelName[12] == 'P') {
+	else if (strcmp(panelName, "MatSystemTopPanel") == 0) {
 		if (force_refresh_specgui.GetBool() && specguiPanel) {
 			g_pVGuiPanel->SendMessage(g_pVGui->HandleToPanel(specguiPanel), performlayoutCommand, g_pVGui->HandleToPanel(specguiPanel));
 		}
