@@ -121,7 +121,7 @@ void UpdateEntities() {
 			}
 			else if (strcmp(itemType, "head") == 0 || strcmp(itemType, "misc") == 0) {
 				for (int slot = 0; slot < 3; slot++) {
-					if (!playerInfo[player].cosmetic[slot]) {
+					if (playerInfo[player].cosmetic[slot] == -1) {
 						playerInfo[player].cosmetic[slot] = itemDefinitionIndex;
 						break;
 					}
