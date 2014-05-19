@@ -12,6 +12,7 @@
 
 ConVar force_refresh_specgui("statusspec_force_specgui_refresh", "0", 0, "whether to force the spectator GUI to refresh");
 ConVar loadout_icons_enabled("statusspec_loadout_icons_enabled", "0", 0, "enable loadout icons");
+ConVar loadout_icons_nonloadout("statusspec_loadout_icons_nonloadout", "0", 0, "enable loadout icons for nonloadout items");
 ConVar status_icons_enabled("statusspec_status_icons_enabled", "0", 0, "enable status icons");
 ConVar status_icons_max("statusspec_status_icons_max", "5", 0, "max number of status icons to be rendered");
 
@@ -645,11 +646,21 @@ void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL
 			SHOW_SLOT_ICON(secondary);
 			SHOW_SLOT_ICON(melee);
 			SHOW_SLOT_ICON(pda);
+			
+			if (loadout_icons_nonloadout.GetBool()) {
+				SHOW_SLOT_ICON(pda2);
+				SHOW_SLOT_ICON(building);
+			}
 		}
 		else if (playerInfo[i].tfclass == TFClass_Spy) {
 			SHOW_SLOT_ICON(secondary);
 			SHOW_SLOT_ICON(building);
 			SHOW_SLOT_ICON(melee);
+			
+			if (loadout_icons_nonloadout.GetBool()) {
+				SHOW_SLOT_ICON(pda);
+			}
+			
 			SHOW_SLOT_ICON(pda2);
 		}
 		else {
