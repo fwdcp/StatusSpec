@@ -18,6 +18,17 @@ ConVar status_icons_max("statusspec_status_icons_max", "5", 0, "max number of st
 void (__fastcall *origSendMessage)(void* thisptr, int edx, vgui::VPANEL, KeyValues *, vgui::VPANEL);
 void (__fastcall *origPaintTraverse)(void* thisptr, int edx, vgui::VPANEL, bool, bool);
 
+int FindOrCreateTexture(const char *textureFile) {
+	int textureId = g_pVGuiSurface->DrawGetTextureId(textureFile);
+	
+	if (textureId == -1) {
+		textureId = g_pVGuiSurface->CreateNewTextureID();
+		g_pVGuiSurface->DrawSetTextureFile(textureId, textureFile, 0, false);
+	}
+
+	return textureId;
+}
+
 bool CheckCondition(uint32_t conditions[3], int condition) {
 	if (condition < 32) {
 		if (conditions[0] & (1 << condition)) {
@@ -120,10 +131,7 @@ void UpdateEntities() {
 				playerInfo[player].action = itemDefinitionIndex;
 			}
 			
-			if (m_iTextureItemIcon.find(itemDefinitionIndex) == m_iTextureItemIcon.end()) {
-				m_iTextureItemIcon[itemDefinitionIndex] = g_pVGuiSurface->CreateNewTextureID();
-				g_pVGuiSurface->DrawSetTextureFile(m_iTextureItemIcon[itemDefinitionIndex], itemSchema->GetItemKeyValue(itemDefinitionIndex, "image_inventory"), 0, false);
-			}
+			m_iTextureItemIcon[itemDefinitionIndex] = FindOrCreateTexture(itemSchema->GetItemKeyValue(itemDefinitionIndex, "image_inventory"));
 		}
 	}
 }
@@ -691,49 +699,27 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	
 	itemSchema = new ItemSchema();
 	
-	m_iTextureUbercharged = g_pVGuiSurface->CreateNewTextureID();
-	m_iTextureCritBoosted = g_pVGuiSurface->CreateNewTextureID();
-	m_iTextureResistShieldRed = g_pVGuiSurface->CreateNewTextureID();
-	m_iTextureResistShieldBlu = g_pVGuiSurface->CreateNewTextureID();
-	m_iTextureBulletResistRed = g_pVGuiSurface->CreateNewTextureID();
-	m_iTextureBlastResistRed = g_pVGuiSurface->CreateNewTextureID();
-	m_iTextureFireResistRed = g_pVGuiSurface->CreateNewTextureID();
-	m_iTextureBulletResistBlu = g_pVGuiSurface->CreateNewTextureID();
-	m_iTextureBlastResistBlu = g_pVGuiSurface->CreateNewTextureID();
-	m_iTextureFireResistBlu = g_pVGuiSurface->CreateNewTextureID();
-	m_iTextureBuffBannerRed = g_pVGuiSurface->CreateNewTextureID();
-	m_iTextureBuffBannerBlu = g_pVGuiSurface->CreateNewTextureID();
-	m_iTextureBattalionsBackupRed = g_pVGuiSurface->CreateNewTextureID();
-	m_iTextureBattalionsBackupBlu = g_pVGuiSurface->CreateNewTextureID();
-	m_iTextureConcherorRed = g_pVGuiSurface->CreateNewTextureID();
-	m_iTextureConcherorBlu = g_pVGuiSurface->CreateNewTextureID();
-	m_iTextureJarated = g_pVGuiSurface->CreateNewTextureID();
-	m_iTextureMilked = g_pVGuiSurface->CreateNewTextureID();
-	m_iTextureMarkedForDeath = g_pVGuiSurface->CreateNewTextureID();
-	m_iTextureBleeding = g_pVGuiSurface->CreateNewTextureID();
-	m_iTextureOnFire = g_pVGuiSurface->CreateNewTextureID();
-	
-	g_pVGuiSurface->DrawSetTextureFile(m_iTextureUbercharged, TEXTURE_UBERCHARGEICON, 0, false);
-	g_pVGuiSurface->DrawSetTextureFile(m_iTextureCritBoosted, TEXTURE_CRITBOOSTICON, 0, false);
-	g_pVGuiSurface->DrawSetTextureFile(m_iTextureResistShieldRed, TEXTURE_RESISTSHIELDRED, 0, false);
-	g_pVGuiSurface->DrawSetTextureFile(m_iTextureResistShieldBlu, TEXTURE_RESISTSHIELDBLU, 0, false);
-	g_pVGuiSurface->DrawSetTextureFile(m_iTextureBulletResistRed, TEXTURE_BULLETRESISTRED, 0, false);
-	g_pVGuiSurface->DrawSetTextureFile(m_iTextureBlastResistRed, TEXTURE_BLASTRESISTRED, 0, false);
-	g_pVGuiSurface->DrawSetTextureFile(m_iTextureFireResistRed, TEXTURE_FIRERESISTRED, 0, false);
-	g_pVGuiSurface->DrawSetTextureFile(m_iTextureBulletResistBlu, TEXTURE_BULLETRESISTBLU, 0, false);
-	g_pVGuiSurface->DrawSetTextureFile(m_iTextureBlastResistBlu, TEXTURE_BLASTRESISTBLU, 0, false);
-	g_pVGuiSurface->DrawSetTextureFile(m_iTextureFireResistBlu, TEXTURE_FIRERESISTBLU, 0, false);
-	g_pVGuiSurface->DrawSetTextureFile(m_iTextureBuffBannerRed, TEXTURE_BUFFBANNERRED, 0, false);
-	g_pVGuiSurface->DrawSetTextureFile(m_iTextureBuffBannerBlu, TEXTURE_BUFFBANNERBLU, 0, false);
-	g_pVGuiSurface->DrawSetTextureFile(m_iTextureBattalionsBackupRed, TEXTURE_BATTALIONSBACKUPRED, 0, false);
-	g_pVGuiSurface->DrawSetTextureFile(m_iTextureBattalionsBackupBlu, TEXTURE_BATTALIONSBACKUPBLU, 0, false);
-	g_pVGuiSurface->DrawSetTextureFile(m_iTextureConcherorRed, TEXTURE_CONCHERORRED, 0, false);
-	g_pVGuiSurface->DrawSetTextureFile(m_iTextureConcherorBlu, TEXTURE_CONCHERORBLU, 0, false);
-	g_pVGuiSurface->DrawSetTextureFile(m_iTextureJarated, TEXTURE_JARATE, 0, false);
-	g_pVGuiSurface->DrawSetTextureFile(m_iTextureMilked, TEXTURE_MADMILK, 0, false);
-	g_pVGuiSurface->DrawSetTextureFile(m_iTextureMarkedForDeath, TEXTURE_MARKEDFORDEATH, 0, false);
-	g_pVGuiSurface->DrawSetTextureFile(m_iTextureBleeding, TEXTURE_BLEEDING, 0, false);
-	g_pVGuiSurface->DrawSetTextureFile(m_iTextureOnFire, TEXTURE_ONFIRE, 0, false);
+	m_iTextureUbercharged = FindOrCreateTexture(TEXTURE_UBERCHARGEICON);
+	m_iTextureCritBoosted = FindOrCreateTexture(TEXTURE_CRITBOOSTICON);
+	m_iTextureResistShieldRed = FindOrCreateTexture(TEXTURE_RESISTSHIELDRED);
+	m_iTextureResistShieldBlu = FindOrCreateTexture(TEXTURE_RESISTSHIELDBLU);
+	m_iTextureBulletResistRed = FindOrCreateTexture(TEXTURE_BULLETRESISTRED);
+	m_iTextureBlastResistRed = FindOrCreateTexture(TEXTURE_BLASTRESISTRED);
+	m_iTextureFireResistRed = FindOrCreateTexture(TEXTURE_FIRERESISTRED);
+	m_iTextureBulletResistBlu = FindOrCreateTexture(TEXTURE_BULLETRESISTBLU);
+	m_iTextureBlastResistBlu = FindOrCreateTexture(TEXTURE_BLASTRESISTBLU);
+	m_iTextureFireResistBlu = FindOrCreateTexture(TEXTURE_FIRERESISTBLU);
+	m_iTextureBuffBannerRed = FindOrCreateTexture(TEXTURE_BUFFBANNERRED);
+	m_iTextureBuffBannerBlu = FindOrCreateTexture(TEXTURE_BUFFBANNERBLU);
+	m_iTextureBattalionsBackupRed = FindOrCreateTexture(TEXTURE_BATTALIONSBACKUPRED);
+	m_iTextureBattalionsBackupBlu = FindOrCreateTexture(TEXTURE_BATTALIONSBACKUPBLU);
+	m_iTextureConcherorRed = FindOrCreateTexture(TEXTURE_CONCHERORRED);
+	m_iTextureConcherorBlu = FindOrCreateTexture(TEXTURE_CONCHERORBLU);
+	m_iTextureJarated = FindOrCreateTexture(TEXTURE_JARATE);
+	m_iTextureMilked = FindOrCreateTexture(TEXTURE_MADMILK);
+	m_iTextureMarkedForDeath = FindOrCreateTexture(TEXTURE_MARKEDFORDEATH);
+	m_iTextureBleeding = FindOrCreateTexture(TEXTURE_BLEEDING);
+	m_iTextureOnFire = FindOrCreateTexture(TEXTURE_ONFIRE);
 	
 	performlayoutCommand = new KeyValues("Command", "Command", "performlayout");
 	
