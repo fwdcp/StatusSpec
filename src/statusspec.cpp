@@ -18,6 +18,68 @@ ConVar status_icons_max("statusspec_status_icons_max", "5", 0, "max number of st
 void (__fastcall *origSendMessage)(void* thisptr, int edx, vgui::VPANEL, KeyValues *, vgui::VPANEL);
 void (__fastcall *origPaintTraverse)(void* thisptr, int edx, vgui::VPANEL, bool, bool);
 
+#define SHOW_SLOT_ICON(slot) \
+	if (playerInfo[i].slot != -1) { \
+		g_pVGuiSurface->DrawSetTexture(m_iTextureItemIcon[playerInfo[i].slot]); \
+		if (playerInfo[i].activeWeaponSlot.compare(#slot) == 0) { \
+			g_pVGuiSurface->DrawSetColor(loadout_active_filter.r(), loadout_active_filter.g(), loadout_active_filter.b(), loadout_active_filter.a()); \
+		} \
+		else { \
+			g_pVGuiSurface->DrawSetColor(loadout_nonactive_filter.r(), loadout_nonactive_filter.g(), loadout_nonactive_filter.b(), loadout_nonactive_filter.a()); \
+		} \
+		g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize); \
+	} \
+	 \
+	iconsWide += iconSize;
+
+inline bool IsInteger(const std::string &s)
+{
+   if (s.empty() || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))) return false;
+
+   char *p;
+   strtol(s.c_str(), &p, 10);
+
+   return (*p == 0);
+}
+
+inline int ColorRangeRestrict(int color) {
+	if (color < 0) return 0;
+	else if (color > 255) return 255;
+	else return color;
+}
+
+CON_COMMAND(statusspec_loadout_filter_nonactive, "the RGBA filter applied to the icon when the item is not active") {
+	if (args.ArgC() < 4 || !IsInteger(args.Arg(1)) || !IsInteger(args.Arg(2)) || !IsInteger(args.Arg(3)) || !IsInteger(args.Arg(4)))
+	{
+		Msg("Usage: statusspec_loadout_filter_nonactive <red> <green> <blue> <alpha>\n");
+		return;
+	}
+	
+	int red = ColorRangeRestrict(std::stoi(args.Arg(1)));
+	int green = ColorRangeRestrict(std::stoi(args.Arg(2)));
+	int blue = ColorRangeRestrict(std::stoi(args.Arg(3)));
+	int alpha = ColorRangeRestrict(std::stoi(args.Arg(4)));
+	
+	loadout_nonactive_filter.SetColor(red, green, blue, alpha);
+	Msg("Set nonactive loadout item icon filter to rgba(%i, %i, %i, %i).", red, green, blue, alpha);
+}
+
+CON_COMMAND(statusspec_loadout_filter_active, "the RGBA filter applied to the icon when the item is active") {
+	if (args.ArgC() < 4 || !IsInteger(args.Arg(1)) || !IsInteger(args.Arg(2)) || !IsInteger(args.Arg(3)) || !IsInteger(args.Arg(4)))
+	{
+		Msg("Usage: statusspec_loadout_filter_active <red> <green> <blue> <alpha>\n");
+		return;
+	}
+	
+	int red = ColorRangeRestrict(std::stoi(args.Arg(1)));
+	int green = ColorRangeRestrict(std::stoi(args.Arg(2)));
+	int blue = ColorRangeRestrict(std::stoi(args.Arg(3)));
+	int alpha = ColorRangeRestrict(std::stoi(args.Arg(4)));
+	
+	loadout_active_filter.SetColor(red, green, blue, alpha);
+	Msg("Set nonactive loadout icon filter to rgba(%i, %i, %i, %i).", red, green, blue, alpha);
+}
+
 int FindOrCreateTexture(const char *textureFile) {
 	int textureId = g_pVGuiSurface->DrawGetTextureId(textureFile);
 	
@@ -579,81 +641,21 @@ void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL
 		iconsWide = 0;
 
 		if (playerInfo[i].tfclass == TFClass_Engineer) {
-			if (playerInfo[i].primary != -1) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureItemIcon[playerInfo[i].primary]);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
-			}
-
-			iconsWide += iconSize;
-			if (playerInfo[i].secondary != -1) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureItemIcon[playerInfo[i].secondary]);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
-			}
-
-			iconsWide += iconSize;
-			if (playerInfo[i].melee != -1) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureItemIcon[playerInfo[i].melee]);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
-			}
-
-			iconsWide += iconSize;
-			if (playerInfo[i].pda != -1) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureItemIcon[playerInfo[i].pda]);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
-			}
+			SHOW_SLOT_ICON(primary);
+			SHOW_SLOT_ICON(secondary);
+			SHOW_SLOT_ICON(melee);
+			SHOW_SLOT_ICON(pda);
 		}
 		else if (playerInfo[i].tfclass == TFClass_Spy) {
-			if (playerInfo[i].secondary != -1) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureItemIcon[playerInfo[i].secondary]);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
-			}
-
-			iconsWide += iconSize;
-			if (playerInfo[i].building != -1) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureItemIcon[playerInfo[i].building]);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
-			}
-
-			iconsWide += iconSize;
-			if (playerInfo[i].melee != -1) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureItemIcon[playerInfo[i].melee]);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
-			}
-
-			iconsWide += iconSize;
-			if (playerInfo[i].pda2 != -1) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureItemIcon[playerInfo[i].pda2]);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
-			}
+			SHOW_SLOT_ICON(secondary);
+			SHOW_SLOT_ICON(building);
+			SHOW_SLOT_ICON(melee);
+			SHOW_SLOT_ICON(pda2);
 		}
 		else {
-			if (playerInfo[i].primary != -1) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureItemIcon[playerInfo[i].primary]);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
-			}
-
-			iconsWide += iconSize;
-			if (playerInfo[i].secondary != -1) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureItemIcon[playerInfo[i].secondary]);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
-			}
-
-			iconsWide += iconSize;
-			if (playerInfo[i].melee != -1) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureItemIcon[playerInfo[i].melee]);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
-			}
+			SHOW_SLOT_ICON(primary);
+			SHOW_SLOT_ICON(secondary);
+			SHOW_SLOT_ICON(melee);
 		}
 	}
 	else if (strcmp(panelName, "MatSystemTopPanel") == 0) {

@@ -22,6 +22,7 @@
 #include "vfuncs.h"
 #include "itemschema.h"
 
+#include "Color.h"
 #include "ehandle.h"
 #include "icliententity.h"
 
@@ -205,7 +206,8 @@ std::string playerPanelName = "playerpanel";
 
 ItemSchema *itemSchema;
 
-#define Round(x) ((x)>=0?(int)((x)+0.5):(int)((x)-0.5))
+Color loadout_nonactive_filter(127, 127, 127, 255);
+Color loadout_active_filter(255, 255, 255, 255);
 
 class StatusSpecPlugin: public IServerPluginCallbacks
 {
