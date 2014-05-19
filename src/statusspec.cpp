@@ -11,6 +11,7 @@
 #include "statusspec.h"
 
 ConVar force_refresh_specgui("statusspec_force_specgui_refresh", "0", 0, "whether to force the spectator GUI to refresh");
+ConVar loadout_icons_enabled("statusspec_loadout_icons_enabled", "0", 0, "enable loadout icons");
 ConVar status_icons_enabled("statusspec_status_icons_enabled", "0", 0, "enable status icons");
 ConVar status_icons_max("statusspec_status_icons_max", "5", 0, "max number of status icons to be rendered");
 
@@ -546,6 +547,119 @@ void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL
 		
 		if (icons >= maxIcons) {
 			return;
+		}
+	}
+	else if (strcmp(panelName, "loadouticons") == 0) {
+		if (!loadout_icons_enabled.GetBool()) {
+			return;
+		}
+
+		vgui::VPANEL playerPanel = g_pVGuiPanel->GetParent(vguiPanel);
+		const char *playerPanelName = g_pVGuiPanel->GetName(playerPanel);
+		
+		if (playerPanels.find(playerPanelName) == playerPanels.end()) {
+			return;
+		}
+		
+		int i = playerPanels[playerPanelName];
+		
+		int iconsWide, iconsTall;
+		
+		g_pVGuiPanel->GetSize(vguiPanel, iconsWide, iconsTall);
+		
+		int iconSize = iconsTall;
+		int slot;
+
+		if (playerInfo[i].tfclass == TFClass_Engineer) {
+			slot = 0;
+
+			if (playerInfo[i].primary != -1) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureItemIcon[playerInfo[i].primary]);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconSize * slot, 0, iconSize, iconSize);
+			}
+
+			slot++;
+
+			if (playerInfo[i].secondary != -1) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureItemIcon[playerInfo[i].secondary]);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconSize * slot, 0, iconSize, iconSize);
+			}
+
+			slot++;
+
+			if (playerInfo[i].melee != -1) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureItemIcon[playerInfo[i].melee]);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconSize * slot, 0, iconSize, iconSize);
+			}
+
+			slot++;
+
+			if (playerInfo[i].pda != -1) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureItemIcon[playerInfo[i].pda]);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconSize * slot, 0, iconSize, iconSize);
+			}
+		}
+		else if (playerInfo[i].tfclass == TFClass_Spy) {
+			slot = 0;
+
+			if (playerInfo[i].secondary != -1) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureItemIcon[playerInfo[i].secondary]);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconSize * slot, 0, iconSize, iconSize);
+			}
+
+			slot++;
+
+			if (playerInfo[i].building != -1) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureItemIcon[playerInfo[i].building]);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconSize * slot, 0, iconSize, iconSize);
+			}
+
+			slot++;
+
+			if (playerInfo[i].melee != -1) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureItemIcon[playerInfo[i].melee]);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconSize * slot, 0, iconSize, iconSize);
+			}
+
+			slot++;
+
+			if (playerInfo[i].pda2 != -1) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureItemIcon[playerInfo[i].pda2]);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconSize * slot, 0, iconSize, iconSize);
+			}
+		}
+		else {
+			slot = 0;
+
+			if (playerInfo[i].primary != -1) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureItemIcon[playerInfo[i].primary]);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconSize * slot, 0, iconSize, iconSize);
+			}
+
+			slot++;
+
+			if (playerInfo[i].secondary != -1) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureItemIcon[playerInfo[i].secondary]);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconSize * slot, 0, iconSize, iconSize);
+			}
+
+			slot++;
+
+			if (playerInfo[i].melee != -1) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureItemIcon[playerInfo[i].melee]);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconSize * slot, 0, iconSize, iconSize);
+			}
 		}
 	}
 	else if (strcmp(panelName, "MatSystemTopPanel") == 0) {
