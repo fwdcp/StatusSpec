@@ -20,11 +20,13 @@
 
 class WSOffsets {
 public:
+	static int pCTFPlayer__m_iClass;
 	static int pCTFPlayer__m_iTeamNum;
 	static int pCTFPlayer__m_nPlayerCond;
 	static int pCTFPlayer___condition_bits;
 	static int pCTFPlayer__m_nPlayerCondEx;
 	static int pCTFPlayer__m_nPlayerCondEx2;
+	static int pCTFPlayer__m_hActiveWeapon;
 	static int pCEconEntity__m_hOwnerEntity;
 	static int pCEconEntity__m_iItemDefinitionIndex;
 

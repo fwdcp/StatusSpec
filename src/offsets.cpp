@@ -11,11 +11,13 @@
 
 #include "offsets.h"
 
+int WSOffsets::pCTFPlayer__m_iClass = 0;
 int WSOffsets::pCTFPlayer__m_iTeamNum = 0;
 int WSOffsets::pCTFPlayer__m_nPlayerCond = 0;
 int WSOffsets::pCTFPlayer___condition_bits = 0;
 int WSOffsets::pCTFPlayer__m_nPlayerCondEx = 0;
 int WSOffsets::pCTFPlayer__m_nPlayerCondEx2 = 0;
+int WSOffsets::pCTFPlayer__m_hActiveWeapon = 0;
 int WSOffsets::pCEconEntity__m_hOwnerEntity = 0;
 int WSOffsets::pCEconEntity__m_iItemDefinitionIndex = 0;
 
@@ -24,11 +26,13 @@ int WSOffsets::pCEconEntity__m_iItemDefinitionIndex = 0;
 // TODO: change to bool when an offset can't be found
 //=================================================================================
 void WSOffsets::PrepareOffsets() {
+	WSOffsets::pCTFPlayer__m_iClass = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "m_iClass");
 	WSOffsets::pCTFPlayer__m_iTeamNum = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "m_iTeamNum");
 	WSOffsets::pCTFPlayer__m_nPlayerCond = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCond");
 	WSOffsets::pCTFPlayer___condition_bits = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "_condition_bits");
 	WSOffsets::pCTFPlayer__m_nPlayerCondEx = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCondEx");
 	WSOffsets::pCTFPlayer__m_nPlayerCondEx2 = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCondEx2");
+	WSOffsets::pCTFPlayer__m_hActiveWeapon = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "m_hActiveWeapon");
 	WSOffsets::pCEconEntity__m_hOwnerEntity = WSOffsets::FindOffsetOfClassProp("CEconEntity", "m_hOwnerEntity");
 	WSOffsets::pCEconEntity__m_iItemDefinitionIndex = WSOffsets::FindOffsetOfClassProp("CEconEntity", "m_iItemDefinitionIndex");
 }

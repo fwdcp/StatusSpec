@@ -50,63 +50,79 @@ void UpdateEntities() {
 			continue;
 		}
 		
-		if (WSOffsets::CheckClassBaseclass(cEntity->GetClientClass(), "DT_EconEntity")) {
-			unsigned int client = reinterpret_cast<CHandle<C_BaseEntity>*>((char *) cEntity + WSOffsets::pCEconEntity__m_hOwnerEntity)->GetEntryIndex();
-			
-			int itemDefinitionIndex = *MakePtr(int*, cEntity, WSOffsets::pCEconEntity__m_iItemDefinitionIndex);
-			
-			const char *itemType = itemSchema->GetItemKeyValue(itemDefinitionIndex, "item_slot");
-			
-			if (strcmp(itemType, "primary") == 0) {
-				playerInfo[client].primary = itemDefinitionIndex;
-			}
-			else if (strcmp(itemType, "secondary") == 0) {
-				playerInfo[client].secondary = itemDefinitionIndex;
-			}
-			else if (strcmp(itemType, "melee") == 0) {
-				playerInfo[client].melee = itemDefinitionIndex;
-			}
-			else if (strcmp(itemType, "pda") == 0) {
-				playerInfo[client].pda = itemDefinitionIndex;
-			}
-			else if (strcmp(itemType, "pda2") == 0) {
-				playerInfo[client].pda2 = itemDefinitionIndex;
-			}
-			else if (strcmp(itemType, "building") == 0) {
-				playerInfo[client].building = itemDefinitionIndex;
-			}
-			else if (strcmp(itemType, "head") == 0 || strcmp(itemType, "misc") == 0) {
-				for (int slot = 0; slot < 3; slot++) {
-					if (!playerInfo[client].cosmetic[slot]) {
-						playerInfo[client].cosmetic[slot] = itemDefinitionIndex;
-						break;
-					}
-				}
-			}
-			else if (strcmp(itemType, "action") == 0) {
-				playerInfo[client].action = itemDefinitionIndex;
-			}
-			
-			if (m_iTextureItemIcon.find(itemDefinitionIndex) == m_iTextureItemIcon.end()) {
-				m_iTextureItemIcon[itemDefinitionIndex] = g_pVGuiSurface->CreateNewTextureID();
-				g_pVGuiSurface->DrawSetTextureFile(m_iTextureItemIcon[itemDefinitionIndex], itemSchema->GetItemKeyValue(itemDefinitionIndex, "image_inventory"), 0, false);
-			}
-		}
-		else if (Interfaces::GetGameResources()->IsConnected(i)) {
+		if (Interfaces::GetGameResources()->IsConnected(i)) {
+			int tfclass = *MakePtr(int*, cEntity, WSOffsets::pCTFPlayer__m_iClass);
 			int team = *MakePtr(int*, cEntity, WSOffsets::pCTFPlayer__m_iTeamNum);
 			uint32_t playerCond = *MakePtr(uint32_t*, cEntity, WSOffsets::pCTFPlayer__m_nPlayerCond);
 			uint32_t condBits = *MakePtr(uint32_t*, cEntity, WSOffsets::pCTFPlayer___condition_bits);
 			uint32_t playerCondEx = *MakePtr(uint32_t*, cEntity, WSOffsets::pCTFPlayer__m_nPlayerCondEx);
 			uint32_t playerCondEx2 = *MakePtr(uint32_t*, cEntity, WSOffsets::pCTFPlayer__m_nPlayerCondEx2);
 			
-			if (team != TEAM_RED && team != TEAM_BLU) {
+			if (team != TFTeam_Red && team != TFTeam_Blue) {
 				continue;
 			}
 			
+			playerInfo[i].tfclass = tfclass;
 			playerInfo[i].team = team;
 			playerInfo[i].conditions[0] = playerCond|condBits;
 			playerInfo[i].conditions[1] = playerCondEx;
 			playerInfo[i].conditions[2] = playerCondEx2;
+			playerInfo[i].primary = -1;
+			playerInfo[i].secondary = -1;
+			playerInfo[i].melee = -1;
+			playerInfo[i].pda = -1;
+			playerInfo[i].pda2 = -1;
+			playerInfo[i].building = -1;
+			std::fill(playerInfo[i].cosmetic, playerInfo[i].cosmetic + MAX_COSMETIC_SLOTS, -1);
+			playerInfo[i].action = -1;
+		}
+		else if (WSOffsets::CheckClassBaseclass(cEntity->GetClientClass(), "DT_EconEntity")) {
+			unsigned int player = reinterpret_cast<CHandle<C_BaseEntity>*>((char *) cEntity + WSOffsets::pCEconEntity__m_hOwnerEntity)->GetEntryIndex();
+			IClientEntity *playerEntity = Interfaces::pClientEntityList->GetClientEntity(player);
+			unsigned int activeWeapon = reinterpret_cast<CHandle<C_BaseEntity>*>((char *) playerEntity + WSOffsets::pCTFPlayer__m_hActiveWeapon)->GetEntryIndex();
+			
+			int itemDefinitionIndex = *MakePtr(int*, cEntity, WSOffsets::pCEconEntity__m_iItemDefinitionIndex);
+			
+			const char *itemType = itemSchema->GetItemKeyValue(itemDefinitionIndex, "item_slot");
+
+			if (activeWeapon == i) {
+				playerInfo[player].activeWeaponSlot = itemType;
+			}
+			
+			if (strcmp(itemType, "primary") == 0) {
+				playerInfo[player].primary = itemDefinitionIndex;
+			}
+			else if (strcmp(itemType, "secondary") == 0) {
+				playerInfo[player].secondary = itemDefinitionIndex;
+			}
+			else if (strcmp(itemType, "melee") == 0) {
+				playerInfo[player].melee = itemDefinitionIndex;
+			}
+			else if (strcmp(itemType, "pda") == 0) {
+				playerInfo[player].pda = itemDefinitionIndex;
+			}
+			else if (strcmp(itemType, "pda2") == 0) {
+				playerInfo[player].pda2 = itemDefinitionIndex;
+			}
+			else if (strcmp(itemType, "building") == 0) {
+				playerInfo[player].building = itemDefinitionIndex;
+			}
+			else if (strcmp(itemType, "head") == 0 || strcmp(itemType, "misc") == 0) {
+				for (int slot = 0; slot < 3; slot++) {
+					if (!playerInfo[player].cosmetic[slot]) {
+						playerInfo[player].cosmetic[slot] = itemDefinitionIndex;
+						break;
+					}
+				}
+			}
+			else if (strcmp(itemType, "action") == 0) {
+				playerInfo[player].action = itemDefinitionIndex;
+			}
+			
+			if (m_iTextureItemIcon.find(itemDefinitionIndex) == m_iTextureItemIcon.end()) {
+				m_iTextureItemIcon[itemDefinitionIndex] = g_pVGuiSurface->CreateNewTextureID();
+				g_pVGuiSurface->DrawSetTextureFile(m_iTextureItemIcon[itemDefinitionIndex], itemSchema->GetItemKeyValue(itemDefinitionIndex, "image_inventory"), 0, false);
+			}
 		}
 	}
 }
@@ -220,7 +236,7 @@ void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
-			if (playerInfo[i].team == TEAM_RED) {
+			if (playerInfo[i].team == TFTeam_Red) {
 				g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldRed);
 				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
 				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
@@ -228,7 +244,7 @@ void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL
 				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
 				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
 			}
-			else if (playerInfo[i].team == TEAM_BLU) {
+			else if (playerInfo[i].team == TFTeam_Blue) {
 				g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldBlu);
 				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
 				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
@@ -246,12 +262,12 @@ void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
-			if (playerInfo[i].team == TEAM_RED) {
+			if (playerInfo[i].team == TFTeam_Red) {
 				g_pVGuiSurface->DrawSetTexture(m_iTextureBulletResistRed);
 				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
 				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
 			}
-			else if (playerInfo[i].team == TEAM_BLU) {
+			else if (playerInfo[i].team == TFTeam_Blue) {
 				g_pVGuiSurface->DrawSetTexture(m_iTextureBulletResistBlu);
 				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
 				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
@@ -271,7 +287,7 @@ void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
-			if (playerInfo[i].team == TEAM_RED) {
+			if (playerInfo[i].team == TFTeam_Red) {
 				g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldRed);
 				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
 				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
@@ -279,7 +295,7 @@ void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL
 				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
 				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
 			}
-			else if (playerInfo[i].team == TEAM_BLU) {
+			else if (playerInfo[i].team == TFTeam_Blue) {
 				g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldBlu);
 				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
 				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
@@ -297,12 +313,12 @@ void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
-			if (playerInfo[i].team == TEAM_RED) {
+			if (playerInfo[i].team == TFTeam_Red) {
 				g_pVGuiSurface->DrawSetTexture(m_iTextureBlastResistRed);
 				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
 				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
 			}
-			else if (playerInfo[i].team == TEAM_BLU) {
+			else if (playerInfo[i].team == TFTeam_Blue) {
 				g_pVGuiSurface->DrawSetTexture(m_iTextureBlastResistBlu);
 				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
 				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
@@ -322,7 +338,7 @@ void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
-			if (playerInfo[i].team == TEAM_RED) {
+			if (playerInfo[i].team == TFTeam_Red) {
 				g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldRed);
 				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
 				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
@@ -330,7 +346,7 @@ void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL
 				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
 				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
 			}
-			else if (playerInfo[i].team == TEAM_BLU) {
+			else if (playerInfo[i].team == TFTeam_Blue) {
 				g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldBlu);
 				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
 				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
@@ -348,12 +364,12 @@ void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
-			if (playerInfo[i].team == TEAM_RED) {
+			if (playerInfo[i].team == TFTeam_Red) {
 				g_pVGuiSurface->DrawSetTexture(m_iTextureFireResistRed);
 				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
 				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
 			}
-			else if (playerInfo[i].team == TEAM_BLU) {
+			else if (playerInfo[i].team == TFTeam_Blue) {
 				g_pVGuiSurface->DrawSetTexture(m_iTextureFireResistBlu);
 				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
 				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconSize, iconSize);
@@ -373,10 +389,10 @@ void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
-			if (playerInfo[i].team == TEAM_RED) {
+			if (playerInfo[i].team == TFTeam_Red) {
 				g_pVGuiSurface->DrawSetTexture(m_iTextureBuffBannerRed);
 			}
-			else if (playerInfo[i].team == TEAM_BLU) {
+			else if (playerInfo[i].team == TFTeam_Blue) {
 				g_pVGuiSurface->DrawSetTexture(m_iTextureBuffBannerBlu);
 			}
 			
@@ -397,10 +413,10 @@ void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
-			if (playerInfo[i].team == TEAM_RED) {
+			if (playerInfo[i].team == TFTeam_Red) {
 				g_pVGuiSurface->DrawSetTexture(m_iTextureBattalionsBackupRed);
 			}
-			else if (playerInfo[i].team == TEAM_BLU) {
+			else if (playerInfo[i].team == TFTeam_Blue) {
 				g_pVGuiSurface->DrawSetTexture(m_iTextureBattalionsBackupBlu);
 			}
 			
@@ -421,10 +437,10 @@ void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
-			if (playerInfo[i].team == TEAM_RED) {
+			if (playerInfo[i].team == TFTeam_Red) {
 				g_pVGuiSurface->DrawSetTexture(m_iTextureConcherorRed);
 			}
-			else if (playerInfo[i].team == TEAM_BLU) {
+			else if (playerInfo[i].team == TFTeam_Blue) {
 				g_pVGuiSurface->DrawSetTexture(m_iTextureConcherorBlu);
 			}
 			

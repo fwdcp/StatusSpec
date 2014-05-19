@@ -25,10 +25,29 @@
 #define PLUGIN_DESC "StatusSpec v0.6"
 #define SHORT_DESC "StatusSpec v0.6"
 
-#define TEAM_RED 2
-#define TEAM_BLU 3
+// taken from SourceMod
 
-// taken from SourceMod and adapted
+enum TFClassType
+{
+	TFClass_Unknown = 0,
+	TFClass_Scout,
+	TFClass_Sniper,
+	TFClass_Soldier,
+	TFClass_DemoMan,
+	TFClass_Medic,
+	TFClass_Heavy,
+	TFClass_Pyro,
+	TFClass_Spy,
+	TFClass_Engineer
+};
+
+enum TFTeam
+{
+	TFTeam_Unassigned = 0,
+	TFTeam_Spectator = 1,
+	TFTeam_Red = 2,
+	TFTeam_Blue = 3	
+};
 
 enum TFCond
 {
@@ -160,7 +179,10 @@ std::map<int, int> m_iTextureItemIcon;
 KeyValues *performlayoutCommand;
 vgui::HPanel specguiPanel;
 
+#define MAX_COSMETIC_SLOTS 3
+
 typedef struct Player {
+	int tfclass;
 	int team;
 	uint32_t conditions[3];
 	int primary;
@@ -169,8 +191,9 @@ typedef struct Player {
 	int pda;
 	int pda2;
 	int building;
-	int cosmetic[3];
+	int cosmetic[MAX_COSMETIC_SLOTS];
 	int action;
+	std::string activeWeaponSlot;
 } Player;
 
 std::map<std::string, int> playerPanels;
