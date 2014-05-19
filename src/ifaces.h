@@ -19,16 +19,13 @@
 
 #include "tier3/tier3.h"
 #include "cdll_int.h"
-#include "icliententity.h"
 #include "icliententitylist.h"
 #include "vgui/IVGui.h"
 #include "vgui/IPanel.h"
 #include "vgui/IScheme.h"
 #include "vgui/ISurface.h"
 #include "igameresources.h"
-#include "KeyValues.h"
 #include "filesystem.h"
-#include "ehandle.h"
 
 #ifdef _POSIX
 #define GetFuncAddress(pAddress, szFunction) dlsym(pAddress, szFunction)

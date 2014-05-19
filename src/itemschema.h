@@ -14,6 +14,8 @@
 
 #include "ifaces.h"
 
+#include "KeyValues.h"
+
 #include <vector>
 #include <string>
 #include <sstream>

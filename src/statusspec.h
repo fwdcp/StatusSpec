@@ -22,6 +22,9 @@
 #include "vfuncs.h"
 #include "itemschema.h"
 
+#include "ehandle.h"
+#include "icliententity.h"
+
 #define PLUGIN_DESC "StatusSpec v0.6"
 #define SHORT_DESC "StatusSpec v0.6"
 
