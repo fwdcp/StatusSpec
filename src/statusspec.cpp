@@ -206,6 +206,75 @@ void UpdateEntities() {
 			m_iTextureItemIcon[itemDefinitionIndex] = FindOrCreateTexture(itemSchema->GetItemKeyData(itemDefinitionIndex, "image_inventory"));
 		}
 	}
+	
+	if (loadout_icons_enabled.GetBool()) {
+		for (std::map<int, Player>::iterator iterator = playerInfo.begin(); iterator != playerInfo.end(); iterator++) {
+			int player = iterator->first;
+			IClientEntity *playerEntity = Interfaces::pClientEntityList->GetClientEntity(player);
+			
+			if (!playerEntity) {
+				continue;
+			}
+			
+			int activeWeapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(playerEntity, WSOffsets::pCTFPlayer__m_hActiveWeapon);
+			
+			for (int i = 0; i < MAX_WEAPONS; i++) {
+				int weapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(playerEntity, WSOffsets::pCTFPlayer__m_hMyWeapons[i]);
+				IClientEntity *weaponEntity = Interfaces::pClientEntityList->GetClientEntity(weapon);
+			
+				if (!weaponEntity || !WSOffsets::CheckClassBaseclass(weaponEntity->GetClientClass(), "DT_EconEntity")) {
+					continue;
+				}
+				
+				int itemDefinitionIndex = *MAKE_PTR(int*, weaponEntity, WSOffsets::pCEconEntity__m_iItemDefinitionIndex);
+			
+				const char *itemSlot = itemSchema->GetItemKeyData(itemDefinitionIndex, "item_slot");
+				
+				KeyValues *classUses = itemSchema->GetItemKey(itemDefinitionIndex, "used_by_classes");
+				if (classUses) {
+					const char *classUse = classUses->GetString(tfclassNames[playerInfo[player].tfclass].c_str(), "");
+
+					if (std::find(std::begin(itemSlots), std::end(itemSlots), classUse) != std::end(itemSlots)) {
+						itemSlot = classUse;
+					}
+				}
+
+				if (activeWeapon == i) {
+					playerInfo[player].activeWeaponSlot = itemSlot;
+				}
+				
+				if (strcmp(itemSlot, "primary") == 0) {
+					playerInfo[player].primary = itemDefinitionIndex;
+				}
+				else if (strcmp(itemSlot, "secondary") == 0) {
+					playerInfo[player].secondary = itemDefinitionIndex;
+				}
+				else if (strcmp(itemSlot, "melee") == 0) {
+					playerInfo[player].melee = itemDefinitionIndex;
+				}
+				else if (strcmp(itemSlot, "pda") == 0) {
+					playerInfo[player].pda = itemDefinitionIndex;
+				}
+				else if (strcmp(itemSlot, "pda2") == 0) {
+					playerInfo[player].pda2 = itemDefinitionIndex;
+				}
+				else if (strcmp(itemSlot, "building") == 0) {
+					playerInfo[player].building = itemDefinitionIndex;
+				}
+				else if (strcmp(itemSlot, "head") == 0 || strcmp(itemSlot, "misc") == 0) {
+					for (int slot = 0; slot < 3; slot++) {
+						if (playerInfo[player].cosmetic[slot] == -1) {
+							playerInfo[player].cosmetic[slot] = itemDefinitionIndex;
+							break;
+						}
+					}
+				}
+				else if (strcmp(itemSlot, "action") == 0) {
+					playerInfo[player].action = itemDefinitionIndex;
+				}
+			}
+		}
+	}
 }
 
 void __fastcall hookedSendMessage(vgui::IPanel *thisPtr, int edx, vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel) {
