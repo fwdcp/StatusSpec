@@ -126,12 +126,12 @@ void UpdateEntities() {
 		}
 		
 		if (Interfaces::GetGameResources()->IsConnected(i)) {
-			int tfclass = *MakePtr(int*, cEntity, WSOffsets::pCTFPlayer__m_iClass);
-			int team = *MakePtr(int*, cEntity, WSOffsets::pCTFPlayer__m_iTeamNum);
-			uint32_t playerCond = *MakePtr(uint32_t*, cEntity, WSOffsets::pCTFPlayer__m_nPlayerCond);
-			uint32_t condBits = *MakePtr(uint32_t*, cEntity, WSOffsets::pCTFPlayer___condition_bits);
-			uint32_t playerCondEx = *MakePtr(uint32_t*, cEntity, WSOffsets::pCTFPlayer__m_nPlayerCondEx);
-			uint32_t playerCondEx2 = *MakePtr(uint32_t*, cEntity, WSOffsets::pCTFPlayer__m_nPlayerCondEx2);
+			int tfclass = *MAKE_PTR(int*, cEntity, WSOffsets::pCTFPlayer__m_iClass);
+			int team = *MAKE_PTR(int*, cEntity, WSOffsets::pCTFPlayer__m_iTeamNum);
+			uint32_t playerCond = *MAKE_PTR(uint32_t*, cEntity, WSOffsets::pCTFPlayer__m_nPlayerCond);
+			uint32_t condBits = *MAKE_PTR(uint32_t*, cEntity, WSOffsets::pCTFPlayer___condition_bits);
+			uint32_t playerCondEx = *MAKE_PTR(uint32_t*, cEntity, WSOffsets::pCTFPlayer__m_nPlayerCondEx);
+			uint32_t playerCondEx2 = *MAKE_PTR(uint32_t*, cEntity, WSOffsets::pCTFPlayer__m_nPlayerCondEx2);
 			
 			if (team != TFTeam_Red && team != TFTeam_Blue) {
 				continue;
@@ -152,11 +152,11 @@ void UpdateEntities() {
 			playerInfo[i].action = -1;
 		}
 		else if (loadout_icons_enabled.GetBool() && WSOffsets::CheckClassBaseclass(cEntity->GetClientClass(), "DT_EconEntity")) {
-			int player = reinterpret_cast<CHandle<C_BaseEntity>*>((char *) cEntity + WSOffsets::pCEconEntity__m_hOwnerEntity)->GetEntryIndex();
+			int player = ENTITY_INDEX_FROM_ENTITY_OFFSET(cEntity, WSOffsets::pCEconEntity__m_hOwnerEntity);
 			IClientEntity *playerEntity = Interfaces::pClientEntityList->GetClientEntity(player);
-			int activeWeapon = reinterpret_cast<CHandle<C_BaseEntity>*>((char *) playerEntity + WSOffsets::pCTFPlayer__m_hActiveWeapon)->GetEntryIndex();
+			int activeWeapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(playerEntity, WSOffsets::pCTFPlayer__m_hActiveWeapon);
 			
-			int itemDefinitionIndex = *MakePtr(int*, cEntity, WSOffsets::pCEconEntity__m_iItemDefinitionIndex);
+			int itemDefinitionIndex = *MAKE_PTR(int*, cEntity, WSOffsets::pCEconEntity__m_iItemDefinitionIndex);
 			
 			const char *itemType = itemSchema->GetItemKeyValue(itemDefinitionIndex, "item_slot");
 

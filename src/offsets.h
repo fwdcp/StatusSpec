@@ -40,4 +40,5 @@ private:
 	static bool CrawlForArrayEnt(RecvTable *sTable, const char *propName, int element, int &offset);
 };
 
-#define MakePtr(cast, ptr, addValue) (cast)((unsigned long) (ptr) + (unsigned long) (addValue))
+#define MAKE_PTR(cast, ptr, addValue) (cast)((unsigned long) (ptr) + (unsigned long) (addValue))
+#define ENTITY_INDEX_FROM_ENTITY_OFFSET(entity, offset) reinterpret_cast<CHandle<C_BaseEntity>*>(MAKE_PTR(char*, entity, offset))->GetEntryIndex();
