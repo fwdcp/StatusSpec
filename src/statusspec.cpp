@@ -158,31 +158,40 @@ void UpdateEntities() {
 			
 			int itemDefinitionIndex = *MAKE_PTR(int*, cEntity, WSOffsets::pCEconEntity__m_iItemDefinitionIndex);
 			
-			const char *itemType = itemSchema->GetItemKeyData(itemDefinitionIndex, "item_slot");
+			const char *itemSlot = itemSchema->GetItemKeyData(itemDefinitionIndex, "item_slot");
+			
+			KeyValues *classUses = itemSchema->GetItemKey(itemDefinitionIndex, "used_by_classes");
+			if (classUses) {
+				const char *classUse = classUses->GetString(tfclassNames[playerInfo[player].tfclass].c_str(), "");
+
+				if (std::find(std::begin(itemSlots), std::end(itemSlots), classUse) != std::end(itemSlots)) {
+					itemSlot = classUse;
+				}
+			}
 
 			if (activeWeapon == i) {
-				playerInfo[player].activeWeaponSlot = itemType;
+				playerInfo[player].activeWeaponSlot = itemSlot;
 			}
 			
-			if (strcmp(itemType, "primary") == 0) {
+			if (strcmp(itemSlot, "primary") == 0) {
 				playerInfo[player].primary = itemDefinitionIndex;
 			}
-			else if (strcmp(itemType, "secondary") == 0) {
+			else if (strcmp(itemSlot, "secondary") == 0) {
 				playerInfo[player].secondary = itemDefinitionIndex;
 			}
-			else if (strcmp(itemType, "melee") == 0) {
+			else if (strcmp(itemSlot, "melee") == 0) {
 				playerInfo[player].melee = itemDefinitionIndex;
 			}
-			else if (strcmp(itemType, "pda") == 0) {
+			else if (strcmp(itemSlot, "pda") == 0) {
 				playerInfo[player].pda = itemDefinitionIndex;
 			}
-			else if (strcmp(itemType, "pda2") == 0) {
+			else if (strcmp(itemSlot, "pda2") == 0) {
 				playerInfo[player].pda2 = itemDefinitionIndex;
 			}
-			else if (strcmp(itemType, "building") == 0) {
+			else if (strcmp(itemSlot, "building") == 0) {
 				playerInfo[player].building = itemDefinitionIndex;
 			}
-			else if (strcmp(itemType, "head") == 0 || strcmp(itemType, "misc") == 0) {
+			else if (strcmp(itemSlot, "head") == 0 || strcmp(itemSlot, "misc") == 0) {
 				for (int slot = 0; slot < 3; slot++) {
 					if (playerInfo[player].cosmetic[slot] == -1) {
 						playerInfo[player].cosmetic[slot] = itemDefinitionIndex;
@@ -190,7 +199,7 @@ void UpdateEntities() {
 					}
 				}
 			}
-			else if (strcmp(itemType, "action") == 0) {
+			else if (strcmp(itemSlot, "action") == 0) {
 				playerInfo[player].action = itemDefinitionIndex;
 			}
 			
