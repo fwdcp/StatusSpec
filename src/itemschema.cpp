@@ -24,7 +24,140 @@ ItemSchema::~ItemSchema() {
 	prefabInfo->deleteThis();
 }
 
-const char *ItemSchema::GetItemKeyValue(int itemDefinitionIndex, const char *keyName) {
+KeyValues *ItemSchema::GetItemKey(int itemDefinitionIndex, const char *keyName) {
+	KeyValues *item = itemInfo->FindKey(std::to_string((long long) itemDefinitionIndex).c_str());
+	
+	if (!item) {
+		return NULL;
+	}
+	
+	KeyValues *value = item->FindKey(keyName, false);
+	
+	if (value) {
+		return value;
+	}
+	
+	int level = -1;
+	int prefabLevel;
+	KeyValues *prefabValue;
+	
+	std::string prefabs = item->GetString("prefab", "");
+	std::stringstream ss(prefabs);
+	std::string prefabName;
+	while (std::getline(ss, prefabName, ' ')) {
+		prefabLevel = 1;
+		prefabValue = GetPrefabKey(prefabName.c_str(), keyName, prefabLevel);
+		
+		if (prefabValue && (level == -1 || prefabLevel < level)) {
+			value = prefabValue;
+			level = prefabLevel;
+		}
+    }
+	
+	return value;
+}
+
+KeyValues *ItemSchema::GetItemKey(const char *itemDefinitionIndex, const char *keyName) {
+	KeyValues *item = itemInfo->FindKey(itemDefinitionIndex);
+	
+	if (!item) {
+		return NULL;
+	}
+	
+	KeyValues *value = item->FindKey(keyName, false);
+	
+	if (value) {
+		return value;
+	}
+	
+	int level = -1;
+	int prefabLevel;
+	KeyValues *prefabValue;
+	
+	std::string prefabs = item->GetString("prefab", "");
+	std::stringstream ss(prefabs);
+	std::string prefabName;
+	while (std::getline(ss, prefabName, ' ')) {
+		prefabLevel = 1;
+		prefabValue = GetPrefabKey(prefabName.c_str(), keyName, prefabLevel);
+		
+		if (prefabValue && (level == -1 || prefabLevel < level)) {
+			value = prefabValue;
+			level = prefabLevel;
+		}
+    }
+	
+	return value;
+}
+
+KeyValues *ItemSchema::GetPrefabKey(const char *prefabName, const char *keyName) {
+	KeyValues *prefab = prefabInfo->FindKey(prefabName);
+	
+	if (prefab == NULL) {
+		return NULL;
+	}
+	
+	KeyValues *value = prefab->FindKey(keyName, false);
+	
+	if (value != NULL) {
+		return value;
+	}
+	
+	int level = -1;
+	int prefabLevel;
+	KeyValues *prefabValue;
+	
+	std::string subprefabs = prefab->GetString("prefab", "");
+	std::stringstream ss(subprefabs);
+	std::string subprefabName;
+	while (std::getline(ss, subprefabName, ' ')) {
+		prefabLevel = 1;
+		prefabValue = GetPrefabKey(subprefabName.c_str(), keyName, prefabLevel);
+		
+		if (prefabValue != NULL && (level == -1 || prefabLevel < level)) {
+			value = prefabValue;
+			level = prefabLevel;
+		}
+    }
+	
+	return value;
+}
+
+KeyValues *ItemSchema::GetPrefabKey(const char *prefabName, const char *keyName, int &level) {
+	KeyValues *prefab = prefabInfo->FindKey(prefabName);
+	
+	if (prefab == NULL) {
+		return NULL;
+	}
+	
+	KeyValues *value = prefab->FindKey(keyName, false);
+	
+	if (value != NULL) {
+		return value;
+	}
+	
+	int nextLevel = level + 1;
+	int prefabLevel;
+	level = -1;
+	KeyValues *prefabValue;
+	
+	std::string subprefabs = prefab->GetString("prefab", "");
+	std::stringstream ss(subprefabs);
+	std::string subprefabName;
+	while (std::getline(ss, subprefabName, ' ')) {
+		prefabLevel = nextLevel;
+		prefabValue = GetPrefabKey(subprefabName.c_str(), keyName, prefabLevel);
+		
+		if (prefabValue != NULL && (level == -1 || prefabLevel < level)) {
+			value = prefabValue;
+			level = prefabLevel;
+		}
+    }
+	
+	return value;
+}
+
+const char *ItemSchema::GetItemKeyData(int itemDefinitionIndex, const char *keyName) {
 	KeyValues *item = itemInfo->FindKey(std::to_string((long long) itemDefinitionIndex).c_str());
 	
 	if (!item) {
@@ -46,7 +179,7 @@ const char *ItemSchema::GetItemKeyValue(int itemDefinitionIndex, const char *key
 	std::string prefabName;
 	while (std::getline(ss, prefabName, ' ')) {
 		prefabLevel = 1;
-		prefabValue = GetPrefabKeyValue(prefabName.c_str(), keyName, prefabLevel);
+		prefabValue = GetPrefabKeyData(prefabName.c_str(), keyName, prefabLevel);
 		
 		if (prefabValue && (level == -1 || prefabLevel < level)) {
 			value = prefabValue;
@@ -57,7 +190,7 @@ const char *ItemSchema::GetItemKeyValue(int itemDefinitionIndex, const char *key
 	return value;
 }
 
-const char *ItemSchema::GetItemKeyValue(const char *itemDefinitionIndex, const char *keyName) {
+const char *ItemSchema::GetItemKeyData(const char *itemDefinitionIndex, const char *keyName) {
 	KeyValues *item = itemInfo->FindKey(itemDefinitionIndex);
 	
 	if (!item) {
@@ -79,7 +212,7 @@ const char *ItemSchema::GetItemKeyValue(const char *itemDefinitionIndex, const c
 	std::string prefabName;
 	while (std::getline(ss, prefabName, ' ')) {
 		prefabLevel = 1;
-		prefabValue = GetPrefabKeyValue(prefabName.c_str(), keyName, prefabLevel);
+		prefabValue = GetPrefabKeyData(prefabName.c_str(), keyName, prefabLevel);
 		
 		if (prefabValue && (level == -1 || prefabLevel < level)) {
 			value = prefabValue;
@@ -90,7 +223,7 @@ const char *ItemSchema::GetItemKeyValue(const char *itemDefinitionIndex, const c
 	return value;
 }
 
-const char *ItemSchema::GetPrefabKeyValue(const char *prefabName, const char *keyName) {
+const char *ItemSchema::GetPrefabKeyData(const char *prefabName, const char *keyName) {
 	KeyValues *prefab = prefabInfo->FindKey(prefabName);
 	
 	if (prefab == NULL) {
@@ -112,7 +245,7 @@ const char *ItemSchema::GetPrefabKeyValue(const char *prefabName, const char *ke
 	std::string subprefabName;
 	while (std::getline(ss, subprefabName, ' ')) {
 		prefabLevel = 1;
-		prefabValue = GetPrefabKeyValue(subprefabName.c_str(), keyName, prefabLevel);
+		prefabValue = GetPrefabKeyData(subprefabName.c_str(), keyName, prefabLevel);
 		
 		if (prefabValue != NULL && (level == -1 || prefabLevel < level)) {
 			value = prefabValue;
@@ -123,7 +256,7 @@ const char *ItemSchema::GetPrefabKeyValue(const char *prefabName, const char *ke
 	return value;
 }
 
-const char *ItemSchema::GetPrefabKeyValue(const char *prefabName, const char *keyName, int &level) {
+const char *ItemSchema::GetPrefabKeyData(const char *prefabName, const char *keyName, int &level) {
 	KeyValues *prefab = prefabInfo->FindKey(prefabName);
 	
 	if (prefab == NULL) {
@@ -146,7 +279,7 @@ const char *ItemSchema::GetPrefabKeyValue(const char *prefabName, const char *ke
 	std::string subprefabName;
 	while (std::getline(ss, subprefabName, ' ')) {
 		prefabLevel = nextLevel;
-		prefabValue = GetPrefabKeyValue(subprefabName.c_str(), keyName, prefabLevel);
+		prefabValue = GetPrefabKeyData(subprefabName.c_str(), keyName, prefabLevel);
 		
 		if (prefabValue != NULL && (level == -1 || prefabLevel < level)) {
 			value = prefabValue;

@@ -24,13 +24,17 @@ class ItemSchema {
 	public:
 		ItemSchema();
 		~ItemSchema();
-		const char *GetItemKeyValue(int itemDefinitionIndex, const char *keyName);
-		const char *GetItemKeyValue(const char *itemDefinitionIndex, const char *keyName);
-		const char *GetPrefabKeyValue(const char *prefabName, const char *keyName);
+		KeyValues *GetItemKey(int itemDefinitionIndex, const char *keyName);
+		KeyValues *GetItemKey(const char *itemDefinitionIndex, const char *keyName);
+		KeyValues *GetPrefabKey(const char *prefabName, const char *keyName);
+		const char *GetItemKeyData(int itemDefinitionIndex, const char *keyName);
+		const char *GetItemKeyData(const char *itemDefinitionIndex, const char *keyName);
+		const char *GetPrefabKeyData(const char *prefabName, const char *keyName);
 		void ForEachItem(void (*f)(const char *));
 	private:
 		KeyValues *itemSchema;
 		KeyValues *itemInfo;
 		KeyValues *prefabInfo;
-		const char *GetPrefabKeyValue(const char *prefabName, const char *keyName, int &level);
+		KeyValues *GetPrefabKey(const char *prefabName, const char *keyName, int &level);
+		const char *GetPrefabKeyData(const char *prefabName, const char *keyName, int &level);
 };

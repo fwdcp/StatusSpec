@@ -158,7 +158,7 @@ void UpdateEntities() {
 			
 			int itemDefinitionIndex = *MAKE_PTR(int*, cEntity, WSOffsets::pCEconEntity__m_iItemDefinitionIndex);
 			
-			const char *itemType = itemSchema->GetItemKeyValue(itemDefinitionIndex, "item_slot");
+			const char *itemType = itemSchema->GetItemKeyData(itemDefinitionIndex, "item_slot");
 
 			if (activeWeapon == i) {
 				playerInfo[player].activeWeaponSlot = itemType;
@@ -194,7 +194,7 @@ void UpdateEntities() {
 				playerInfo[player].action = itemDefinitionIndex;
 			}
 			
-			m_iTextureItemIcon[itemDefinitionIndex] = FindOrCreateTexture(itemSchema->GetItemKeyValue(itemDefinitionIndex, "image_inventory"));
+			m_iTextureItemIcon[itemDefinitionIndex] = FindOrCreateTexture(itemSchema->GetItemKeyData(itemDefinitionIndex, "image_inventory"));
 		}
 	}
 }
