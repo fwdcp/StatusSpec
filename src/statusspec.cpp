@@ -49,22 +49,6 @@ inline int ColorRangeRestrict(int color) {
 	else return color;
 }
 
-CON_COMMAND(statusspec_loadout_filter_nonactive, "the RGBA filter applied to the icon when the item is not active") {
-	if (args.ArgC() < 4 || !IsInteger(args.Arg(1)) || !IsInteger(args.Arg(2)) || !IsInteger(args.Arg(3)) || !IsInteger(args.Arg(4)))
-	{
-		Msg("Usage: statusspec_loadout_filter_nonactive <red> <green> <blue> <alpha>\n");
-		return;
-	}
-	
-	int red = ColorRangeRestrict(std::stoi(args.Arg(1)));
-	int green = ColorRangeRestrict(std::stoi(args.Arg(2)));
-	int blue = ColorRangeRestrict(std::stoi(args.Arg(3)));
-	int alpha = ColorRangeRestrict(std::stoi(args.Arg(4)));
-	
-	loadout_nonactive_filter.SetColor(red, green, blue, alpha);
-	Msg("Set nonactive loadout item icon filter to rgba(%i, %i, %i, %i).", red, green, blue, alpha);
-}
-
 CON_COMMAND(statusspec_loadout_filter_active, "the RGBA filter applied to the icon when the item is active") {
 	if (args.ArgC() < 4 || !IsInteger(args.Arg(1)) || !IsInteger(args.Arg(2)) || !IsInteger(args.Arg(3)) || !IsInteger(args.Arg(4)))
 	{
@@ -79,6 +63,22 @@ CON_COMMAND(statusspec_loadout_filter_active, "the RGBA filter applied to the ic
 	
 	loadout_active_filter.SetColor(red, green, blue, alpha);
 	Msg("Set nonactive loadout icon filter to rgba(%i, %i, %i, %i).", red, green, blue, alpha);
+}
+
+CON_COMMAND(statusspec_loadout_filter_nonactive, "the RGBA filter applied to the icon when the item is not active") {
+	if (args.ArgC() < 4 || !IsInteger(args.Arg(1)) || !IsInteger(args.Arg(2)) || !IsInteger(args.Arg(3)) || !IsInteger(args.Arg(4)))
+	{
+		Msg("Usage: statusspec_loadout_filter_nonactive <red> <green> <blue> <alpha>\n");
+		return;
+	}
+	
+	int red = ColorRangeRestrict(std::stoi(args.Arg(1)));
+	int green = ColorRangeRestrict(std::stoi(args.Arg(2)));
+	int blue = ColorRangeRestrict(std::stoi(args.Arg(3)));
+	int alpha = ColorRangeRestrict(std::stoi(args.Arg(4)));
+	
+	loadout_nonactive_filter.SetColor(red, green, blue, alpha);
+	Msg("Set nonactive loadout item icon filter to rgba(%i, %i, %i, %i).", red, green, blue, alpha);
 }
 
 int FindOrCreateTexture(const char *textureFile) {
