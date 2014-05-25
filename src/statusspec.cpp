@@ -331,29 +331,35 @@ void UpdateEntities() {
 }
 
 void __fastcall hookedSendMessage(vgui::IPanel *thisPtr, int edx, vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel) {
-	origSendMessage(thisPtr, edx, vguiPanel, params, ifromPanel);
-	
 	std::string originPanelName = g_pVGuiPanel->GetName(ifromPanel);
+	std::string destinationPanelName = g_pVGuiPanel->GetName(vguiPanel);
 	
-	if (originPanelName.substr(0, 11).compare("playerpanel") == 0 && strcmp(params->GetName(), "DialogVariables") == 0) {
-		const char *playerName = params->GetString("playername");
+	if (strcmp(params->GetName(), "DialogVariables") == 0) {
+		const char *playerName = params->GetString("playername", NULL);
 		
-		int iEntCount = Interfaces::pClientEntityList->GetHighestEntityIndex();
-		IClientEntity *cEntity;
+		if (playerName) {
+			int iEntCount = Interfaces::pClientEntityList->GetHighestEntityIndex();
+			IClientEntity *cEntity;
 		
-		for (int i = 0; i < iEntCount; i++) {
-			cEntity = Interfaces::pClientEntityList->GetClientEntity(i);
+			for (int i = 0; i < iEntCount; i++) {
+				cEntity = Interfaces::pClientEntityList->GetClientEntity(i);
 			
-			if (cEntity == NULL || !(Interfaces::GetGameResources()->IsConnected(i))) {
-				continue;
-			}
+				if (cEntity == NULL || !(Interfaces::GetGameResources()->IsConnected(i))) {
+					continue;
+				}
 			
-			if (strcmp(playerName, Interfaces::GetGameResources()->GetPlayerName(i)) == 0) {
-				playerPanels[g_pVGuiPanel->GetName(ifromPanel)] = i;
-				break;
+				if (strcmp(playerName, Interfaces::GetGameResources()->GetPlayerName(i)) == 0) {
+					if (originPanelName.substr(0, 11).compare("playerpanel") == 0) {
+						playerPanels[originPanelName] = i;
+					}
+
+					break;
+				}
 			}
 		}
 	}
+
+	origSendMessage(thisPtr, edx, vguiPanel, params, ifromPanel);
 }
 	
 void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
