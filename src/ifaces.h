@@ -17,8 +17,10 @@
 #include "stdafx.h"
 
 #define CLIENT_DLL
+#define VERSION_SAFE_STEAM_API_INTERFACES
 
 #include "tier3/tier3.h"
+#include "steam/steam_api.h"
 #include "cdll_int.h"
 #include "icliententitylist.h"
 #include "vgui/IVGui.h"
@@ -43,6 +45,7 @@ class Interfaces {
 		static IBaseClientDLL* pClientDLL;
 		static IClientEntityList* pClientEntityList;
 		static IVEngineClient* pEngineClient;
+		static CSteamAPIContext* pSteamAPIContext; 
 		static IGameResources* GetGameResources();
 	private:
 		static CDllDemandLoader *pClientModule;

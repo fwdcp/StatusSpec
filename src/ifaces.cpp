@@ -19,6 +19,7 @@
 IBaseClientDLL* Interfaces::pClientDLL = NULL;
 IClientEntityList* Interfaces::pClientEntityList = NULL;
 IVEngineClient* Interfaces::pEngineClient = NULL;
+CSteamAPIContext* Interfaces::pSteamAPIContext = NULL;
 CDllDemandLoader *Interfaces::pClientModule = NULL;
 
 inline bool DataCompare(const BYTE* pData, const BYTE* bSig, const char* szMask)
@@ -68,6 +69,14 @@ bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 	
 	pClientDLL = (IBaseClientDLL*) gameClientFactory(CLIENT_DLL_INTERFACE_VERSION, NULL);
 	pClientEntityList = (IClientEntityList*) gameClientFactory(VCLIENTENTITYLIST_INTERFACE_VERSION, NULL);
+
+	SteamAPI_InitSafe();
+
+	pSteamAPIContext = new CSteamAPIContext();
+	if (!pSteamAPIContext->Init()) {
+		Warning("[StatusSpec] Could not initialize Steam API!");
+		return false;
+	}
 	
 	CheckPointerAndWarn(pClientDLL, IBaseClientDLL);
 	CheckPointerAndWarn(pClientEntityList, IClientEntityList);
@@ -86,6 +95,8 @@ void Interfaces::Unload() {
 	DisconnectTier2Libraries();
 	DisconnectTier1Libraries();
 	
+	pSteamAPIContext->Clear();
+
 	pClientModule->Unload();
 	pClientModule = NULL;
 	

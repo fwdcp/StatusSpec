@@ -48,5 +48,6 @@ $Project "StatusSpec"
 		$Lib tier1
 		$Lib tier2
 		$Lib tier3
+		$Lib steam_api
 	}
 }
