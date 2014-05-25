@@ -280,9 +280,9 @@ void UpdateEntities() {
 void __fastcall hookedSendMessage(vgui::IPanel *thisPtr, int edx, vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel) {
 	origSendMessage(thisPtr, edx, vguiPanel, params, ifromPanel);
 	
-	const char *ifromPanelName = g_pVGuiPanel->GetName(ifromPanel);
+	std::string originPanelName = g_pVGuiPanel->GetName(ifromPanel);
 	
-	if (playerPanelName.compare(0, 11, ifromPanelName, 0, 11) == 0 && strcmp(params->GetName(), "DialogVariables") == 0) {
+	if (originPanelName.substr(0, 11).compare("playerpanel") == 0 && strcmp(params->GetName(), "DialogVariables") == 0) {
 		const char *playerName = params->GetString("playername");
 		
 		int iEntCount = Interfaces::pClientEntityList->GetHighestEntityIndex();
@@ -305,8 +305,15 @@ void __fastcall hookedSendMessage(vgui::IPanel *thisPtr, int edx, vgui::VPANEL v
 	
 void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
 	const char* panelName = g_pVGuiPanel->GetName(vguiPanel);
+	vgui::HPanel panelHandle = g_pVGui->PanelToHandle(vguiPanel);
 
-	if (strcmp(panelName, "MatSystemTopPanel") == 0 && (status_icons_enabled.GetBool() || loadout_icons_enabled.GetBool())) {
+	static vgui::HPanel topPanelHandle = vgui::INVALID_PANEL;
+
+	if (topPanelHandle == vgui::INVALID_PANEL && strcmp(panelName, "MatSystemTopPanel") == 0) {
+		topPanelHandle = panelHandle;
+	}
+
+	if (topPanelHandle == panelHandle) {
 		UpdateEntities();
 	}
 	

@@ -206,7 +206,6 @@ std::array<std::string, 9> itemSlots = {"primary", "secondary", "melee", "pda", 
 
 std::map<std::string, int> playerPanels;
 std::map<int, Player> playerInfo;
-std::string playerPanelName = "playerpanel";
 
 ItemSchema *itemSchema;
 
