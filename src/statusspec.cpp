@@ -69,6 +69,59 @@ bool CheckCondition(uint32_t conditions[3], int condition) {
 	return false;
 }
 
+CSteamID GetClientSteamID(int client) {
+	player_info_t playerInfo;
+
+	if (Interfaces::pEngineClient->GetPlayerInfo(client, &playerInfo))
+	{
+		if (playerInfo.friendsID)
+		{
+			static EUniverse universe = k_EUniverseInvalid;
+
+			if (universe == k_EUniverseInvalid) {
+				universe = Interfaces::pSteamAPIContext->SteamUtils()->GetConnectedUniverse();
+			}
+
+			return CSteamID(playerInfo.friendsID, 1, universe, k_EAccountTypeIndividual);
+		}
+	}
+
+	return CSteamID();
+}
+
+CSteamID ConvertTextToSteamID(std::string textID) {
+	if (textID.substr(0, 6).compare("STEAM_") == 0 && std::count(textID.begin(), textID.end(), ':') == 2) {
+		std::stringstream ss(textID);
+		std::string universe;
+		std::string server;
+		std::string authID;
+		std::getline(ss, universe, ':');
+		std::getline(ss, server, ':');
+		std::getline(ss, authID, ':');
+
+		if (IsInteger(server) && IsInteger(authID)) {
+			uint32_t accountID = (2 * strtoul(authID.c_str(), NULL, 10)) + strtoul(server.c_str(), NULL, 10);
+
+			static EUniverse universe = k_EUniverseInvalid;
+
+			if (universe == k_EUniverseInvalid) {
+				universe = Interfaces::pSteamAPIContext->SteamUtils()->GetConnectedUniverse();
+			}
+
+			return CSteamID(accountID, universe, k_EAccountTypeIndividual);
+		}
+
+		return CSteamID();
+	}
+	else if (IsInteger(textID)) {
+		uint64_t steamID = strtoull(textID.c_str(), NULL, 10);
+
+		return CSteamID(steamID);
+	}
+
+	return CSteamID();
+}
+
 CON_COMMAND(statusspec_loadout_filter_active, "the RGBA filter applied to the icon when the item is active") {
 	if (args.ArgC() < 4 || !IsInteger(args.Arg(1)) || !IsInteger(args.Arg(2)) || !IsInteger(args.Arg(3)) || !IsInteger(args.Arg(4)))
 	{
