@@ -125,7 +125,7 @@ CSteamID ConvertTextToSteamID(std::string textID) {
 CON_COMMAND(statusspec_loadout_filter_active, "the RGBA filter applied to the icon when the item is active") {
 	if (args.ArgC() < 4 || !IsInteger(args.Arg(1)) || !IsInteger(args.Arg(2)) || !IsInteger(args.Arg(3)) || !IsInteger(args.Arg(4)))
 	{
-		Msg("Usage: statusspec_loadout_filter_active <red> <green> <blue> <alpha>\n");
+		Warning("Usage: statusspec_loadout_filter_active <red> <green> <blue> <alpha>\n");
 		return;
 	}
 	
@@ -141,7 +141,7 @@ CON_COMMAND(statusspec_loadout_filter_active, "the RGBA filter applied to the ic
 CON_COMMAND(statusspec_loadout_filter_nonactive, "the RGBA filter applied to the icon when the item is not active") {
 	if (args.ArgC() < 4 || !IsInteger(args.Arg(1)) || !IsInteger(args.Arg(2)) || !IsInteger(args.Arg(3)) || !IsInteger(args.Arg(4)))
 	{
-		Msg("Usage: statusspec_loadout_filter_nonactive <red> <green> <blue> <alpha>\n");
+		Warning("Usage: statusspec_loadout_filter_nonactive <red> <green> <blue> <alpha>\n");
 		return;
 	}
 	
