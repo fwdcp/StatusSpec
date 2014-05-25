@@ -27,8 +27,8 @@
 #include "ehandle.h"
 #include "icliententity.h"
 
-#define PLUGIN_DESC "StatusSpec v0.6"
-#define SHORT_DESC "StatusSpec v0.6"
+#define PLUGIN_DESC "StatusSpec v0.7"
+#define SHORT_DESC "StatusSpec v0.7"
 
 // taken from SourceMod
 

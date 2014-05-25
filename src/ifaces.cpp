@@ -12,7 +12,7 @@
 
 #define CheckPointerAndWarn(pPointer, className) \
 	if (pPointer == nullptr) { \
-		Warning("[AS] %s is NULL!\n", #className); \
+		Warning("[StatusSpec] %s is NULL!\n", #className); \
 		return false; \
 	}
 

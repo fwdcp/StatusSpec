@@ -11,9 +11,10 @@
 #pragma once
 
 #if defined(WIN32)
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#define strtoull _strtoui64
 #endif
+
+#include "stdafx.h"
 
 #define CLIENT_DLL
 

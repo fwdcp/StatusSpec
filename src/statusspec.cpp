@@ -35,10 +35,10 @@ void (__fastcall *origPaintTraverse)(void* thisptr, int edx, vgui::VPANEL, bool,
 
 inline bool IsInteger(const std::string &s)
 {
-   if (s.empty() || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))) return false;
+   if (s.empty() || !isdigit(s[0])) return false;
 
    char *p;
-   strtol(s.c_str(), &p, 10);
+   strtoull(s.c_str(), &p, 10);
 
    return (*p == 0);
 }
@@ -47,6 +47,26 @@ inline int ColorRangeRestrict(int color) {
 	if (color < 0) return 0;
 	else if (color > 255) return 255;
 	else return color;
+}
+
+bool CheckCondition(uint32_t conditions[3], int condition) {
+	if (condition < 32) {
+		if (conditions[0] & (1 << condition)) {
+			return true;
+		}
+	}
+	else if (condition < 64) {
+		if (conditions[1] & (1 << (condition - 32))) {
+			return true;
+		}
+	}
+	else if (condition < 96) {
+		if (conditions[2] & (1 << (condition - 64))) {
+			return true;
+		}
+	}
+	
+	return false;
 }
 
 CON_COMMAND(statusspec_loadout_filter_active, "the RGBA filter applied to the icon when the item is active") {
@@ -90,26 +110,6 @@ int FindOrCreateTexture(const char *textureFile) {
 	}
 
 	return textureId;
-}
-
-bool CheckCondition(uint32_t conditions[3], int condition) {
-	if (condition < 32) {
-		if (conditions[0] & (1 << condition)) {
-			return true;
-		}
-	}
-	else if (condition < 64) {
-		if (conditions[1] & (1 << (condition - 32))) {
-			return true;
-		}
-	}
-	else if (condition < 96) {
-		if (conditions[2] & (1 << (condition - 64))) {
-			return true;
-		}
-	}
-	
-	return false;
 }
 
 void UpdateEntities() {
