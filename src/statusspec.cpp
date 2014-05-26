@@ -284,8 +284,6 @@ void UpdateEntities() {
 			playerInfo[i].conditions[0] = playerCond|condBits;
 			playerInfo[i].conditions[1] = playerCondEx;
 			playerInfo[i].conditions[2] = playerCondEx2;
-			playerInfo[i].origin = origin;
-			playerInfo[i].angles = angles;
 			playerInfo[i].primary = -1;
 			playerInfo[i].secondary = -1;
 			playerInfo[i].melee = -1;
