@@ -8,6 +8,9 @@ a client plugin that shows certain player statuses via icons next to a tournamen
 Changelog
 ---------
 
+**0.8.0**
+* implement player aliasing
+
 **0.7.0**
 * implement loadout icons
 
@@ -39,12 +42,16 @@ This plugin is not signed by Valve, and therefore will not load unless TF2 is lo
 * `statusspec_force_refresh_specgui` - whether to force the spectator GUI to refresh
 * `statusspec_loadout_icons_enabled` - enable loadout icons
 * `statusspec_loadout_icons_nonloadout` - enable loadout icons for nonloadout items
+* `statusspec_player_alias_enabled` - enable player aliases
 * `statusspec_status_icons_enabled` - enable status icons
 * `statusspec_status_icons_max` - max number of status icons to be rendered
 
 ### Console Commands
 * `statusspec_loadout_filter_active` - the RGBA filter applied to the icon when the item is active (usage: statusspec_loadout_filter_active <red> <green> <blue> <alpha>)
 * `statusspec_loadout_filter_nonactive` - the RGBA filter applied to the icon when the item is not active (usage: statusspec_loadout_filter_nonactive <red> <green> <blue> <alpha>)
+* `statusspec_player_alias_get` - get an alias for a player (usage: statusspec_player_alias_get <steamid>)
+* `statusspec_player_alias_remove` - remove an alias for a player (usage: statusspec_player_alias_remove <steamid>)
+* `statusspec_player_alias_set` - set an alias for a player (usage: statusspec_player_alias_set <steamid> <alias>)
 
 ### UI Resource Files
 
@@ -86,4 +93,4 @@ Thanks
 ------
 **bluee** - for the inspiration to do this project and for a lot of code reused from his [AdvSpec project](https://github.com/MattMcNam/advspec)
 
-**SourceMod Development Team** - for the information on how to get TF2 player and weapon information
+**AlliedModders** - for in-depth information about the internals of the Source Engine and for SourceHook
