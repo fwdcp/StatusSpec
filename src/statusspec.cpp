@@ -976,8 +976,6 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	m_iTextureBleeding = FindOrCreateTexture(TEXTURE_BLEEDING);
 	m_iTextureOnFire = FindOrCreateTexture(TEXTURE_ONFIRE);
 	
-	performlayoutCommand = new KeyValues("Command", "Command", "performlayout");
-	
 	SH_ADD_HOOK(IPanel, SendMessage, g_pVGuiPanel, Hook_SendMessage, true);
 	SH_ADD_HOOK(IPanel, PaintTraverse, g_pVGuiPanel, Hook_PaintTraverse, true);
 	

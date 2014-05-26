@@ -23,10 +23,6 @@
 #include "steam/steam_api.h"
 #include "cdll_int.h"
 #include "icliententitylist.h"
-#include "vgui/IVGui.h"
-#include "vgui/IPanel.h"
-#include "vgui/IScheme.h"
-#include "vgui/ISurface.h"
 #include "igameresources.h"
 #include "filesystem.h"
 

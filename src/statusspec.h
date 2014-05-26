@@ -27,6 +27,10 @@
 #include "Color.h"
 #include "ehandle.h"
 #include "icliententity.h"
+#include "vgui/IVGui.h"
+#include "vgui/IPanel.h"
+#include "vgui/IScheme.h"
+#include "vgui/ISurface.h"
 
 #define PLUGIN_DESC "StatusSpec v0.8"
 
@@ -185,7 +189,7 @@ int m_iTextureBleeding;
 int m_iTextureOnFire;
 std::map<int, int> m_iTextureItemIcon;
 
-KeyValues *performlayoutCommand;
+KeyValues *performlayoutCommand = new KeyValues("Command", "Command", "performlayout");
 vgui::HPanel specguiPanel;
 
 #define MAX_COSMETIC_SLOTS 3
