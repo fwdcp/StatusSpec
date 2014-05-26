@@ -969,6 +969,9 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 
 void StatusSpecPlugin::Unload(void)
 {
+	SH_REMOVE_HOOK(IPanel, SendMessage, g_pVGuiPanel, Hook_SendMessage, true);
+	SH_REMOVE_HOOK(IPanel, PaintTraverse, g_pVGuiPanel, Hook_PaintTraverse, true);
+
 	ConVar_Unregister();
 	Interfaces::Unload();
 }
