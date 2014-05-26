@@ -138,6 +138,8 @@ enum TFCond
 
 #define TEXTURE_UBERCHARGEICON "vgui/replay/thumbnails/ubercharge"
 #define TEXTURE_CRITBOOSTICON "vgui/replay/thumbnails/critboost"
+#define TEXTURE_MEGAHEALRED "vgui/replay/thumbnails/megaheal_red"
+#define TEXTURE_MEGAHEALBLU "vgui/replay/thumbnails/megaheal_blue"
 #define TEXTURE_RESISTSHIELDRED "vgui/replay/thumbnails/resist_shield"
 #define TEXTURE_RESISTSHIELDBLU "vgui/replay/thumbnails/resist_shield_blue"
 #define TEXTURE_BULLETRESISTRED "vgui/replay/thumbnails/defense_buff_bullet_red"
@@ -160,6 +162,8 @@ enum TFCond
 
 int m_iTextureUbercharged;
 int m_iTextureCritBoosted;
+int m_iTextureMegaHealedRed;
+int m_iTextureMegaHealedBlu;
 int m_iTextureResistShieldRed;
 int m_iTextureResistShieldBlu;
 int m_iTextureBulletResistRed;

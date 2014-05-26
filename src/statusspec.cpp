@@ -534,6 +534,31 @@ void Hook_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowFor
 			return;
 		}
 		
+		if (CheckCondition(playerInfo[i].conditions, TFCond_MegaHeal)) {
+			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
+			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
+			
+			if (playerInfo[i].team == TFTeam_Red) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureMegaHealedRed);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
+			}
+			else if (playerInfo[i].team == TFTeam_Blue) {
+				g_pVGuiSurface->DrawSetTexture(m_iTextureMegaHealedBlu);
+				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
+				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
+			}
+			
+			playerWide += iconSize;
+			iconsWide += iconSize;
+			
+			icons++;
+		}
+		
+		if (icons >= maxIcons) {
+			return;
+		}
+		
 		if (CheckCondition(playerInfo[i].conditions, TFCond_UberBulletResist)) {
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
@@ -929,6 +954,8 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	
 	m_iTextureUbercharged = FindOrCreateTexture(TEXTURE_UBERCHARGEICON);
 	m_iTextureCritBoosted = FindOrCreateTexture(TEXTURE_CRITBOOSTICON);
+	m_iTextureMegaHealedRed = FindOrCreateTexture(TEXTURE_MEGAHEALRED);
+	m_iTextureMegaHealedBlu = FindOrCreateTexture(TEXTURE_MEGAHEALBLU);
 	m_iTextureResistShieldRed = FindOrCreateTexture(TEXTURE_RESISTSHIELDRED);
 	m_iTextureResistShieldBlu = FindOrCreateTexture(TEXTURE_RESISTSHIELDBLU);
 	m_iTextureBulletResistRed = FindOrCreateTexture(TEXTURE_BULLETRESISTRED);
