@@ -10,14 +10,14 @@
 
 #include "statusspec.h"
 
+SourceHook::ISourceHook *g_SHPtr = &g_SourceHook;
+int g_PLID = 0;
+
 ConVar force_refresh_specgui("statusspec_force_specgui_refresh", "0", 0, "whether to force the spectator GUI to refresh");
 ConVar loadout_icons_enabled("statusspec_loadout_icons_enabled", "0", 0, "enable loadout icons");
 ConVar loadout_icons_nonloadout("statusspec_loadout_icons_nonloadout", "0", 0, "enable loadout icons for nonloadout items");
 ConVar status_icons_enabled("statusspec_status_icons_enabled", "0", 0, "enable status icons");
 ConVar status_icons_max("statusspec_status_icons_max", "5", 0, "max number of status icons to be rendered");
-
-void (__fastcall *origSendMessage)(void* thisptr, int edx, vgui::VPANEL, KeyValues *, vgui::VPANEL);
-void (__fastcall *origPaintTraverse)(void* thisptr, int edx, vgui::VPANEL, bool, bool);
 
 #define SHOW_SLOT_ICON(slot) \
 	if (playerInfo[i].slot != -1) { \
@@ -330,7 +330,7 @@ void UpdateEntities() {
 	}
 }
 
-void __fastcall hookedSendMessage(vgui::IPanel *thisPtr, int edx, vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel) {
+void Hook_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel) {
 	std::string originPanelName = g_pVGuiPanel->GetName(ifromPanel);
 	std::string destinationPanelName = g_pVGuiPanel->GetName(vguiPanel);
 	
@@ -358,11 +358,9 @@ void __fastcall hookedSendMessage(vgui::IPanel *thisPtr, int edx, vgui::VPANEL v
 			}
 		}
 	}
-
-	origSendMessage(thisPtr, edx, vguiPanel, params, ifromPanel);
 }
 	
-void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
+void Hook_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
 	const char* panelName = g_pVGuiPanel->GetName(vguiPanel);
 	vgui::HPanel panelHandle = g_pVGui->PanelToHandle(vguiPanel);
 
@@ -375,8 +373,6 @@ void __fastcall hookedPaintTraverse(vgui::IPanel *thisPtr, int edx, vgui::VPANEL
 	if (topPanelHandle == panelHandle) {
 		UpdateEntities();
 	}
-	
-	origPaintTraverse(thisPtr, edx, vguiPanel, forceRepaint, allowForce);
 
 	if (Interfaces::pEngineClient->IsDrawingLoadingImage() || !Interfaces::pEngineClient->IsInGame() || !Interfaces::pEngineClient->IsConnected() || Interfaces::pEngineClient->Con_IsVisible())
 		return;
@@ -866,13 +862,8 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	
 	performlayoutCommand = new KeyValues("Command", "Command", "performlayout");
 	
-	// hook SendMessage
-	origSendMessage = (void (__fastcall *)(void *, int, vgui::VPANEL, KeyValues *, vgui::VPANEL))
-	HookVFunc(*(DWORD**)g_pVGuiPanel, Index_SendMessage, (DWORD*) &hookedSendMessage);
-	
-	// hook PaintTraverse
-	origPaintTraverse = (void (__fastcall *)(void *, int, vgui::VPANEL, bool, bool))
-	HookVFunc(*(DWORD**)g_pVGuiPanel, Index_PaintTraverse, (DWORD*) &hookedPaintTraverse);
+	SH_ADD_HOOK(IPanel, SendMessage, g_pVGuiPanel, Hook_SendMessage, true);
+	SH_ADD_HOOK(IPanel, PaintTraverse, g_pVGuiPanel, Hook_PaintTraverse, true);
 	
 	// get offsets
 	WSOffsets::PrepareOffsets();

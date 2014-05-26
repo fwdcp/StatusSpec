@@ -18,10 +18,10 @@
 #include <string>
 #include <array>
 
+#include "hooks.h"
 #include "ifaces.h"
-#include "offsets.h"
-#include "vfuncs.h"
 #include "itemschema.h"
+#include "offsets.h"
 
 #include "Color.h"
 #include "ehandle.h"

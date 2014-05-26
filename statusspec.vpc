@@ -13,7 +13,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE,$SRCDIR\game\client,$SRCDIR\game\shared,$SRCDIR\public"
+		$AdditionalIncludeDirectories		"$BASE,$SRCDIR\game\client,$SRCDIR\game\shared,$SRCDIR\public,..\mmsource\core"
 		$PreprocessorDefinitions			"$BASE;statusspecONLY;_MBCS"
 	}
 
@@ -31,16 +31,22 @@ $Project "StatusSpec"
 		$File	"src\ifaces.cpp"
 		$File	"src\itemschema.cpp"
 		$File	"src\offsets.cpp"
-		$File	"src\vfuncs.cpp"
+		$File	"..\mmsource\core\sourcehook\sourcehook.cpp"
+		$File	"..\mmsource\core\sourcehook\sourcehook.cpp"
+		$File	"..\mmsource\core\sourcehook\sourcehook_hookmangen.cpp"
+		$File	"..\mmsource\core\sourcehook\sourcehook_impl_chookidman.cpp"
+		$File	"..\mmsource\core\sourcehook\sourcehook_impl_chookmaninfo.cpp"
+		$File	"..\mmsource\core\sourcehook\sourcehook_impl_cproto.cpp"
+		$File	"..\mmsource\core\sourcehook\sourcehook_impl_cvfnptr.cpp"
 	}
 	
 	$Folder	"Header Files"
 	{
 		$File	"src\statusspec.h"
+		$File	"src\hooks.h"
 		$File	"src\ifaces.h"
 		$File	"src\itemschema.h"
 		$File	"src\offsets.h"
-		$File	"src\vfuncs.h"
 	}
 	
 	$Folder	"Link Libraries"
