@@ -47,11 +47,11 @@ This plugin is not signed by Valve, and therefore will not load unless TF2 is lo
 * `statusspec_status_icons_max` - max number of status icons to be rendered
 
 ### Console Commands
-* `statusspec_loadout_filter_active` - the RGBA filter applied to the icon when the item is active (usage: statusspec_loadout_filter_active <red> <green> <blue> <alpha>)
-* `statusspec_loadout_filter_nonactive` - the RGBA filter applied to the icon when the item is not active (usage: statusspec_loadout_filter_nonactive <red> <green> <blue> <alpha>)
-* `statusspec_player_alias_get` - get an alias for a player (usage: statusspec_player_alias_get <steamid>)
-* `statusspec_player_alias_remove` - remove an alias for a player (usage: statusspec_player_alias_remove <steamid>)
-* `statusspec_player_alias_set` - set an alias for a player (usage: statusspec_player_alias_set <steamid> <alias>)
+* `statusspec_loadout_filter_active <red> <green> <blue> <alpha>` - the RGBA filter applied to the icon when the item is active
+* `statusspec_loadout_filter_nonactive <red> <green> <blue> <alpha>` - the RGBA filter applied to the icon when the item is not active
+* `statusspec_player_alias_get <steamid>` - get an alias for a player
+* `statusspec_player_alias_remove <steamid>` - remove an alias for a player
+* `statusspec_player_alias_set <steamid> <alias>` - set an alias for a player
 
 ### UI Resource Files
 
