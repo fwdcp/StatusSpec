@@ -15,6 +15,7 @@
 #include "KeyValues.h"
 #include "vgui/vgui.h"
 #include "vgui/IPanel.h"
+#include "igameresources.h"
 
 #include <sourcehook/sourcehook_impl.h>
 #include <sourcehook/sourcehook.h>
@@ -28,3 +29,4 @@ extern int g_PLID;
 
 SH_DECL_HOOK3_void(IPanel, SendMessage, SH_NOATTRIB, 0, VPANEL, KeyValues *, VPANEL);
 SH_DECL_HOOK3_void(IPanel, PaintTraverse, SH_NOATTRIB, 0, VPANEL, bool, bool);
+SH_DECL_HOOK1(IGameResources, GetPlayerName, SH_NOATTRIB, 0, const char *, int);

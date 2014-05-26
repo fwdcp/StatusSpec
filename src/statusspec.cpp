@@ -16,6 +16,7 @@ int g_PLID = 0;
 ConVar force_refresh_specgui("statusspec_force_specgui_refresh", "0", 0, "whether to force the spectator GUI to refresh");
 ConVar loadout_icons_enabled("statusspec_loadout_icons_enabled", "0", 0, "enable loadout icons");
 ConVar loadout_icons_nonloadout("statusspec_loadout_icons_nonloadout", "0", 0, "enable loadout icons for nonloadout items");
+ConVar player_aliases_enabled("statusspec_player_alias_enabled", "0", 0, "enable player aliases");
 ConVar status_icons_enabled("statusspec_status_icons_enabled", "0", 0, "enable status icons");
 ConVar status_icons_max("statusspec_status_icons_max", "5", 0, "max number of status icons to be rendered");
 
@@ -154,6 +155,64 @@ CON_COMMAND(statusspec_loadout_filter_nonactive, "the RGBA filter applied to the
 	Msg("Set nonactive loadout item icon filter to rgba(%i, %i, %i, %i).", red, green, blue, alpha);
 }
 
+CON_COMMAND(statusspec_player_alias_get, "get an alias for a player") {
+	if (args.ArgC() < 1)
+	{
+		Warning("Usage: statusspec_player_alias_get <steamid>\n");
+		return;
+	}
+
+	CSteamID playerSteamID = ConvertTextToSteamID(args.Arg(1));
+
+	if (!playerSteamID.IsValid()) {
+		Warning("The Steam ID entered is invalid.\n");
+		return;
+	}
+
+	if (playerAliases.find(playerSteamID) != playerAliases.end()) {
+		Msg("Steam ID %llu has an associated alias '%s'.\n", playerSteamID.ConvertToUint64(), playerAliases[playerSteamID].c_str());
+	}
+	else {
+		Msg("Steam ID %llu does not have an associated alias.\n", playerSteamID.ConvertToUint64());
+	}
+}
+
+CON_COMMAND(statusspec_player_alias_set, "set an alias for a player") {
+	if (args.ArgC() < 2)
+	{
+		Warning("Usage: statusspec_player_alias_set <steamid> <alias>\n");
+		return;
+	}
+
+	CSteamID playerSteamID = ConvertTextToSteamID(args.Arg(1));
+
+	if (!playerSteamID.IsValid()) {
+		Warning("The Steam ID entered is invalid.\n");
+		return;
+	}
+
+	playerAliases[playerSteamID] = args.Arg(2);
+	Msg("Steam ID %llu has been associated with alias '%s'.\n", playerSteamID.ConvertToUint64(), playerAliases[playerSteamID].c_str());
+}
+
+CON_COMMAND(statusspec_player_alias_remove, "remove an alias for a player") {
+	if (args.ArgC() < 1)
+	{
+		Warning("Usage: statusspec_player_alias_remove <steamid>\n");
+		return;
+	}
+
+	CSteamID playerSteamID = ConvertTextToSteamID(args.Arg(1));
+
+	if (!playerSteamID.IsValid()) {
+		Warning("The Steam ID entered is invalid.\n");
+		return;
+	}
+
+	playerAliases.erase(playerSteamID);
+	Msg("Alias associated with Steam ID %llu erased.\n", playerSteamID.ConvertToUint64());
+}
+
 int FindOrCreateTexture(const char *textureFile) {
 	int textureId = g_pVGuiSurface->DrawGetTextureId(textureFile);
 	
@@ -165,7 +224,35 @@ int FindOrCreateTexture(const char *textureFile) {
 	return textureId;
 }
 
+const char * Hook_GetPlayerName(int client) {
+	if (player_aliases_enabled.GetBool()) {
+		CSteamID playerSteamID = GetClientSteamID(client);
+
+		if (playerAliases.find(playerSteamID) != playerAliases.end()) {
+			RETURN_META_VALUE(MRES_SUPERCEDE, playerAliases[playerSteamID].c_str());
+		}
+	}
+
+	RETURN_META_VALUE(MRES_IGNORED, "");
+}
+
 void UpdateEntities() {
+	static IGameResources* gameResources = NULL;
+	static int getPlayerNameHook;
+
+	if (gameResources != Interfaces::GetGameResources()) {
+		if (getPlayerNameHook) {
+			SH_REMOVE_HOOK_ID(getPlayerNameHook);
+			getPlayerNameHook = 0;
+		}
+
+		gameResources = Interfaces::GetGameResources();
+		
+		if (gameResources) {
+			getPlayerNameHook = SH_ADD_HOOK(IGameResources, GetPlayerName, gameResources, Hook_GetPlayerName, true);
+		}
+	}
+
 	int iEntCount = Interfaces::pClientEntityList->GetHighestEntityIndex();
 	IClientEntity *cEntity;
 	
@@ -185,16 +272,20 @@ void UpdateEntities() {
 			uint32_t condBits = *MAKE_PTR(uint32_t*, cEntity, WSOffsets::pCTFPlayer___condition_bits);
 			uint32_t playerCondEx = *MAKE_PTR(uint32_t*, cEntity, WSOffsets::pCTFPlayer__m_nPlayerCondEx);
 			uint32_t playerCondEx2 = *MAKE_PTR(uint32_t*, cEntity, WSOffsets::pCTFPlayer__m_nPlayerCondEx2);
+			Vector origin = cEntity->GetAbsOrigin();
+			QAngle angles = cEntity->GetAbsAngles();
 			
 			if (team != TFTeam_Red && team != TFTeam_Blue) {
 				continue;
 			}
-			
+
 			playerInfo[i].tfclass = tfclass;
 			playerInfo[i].team = team;
 			playerInfo[i].conditions[0] = playerCond|condBits;
 			playerInfo[i].conditions[1] = playerCondEx;
 			playerInfo[i].conditions[2] = playerCondEx2;
+			playerInfo[i].origin = origin;
+			playerInfo[i].angles = angles;
 			playerInfo[i].primary = -1;
 			playerInfo[i].secondary = -1;
 			playerInfo[i].melee = -1;

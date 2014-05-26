@@ -13,6 +13,7 @@
 #include "stdafx.h"
 
 #include <cstdint>
+#include <cstdlib>
 #include <vector>
 #include <map>
 #include <string>
@@ -204,6 +205,7 @@ typedef struct Player {
 std::array<std::string, 10> tfclassNames = {"", "scout", "sniper", "soldier", "demoman", "medic", "heavy", "pyro", "spy", "engineer"};
 std::array<std::string, 9> itemSlots = {"primary", "secondary", "melee", "pda", "pda2", "building", "head", "misc", "action"};
 
+std::map<CSteamID, std::string> playerAliases;
 std::map<std::string, int> playerPanels;
 std::map<int, Player> playerInfo;
 
