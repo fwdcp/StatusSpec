@@ -31,6 +31,7 @@
 #include "vgui/IPanel.h"
 #include "vgui/IScheme.h"
 #include "vgui/ISurface.h"
+#include "vgui_controls/AnimationController.h"
 
 #define PLUGIN_DESC "StatusSpec v0.8"
 

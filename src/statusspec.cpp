@@ -70,6 +70,10 @@ bool CheckCondition(uint32_t conditions[3], int condition) {
 	return false;
 }
 
+inline void StartAnimationSequence(const char *sequenceName) {
+	Interfaces::GetClientMode()->GetViewportAnimationController()->StartAnimationSequence(sequenceName);
+}
+
 CSteamID GetClientSteamID(int client) {
 	player_info_t playerInfo;
 
