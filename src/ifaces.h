@@ -34,6 +34,9 @@
 #define GetHandleOfModule(szModuleName) GetModuleHandleA(szModuleName".dll")
 #endif
 
+#define CLIENT_MODULE_SIZE 0xC74EC0
+#define GAMERESOURCES_SIG "\xA1\x00\x00\x00\x00\x85\xC0\x74\x06\x05"
+#define GAMERESOURCES_MASK "x????xxxxx"
 class Interfaces {
 	public:
 		static bool Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory);

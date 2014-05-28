@@ -45,11 +45,11 @@ inline DWORD FindPattern(DWORD dwAddress, DWORD dwSize, BYTE* pbSig, const char*
 }
 
 IGameResources* Interfaces::GetGameResources() {
-	static DWORD funcadd = NULL;
-	if (!funcadd)
-		funcadd = FindPattern((DWORD) GetHandleOfModule(_T("client")), 0x2680C6, (PBYTE) "\xA1\x00\x00\x00\x00\x85\xC0\x74\x06\x05", "x????xxxxx");
+	static DWORD pointer = NULL;
+	if (!pointer)
+		pointer = FindPattern((DWORD) GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE) GAMERESOURCES_SIG, GAMERESOURCES_MASK);
 	typedef IGameResources* (*GGR_t) (void);
-	GGR_t GGR = (GGR_t) funcadd;
+	GGR_t GGR = (GGR_t) pointer;
 	return GGR();
 }
 
