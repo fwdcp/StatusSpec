@@ -185,8 +185,8 @@ void UpdateEntities() {
 				continue;
 			}
 
-			playerInfo[i].tfclass = tfclass;
-			playerInfo[i].team = team;
+			playerInfo[i].tfclass = (TFClassType) tfclass;
+			playerInfo[i].team = (TFTeam) team;
 			playerInfo[i].conditions[0] = playerCond|condBits;
 			playerInfo[i].conditions[1] = playerCondEx;
 			playerInfo[i].conditions[2] = playerCondEx2;

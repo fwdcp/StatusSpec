@@ -196,8 +196,8 @@ vgui::HPanel specguiPanel;
 #define MAX_COSMETIC_SLOTS 3
 
 typedef struct Player {
-	int tfclass;
-	int team;
+	TFClassType tfclass;
+	TFTeam team;
 	uint32_t conditions[3];
 	int primary;
 	int secondary;
