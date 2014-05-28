@@ -11,6 +11,13 @@
 
 #include "offsets.h"
 
+#define RetrieveAndCheckOffsetAndWarn(offset, retrieve) \
+	Offsets::offset = retrieve; \
+	if (Offsets::offset == INVALID_OFFSET) { \
+		Warning("[StatusSpec] Offset %s is invalid!\n", #offset); \
+		return false; \
+	}
+
 int Offsets::pCTFPlayer__m_iClass = 0;
 int Offsets::pCTFPlayer__m_iTeamNum = 0;
 int Offsets::pCTFPlayer__m_nPlayerCond = 0;
@@ -24,27 +31,27 @@ int Offsets::pCEconEntity__m_iItemDefinitionIndex = 0;
 
 //=================================================================================
 // Find the offsets for all stored NetVars
-// TODO: change to bool when an offset can't be found
 //=================================================================================
-void Offsets::PrepareOffsets() {
-	Offsets::pCTFPlayer__m_iClass = Offsets::FindOffsetOfClassProp("CTFPlayer", "m_iClass");
-	Offsets::pCTFPlayer__m_iTeamNum = Offsets::FindOffsetOfClassProp("CTFPlayer", "m_iTeamNum");
-	Offsets::pCTFPlayer__m_nPlayerCond = Offsets::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCond");
-	Offsets::pCTFPlayer___condition_bits = Offsets::FindOffsetOfClassProp("CTFPlayer", "_condition_bits");
-	Offsets::pCTFPlayer__m_nPlayerCondEx = Offsets::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCondEx");
-	Offsets::pCTFPlayer__m_nPlayerCondEx2 = Offsets::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCondEx2");
-	Offsets::pCTFPlayer__m_hActiveWeapon = Offsets::FindOffsetOfClassProp("CTFPlayer", "m_hActiveWeapon");
+bool Offsets::PrepareOffsets() {
+	RetrieveAndCheckOffsetAndWarn(pCTFPlayer__m_iClass, Offsets::FindOffsetOfClassProp("CTFPlayer", "m_iClass"));
+	RetrieveAndCheckOffsetAndWarn(pCTFPlayer__m_iTeamNum, Offsets::FindOffsetOfClassProp("CTFPlayer", "m_iTeamNum"));
+	RetrieveAndCheckOffsetAndWarn(pCTFPlayer__m_nPlayerCond, Offsets::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCond"));
+	RetrieveAndCheckOffsetAndWarn(pCTFPlayer___condition_bits, Offsets::FindOffsetOfClassProp("CTFPlayer", "_condition_bits"));
+	RetrieveAndCheckOffsetAndWarn(pCTFPlayer__m_nPlayerCondEx, Offsets::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCondEx"));
+	RetrieveAndCheckOffsetAndWarn(pCTFPlayer__m_nPlayerCondEx2, Offsets::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCondEx2"));
+	RetrieveAndCheckOffsetAndWarn(pCTFPlayer__m_hActiveWeapon, Offsets::FindOffsetOfClassProp("CTFPlayer", "m_hActiveWeapon"));
 	for (int i = 0; i < MAX_WEAPONS; i++) {
-		Offsets::pCTFPlayer__m_hMyWeapons[i] = Offsets::FindOffsetOfArrayEnt("CTFPlayer", "m_hMyWeapons", i);
+		RetrieveAndCheckOffsetAndWarn(pCTFPlayer__m_hMyWeapons[i], Offsets::FindOffsetOfArrayEnt("CTFPlayer", "m_hMyWeapons", i));
 	}
-	Offsets::pCEconEntity__m_hOwnerEntity = Offsets::FindOffsetOfClassProp("CEconEntity", "m_hOwnerEntity");
-	Offsets::pCEconEntity__m_iItemDefinitionIndex = Offsets::FindOffsetOfClassProp("CEconEntity", "m_iItemDefinitionIndex");
+	RetrieveAndCheckOffsetAndWarn(pCEconEntity__m_hOwnerEntity, Offsets::FindOffsetOfClassProp("CEconEntity", "m_hOwnerEntity"));
+	RetrieveAndCheckOffsetAndWarn(pCEconEntity__m_iItemDefinitionIndex, Offsets::FindOffsetOfClassProp("CEconEntity", "m_iItemDefinitionIndex"));
+	
+	return true;
 }
 
 //=================================================================================
 // Loop through all server classes until className is found, then crawl through the
 // class to find the property
-// TODO: return -1 when an offset is not found
 //=================================================================================
 int Offsets::FindOffsetOfClassProp(const char *className, const char *propName) {
 	//ServerClass *sc = serverGameDLL->GetAllServerClasses();
@@ -57,13 +64,13 @@ int Offsets::FindOffsetOfClassProp(const char *className, const char *propName) 
 				int offset = 0;
 				bool found = Offsets::CrawlForPropOffset(sTable, propName, offset);
 				if (!found)
-					offset = 0;
+					offset = -1;
 				return offset;
 			}
 		}
 		cc = cc->m_pNext;
 	}
-	return 0;
+	return -1;
 }
 
 int Offsets::FindOffsetOfArrayEnt(const char *classname, const char *arrayName, int element) {
@@ -75,14 +82,14 @@ int Offsets::FindOffsetOfArrayEnt(const char *classname, const char *arrayName, 
 				int offset = 0;
 				bool found = Offsets::CrawlForArrayEnt(rTable, arrayName, element, offset);
 				if (!found)
-					offset = 0;
+					offset = -1;
 				return offset;
 			}
 		}
 		cc = cc->m_pNext;
 	}
 
-	return 0;
+	return -1;
 }
 
 //=================================================================================

@@ -944,9 +944,13 @@ StatusSpecPlugin::~StatusSpecPlugin()
 
 bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory)
 {
-	if (!Interfaces::Load(interfaceFactory, gameServerFactory))
-	{
-		Warning("Unable to load required libraries for %s!", PLUGIN_DESC);
+	if (!Interfaces::Load(interfaceFactory, gameServerFactory)) {
+		Warning("[%s] Unable to load required libraries!", PLUGIN_DESC);
+		return false;
+	}
+
+	if (!Offsets::PrepareOffsets()) {
+		Warning("[%s] Unable to determine proper offsets!", PLUGIN_DESC);
 		return false;
 	}
 	
@@ -978,9 +982,6 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	
 	SH_ADD_HOOK(IPanel, SendMessage, g_pVGuiPanel, Hook_SendMessage, true);
 	SH_ADD_HOOK(IPanel, PaintTraverse, g_pVGuiPanel, Hook_PaintTraverse, true);
-	
-	// get offsets
-	Offsets::PrepareOffsets();
 	
 	// register CVars
 	ConVar_Register(0);

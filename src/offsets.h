@@ -16,6 +16,8 @@
 #include "cdll_client_int.h"
 #include "client_class.h"
 
+#define INVALID_OFFSET -1
+
 #define MAX_WEAPONS 48
 
 class Offsets {
@@ -31,7 +33,7 @@ public:
 	static int pCEconEntity__m_hOwnerEntity;
 	static int pCEconEntity__m_iItemDefinitionIndex;
 
-	static void PrepareOffsets();
+	static bool PrepareOffsets();
 	static int FindOffsetOfClassProp(const char *className, const char *propName);
 	static int FindOffsetOfArrayEnt(const char *classname, const char *arrayName, int element);
 	static bool CheckClassBaseclass(ClientClass *clientClass, const char *baseclassDataTableName);
