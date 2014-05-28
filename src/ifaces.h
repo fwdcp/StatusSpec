@@ -24,6 +24,7 @@
 #include "cdll_int.h"
 #include "icliententitylist.h"
 #include "igameresources.h"
+#include "iclientmode.h"
 #include "filesystem.h"
 
 #ifdef _POSIX
@@ -37,6 +38,10 @@
 #define CLIENT_MODULE_SIZE 0xC74EC0
 #define GAMERESOURCES_SIG "\xA1\x00\x00\x00\x00\x85\xC0\x74\x06\x05"
 #define GAMERESOURCES_MASK "x????xxxxx"
+#define CLIENTMODE_SIG "\xC7\x05\x00\x00\x00\x00\x00\x00\x00\x00\xE8\x00\x00\x00\x00\x68\x00\x00\x00\x00\x8B\xC8"
+#define CLIENTMODE_MASK "xx????????x????x????xx"
+#define CLIENTMODE_OFFSET 2
+
 class Interfaces {
 	public:
 		static bool Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory);
@@ -46,6 +51,7 @@ class Interfaces {
 		static IVEngineClient* pEngineClient;
 		static CSteamAPIContext* pSteamAPIContext; 
 		static IGameResources* GetGameResources();
+		static IClientMode* GetClientMode();
 	private:
 		static CDllDemandLoader *pClientModule;
 };

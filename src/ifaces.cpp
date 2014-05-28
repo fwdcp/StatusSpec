@@ -53,6 +53,13 @@ IGameResources* Interfaces::GetGameResources() {
 	return GGR();
 }
 
+IClientMode* Interfaces::GetClientMode() {
+	static DWORD pointer = NULL;
+	if (!pointer)
+		pointer = FindPattern((DWORD) GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE) CLIENTMODE_SIG, CLIENTMODE_MASK) + CLIENTMODE_OFFSET;
+	return **(IClientMode***)(pointer);
+}
+
 bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory) {
 	ConnectTier1Libraries(&interfaceFactory, 1);
 	ConnectTier2Libraries(&interfaceFactory, 1);
