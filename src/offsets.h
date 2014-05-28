@@ -35,6 +35,9 @@ public:
 	static int pCTFPlayer__m_hMyWeapons[MAX_WEAPONS];
 	static int pCEconEntity__m_hOwnerEntity;
 	static int pCEconEntity__m_iItemDefinitionIndex;
+	static int pCWeaponMedigun__m_bChargeRelease;
+	static int pCWeaponMedigun__m_nChargeResistType;
+	static int pCWeaponMedigun__m_flChargeLevel;
 
 	static bool PrepareOffsets();
 	static int FindOffsetOfClassProp(const char *className, const char *propName);

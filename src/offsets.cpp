@@ -28,6 +28,9 @@ int Offsets::pCTFPlayer__m_hActiveWeapon = 0;
 int Offsets::pCTFPlayer__m_hMyWeapons[MAX_WEAPONS] = {0};
 int Offsets::pCEconEntity__m_hOwnerEntity = 0;
 int Offsets::pCEconEntity__m_iItemDefinitionIndex = 0;
+int Offsets::pCWeaponMedigun__m_bChargeRelease = 0;
+int Offsets::pCWeaponMedigun__m_nChargeResistType = 0;
+int Offsets::pCWeaponMedigun__m_flChargeLevel = 0;
 
 //=================================================================================
 // Find the offsets for all stored NetVars
@@ -45,6 +48,9 @@ bool Offsets::PrepareOffsets() {
 	}
 	RetrieveAndCheckOffsetAndWarn(pCEconEntity__m_hOwnerEntity, Offsets::FindOffsetOfClassProp("CEconEntity", "m_hOwnerEntity"));
 	RetrieveAndCheckOffsetAndWarn(pCEconEntity__m_iItemDefinitionIndex, Offsets::FindOffsetOfClassProp("CEconEntity", "m_iItemDefinitionIndex"));
+	RetrieveAndCheckOffsetAndWarn(pCWeaponMedigun__m_bChargeRelease, Offsets::FindOffsetOfClassProp("CWeaponMedigun", "m_bChargeRelease"));
+	RetrieveAndCheckOffsetAndWarn(pCWeaponMedigun__m_nChargeResistType, Offsets::FindOffsetOfClassProp("CWeaponMedigun", "m_nChargeResistType"));
+	RetrieveAndCheckOffsetAndWarn(pCWeaponMedigun__m_flChargeLevel, Offsets::FindOffsetOfClassProp("CWeaponMedigun", "m_flChargeLevel"));
 	
 	return true;
 }
