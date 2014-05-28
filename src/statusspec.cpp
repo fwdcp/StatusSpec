@@ -10,16 +10,6 @@
 
 #include "statusspec.h"
 
-SourceHook::ISourceHook *g_SHPtr = &g_SourceHook;
-int g_PLID = 0;
-
-ConVar force_refresh_specgui("statusspec_force_specgui_refresh", "0", 0, "whether to force the spectator GUI to refresh");
-ConVar loadout_icons_enabled("statusspec_loadout_icons_enabled", "0", 0, "enable loadout icons");
-ConVar loadout_icons_nonloadout("statusspec_loadout_icons_nonloadout", "0", 0, "enable loadout icons for nonloadout items");
-ConVar player_aliases_enabled("statusspec_player_alias_enabled", "0", 0, "enable player aliases");
-ConVar status_icons_enabled("statusspec_status_icons_enabled", "0", 0, "enable status icons");
-ConVar status_icons_max("statusspec_status_icons_max", "5", 0, "max number of status icons to be rendered");
-
 #define SHOW_SLOT_ICON(slot) \
 	if (playerInfo[i].slot != -1) { \
 		g_pVGuiSurface->DrawSetTexture(m_iTextureItemIcon[playerInfo[i].slot]); \
@@ -34,6 +24,26 @@ ConVar status_icons_max("statusspec_status_icons_max", "5", 0, "max number of st
 	 \
 	iconsWide += iconSize;
 
+SourceHook::ISourceHook *g_SHPtr = &g_SourceHook;
+int g_PLID = 0;
+
+ConVar force_refresh_specgui("statusspec_force_specgui_refresh", "0", 0, "whether to force the spectator GUI to refresh");
+ConVar loadout_icons_enabled("statusspec_loadout_icons_enabled", "0", 0, "enable loadout icons");
+ConVar loadout_icons_nonloadout("statusspec_loadout_icons_nonloadout", "0", 0, "enable loadout icons for nonloadout items");
+ConVar player_aliases_enabled("statusspec_player_alias_enabled", "0", 0, "enable player aliases");
+ConVar status_icons_enabled("statusspec_status_icons_enabled", "0", 0, "enable status icons");
+ConVar status_icons_max("statusspec_status_icons_max", "5", 0, "max number of status icons to be rendered");
+
+const char *Hook_IGameResources_GetPlayerName(int client);
+void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce);
+void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel);
+
+inline int ColorRangeRestrict(int color) {
+	if (color < 0) return 0;
+	else if (color > 255) return 255;
+	else return color;
+}
+
 inline bool IsInteger(const std::string &s)
 {
    if (s.empty() || !isdigit(s[0])) return false;
@@ -44,10 +54,8 @@ inline bool IsInteger(const std::string &s)
    return (*p == 0);
 }
 
-inline int ColorRangeRestrict(int color) {
-	if (color < 0) return 0;
-	else if (color > 255) return 255;
-	else return color;
+inline void StartAnimationSequence(const char *sequenceName) {
+	Interfaces::GetClientMode()->GetViewportAnimationController()->StartAnimationSequence(sequenceName);
 }
 
 bool CheckCondition(uint32_t conditions[3], int condition) {
@@ -68,30 +76,6 @@ bool CheckCondition(uint32_t conditions[3], int condition) {
 	}
 	
 	return false;
-}
-
-inline void StartAnimationSequence(const char *sequenceName) {
-	Interfaces::GetClientMode()->GetViewportAnimationController()->StartAnimationSequence(sequenceName);
-}
-
-CSteamID GetClientSteamID(int client) {
-	player_info_t playerInfo;
-
-	if (Interfaces::pEngineClient->GetPlayerInfo(client, &playerInfo))
-	{
-		if (playerInfo.friendsID)
-		{
-			static EUniverse universe = k_EUniverseInvalid;
-
-			if (universe == k_EUniverseInvalid) {
-				universe = Interfaces::pSteamAPIContext->SteamUtils()->GetConnectedUniverse();
-			}
-
-			return CSteamID(playerInfo.friendsID, 1, universe, k_EAccountTypeIndividual);
-		}
-	}
-
-	return CSteamID();
 }
 
 CSteamID ConvertTextToSteamID(std::string textID) {
@@ -127,96 +111,6 @@ CSteamID ConvertTextToSteamID(std::string textID) {
 	return CSteamID();
 }
 
-CON_COMMAND(statusspec_loadout_filter_active, "the RGBA filter applied to the icon when the item is active") {
-	if (args.ArgC() < 4 || !IsInteger(args.Arg(1)) || !IsInteger(args.Arg(2)) || !IsInteger(args.Arg(3)) || !IsInteger(args.Arg(4)))
-	{
-		Warning("Usage: statusspec_loadout_filter_active <red> <green> <blue> <alpha>\n");
-		return;
-	}
-	
-	int red = ColorRangeRestrict(std::stoi(args.Arg(1)));
-	int green = ColorRangeRestrict(std::stoi(args.Arg(2)));
-	int blue = ColorRangeRestrict(std::stoi(args.Arg(3)));
-	int alpha = ColorRangeRestrict(std::stoi(args.Arg(4)));
-	
-	loadout_active_filter.SetColor(red, green, blue, alpha);
-	Msg("Set nonactive loadout icon filter to rgba(%i, %i, %i, %i).", red, green, blue, alpha);
-}
-
-CON_COMMAND(statusspec_loadout_filter_nonactive, "the RGBA filter applied to the icon when the item is not active") {
-	if (args.ArgC() < 4 || !IsInteger(args.Arg(1)) || !IsInteger(args.Arg(2)) || !IsInteger(args.Arg(3)) || !IsInteger(args.Arg(4)))
-	{
-		Warning("Usage: statusspec_loadout_filter_nonactive <red> <green> <blue> <alpha>\n");
-		return;
-	}
-	
-	int red = ColorRangeRestrict(std::stoi(args.Arg(1)));
-	int green = ColorRangeRestrict(std::stoi(args.Arg(2)));
-	int blue = ColorRangeRestrict(std::stoi(args.Arg(3)));
-	int alpha = ColorRangeRestrict(std::stoi(args.Arg(4)));
-	
-	loadout_nonactive_filter.SetColor(red, green, blue, alpha);
-	Msg("Set nonactive loadout item icon filter to rgba(%i, %i, %i, %i).", red, green, blue, alpha);
-}
-
-CON_COMMAND(statusspec_player_alias_get, "get an alias for a player") {
-	if (args.ArgC() < 1)
-	{
-		Warning("Usage: statusspec_player_alias_get <steamid>\n");
-		return;
-	}
-
-	CSteamID playerSteamID = ConvertTextToSteamID(args.Arg(1));
-
-	if (!playerSteamID.IsValid()) {
-		Warning("The Steam ID entered is invalid.\n");
-		return;
-	}
-
-	if (playerAliases.find(playerSteamID) != playerAliases.end()) {
-		Msg("Steam ID %llu has an associated alias '%s'.\n", playerSteamID.ConvertToUint64(), playerAliases[playerSteamID].c_str());
-	}
-	else {
-		Msg("Steam ID %llu does not have an associated alias.\n", playerSteamID.ConvertToUint64());
-	}
-}
-
-CON_COMMAND(statusspec_player_alias_set, "set an alias for a player") {
-	if (args.ArgC() < 2)
-	{
-		Warning("Usage: statusspec_player_alias_set <steamid> <alias>\n");
-		return;
-	}
-
-	CSteamID playerSteamID = ConvertTextToSteamID(args.Arg(1));
-
-	if (!playerSteamID.IsValid()) {
-		Warning("The Steam ID entered is invalid.\n");
-		return;
-	}
-
-	playerAliases[playerSteamID] = args.Arg(2);
-	Msg("Steam ID %llu has been associated with alias '%s'.\n", playerSteamID.ConvertToUint64(), playerAliases[playerSteamID].c_str());
-}
-
-CON_COMMAND(statusspec_player_alias_remove, "remove an alias for a player") {
-	if (args.ArgC() < 1)
-	{
-		Warning("Usage: statusspec_player_alias_remove <steamid>\n");
-		return;
-	}
-
-	CSteamID playerSteamID = ConvertTextToSteamID(args.Arg(1));
-
-	if (!playerSteamID.IsValid()) {
-		Warning("The Steam ID entered is invalid.\n");
-		return;
-	}
-
-	playerAliases.erase(playerSteamID);
-	Msg("Alias associated with Steam ID %llu erased.\n", playerSteamID.ConvertToUint64());
-}
-
 int FindOrCreateTexture(const char *textureFile) {
 	int textureId = g_pVGuiSurface->DrawGetTextureId(textureFile);
 	
@@ -228,16 +122,24 @@ int FindOrCreateTexture(const char *textureFile) {
 	return textureId;
 }
 
-const char * Hook_GetPlayerName(int client) {
-	if (player_aliases_enabled.GetBool()) {
-		CSteamID playerSteamID = GetClientSteamID(client);
+CSteamID GetClientSteamID(int client) {
+	player_info_t playerInfo;
 
-		if (playerAliases.find(playerSteamID) != playerAliases.end()) {
-			RETURN_META_VALUE(MRES_SUPERCEDE, playerAliases[playerSteamID].c_str());
+	if (Interfaces::pEngineClient->GetPlayerInfo(client, &playerInfo))
+	{
+		if (playerInfo.friendsID)
+		{
+			static EUniverse universe = k_EUniverseInvalid;
+
+			if (universe == k_EUniverseInvalid) {
+				universe = Interfaces::pSteamAPIContext->SteamUtils()->GetConnectedUniverse();
+			}
+
+			return CSteamID(playerInfo.friendsID, 1, universe, k_EAccountTypeIndividual);
 		}
 	}
 
-	RETURN_META_VALUE(MRES_IGNORED, "");
+	return CSteamID();
 }
 
 void UpdateEntities() {
@@ -253,7 +155,7 @@ void UpdateEntities() {
 		gameResources = Interfaces::GetGameResources();
 		
 		if (gameResources) {
-			getPlayerNameHook = SH_ADD_HOOK(IGameResources, GetPlayerName, gameResources, Hook_GetPlayerName, true);
+			getPlayerNameHook = SH_ADD_HOOK(IGameResources, GetPlayerName, gameResources, Hook_IGameResources_GetPlayerName, true);
 		}
 	}
 
@@ -423,37 +325,109 @@ void UpdateEntities() {
 	}
 }
 
-void Hook_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel) {
-	std::string originPanelName = g_pVGuiPanel->GetName(ifromPanel);
-	std::string destinationPanelName = g_pVGuiPanel->GetName(vguiPanel);
+CON_COMMAND(statusspec_loadout_filter_active, "the RGBA filter applied to the icon when the item is active") {
+	if (args.ArgC() < 4 || !IsInteger(args.Arg(1)) || !IsInteger(args.Arg(2)) || !IsInteger(args.Arg(3)) || !IsInteger(args.Arg(4)))
+	{
+		Warning("Usage: statusspec_loadout_filter_active <red> <green> <blue> <alpha>\n");
+		return;
+	}
 	
-	if (strcmp(params->GetName(), "DialogVariables") == 0) {
-		const char *playerName = params->GetString("playername", NULL);
-		
-		if (playerName) {
-			int iEntCount = Interfaces::pClientEntityList->GetHighestEntityIndex();
-			IClientEntity *cEntity;
-		
-			for (int i = 0; i < iEntCount; i++) {
-				cEntity = Interfaces::pClientEntityList->GetClientEntity(i);
-			
-				if (cEntity == NULL || !(Interfaces::GetGameResources()->IsConnected(i))) {
-					continue;
-				}
-			
-				if (strcmp(playerName, Interfaces::GetGameResources()->GetPlayerName(i)) == 0) {
-					if (originPanelName.substr(0, 11).compare("playerpanel") == 0) {
-						playerPanels[originPanelName] = i;
-					}
+	int red = ColorRangeRestrict(std::stoi(args.Arg(1)));
+	int green = ColorRangeRestrict(std::stoi(args.Arg(2)));
+	int blue = ColorRangeRestrict(std::stoi(args.Arg(3)));
+	int alpha = ColorRangeRestrict(std::stoi(args.Arg(4)));
+	
+	loadout_active_filter.SetColor(red, green, blue, alpha);
+	Msg("Set nonactive loadout icon filter to rgba(%i, %i, %i, %i).", red, green, blue, alpha);
+}
 
-					break;
-				}
-			}
-		}
+CON_COMMAND(statusspec_loadout_filter_nonactive, "the RGBA filter applied to the icon when the item is not active") {
+	if (args.ArgC() < 4 || !IsInteger(args.Arg(1)) || !IsInteger(args.Arg(2)) || !IsInteger(args.Arg(3)) || !IsInteger(args.Arg(4)))
+	{
+		Warning("Usage: statusspec_loadout_filter_nonactive <red> <green> <blue> <alpha>\n");
+		return;
+	}
+	
+	int red = ColorRangeRestrict(std::stoi(args.Arg(1)));
+	int green = ColorRangeRestrict(std::stoi(args.Arg(2)));
+	int blue = ColorRangeRestrict(std::stoi(args.Arg(3)));
+	int alpha = ColorRangeRestrict(std::stoi(args.Arg(4)));
+	
+	loadout_nonactive_filter.SetColor(red, green, blue, alpha);
+	Msg("Set nonactive loadout item icon filter to rgba(%i, %i, %i, %i).", red, green, blue, alpha);
+}
+
+CON_COMMAND(statusspec_player_alias_get, "get an alias for a player") {
+	if (args.ArgC() < 1)
+	{
+		Warning("Usage: statusspec_player_alias_get <steamid>\n");
+		return;
+	}
+
+	CSteamID playerSteamID = ConvertTextToSteamID(args.Arg(1));
+
+	if (!playerSteamID.IsValid()) {
+		Warning("The Steam ID entered is invalid.\n");
+		return;
+	}
+
+	if (playerAliases.find(playerSteamID) != playerAliases.end()) {
+		Msg("Steam ID %llu has an associated alias '%s'.\n", playerSteamID.ConvertToUint64(), playerAliases[playerSteamID].c_str());
+	}
+	else {
+		Msg("Steam ID %llu does not have an associated alias.\n", playerSteamID.ConvertToUint64());
 	}
 }
+
+CON_COMMAND(statusspec_player_alias_remove, "remove an alias for a player") {
+	if (args.ArgC() < 1)
+	{
+		Warning("Usage: statusspec_player_alias_remove <steamid>\n");
+		return;
+	}
+
+	CSteamID playerSteamID = ConvertTextToSteamID(args.Arg(1));
+
+	if (!playerSteamID.IsValid()) {
+		Warning("The Steam ID entered is invalid.\n");
+		return;
+	}
+
+	playerAliases.erase(playerSteamID);
+	Msg("Alias associated with Steam ID %llu erased.\n", playerSteamID.ConvertToUint64());
+}
+
+CON_COMMAND(statusspec_player_alias_set, "set an alias for a player") {
+	if (args.ArgC() < 2)
+	{
+		Warning("Usage: statusspec_player_alias_set <steamid> <alias>\n");
+		return;
+	}
+
+	CSteamID playerSteamID = ConvertTextToSteamID(args.Arg(1));
+
+	if (!playerSteamID.IsValid()) {
+		Warning("The Steam ID entered is invalid.\n");
+		return;
+	}
+
+	playerAliases[playerSteamID] = args.Arg(2);
+	Msg("Steam ID %llu has been associated with alias '%s'.\n", playerSteamID.ConvertToUint64(), playerAliases[playerSteamID].c_str());
+}
+
+const char * Hook_IGameResources_GetPlayerName(int client) {
+	if (player_aliases_enabled.GetBool()) {
+		CSteamID playerSteamID = GetClientSteamID(client);
+
+		if (playerAliases.find(playerSteamID) != playerAliases.end()) {
+			RETURN_META_VALUE(MRES_SUPERCEDE, playerAliases[playerSteamID].c_str());
+		}
+	}
+
+	RETURN_META_VALUE(MRES_IGNORED, "");
+}
 	
-void Hook_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
+void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
 	const char* panelName = g_pVGuiPanel->GetName(vguiPanel);
 	vgui::HPanel panelHandle = g_pVGui->PanelToHandle(vguiPanel);
 
@@ -934,6 +908,36 @@ void Hook_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowFor
 	}
 }
 
+void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel) {
+	std::string originPanelName = g_pVGuiPanel->GetName(ifromPanel);
+	std::string destinationPanelName = g_pVGuiPanel->GetName(vguiPanel);
+	
+	if (strcmp(params->GetName(), "DialogVariables") == 0) {
+		const char *playerName = params->GetString("playername", NULL);
+		
+		if (playerName) {
+			int iEntCount = Interfaces::pClientEntityList->GetHighestEntityIndex();
+			IClientEntity *cEntity;
+		
+			for (int i = 0; i < iEntCount; i++) {
+				cEntity = Interfaces::pClientEntityList->GetClientEntity(i);
+			
+				if (cEntity == NULL || !(Interfaces::GetGameResources()->IsConnected(i))) {
+					continue;
+				}
+			
+				if (strcmp(playerName, Interfaces::GetGameResources()->GetPlayerName(i)) == 0) {
+					if (originPanelName.substr(0, 11).compare("playerpanel") == 0) {
+						playerPanels[originPanelName] = i;
+					}
+
+					break;
+				}
+			}
+		}
+	}
+}
+
 // The plugin is a static singleton that is exported as an interface
 StatusSpecPlugin g_StatusSpecPlugin;
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(StatusSpecPlugin, IServerPluginCallbacks, INTERFACEVERSION_ISERVERPLUGINCALLBACKS, g_StatusSpecPlugin);
@@ -984,21 +988,19 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	m_iTextureBleeding = FindOrCreateTexture(TEXTURE_BLEEDING);
 	m_iTextureOnFire = FindOrCreateTexture(TEXTURE_ONFIRE);
 	
-	SH_ADD_HOOK(IPanel, SendMessage, g_pVGuiPanel, Hook_SendMessage, true);
-	SH_ADD_HOOK(IPanel, PaintTraverse, g_pVGuiPanel, Hook_PaintTraverse, true);
+	SH_ADD_HOOK(IPanel, PaintTraverse, g_pVGuiPanel, Hook_IPanel_PaintTraverse, true);
+	SH_ADD_HOOK(IPanel, SendMessage, g_pVGuiPanel, Hook_IPanel_SendMessage, true);
 	
-	// register CVars
-	ConVar_Register(0);
+	ConVar_Register();
 	
-	// ready to go
 	Msg("%s loaded!\n", PLUGIN_DESC);
 	return true;
 }
 
 void StatusSpecPlugin::Unload(void)
 {
-	SH_REMOVE_HOOK(IPanel, SendMessage, g_pVGuiPanel, Hook_SendMessage, true);
-	SH_REMOVE_HOOK(IPanel, PaintTraverse, g_pVGuiPanel, Hook_PaintTraverse, true);
+	SH_REMOVE_HOOK(IPanel, PaintTraverse, g_pVGuiPanel, Hook_IPanel_PaintTraverse, true);
+	SH_REMOVE_HOOK(IPanel, SendMessage, g_pVGuiPanel, Hook_IPanel_SendMessage, true);
 
 	ConVar_Unregister();
 	Interfaces::Unload();
