@@ -30,6 +30,7 @@ int g_PLID = 0;
 ConVar force_refresh_specgui("statusspec_force_specgui_refresh", "0", 0, "whether to force the spectator GUI to refresh");
 ConVar loadout_icons_enabled("statusspec_loadout_icons_enabled", "0", 0, "enable loadout icons");
 ConVar loadout_icons_nonloadout("statusspec_loadout_icons_nonloadout", "0", 0, "enable loadout icons for nonloadout items");
+ConVar medigun_charge_info_enabled("statusspec_medigun_charge_info_enabled", "0", 0, "enable medigun charge info");
 ConVar player_aliases_enabled("statusspec_player_alias_enabled", "0", 0, "enable player aliases");
 ConVar status_icons_enabled("statusspec_status_icons_enabled", "0", 0, "enable status icons");
 ConVar status_icons_max("statusspec_status_icons_max", "5", 0, "max number of status icons to be rendered");
@@ -163,6 +164,7 @@ void UpdateEntities() {
 	IClientEntity *cEntity;
 	
 	playerInfo.clear();
+	medigunInfo.clear();
 
 	for (int i = 0; i < iEntCount; i++) {
 		cEntity = Interfaces::pClientEntityList->GetClientEntity(i);
@@ -199,59 +201,70 @@ void UpdateEntities() {
 			std::fill(playerInfo[i].cosmetic, playerInfo[i].cosmetic + MAX_COSMETIC_SLOTS, -1);
 			playerInfo[i].action = -1;
 		}
-		else if (loadout_icons_enabled.GetBool() && Offsets::CheckClassBaseclass(cEntity->GetClientClass(), "DT_EconEntity")) {
+		else if (Offsets::CheckClassBaseclass(cEntity->GetClientClass(), "DT_EconEntity")) {
 			int player = ENTITY_INDEX_FROM_ENTITY_OFFSET(cEntity, Offsets::pCEconEntity__m_hOwnerEntity);
 			IClientEntity *playerEntity = Interfaces::pClientEntityList->GetClientEntity(player);
-			int activeWeapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(playerEntity, Offsets::pCTFPlayer__m_hActiveWeapon);
-			
 			int itemDefinitionIndex = *MAKE_PTR(int*, cEntity, Offsets::pCEconEntity__m_iItemDefinitionIndex);
-			
-			const char *itemSlot = itemSchema->GetItemKeyData(itemDefinitionIndex, "item_slot");
-			
-			KeyValues *classUses = itemSchema->GetItemKey(itemDefinitionIndex, "used_by_classes");
-			if (classUses) {
-				const char *classUse = classUses->GetString(tfclassNames[playerInfo[player].tfclass].c_str(), "");
 
-				if (std::find(std::begin(itemSlots), std::end(itemSlots), classUse) != std::end(itemSlots)) {
-					itemSlot = classUse;
-				}
-			}
+			if (loadout_icons_enabled.GetBool()) {
+				int activeWeapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(playerEntity, Offsets::pCTFPlayer__m_hActiveWeapon);
 
-			if (activeWeapon == i) {
-				playerInfo[player].activeWeaponSlot = itemSlot;
-			}
+				const char *itemSlot = itemSchema->GetItemKeyData(itemDefinitionIndex, "item_slot");
 			
-			if (strcmp(itemSlot, "primary") == 0) {
-				playerInfo[player].primary = itemDefinitionIndex;
-			}
-			else if (strcmp(itemSlot, "secondary") == 0) {
-				playerInfo[player].secondary = itemDefinitionIndex;
-			}
-			else if (strcmp(itemSlot, "melee") == 0) {
-				playerInfo[player].melee = itemDefinitionIndex;
-			}
-			else if (strcmp(itemSlot, "pda") == 0) {
-				playerInfo[player].pda = itemDefinitionIndex;
-			}
-			else if (strcmp(itemSlot, "pda2") == 0) {
-				playerInfo[player].pda2 = itemDefinitionIndex;
-			}
-			else if (strcmp(itemSlot, "building") == 0) {
-				playerInfo[player].building = itemDefinitionIndex;
-			}
-			else if (strcmp(itemSlot, "head") == 0 || strcmp(itemSlot, "misc") == 0) {
-				for (int slot = 0; slot < 3; slot++) {
-					if (playerInfo[player].cosmetic[slot] == -1) {
-						playerInfo[player].cosmetic[slot] = itemDefinitionIndex;
-						break;
+				KeyValues *classUses = itemSchema->GetItemKey(itemDefinitionIndex, "used_by_classes");
+				if (classUses) {
+					const char *classUse = classUses->GetString(tfclassNames[playerInfo[player].tfclass].c_str(), "");
+
+					if (std::find(std::begin(itemSlots), std::end(itemSlots), classUse) != std::end(itemSlots)) {
+						itemSlot = classUse;
 					}
 				}
-			}
-			else if (strcmp(itemSlot, "action") == 0) {
-				playerInfo[player].action = itemDefinitionIndex;
-			}
+
+				if (activeWeapon == i) {
+					playerInfo[player].activeWeaponSlot = itemSlot;
+				}
 			
-			m_iTextureItemIcon[itemDefinitionIndex] = FindOrCreateTexture(itemSchema->GetItemKeyData(itemDefinitionIndex, "image_inventory"));
+				if (strcmp(itemSlot, "primary") == 0) {
+					playerInfo[player].primary = itemDefinitionIndex;
+				}
+				else if (strcmp(itemSlot, "secondary") == 0) {
+					playerInfo[player].secondary = itemDefinitionIndex;
+				}
+				else if (strcmp(itemSlot, "melee") == 0) {
+					playerInfo[player].melee = itemDefinitionIndex;
+				}
+				else if (strcmp(itemSlot, "pda") == 0) {
+					playerInfo[player].pda = itemDefinitionIndex;
+				}
+				else if (strcmp(itemSlot, "pda2") == 0) {
+					playerInfo[player].pda2 = itemDefinitionIndex;
+				}
+				else if (strcmp(itemSlot, "building") == 0) {
+					playerInfo[player].building = itemDefinitionIndex;
+				}
+				else if (strcmp(itemSlot, "head") == 0 || strcmp(itemSlot, "misc") == 0) {
+					for (int slot = 0; slot < 3; slot++) {
+						if (playerInfo[player].cosmetic[slot] == -1) {
+							playerInfo[player].cosmetic[slot] = itemDefinitionIndex;
+							break;
+						}
+					}
+				}
+				else if (strcmp(itemSlot, "action") == 0) {
+					playerInfo[player].action = itemDefinitionIndex;
+				}
+			
+				m_iTextureItemIcon[itemDefinitionIndex] = FindOrCreateTexture(itemSchema->GetItemKeyData(itemDefinitionIndex, "image_inventory"));
+			}
+
+			if (medigun_charge_info_enabled.GetBool() && Offsets::CheckClassBaseclass(cEntity->GetClientClass(), "DT_WeaponMedigun")) {
+				TFTeam team = (TFTeam) *MAKE_PTR(int*, cEntity, Offsets::pCTFPlayer__m_iTeamNum);
+
+				medigunInfo[team].itemDefinitionIndex = itemDefinitionIndex;
+				medigunInfo[team].chargeRelease = *MAKE_PTR(bool*, cEntity, Offsets::pCWeaponMedigun__m_bChargeRelease);
+				medigunInfo[team].chargeResistType = *MAKE_PTR(int*, cEntity, Offsets::pCWeaponMedigun__m_nChargeResistType);
+				medigunInfo[team].chargeLevel = *MAKE_PTR(float*, cEntity, Offsets::pCWeaponMedigun__m_flChargeLevel);
+			}
 		}
 	}
 	

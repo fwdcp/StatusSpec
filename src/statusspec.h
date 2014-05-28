@@ -210,12 +210,20 @@ typedef struct Player {
 	std::string activeWeaponSlot;
 } Player;
 
+typedef struct Medigun {
+	int itemDefinitionIndex;
+	float chargeLevel;
+	int chargeResistType;
+	bool chargeRelease;
+} Medigun;
+
 std::array<std::string, 10> tfclassNames = {"", "scout", "sniper", "soldier", "demoman", "medic", "heavy", "pyro", "spy", "engineer"};
 std::array<std::string, 9> itemSlots = {"primary", "secondary", "melee", "pda", "pda2", "building", "head", "misc", "action"};
 
 std::map<CSteamID, std::string> playerAliases;
 std::map<std::string, int> playerPanels;
 std::map<int, Player> playerInfo;
+std::map<TFTeam, Medigun> medigunInfo;
 
 ItemSchema *itemSchema;
 
