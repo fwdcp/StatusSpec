@@ -11,34 +11,34 @@
 
 #include "offsets.h"
 
-int WSOffsets::pCTFPlayer__m_iClass = 0;
-int WSOffsets::pCTFPlayer__m_iTeamNum = 0;
-int WSOffsets::pCTFPlayer__m_nPlayerCond = 0;
-int WSOffsets::pCTFPlayer___condition_bits = 0;
-int WSOffsets::pCTFPlayer__m_nPlayerCondEx = 0;
-int WSOffsets::pCTFPlayer__m_nPlayerCondEx2 = 0;
-int WSOffsets::pCTFPlayer__m_hActiveWeapon = 0;
-int WSOffsets::pCTFPlayer__m_hMyWeapons[MAX_WEAPONS] = {0};
-int WSOffsets::pCEconEntity__m_hOwnerEntity = 0;
-int WSOffsets::pCEconEntity__m_iItemDefinitionIndex = 0;
+int Offsets::pCTFPlayer__m_iClass = 0;
+int Offsets::pCTFPlayer__m_iTeamNum = 0;
+int Offsets::pCTFPlayer__m_nPlayerCond = 0;
+int Offsets::pCTFPlayer___condition_bits = 0;
+int Offsets::pCTFPlayer__m_nPlayerCondEx = 0;
+int Offsets::pCTFPlayer__m_nPlayerCondEx2 = 0;
+int Offsets::pCTFPlayer__m_hActiveWeapon = 0;
+int Offsets::pCTFPlayer__m_hMyWeapons[MAX_WEAPONS] = {0};
+int Offsets::pCEconEntity__m_hOwnerEntity = 0;
+int Offsets::pCEconEntity__m_iItemDefinitionIndex = 0;
 
 //=================================================================================
 // Find the offsets for all stored NetVars
 // TODO: change to bool when an offset can't be found
 //=================================================================================
-void WSOffsets::PrepareOffsets() {
-	WSOffsets::pCTFPlayer__m_iClass = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "m_iClass");
-	WSOffsets::pCTFPlayer__m_iTeamNum = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "m_iTeamNum");
-	WSOffsets::pCTFPlayer__m_nPlayerCond = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCond");
-	WSOffsets::pCTFPlayer___condition_bits = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "_condition_bits");
-	WSOffsets::pCTFPlayer__m_nPlayerCondEx = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCondEx");
-	WSOffsets::pCTFPlayer__m_nPlayerCondEx2 = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCondEx2");
-	WSOffsets::pCTFPlayer__m_hActiveWeapon = WSOffsets::FindOffsetOfClassProp("CTFPlayer", "m_hActiveWeapon");
+void Offsets::PrepareOffsets() {
+	Offsets::pCTFPlayer__m_iClass = Offsets::FindOffsetOfClassProp("CTFPlayer", "m_iClass");
+	Offsets::pCTFPlayer__m_iTeamNum = Offsets::FindOffsetOfClassProp("CTFPlayer", "m_iTeamNum");
+	Offsets::pCTFPlayer__m_nPlayerCond = Offsets::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCond");
+	Offsets::pCTFPlayer___condition_bits = Offsets::FindOffsetOfClassProp("CTFPlayer", "_condition_bits");
+	Offsets::pCTFPlayer__m_nPlayerCondEx = Offsets::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCondEx");
+	Offsets::pCTFPlayer__m_nPlayerCondEx2 = Offsets::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCondEx2");
+	Offsets::pCTFPlayer__m_hActiveWeapon = Offsets::FindOffsetOfClassProp("CTFPlayer", "m_hActiveWeapon");
 	for (int i = 0; i < MAX_WEAPONS; i++) {
-		WSOffsets::pCTFPlayer__m_hMyWeapons[i] = WSOffsets::FindOffsetOfArrayEnt("CTFPlayer", "m_hMyWeapons", i);
+		Offsets::pCTFPlayer__m_hMyWeapons[i] = Offsets::FindOffsetOfArrayEnt("CTFPlayer", "m_hMyWeapons", i);
 	}
-	WSOffsets::pCEconEntity__m_hOwnerEntity = WSOffsets::FindOffsetOfClassProp("CEconEntity", "m_hOwnerEntity");
-	WSOffsets::pCEconEntity__m_iItemDefinitionIndex = WSOffsets::FindOffsetOfClassProp("CEconEntity", "m_iItemDefinitionIndex");
+	Offsets::pCEconEntity__m_hOwnerEntity = Offsets::FindOffsetOfClassProp("CEconEntity", "m_hOwnerEntity");
+	Offsets::pCEconEntity__m_iItemDefinitionIndex = Offsets::FindOffsetOfClassProp("CEconEntity", "m_iItemDefinitionIndex");
 }
 
 //=================================================================================
@@ -46,7 +46,7 @@ void WSOffsets::PrepareOffsets() {
 // class to find the property
 // TODO: return -1 when an offset is not found
 //=================================================================================
-int WSOffsets::FindOffsetOfClassProp(const char *className, const char *propName) {
+int Offsets::FindOffsetOfClassProp(const char *className, const char *propName) {
 	//ServerClass *sc = serverGameDLL->GetAllServerClasses();
 	ClientClass *cc = Interfaces::pClientDLL->GetAllClasses();
 	while (cc) {
@@ -55,7 +55,7 @@ int WSOffsets::FindOffsetOfClassProp(const char *className, const char *propName
 			RecvTable *sTable = cc->m_pRecvTable;
 			if (sTable) {
 				int offset = 0;
-				bool found = WSOffsets::CrawlForPropOffset(sTable, propName, offset);
+				bool found = Offsets::CrawlForPropOffset(sTable, propName, offset);
 				if (!found)
 					offset = 0;
 				return offset;
@@ -66,14 +66,14 @@ int WSOffsets::FindOffsetOfClassProp(const char *className, const char *propName
 	return 0;
 }
 
-int WSOffsets::FindOffsetOfArrayEnt(const char *classname, const char *arrayName, int element) {
+int Offsets::FindOffsetOfArrayEnt(const char *classname, const char *arrayName, int element) {
 	ClientClass *cc = Interfaces::pClientDLL->GetAllClasses();
 	while (cc) {
 		if (Q_strcmp(cc->GetName(), classname) == 0) {
 			RecvTable *rTable = cc->m_pRecvTable;
 			if (rTable) {
 				int offset = 0;
-				bool found = WSOffsets::CrawlForArrayEnt(rTable, arrayName, element, offset);
+				bool found = Offsets::CrawlForArrayEnt(rTable, arrayName, element, offset);
 				if (!found)
 					offset = 0;
 				return offset;
@@ -88,7 +88,7 @@ int WSOffsets::FindOffsetOfArrayEnt(const char *classname, const char *arrayName
 //=================================================================================
 // Search through a class table, and any subtables, for a given property name
 //=================================================================================
-bool WSOffsets::CrawlForPropOffset(RecvTable *sTable, const char *propName, int &offset) {
+bool Offsets::CrawlForPropOffset(RecvTable *sTable, const char *propName, int &offset) {
 	for (int i=0; i < sTable->GetNumProps(); i++) {
 		//SendProp *sProp = sTable->GetProp(i);
 		RecvProp *sProp = sTable->GetProp(i);
@@ -118,7 +118,7 @@ bool WSOffsets::CrawlForPropOffset(RecvTable *sTable, const char *propName, int 
 			if (sProp->GetType() == DPT_DataTable) {
 				int origOffset = offset;
 				offset += sProp->GetOffset();
-				bool found = WSOffsets::CrawlForPropOffset(sChildTable, propName, offset);
+				bool found = Offsets::CrawlForPropOffset(sChildTable, propName, offset);
 				if (found) {
 					return true;
 				} else {
@@ -135,7 +135,7 @@ bool WSOffsets::CrawlForPropOffset(RecvTable *sTable, const char *propName, int 
 	return false;
 }
 
-bool WSOffsets::CrawlForArrayEnt(RecvTable *sTable, const char *propName, int element, int &offset) {
+bool Offsets::CrawlForArrayEnt(RecvTable *sTable, const char *propName, int element, int &offset) {
 	for (int i=0; i < sTable->GetNumProps(); i++) {
 		RecvProp *sProp = sTable->GetProp(i);
 		if (strcmp(sProp->GetName(),"000") == 0) //End of an array
@@ -164,7 +164,7 @@ bool WSOffsets::CrawlForArrayEnt(RecvTable *sTable, const char *propName, int el
 			if (sProp->GetType() == DPT_DataTable) {
 				int origOffset = offset;
 				offset += sProp->GetOffset();
-				bool found = WSOffsets::CrawlForArrayEnt(sChildTable, propName, element, offset);
+				bool found = Offsets::CrawlForArrayEnt(sChildTable, propName, element, offset);
 				if (found) {
 					return true;
 				} else {
@@ -213,7 +213,7 @@ inline bool CheckBaseclass(RecvTable *sTable, const char *baseclassDataTableName
 	return false;
 }
 
-bool WSOffsets::CheckClassBaseclass(ClientClass *clientClass, const char *baseclassDataTableName) {
+bool Offsets::CheckClassBaseclass(ClientClass *clientClass, const char *baseclassDataTableName) {
 	RecvTable *sTable = clientClass->m_pRecvTable;
 	
 	if (sTable) {

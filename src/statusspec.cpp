@@ -266,12 +266,12 @@ void UpdateEntities() {
 		}
 		
 		if (Interfaces::GetGameResources()->IsConnected(i)) {
-			int tfclass = *MAKE_PTR(int*, cEntity, WSOffsets::pCTFPlayer__m_iClass);
-			int team = *MAKE_PTR(int*, cEntity, WSOffsets::pCTFPlayer__m_iTeamNum);
-			uint32_t playerCond = *MAKE_PTR(uint32_t*, cEntity, WSOffsets::pCTFPlayer__m_nPlayerCond);
-			uint32_t condBits = *MAKE_PTR(uint32_t*, cEntity, WSOffsets::pCTFPlayer___condition_bits);
-			uint32_t playerCondEx = *MAKE_PTR(uint32_t*, cEntity, WSOffsets::pCTFPlayer__m_nPlayerCondEx);
-			uint32_t playerCondEx2 = *MAKE_PTR(uint32_t*, cEntity, WSOffsets::pCTFPlayer__m_nPlayerCondEx2);
+			int tfclass = *MAKE_PTR(int*, cEntity, Offsets::pCTFPlayer__m_iClass);
+			int team = *MAKE_PTR(int*, cEntity, Offsets::pCTFPlayer__m_iTeamNum);
+			uint32_t playerCond = *MAKE_PTR(uint32_t*, cEntity, Offsets::pCTFPlayer__m_nPlayerCond);
+			uint32_t condBits = *MAKE_PTR(uint32_t*, cEntity, Offsets::pCTFPlayer___condition_bits);
+			uint32_t playerCondEx = *MAKE_PTR(uint32_t*, cEntity, Offsets::pCTFPlayer__m_nPlayerCondEx);
+			uint32_t playerCondEx2 = *MAKE_PTR(uint32_t*, cEntity, Offsets::pCTFPlayer__m_nPlayerCondEx2);
 			Vector origin = cEntity->GetAbsOrigin();
 			QAngle angles = cEntity->GetAbsAngles();
 			
@@ -293,12 +293,12 @@ void UpdateEntities() {
 			std::fill(playerInfo[i].cosmetic, playerInfo[i].cosmetic + MAX_COSMETIC_SLOTS, -1);
 			playerInfo[i].action = -1;
 		}
-		else if (loadout_icons_enabled.GetBool() && WSOffsets::CheckClassBaseclass(cEntity->GetClientClass(), "DT_EconEntity")) {
-			int player = ENTITY_INDEX_FROM_ENTITY_OFFSET(cEntity, WSOffsets::pCEconEntity__m_hOwnerEntity);
+		else if (loadout_icons_enabled.GetBool() && Offsets::CheckClassBaseclass(cEntity->GetClientClass(), "DT_EconEntity")) {
+			int player = ENTITY_INDEX_FROM_ENTITY_OFFSET(cEntity, Offsets::pCEconEntity__m_hOwnerEntity);
 			IClientEntity *playerEntity = Interfaces::pClientEntityList->GetClientEntity(player);
-			int activeWeapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(playerEntity, WSOffsets::pCTFPlayer__m_hActiveWeapon);
+			int activeWeapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(playerEntity, Offsets::pCTFPlayer__m_hActiveWeapon);
 			
-			int itemDefinitionIndex = *MAKE_PTR(int*, cEntity, WSOffsets::pCEconEntity__m_iItemDefinitionIndex);
+			int itemDefinitionIndex = *MAKE_PTR(int*, cEntity, Offsets::pCEconEntity__m_iItemDefinitionIndex);
 			
 			const char *itemSlot = itemSchema->GetItemKeyData(itemDefinitionIndex, "item_slot");
 			
@@ -358,17 +358,17 @@ void UpdateEntities() {
 				continue;
 			}
 			
-			int activeWeapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(playerEntity, WSOffsets::pCTFPlayer__m_hActiveWeapon);
+			int activeWeapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(playerEntity, Offsets::pCTFPlayer__m_hActiveWeapon);
 			
 			for (int i = 0; i < MAX_WEAPONS; i++) {
-				int weapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(playerEntity, WSOffsets::pCTFPlayer__m_hMyWeapons[i]);
+				int weapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(playerEntity, Offsets::pCTFPlayer__m_hMyWeapons[i]);
 				IClientEntity *weaponEntity = Interfaces::pClientEntityList->GetClientEntity(weapon);
 			
-				if (!weaponEntity || !WSOffsets::CheckClassBaseclass(weaponEntity->GetClientClass(), "DT_EconEntity")) {
+				if (!weaponEntity || !Offsets::CheckClassBaseclass(weaponEntity->GetClientClass(), "DT_EconEntity")) {
 					continue;
 				}
 				
-				int itemDefinitionIndex = *MAKE_PTR(int*, weaponEntity, WSOffsets::pCEconEntity__m_iItemDefinitionIndex);
+				int itemDefinitionIndex = *MAKE_PTR(int*, weaponEntity, Offsets::pCEconEntity__m_iItemDefinitionIndex);
 			
 				const char *itemSlot = itemSchema->GetItemKeyData(itemDefinitionIndex, "item_slot");
 				
@@ -980,7 +980,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	SH_ADD_HOOK(IPanel, PaintTraverse, g_pVGuiPanel, Hook_PaintTraverse, true);
 	
 	// get offsets
-	WSOffsets::PrepareOffsets();
+	Offsets::PrepareOffsets();
 	
 	// register CVars
 	ConVar_Register(0);

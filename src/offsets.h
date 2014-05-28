@@ -18,7 +18,7 @@
 
 #define MAX_WEAPONS 48
 
-class WSOffsets {
+class Offsets {
 public:
 	static int pCTFPlayer__m_iClass;
 	static int pCTFPlayer__m_iTeamNum;
