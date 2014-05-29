@@ -258,7 +258,7 @@ void UpdateEntities() {
 			}
 
 			if (medigun_charge_info_enabled.GetBool() && Offsets::CheckClassBaseclass(cEntity->GetClientClass(), "DT_WeaponMedigun")) {
-				TFTeam team = (TFTeam) *MAKE_PTR(int*, cEntity, Offsets::pCTFPlayer__m_iTeamNum);
+				TFTeam team = (TFTeam) *MAKE_PTR(int*, playerEntity, Offsets::pCTFPlayer__m_iTeamNum);
 
 				medigunInfo[team].itemDefinitionIndex = itemDefinitionIndex;
 				medigunInfo[team].chargeRelease = *MAKE_PTR(bool*, cEntity, Offsets::pCWeaponMedigun__m_bChargeRelease);
