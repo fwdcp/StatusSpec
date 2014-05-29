@@ -15,6 +15,7 @@
 #include "ifaces.h"
 
 #include "KeyValues.h"
+#include "filesystem.h"
 
 #include <vector>
 #include <string>

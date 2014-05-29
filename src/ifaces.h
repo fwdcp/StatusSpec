@@ -25,7 +25,6 @@
 #include "icliententitylist.h"
 #include "igameresources.h"
 #include "iclientmode.h"
-#include "filesystem.h"
 #include "vgui_controls/Controls.h"
 
 #ifdef _POSIX

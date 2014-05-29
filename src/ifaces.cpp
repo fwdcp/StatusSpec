@@ -82,10 +82,8 @@ bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 	pClientDLL = (IBaseClientDLL*) gameClientFactory(CLIENT_DLL_INTERFACE_VERSION, NULL);
 	pClientEntityList = (IClientEntityList*) gameClientFactory(VCLIENTENTITYLIST_INTERFACE_VERSION, NULL);
 
-	SteamAPI_InitSafe();
-
 	pSteamAPIContext = new CSteamAPIContext();
-	if (!pSteamAPIContext->Init()) {
+	if (!SteamAPI_InitSafe() || !pSteamAPIContext->Init()) {
 		Warning("[StatusSpec] Could not initialize Steam API!");
 		return false;
 	}
