@@ -38,6 +38,7 @@ $Project "StatusSpec"
 		$File	"..\mmsource\core\sourcehook\sourcehook_impl_chookmaninfo.cpp"
 		$File	"..\mmsource\core\sourcehook\sourcehook_impl_cproto.cpp"
 		$File	"..\mmsource\core\sourcehook\sourcehook_impl_cvfnptr.cpp"
+		$File	"..\..\public\vgui_controls\vgui_controls.cpp"
 	}
 	
 	$Folder	"Header Files"
@@ -55,5 +56,6 @@ $Project "StatusSpec"
 		$Lib tier1
 		$Lib tier2
 		$Lib tier3
+		$Lib vgui_controls
 	}
 }

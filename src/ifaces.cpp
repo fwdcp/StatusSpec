@@ -65,6 +65,11 @@ bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 	ConnectTier2Libraries(&interfaceFactory, 1);
 	ConnectTier3Libraries(&interfaceFactory, 1);
 	
+	if (!vgui::VGui_InitInterfacesList("statusspec", &interfaceFactory, 1)) {
+		Warning("[StatusSpec] Could not initialize VGUI interfaces!");
+		return false;
+	}
+	
 	pEngineClient = (IVEngineClient*) interfaceFactory(VENGINE_CLIENT_INTERFACE_VERSION, NULL);
 	
 	#ifdef _POSIX
