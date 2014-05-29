@@ -37,10 +37,6 @@ ConVar player_aliases_enabled("statusspec_player_alias_enabled", "0", 0, "enable
 ConVar status_icons_enabled("statusspec_status_icons_enabled", "0", 0, "enable status icons");
 ConVar status_icons_max("statusspec_status_icons_max", "5", 0, "max number of status icons to be rendered");
 
-const char *Hook_IGameResources_GetPlayerName(int client);
-void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce);
-void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel);
-
 inline int ColorRangeRestrict(int color) {
 	if (color < 0) return 0;
 	else if (color > 255) return 255;
@@ -59,8 +55,7 @@ inline void FindAndReplaceInString(std::string &str, const std::string &find, co
     }
 }
 
-inline bool IsInteger(const std::string &s)
-{
+inline bool IsInteger(const std::string &s) {
    if (s.empty() || !isdigit(s[0])) return false;
 
    char *p;
@@ -127,31 +122,6 @@ CSteamID ConvertTextToSteamID(std::string textID) {
 }
 
 void DisplayMedigunInfo() {
-	static vgui::EditablePanel *medigunInfoPanel = NULL;
-	static vgui::ImagePanel *medigunInfoBackground = NULL;
-
-	static vgui::ImagePanel *medigunInfoRedBackground = NULL;
-	static vgui::Label *medigunInfoRedNameLabel = NULL;
-	static vgui::ContinuousProgressBar *medigunInfoRedChargeMeter = NULL;
-	static vgui::ContinuousProgressBar *medigunInfoRedChargeMeter1 = NULL;
-	static vgui::ContinuousProgressBar *medigunInfoRedChargeMeter2 = NULL;
-	static vgui::ContinuousProgressBar *medigunInfoRedChargeMeter3 = NULL;
-	static vgui::ContinuousProgressBar *medigunInfoRedChargeMeter4 = NULL;
-	static vgui::Label *medigunInfoRedChargeLabel = NULL;
-	static vgui::Label *medigunInfoRedIndividualChargesLabel = NULL;
-	static vgui::ImagePanel *medigunInfoRedChargeTypeIcon = NULL;
-
-	static vgui::ImagePanel *medigunInfoBluBackground = NULL;
-	static vgui::Label *medigunInfoBluNameLabel = NULL;
-	static vgui::ContinuousProgressBar *medigunInfoBluChargeMeter = NULL;
-	static vgui::ContinuousProgressBar *medigunInfoBluChargeMeter1 = NULL;
-	static vgui::ContinuousProgressBar *medigunInfoBluChargeMeter2 = NULL;
-	static vgui::ContinuousProgressBar *medigunInfoBluChargeMeter3 = NULL;
-	static vgui::ContinuousProgressBar *medigunInfoBluChargeMeter4 = NULL;
-	static vgui::Label *medigunInfoBluChargeLabel = NULL;
-	static vgui::Label *medigunInfoBluIndividualChargesLabel = NULL;
-	static vgui::ImagePanel *medigunInfoBluChargeTypeIcon = NULL;
-
 	if (!medigunInfoPanel) {
 		Panel *viewport = Interfaces::GetClientMode()->GetViewport();
 
@@ -424,7 +394,7 @@ void DisplayMedigunInfo() {
 				case 961:
 				case 970:
 				{
-					medigunInfoRedChargeTypeIcon->SetImage(TEXTURE_UBERCHARGEICON);
+					medigunInfoRedChargeTypeIcon->SetImage(VGUI_TEXTURE_UBERCHARGE);
 
 					medigunInfoRedChargeTypeIcon->SetVisible(true);
 
@@ -432,7 +402,7 @@ void DisplayMedigunInfo() {
 				}
 				case 35:	// Kritzkrieg
 				{
-					medigunInfoRedChargeTypeIcon->SetImage(TEXTURE_CRITBOOSTICON);
+					medigunInfoRedChargeTypeIcon->SetImage(VGUI_TEXTURE_CRITBOOST);
 
 					medigunInfoRedChargeTypeIcon->SetVisible(true);
 
@@ -440,7 +410,7 @@ void DisplayMedigunInfo() {
 				}
 				case 411:	// Quick-Fix
 				{
-					medigunInfoRedChargeTypeIcon->SetImage(TEXTURE_MEGAHEALRED);
+					medigunInfoRedChargeTypeIcon->SetImage(VGUI_TEXTURE_MEGAHEALRED);
 
 					medigunInfoRedChargeTypeIcon->SetVisible(true);
 
@@ -450,25 +420,25 @@ void DisplayMedigunInfo() {
 				{
 					switch(medigunInfo[TFTeam_Red].chargeResistType) {
 						case TFResistType_Bullet:
-							medigunInfoRedChargeTypeIcon->SetImage(TEXTURE_BULLETRESISTRED);
+							medigunInfoRedChargeTypeIcon->SetImage(VGUI_TEXTURE_BULLETRESISTRED);
 
 							medigunInfoRedChargeTypeIcon->SetVisible(true);
 
 							break;
 						case TFResistType_Explosive:
-							medigunInfoRedChargeTypeIcon->SetImage(TEXTURE_BLASTRESISTRED);
+							medigunInfoRedChargeTypeIcon->SetImage(VGUI_TEXTURE_BLASTRESISTRED);
 
 							medigunInfoRedChargeTypeIcon->SetVisible(true);
 
 							break;
 						case TFResistType_Fire:
-							medigunInfoRedChargeTypeIcon->SetImage(TEXTURE_FIRERESISTRED);
+							medigunInfoRedChargeTypeIcon->SetImage(VGUI_TEXTURE_FIRERESISTRED);
 
 							medigunInfoRedChargeTypeIcon->SetVisible(true);
 
 							break;
 						default:
-							medigunInfoRedChargeTypeIcon->SetImage(TEXTURE_NULL);
+							medigunInfoRedChargeTypeIcon->SetImage(VGUI_TEXTURE_NULL);
 
 							medigunInfoRedChargeTypeIcon->SetVisible(false);
 
@@ -479,7 +449,7 @@ void DisplayMedigunInfo() {
 				}
 				default:
 				{
-					medigunInfoRedChargeTypeIcon->SetImage(TEXTURE_NULL);
+					medigunInfoRedChargeTypeIcon->SetImage(VGUI_TEXTURE_NULL);
 
 					medigunInfoRedChargeTypeIcon->SetVisible(false);
 
@@ -496,7 +466,7 @@ void DisplayMedigunInfo() {
 			medigunInfoRedChargeMeter4->SetProgress(0.0f);
 			medigunInfoRedChargeLabel->SetText("");
 			medigunInfoRedIndividualChargesLabel->SetText("");
-			medigunInfoRedChargeTypeIcon->SetImage(TEXTURE_NULL);
+			medigunInfoRedChargeTypeIcon->SetImage(VGUI_TEXTURE_NULL);
 		
 			medigunInfoRedNameLabel->SetVisible(true);
 			medigunInfoRedChargeMeter->SetVisible(false);
@@ -688,7 +658,7 @@ void DisplayMedigunInfo() {
 				case 961:
 				case 970:
 				{
-					medigunInfoBluChargeTypeIcon->SetImage(TEXTURE_UBERCHARGEICON);
+					medigunInfoBluChargeTypeIcon->SetImage(VGUI_TEXTURE_UBERCHARGE);
 
 					medigunInfoBluChargeTypeIcon->SetVisible(true);
 
@@ -696,7 +666,7 @@ void DisplayMedigunInfo() {
 				}
 				case 35:	// Kritzkrieg
 				{
-					medigunInfoBluChargeTypeIcon->SetImage(TEXTURE_CRITBOOSTICON);
+					medigunInfoBluChargeTypeIcon->SetImage(VGUI_TEXTURE_CRITBOOST);
 
 					medigunInfoBluChargeTypeIcon->SetVisible(true);
 
@@ -704,7 +674,7 @@ void DisplayMedigunInfo() {
 				}
 				case 411:	// Quick-Fix
 				{
-					medigunInfoBluChargeTypeIcon->SetImage(TEXTURE_MEGAHEALRED);
+					medigunInfoBluChargeTypeIcon->SetImage(VGUI_TEXTURE_MEGAHEALBLU);
 
 					medigunInfoBluChargeTypeIcon->SetVisible(true);
 
@@ -714,25 +684,25 @@ void DisplayMedigunInfo() {
 				{
 					switch(medigunInfo[TFTeam_Blue].chargeResistType) {
 						case TFResistType_Bullet:
-							medigunInfoBluChargeTypeIcon->SetImage(TEXTURE_BULLETRESISTRED);
+							medigunInfoBluChargeTypeIcon->SetImage(VGUI_TEXTURE_BULLETRESISTBLU);
 
 							medigunInfoBluChargeTypeIcon->SetVisible(true);
 
 							break;
 						case TFResistType_Explosive:
-							medigunInfoBluChargeTypeIcon->SetImage(TEXTURE_BLASTRESISTRED);
+							medigunInfoBluChargeTypeIcon->SetImage(VGUI_TEXTURE_BLASTRESISTBLU);
 
 							medigunInfoBluChargeTypeIcon->SetVisible(true);
 
 							break;
 						case TFResistType_Fire:
-							medigunInfoBluChargeTypeIcon->SetImage(TEXTURE_FIRERESISTRED);
+							medigunInfoBluChargeTypeIcon->SetImage(VGUI_TEXTURE_FIRERESISTBLU);
 
 							medigunInfoBluChargeTypeIcon->SetVisible(true);
 
 							break;
 						default:
-							medigunInfoBluChargeTypeIcon->SetImage(TEXTURE_NULL);
+							medigunInfoBluChargeTypeIcon->SetImage(VGUI_TEXTURE_NULL);
 
 							medigunInfoBluChargeTypeIcon->SetVisible(false);
 
@@ -743,7 +713,7 @@ void DisplayMedigunInfo() {
 				}
 				default:
 				{
-					medigunInfoBluChargeTypeIcon->SetImage(TEXTURE_NULL);
+					medigunInfoBluChargeTypeIcon->SetImage(VGUI_TEXTURE_NULL);
 
 					medigunInfoBluChargeTypeIcon->SetVisible(false);
 
@@ -760,7 +730,7 @@ void DisplayMedigunInfo() {
 			medigunInfoBluChargeMeter4->SetProgress(0.0f);
 			medigunInfoBluChargeLabel->SetText("");
 			medigunInfoBluIndividualChargesLabel->SetText("");
-			medigunInfoBluChargeTypeIcon->SetImage(TEXTURE_NULL);
+			medigunInfoBluChargeTypeIcon->SetImage(VGUI_TEXTURE_NULL);
 		
 			medigunInfoBluNameLabel->SetVisible(true);
 			medigunInfoBluChargeMeter->SetVisible(false);
@@ -1188,7 +1158,7 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
-			g_pVGuiSurface->DrawSetTexture(m_iTextureUbercharged);
+			g_pVGuiSurface->DrawSetTexture(m_iTextureUbercharge);
 			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
 			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
 			
@@ -1206,7 +1176,7 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
-			g_pVGuiSurface->DrawSetTexture(m_iTextureCritBoosted);
+			g_pVGuiSurface->DrawSetTexture(m_iTextureCritBoost);
 			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
 			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
 			
@@ -1225,12 +1195,12 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
 			if (playerInfo[i].team == TFTeam_Red) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureMegaHealedRed);
+				g_pVGuiSurface->DrawSetTexture(m_iTextureMegaHealRed);
 				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
 				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
 			}
 			else if (playerInfo[i].team == TFTeam_Blue) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureMegaHealedBlu);
+				g_pVGuiSurface->DrawSetTexture(m_iTextureMegaHealBlu);
 				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
 				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
 			}
@@ -1474,7 +1444,7 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
-			g_pVGuiSurface->DrawSetTexture(m_iTextureJarated);
+			g_pVGuiSurface->DrawSetTexture(m_iTextureJarate);
 			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
 			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
 			
@@ -1492,7 +1462,7 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
-			g_pVGuiSurface->DrawSetTexture(m_iTextureMilked);
+			g_pVGuiSurface->DrawSetTexture(m_iTextureMilk);
 			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
 			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
 			
@@ -1510,7 +1480,7 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
-			g_pVGuiSurface->DrawSetTexture(m_iTextureMarkedForDeath);
+			g_pVGuiSurface->DrawSetTexture(m_iTextureMarkForDeath);
 			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
 			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
 			
@@ -1528,7 +1498,7 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
-			g_pVGuiSurface->DrawSetTexture(m_iTextureBleeding);
+			g_pVGuiSurface->DrawSetTexture(m_iTextureBleed);
 			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
 			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
 			
@@ -1546,7 +1516,7 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
-			g_pVGuiSurface->DrawSetTexture(m_iTextureOnFire);
+			g_pVGuiSurface->DrawSetTexture(m_iTextureFire);
 			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
 			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
 			
@@ -1673,10 +1643,10 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	itemSchema = new ItemSchema();
 	
 	m_iTextureNull = FindOrCreateTexture(TEXTURE_NULL);
-	m_iTextureUbercharged = FindOrCreateTexture(TEXTURE_UBERCHARGEICON);
-	m_iTextureCritBoosted = FindOrCreateTexture(TEXTURE_CRITBOOSTICON);
-	m_iTextureMegaHealedRed = FindOrCreateTexture(TEXTURE_MEGAHEALRED);
-	m_iTextureMegaHealedBlu = FindOrCreateTexture(TEXTURE_MEGAHEALBLU);
+	m_iTextureUbercharge = FindOrCreateTexture(TEXTURE_UBERCHARGE);
+	m_iTextureCritBoost = FindOrCreateTexture(TEXTURE_CRITBOOST);
+	m_iTextureMegaHealRed = FindOrCreateTexture(TEXTURE_MEGAHEALRED);
+	m_iTextureMegaHealBlu = FindOrCreateTexture(TEXTURE_MEGAHEALBLU);
 	m_iTextureResistShieldRed = FindOrCreateTexture(TEXTURE_RESISTSHIELDRED);
 	m_iTextureResistShieldBlu = FindOrCreateTexture(TEXTURE_RESISTSHIELDBLU);
 	m_iTextureBulletResistRed = FindOrCreateTexture(TEXTURE_BULLETRESISTRED);
@@ -1691,11 +1661,11 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	m_iTextureBattalionsBackupBlu = FindOrCreateTexture(TEXTURE_BATTALIONSBACKUPBLU);
 	m_iTextureConcherorRed = FindOrCreateTexture(TEXTURE_CONCHERORRED);
 	m_iTextureConcherorBlu = FindOrCreateTexture(TEXTURE_CONCHERORBLU);
-	m_iTextureJarated = FindOrCreateTexture(TEXTURE_JARATE);
-	m_iTextureMilked = FindOrCreateTexture(TEXTURE_MADMILK);
-	m_iTextureMarkedForDeath = FindOrCreateTexture(TEXTURE_MARKEDFORDEATH);
-	m_iTextureBleeding = FindOrCreateTexture(TEXTURE_BLEEDING);
-	m_iTextureOnFire = FindOrCreateTexture(TEXTURE_ONFIRE);
+	m_iTextureJarate = FindOrCreateTexture(TEXTURE_JARATE);
+	m_iTextureMilk = FindOrCreateTexture(TEXTURE_MADMILK);
+	m_iTextureMarkForDeath = FindOrCreateTexture(TEXTURE_MARKFORDEATH);
+	m_iTextureBleed = FindOrCreateTexture(TEXTURE_BLEEDING);
+	m_iTextureFire = FindOrCreateTexture(TEXTURE_FIRE);
 	
 	SH_ADD_HOOK(IPanel, PaintTraverse, g_pVGuiPanel, Hook_IPanel_PaintTraverse, true);
 	SH_ADD_HOOK(IPanel, SendMessage, g_pVGuiPanel, Hook_IPanel_SendMessage, true);

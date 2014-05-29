@@ -149,8 +149,8 @@ enum TFResistType {
 };
 
 #define TEXTURE_NULL "vgui/replay/thumbnails/null"
-#define TEXTURE_UBERCHARGEICON "vgui/replay/thumbnails/ubercharge"
-#define TEXTURE_CRITBOOSTICON "vgui/replay/thumbnails/critboost"
+#define TEXTURE_UBERCHARGE "vgui/replay/thumbnails/ubercharge"
+#define TEXTURE_CRITBOOST "vgui/replay/thumbnails/critboost"
 #define TEXTURE_MEGAHEALRED "vgui/replay/thumbnails/megaheal_red"
 #define TEXTURE_MEGAHEALBLU "vgui/replay/thumbnails/megaheal_blue"
 #define TEXTURE_RESISTSHIELDRED "vgui/replay/thumbnails/resist_shield"
@@ -169,15 +169,27 @@ enum TFResistType {
 #define TEXTURE_CONCHERORBLU "effects/soldier_buff_healonhit_blue"
 #define TEXTURE_JARATE "vgui/replay/thumbnails/jarated"
 #define TEXTURE_MADMILK "vgui/bleed_drop"
-#define TEXTURE_MARKEDFORDEATH "vgui/marked_for_death"
+#define TEXTURE_MARKFORDEATH "vgui/marked_for_death"
 #define TEXTURE_BLEEDING "vgui/bleed_drop"
-#define TEXTURE_ONFIRE "hud/leaderboard_class_pyro"
+#define TEXTURE_FIRE "hud/leaderboard_class_pyro"
+
+#define VGUI_TEXTURE_NULL "replay/thumbnails/null"
+#define VGUI_TEXTURE_UBERCHARGE "replay/thumbnails/ubercharge"
+#define VGUI_TEXTURE_CRITBOOST "replay/thumbnails/critboost"
+#define VGUI_TEXTURE_MEGAHEALRED "replay/thumbnails/megaheal_red"
+#define VGUI_TEXTURE_MEGAHEALBLU "replay/thumbnails/megaheal_blue"
+#define VGUI_TEXTURE_BULLETRESISTRED "replay/thumbnails/defense_buff_bullet_red"
+#define VGUI_TEXTURE_BLASTRESISTRED "replay/thumbnails/defense_buff_explosion_red"
+#define VGUI_TEXTURE_FIRERESISTRED "replay/thumbnails/defense_buff_fire_red"
+#define VGUI_TEXTURE_BULLETRESISTBLU "replay/thumbnails/defense_buff_bullet_blue"
+#define VGUI_TEXTURE_BLASTRESISTBLU "replay/thumbnails/defense_buff_explosion_blue"
+#define VGUI_TEXTURE_FIRERESISTBLU "replay/thumbnails/defense_buff_fire_blue"
 
 int m_iTextureNull;
-int m_iTextureUbercharged;
-int m_iTextureCritBoosted;
-int m_iTextureMegaHealedRed;
-int m_iTextureMegaHealedBlu;
+int m_iTextureUbercharge;
+int m_iTextureCritBoost;
+int m_iTextureMegaHealRed;
+int m_iTextureMegaHealBlu;
 int m_iTextureResistShieldRed;
 int m_iTextureResistShieldBlu;
 int m_iTextureBulletResistRed;
@@ -192,11 +204,11 @@ int m_iTextureBattalionsBackupRed;
 int m_iTextureBattalionsBackupBlu;
 int m_iTextureConcherorRed;
 int m_iTextureConcherorBlu;
-int m_iTextureJarated;
-int m_iTextureMilked;
-int m_iTextureMarkedForDeath;
-int m_iTextureBleeding;
-int m_iTextureOnFire;
+int m_iTextureJarate;
+int m_iTextureMilk;
+int m_iTextureMarkForDeath;
+int m_iTextureBleed;
+int m_iTextureFire;
 std::map<int, int> m_iTextureItemIcon;
 
 KeyValues *performlayoutCommand = new KeyValues("Command", "Command", "performlayout");
@@ -238,6 +250,38 @@ ItemSchema *itemSchema;
 
 Color loadout_nonactive_filter(127, 127, 127, 255);
 Color loadout_active_filter(255, 255, 255, 255);
+
+vgui::EditablePanel *medigunInfoPanel = NULL;
+vgui::ImagePanel *medigunInfoBackground = NULL;
+vgui::ImagePanel *medigunInfoRedBackground = NULL;
+vgui::Label *medigunInfoRedNameLabel = NULL;
+vgui::ContinuousProgressBar *medigunInfoRedChargeMeter = NULL;
+vgui::ContinuousProgressBar *medigunInfoRedChargeMeter1 = NULL;
+vgui::ContinuousProgressBar *medigunInfoRedChargeMeter2 = NULL;
+vgui::ContinuousProgressBar *medigunInfoRedChargeMeter3 = NULL;
+vgui::ContinuousProgressBar *medigunInfoRedChargeMeter4 = NULL;
+vgui::Label *medigunInfoRedChargeLabel = NULL;
+vgui::Label *medigunInfoRedIndividualChargesLabel = NULL;
+vgui::ImagePanel *medigunInfoRedChargeTypeIcon = NULL;
+vgui::ImagePanel *medigunInfoBluBackground = NULL;
+vgui::Label *medigunInfoBluNameLabel = NULL;
+vgui::ContinuousProgressBar *medigunInfoBluChargeMeter = NULL;
+vgui::ContinuousProgressBar *medigunInfoBluChargeMeter1 = NULL;
+vgui::ContinuousProgressBar *medigunInfoBluChargeMeter2 = NULL;
+vgui::ContinuousProgressBar *medigunInfoBluChargeMeter3 = NULL;
+vgui::ContinuousProgressBar *medigunInfoBluChargeMeter4 = NULL;
+vgui::Label *medigunInfoBluChargeLabel = NULL;
+vgui::Label *medigunInfoBluIndividualChargesLabel = NULL;
+vgui::ImagePanel *medigunInfoBluChargeTypeIcon = NULL;
+
+const char *Hook_IGameResources_GetPlayerName(int client);
+void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce);
+void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel);
+
+inline int ColorRangeRestrict(int color);
+inline void FindAndReplaceInString(std::string &str, const std::string &find, const std::string &replace);
+inline bool IsInteger(const std::string &s);
+inline void StartAnimationSequence(const char *sequenceName);
 
 class StatusSpecPlugin: public IServerPluginCallbacks
 {
