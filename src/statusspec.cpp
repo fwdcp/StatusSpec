@@ -30,7 +30,9 @@ int g_PLID = 0;
 ConVar force_refresh_specgui("statusspec_force_specgui_refresh", "0", 0, "whether to force the spectator GUI to refresh");
 ConVar loadout_icons_enabled("statusspec_loadout_icons_enabled", "0", 0, "enable loadout icons");
 ConVar loadout_icons_nonloadout("statusspec_loadout_icons_nonloadout", "0", 0, "enable loadout icons for nonloadout items");
-ConVar medigun_charge_info_enabled("statusspec_medigun_charge_info_enabled", "0", 0, "enable medigun charge info");
+ConVar medigun_info_charge_label_text("statusspec_medigun_info_charge_label_text", "%charge%%", 0, "text for charge label in medigun info ('%charge%' is replaced with the current charge percentage number)");
+ConVar medigun_info_enabled("statusspec_medigun_info_enabled", "0", 0, "enable medigun info");
+ConVar medigun_info_individual_charges_label_text("statusspec_medigun_info_individual_charges_label_text", "%charges%", 0, "text for individual charges label (for Vaccinator) in medigun info ('%charges%' is replaced with the current number of charges)");
 ConVar player_aliases_enabled("statusspec_player_alias_enabled", "0", 0, "enable player aliases");
 ConVar status_icons_enabled("statusspec_status_icons_enabled", "0", 0, "enable status icons");
 ConVar status_icons_max("statusspec_status_icons_max", "5", 0, "max number of status icons to be rendered");
@@ -43,6 +45,18 @@ inline int ColorRangeRestrict(int color) {
 	if (color < 0) return 0;
 	else if (color > 255) return 255;
 	else return color;
+}
+
+inline void FindAndReplaceInString(std::string &str, const std::string &find, const std::string &replace) {
+	if (find.empty())
+        return;
+
+    size_t start_pos = 0;
+
+    while((start_pos = str.find(find, start_pos)) != std::string::npos) {
+        str.replace(start_pos, find.length(), replace);
+        start_pos += replace.length();
+    }
 }
 
 inline bool IsInteger(const std::string &s)
@@ -110,6 +124,686 @@ CSteamID ConvertTextToSteamID(std::string textID) {
 	}
 
 	return CSteamID();
+}
+
+void DisplayMedigunInfo() {
+	static vgui::EditablePanel *medigunInfoPanel = NULL;
+	static vgui::ImagePanel *medigunInfoBackground = NULL;
+
+	static vgui::ImagePanel *medigunInfoRedBackground = NULL;
+	static vgui::Label *medigunInfoRedNameLabel = NULL;
+	static vgui::ContinuousProgressBar *medigunInfoRedChargeMeter = NULL;
+	static vgui::ContinuousProgressBar *medigunInfoRedChargeMeter1 = NULL;
+	static vgui::ContinuousProgressBar *medigunInfoRedChargeMeter2 = NULL;
+	static vgui::ContinuousProgressBar *medigunInfoRedChargeMeter3 = NULL;
+	static vgui::ContinuousProgressBar *medigunInfoRedChargeMeter4 = NULL;
+	static vgui::Label *medigunInfoRedChargeLabel = NULL;
+	static vgui::Label *medigunInfoRedIndividualChargesLabel = NULL;
+	static vgui::ImagePanel *medigunInfoRedChargeTypeIcon = NULL;
+
+	static vgui::ImagePanel *medigunInfoBluBackground = NULL;
+	static vgui::Label *medigunInfoBluNameLabel = NULL;
+	static vgui::ContinuousProgressBar *medigunInfoBluChargeMeter = NULL;
+	static vgui::ContinuousProgressBar *medigunInfoBluChargeMeter1 = NULL;
+	static vgui::ContinuousProgressBar *medigunInfoBluChargeMeter2 = NULL;
+	static vgui::ContinuousProgressBar *medigunInfoBluChargeMeter3 = NULL;
+	static vgui::ContinuousProgressBar *medigunInfoBluChargeMeter4 = NULL;
+	static vgui::Label *medigunInfoBluChargeLabel = NULL;
+	static vgui::Label *medigunInfoBluIndividualChargesLabel = NULL;
+	static vgui::ImagePanel *medigunInfoBluChargeTypeIcon = NULL;
+
+	if (!medigunInfoPanel) {
+		Panel *viewport = Interfaces::GetClientMode()->GetViewport();
+
+		vgui::VPANEL medigunInfoVPanel = g_pVGui->AllocPanel();
+		medigunInfoPanel = new vgui::EditablePanel(viewport, "MedigunInfo");
+		g_pVGuiPanel->Init(medigunInfoVPanel, medigunInfoPanel);
+		
+		vgui::VPANEL medigunInfoBackgroundVPanel = g_pVGui->AllocPanel();
+		medigunInfoBackground = new vgui::ImagePanel(medigunInfoPanel, "MedigunInfoBackground");
+		g_pVGuiPanel->Init(medigunInfoBackgroundVPanel, medigunInfoBackground);
+		
+		vgui::VPANEL medigunInfoRedBackgroundVPanel = g_pVGui->AllocPanel();
+		medigunInfoRedBackground = new vgui::ImagePanel(medigunInfoPanel, "MedigunInfoRedBackground");
+		g_pVGuiPanel->Init(medigunInfoRedBackgroundVPanel, medigunInfoRedBackground);
+		
+		vgui::VPANEL medigunInfoRedNameLabelVPanel = g_pVGui->AllocPanel();
+		medigunInfoRedNameLabel = new vgui::Label(medigunInfoPanel, "MedigunInfoRedNameLabel", "");
+		g_pVGuiPanel->Init(medigunInfoRedNameLabelVPanel, medigunInfoRedNameLabel);
+		
+		vgui::VPANEL medigunInfoRedChargeMeterVPanel = g_pVGui->AllocPanel();
+		medigunInfoRedChargeMeter = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter");
+		g_pVGuiPanel->Init(medigunInfoRedChargeMeterVPanel, medigunInfoRedChargeMeter);
+		
+		vgui::VPANEL medigunInfoRedChargeMeter1VPanel = g_pVGui->AllocPanel();
+		medigunInfoRedChargeMeter1 = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter1");
+		g_pVGuiPanel->Init(medigunInfoRedChargeMeter1VPanel, medigunInfoRedChargeMeter1);
+		
+		vgui::VPANEL medigunInfoRedChargeMeter2VPanel = g_pVGui->AllocPanel();
+		medigunInfoRedChargeMeter2 = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter2");
+		g_pVGuiPanel->Init(medigunInfoRedChargeMeter2VPanel, medigunInfoRedChargeMeter2);
+		
+		vgui::VPANEL medigunInfoRedChargeMeter3VPanel = g_pVGui->AllocPanel();
+		medigunInfoRedChargeMeter3 = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter3");
+		g_pVGuiPanel->Init(medigunInfoRedChargeMeter3VPanel, medigunInfoRedChargeMeter3);
+		
+		vgui::VPANEL medigunInfoRedChargeMeter4VPanel = g_pVGui->AllocPanel();
+		medigunInfoRedChargeMeter4 = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter4");
+		g_pVGuiPanel->Init(medigunInfoRedChargeMeter4VPanel, medigunInfoRedChargeMeter4);
+		
+		vgui::VPANEL medigunInfoRedChargeLabelVPanel = g_pVGui->AllocPanel();
+		medigunInfoRedChargeLabel = new vgui::Label(medigunInfoPanel, "MedigunInfoRedChargeLabel", "");
+		g_pVGuiPanel->Init(medigunInfoRedChargeLabelVPanel, medigunInfoRedChargeLabel);
+		
+		vgui::VPANEL medigunInfoRedIndividualChargesLabelVPanel = g_pVGui->AllocPanel();
+		medigunInfoRedIndividualChargesLabel = new vgui::Label(medigunInfoPanel, "MedigunInfoRedIndividualChargesLabel", "");
+		g_pVGuiPanel->Init(medigunInfoRedIndividualChargesLabelVPanel, medigunInfoRedIndividualChargesLabel);
+		
+		vgui::VPANEL medigunInfoRedChargeTypeIconVPanel = g_pVGui->AllocPanel();
+		medigunInfoRedChargeTypeIcon = new vgui::ImagePanel(medigunInfoPanel, "MedigunInfoRedChargeTypeIcon");
+		g_pVGuiPanel->Init(medigunInfoRedChargeTypeIconVPanel, medigunInfoRedChargeTypeIcon);
+		
+		vgui::VPANEL medigunInfoBluBackgroundVPanel = g_pVGui->AllocPanel();
+		medigunInfoBluBackground = new vgui::ImagePanel(medigunInfoPanel, "MedigunInfoBluBackground");
+		g_pVGuiPanel->Init(medigunInfoBluBackgroundVPanel, medigunInfoBluBackground);
+		
+		vgui::VPANEL medigunInfoBluNameLabelVPanel = g_pVGui->AllocPanel();
+		medigunInfoBluNameLabel = new vgui::Label(medigunInfoPanel, "MedigunInfoBluNameLabel", "");
+		g_pVGuiPanel->Init(medigunInfoBluNameLabelVPanel, medigunInfoBluNameLabel);
+		
+		vgui::VPANEL medigunInfoBluChargeMeterVPanel = g_pVGui->AllocPanel();
+		medigunInfoBluChargeMeter = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter");
+		g_pVGuiPanel->Init(medigunInfoBluChargeMeterVPanel, medigunInfoBluChargeMeter);
+		
+		vgui::VPANEL medigunInfoBluChargeMeter1VPanel = g_pVGui->AllocPanel();
+		medigunInfoBluChargeMeter1 = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter1");
+		g_pVGuiPanel->Init(medigunInfoBluChargeMeter1VPanel, medigunInfoBluChargeMeter1);
+		
+		vgui::VPANEL medigunInfoBluChargeMeter2VPanel = g_pVGui->AllocPanel();
+		medigunInfoBluChargeMeter2 = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter2");
+		g_pVGuiPanel->Init(medigunInfoBluChargeMeter2VPanel, medigunInfoBluChargeMeter2);
+		
+		vgui::VPANEL medigunInfoBluChargeMeter3VPanel = g_pVGui->AllocPanel();
+		medigunInfoBluChargeMeter3 = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter3");
+		g_pVGuiPanel->Init(medigunInfoBluChargeMeter3VPanel, medigunInfoBluChargeMeter3);
+		
+		vgui::VPANEL medigunInfoBluChargeMeter4VPanel = g_pVGui->AllocPanel();
+		medigunInfoBluChargeMeter4 = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter4");
+		g_pVGuiPanel->Init(medigunInfoBluChargeMeter4VPanel, medigunInfoBluChargeMeter4);
+		
+		vgui::VPANEL medigunInfoBluChargeLabelVPanel = g_pVGui->AllocPanel();
+		medigunInfoBluChargeLabel = new vgui::Label(medigunInfoPanel, "MedigunInfoBluChargeLabel", "");
+		g_pVGuiPanel->Init(medigunInfoBluChargeLabelVPanel, medigunInfoBluChargeLabel);
+		
+		vgui::VPANEL medigunInfoBluIndividualChargesLabelVPanel = g_pVGui->AllocPanel();
+		medigunInfoBluIndividualChargesLabel = new vgui::Label(medigunInfoPanel, "MedigunInfoBluIndividualChargesLabel", "");
+		g_pVGuiPanel->Init(medigunInfoBluIndividualChargesLabelVPanel, medigunInfoBluIndividualChargesLabel);
+		
+		vgui::VPANEL medigunInfoBluChargeTypeIconVPanel = g_pVGui->AllocPanel();
+		medigunInfoBluChargeTypeIcon = new vgui::ImagePanel(medigunInfoPanel, "MedigunInfoBluChargeTypeIcon");
+		g_pVGuiPanel->Init(medigunInfoBluChargeTypeIconVPanel, medigunInfoBluChargeTypeIcon);
+
+		medigunInfoPanel->LoadControlSettings("resource/UI/MedigunInfo.res");
+	}
+	
+	if (medigun_info_enabled.GetBool()) {
+		medigunInfoPanel->SetVisible(true);
+		medigunInfoBackground->SetVisible(true);
+		medigunInfoRedBackground->SetVisible(true);
+		medigunInfoBluBackground->SetVisible(true);
+	
+		static bool redChargeReady = false;
+		static bool redChargeReleased = false;
+
+		if (medigunInfo.find(TFTeam_Red) != medigunInfo.end()) {
+			switch(medigunInfo[TFTeam_Red].itemDefinitionIndex) {
+				case 29:	// Medi Gun
+				case 211:
+				case 663:
+				case 796:
+				case 805:
+				case 885:
+				case 894:
+				case 903:
+				case 912:
+				case 961:
+				case 970:
+				{
+					medigunInfoRedNameLabel->SetText("Medi Gun");
+
+					break;
+				}
+				case 35:	// Kritzkrieg
+				{
+					medigunInfoRedNameLabel->SetText("Kritzkrieg");
+
+					break;
+				}
+				case 411:	// Quick-Fix
+				{
+					medigunInfoRedNameLabel->SetText("Quick-Fix");
+
+					break;
+				}
+				case 998:	// Vaccinator
+				{
+					medigunInfoRedNameLabel->SetText("Vaccinator");
+
+					break;
+				}
+				default:
+				{
+					medigunInfoRedNameLabel->SetText("Unknown");
+					break;
+				}
+			}
+			medigunInfoRedNameLabel->SetVisible(true);
+			
+			switch(medigunInfo[TFTeam_Red].itemDefinitionIndex) {
+				case 998:	// Vaccinator
+				{
+					std::string redIndividualChargesLabelText = medigun_info_individual_charges_label_text.GetString();
+					FindAndReplaceInString(redIndividualChargesLabelText, "%charges%", std::to_string(static_cast<long long>(floor(medigunInfo[TFTeam_Red].chargeLevel * 4.0f))));
+
+					medigunInfoRedChargeMeter->SetProgress(0.0f);
+					medigunInfoRedChargeMeter1->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 0.0f);
+					medigunInfoRedChargeMeter2->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 1.0f);
+					medigunInfoRedChargeMeter3->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 2.0f);
+					medigunInfoRedChargeMeter4->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 3.0f);
+					medigunInfoRedChargeLabel->SetText("");
+					medigunInfoRedIndividualChargesLabel->SetText(redIndividualChargesLabelText.c_str());
+				
+					medigunInfoRedChargeMeter->SetVisible(false);
+					medigunInfoRedChargeMeter1->SetVisible(true);
+					medigunInfoRedChargeMeter2->SetVisible(true);
+					medigunInfoRedChargeMeter3->SetVisible(true);
+					medigunInfoRedChargeMeter4->SetVisible(true);
+					medigunInfoRedChargeLabel->SetVisible(false);
+					medigunInfoRedIndividualChargesLabel->SetVisible(true);
+
+					if (medigunInfo[TFTeam_Red].chargeRelease) {
+						if (!redChargeReleased) {
+							StartAnimationSequence("MedigunInfoRedChargeReleased");
+						}
+
+						redChargeReleased = true;
+						redChargeReady = false;
+					}
+					else if (medigunInfo[TFTeam_Red].chargeLevel >= 0.25f) {
+						if (!redChargeReady) {
+							StartAnimationSequence("MedigunInfoRedChargeReady");
+						}
+					
+						redChargeReleased = false;
+						redChargeReady = true;
+					}
+					else {
+						if (redChargeReleased || redChargeReady) {
+							StartAnimationSequence("MedigunInfoRedChargeStop");
+						}
+					
+						redChargeReleased = false;
+						redChargeReady = false;
+					}
+
+					break;
+				}
+				case 29:	// Medi Gun
+				case 211:
+				case 663:
+				case 796:
+				case 805:
+				case 885:
+				case 894:
+				case 903:
+				case 912:
+				case 961:
+				case 970:
+				case 35:	// Kritzkrieg
+				case 411:	// Quick-Fix
+				default:
+				{
+					std::string redChargeLabelText = medigun_info_charge_label_text.GetString();
+					FindAndReplaceInString(redChargeLabelText, "%charge%", std::to_string(static_cast<long long>(floor(medigunInfo[TFTeam_Red].chargeLevel * 100))));
+				
+					medigunInfoRedChargeMeter->SetProgress(medigunInfo[TFTeam_Red].chargeLevel);
+					medigunInfoRedChargeMeter1->SetProgress(0.0f);
+					medigunInfoRedChargeMeter2->SetProgress(0.0f);
+					medigunInfoRedChargeMeter3->SetProgress(0.0f);
+					medigunInfoRedChargeMeter4->SetProgress(0.0f);
+					medigunInfoRedChargeLabel->SetText(redChargeLabelText.c_str());
+					medigunInfoRedIndividualChargesLabel->SetText("");
+				
+					medigunInfoRedChargeMeter->SetVisible(true);
+					medigunInfoRedChargeMeter1->SetVisible(false);
+					medigunInfoRedChargeMeter2->SetVisible(false);
+					medigunInfoRedChargeMeter3->SetVisible(false);
+					medigunInfoRedChargeMeter4->SetVisible(false);
+					medigunInfoRedChargeLabel->SetVisible(true);
+					medigunInfoRedIndividualChargesLabel->SetVisible(false);
+
+					if (medigunInfo[TFTeam_Red].chargeRelease) {
+						if (!redChargeReleased) {
+							StartAnimationSequence("MedigunInfoRedChargeReleased");
+						}
+
+						redChargeReleased = true;
+						redChargeReady = false;
+					}
+					else if (medigunInfo[TFTeam_Red].chargeLevel >= 1.0f) {
+						if (!redChargeReady) {
+							StartAnimationSequence("MedigunInfoRedChargeReady");
+						}
+					
+						redChargeReleased = false;
+						redChargeReady = true;
+					}
+					else {
+						if (redChargeReleased || redChargeReady) {
+							StartAnimationSequence("MedigunInfoRedChargeStop");
+						}
+					
+						redChargeReleased = false;
+						redChargeReady = false;
+					}
+
+					break;
+				}
+			}
+
+			switch(medigunInfo[TFTeam_Red].itemDefinitionIndex) {
+				case 29:	// Medi Gun
+				case 211:
+				case 663:
+				case 796:
+				case 805:
+				case 885:
+				case 894:
+				case 903:
+				case 912:
+				case 961:
+				case 970:
+				{
+					medigunInfoRedChargeTypeIcon->SetImage(TEXTURE_UBERCHARGEICON);
+
+					medigunInfoRedChargeTypeIcon->SetVisible(true);
+
+					break;
+				}
+				case 35:	// Kritzkrieg
+				{
+					medigunInfoRedChargeTypeIcon->SetImage(TEXTURE_CRITBOOSTICON);
+
+					medigunInfoRedChargeTypeIcon->SetVisible(true);
+
+					break;
+				}
+				case 411:	// Quick-Fix
+				{
+					medigunInfoRedChargeTypeIcon->SetImage(TEXTURE_MEGAHEALRED);
+
+					medigunInfoRedChargeTypeIcon->SetVisible(true);
+
+					break;
+				}
+				case 998:	// Vaccinator
+				{
+					switch(medigunInfo[TFTeam_Red].chargeResistType) {
+						case TFResistType_Bullet:
+							medigunInfoRedChargeTypeIcon->SetImage(TEXTURE_BULLETRESISTRED);
+
+							medigunInfoRedChargeTypeIcon->SetVisible(true);
+
+							break;
+						case TFResistType_Explosive:
+							medigunInfoRedChargeTypeIcon->SetImage(TEXTURE_BLASTRESISTRED);
+
+							medigunInfoRedChargeTypeIcon->SetVisible(true);
+
+							break;
+						case TFResistType_Fire:
+							medigunInfoRedChargeTypeIcon->SetImage(TEXTURE_FIRERESISTRED);
+
+							medigunInfoRedChargeTypeIcon->SetVisible(true);
+
+							break;
+						default:
+							medigunInfoRedChargeTypeIcon->SetImage(TEXTURE_NULL);
+
+							medigunInfoRedChargeTypeIcon->SetVisible(false);
+
+							break;
+					}
+
+					break;
+				}
+				default:
+				{
+					medigunInfoRedChargeTypeIcon->SetImage(TEXTURE_NULL);
+
+					medigunInfoRedChargeTypeIcon->SetVisible(false);
+
+					break;
+				}
+			}
+		}
+		else {
+			medigunInfoRedNameLabel->SetText("N/A");
+			medigunInfoRedChargeMeter->SetProgress(0.0f);
+			medigunInfoRedChargeMeter1->SetProgress(0.0f);
+			medigunInfoRedChargeMeter2->SetProgress(0.0f);
+			medigunInfoRedChargeMeter3->SetProgress(0.0f);
+			medigunInfoRedChargeMeter4->SetProgress(0.0f);
+			medigunInfoRedChargeLabel->SetText("");
+			medigunInfoRedIndividualChargesLabel->SetText("");
+			medigunInfoRedChargeTypeIcon->SetImage(TEXTURE_NULL);
+		
+			medigunInfoRedNameLabel->SetVisible(true);
+			medigunInfoRedChargeMeter->SetVisible(false);
+			medigunInfoRedChargeMeter1->SetVisible(false);
+			medigunInfoRedChargeMeter2->SetVisible(false);
+			medigunInfoRedChargeMeter3->SetVisible(false);
+			medigunInfoRedChargeMeter4->SetVisible(false);
+			medigunInfoRedChargeLabel->SetVisible(false);
+			medigunInfoRedIndividualChargesLabel->SetVisible(false);
+			medigunInfoRedChargeTypeIcon->SetVisible(false);
+
+			if (redChargeReady || redChargeReleased) {
+				redChargeReady = false;
+				redChargeReleased = false;
+
+				StartAnimationSequence("MedigunInfoRedChargeNormal");
+			}
+		}
+	
+		static bool bluChargeReady = false;
+		static bool bluChargeReleased = false;
+
+		if (medigunInfo.find(TFTeam_Blue) != medigunInfo.end()) {
+			switch(medigunInfo[TFTeam_Blue].itemDefinitionIndex) {
+				case 29:	// Medi Gun
+				case 211:
+				case 663:
+				case 796:
+				case 805:
+				case 885:
+				case 894:
+				case 903:
+				case 912:
+				case 961:
+				case 970:
+				{
+					medigunInfoBluNameLabel->SetText("Medi Gun");
+
+					break;
+				}
+				case 35:	// Kritzkrieg
+				{
+					medigunInfoBluNameLabel->SetText("Kritzkrieg");
+
+					break;
+				}
+				case 411:	// Quick-Fix
+				{
+					medigunInfoBluNameLabel->SetText("Quick-Fix");
+
+					break;
+				}
+				case 998:	// Vaccinator
+				{
+					medigunInfoBluNameLabel->SetText("Vaccinator");
+
+					break;
+				}
+				default:
+				{
+					medigunInfoBluNameLabel->SetText("Unknown");
+					break;
+				}
+			}
+			medigunInfoBluNameLabel->SetVisible(true);
+			
+			switch(medigunInfo[TFTeam_Blue].itemDefinitionIndex) {
+				case 998:	// Vaccinator
+				{
+					std::string bluIndividualChargesLabelText = medigun_info_individual_charges_label_text.GetString();
+					FindAndReplaceInString(bluIndividualChargesLabelText, "%charges%", std::to_string(static_cast<long long>(floor(medigunInfo[TFTeam_Blue].chargeLevel * 4.0f))));
+
+					medigunInfoBluChargeMeter->SetProgress(0.0f);
+					medigunInfoBluChargeMeter1->SetProgress((medigunInfo[TFTeam_Blue].chargeLevel * 4.0f) - 0.0f);
+					medigunInfoBluChargeMeter2->SetProgress((medigunInfo[TFTeam_Blue].chargeLevel * 4.0f) - 1.0f);
+					medigunInfoBluChargeMeter3->SetProgress((medigunInfo[TFTeam_Blue].chargeLevel * 4.0f) - 2.0f);
+					medigunInfoBluChargeMeter4->SetProgress((medigunInfo[TFTeam_Blue].chargeLevel * 4.0f) - 3.0f);
+					medigunInfoBluChargeLabel->SetText("");
+					medigunInfoBluIndividualChargesLabel->SetText(bluIndividualChargesLabelText.c_str());
+				
+					medigunInfoBluChargeMeter->SetVisible(false);
+					medigunInfoBluChargeMeter1->SetVisible(true);
+					medigunInfoBluChargeMeter2->SetVisible(true);
+					medigunInfoBluChargeMeter3->SetVisible(true);
+					medigunInfoBluChargeMeter4->SetVisible(true);
+					medigunInfoBluChargeLabel->SetVisible(false);
+					medigunInfoBluIndividualChargesLabel->SetVisible(true);
+
+					if (medigunInfo[TFTeam_Blue].chargeRelease) {
+						if (!bluChargeReleased) {
+							StartAnimationSequence("MedigunInfoBluChargeReleased");
+						}
+
+						bluChargeReleased = true;
+						bluChargeReady = false;
+					}
+					else if (medigunInfo[TFTeam_Blue].chargeLevel >= 0.25f) {
+						if (!bluChargeReady) {
+							StartAnimationSequence("MedigunInfoBluChargeReady");
+						}
+					
+						bluChargeReleased = false;
+						bluChargeReady = true;
+					}
+					else {
+						if (bluChargeReleased || bluChargeReady) {
+							StartAnimationSequence("MedigunInfoBluChargeStop");
+						}
+					
+						bluChargeReleased = false;
+						bluChargeReady = false;
+					}
+
+					break;
+				}
+				case 29:	// Medi Gun
+				case 211:
+				case 663:
+				case 796:
+				case 805:
+				case 885:
+				case 894:
+				case 903:
+				case 912:
+				case 961:
+				case 970:
+				case 35:	// Kritzkrieg
+				case 411:	// Quick-Fix
+				default:
+				{
+					std::string bluChargeLabelText = medigun_info_charge_label_text.GetString();
+					FindAndReplaceInString(bluChargeLabelText, "%charge%", std::to_string(static_cast<long long>(floor(medigunInfo[TFTeam_Blue].chargeLevel * 100))));
+				
+					medigunInfoBluChargeMeter->SetProgress(medigunInfo[TFTeam_Blue].chargeLevel);
+					medigunInfoBluChargeMeter1->SetProgress(0.0f);
+					medigunInfoBluChargeMeter2->SetProgress(0.0f);
+					medigunInfoBluChargeMeter3->SetProgress(0.0f);
+					medigunInfoBluChargeMeter4->SetProgress(0.0f);
+					medigunInfoBluChargeLabel->SetText(bluChargeLabelText.c_str());
+					medigunInfoBluIndividualChargesLabel->SetText("");
+				
+					medigunInfoBluChargeMeter->SetVisible(true);
+					medigunInfoBluChargeMeter1->SetVisible(false);
+					medigunInfoBluChargeMeter2->SetVisible(false);
+					medigunInfoBluChargeMeter3->SetVisible(false);
+					medigunInfoBluChargeMeter4->SetVisible(false);
+					medigunInfoBluChargeLabel->SetVisible(true);
+					medigunInfoBluIndividualChargesLabel->SetVisible(false);
+
+					if (medigunInfo[TFTeam_Blue].chargeRelease) {
+						if (!bluChargeReleased) {
+							StartAnimationSequence("MedigunInfoBluChargeReleased");
+						}
+
+						bluChargeReleased = true;
+						bluChargeReady = false;
+					}
+					else if (medigunInfo[TFTeam_Blue].chargeLevel >= 1.0f) {
+						if (!bluChargeReady) {
+							StartAnimationSequence("MedigunInfoBluChargeReady");
+						}
+					
+						bluChargeReleased = false;
+						bluChargeReady = true;
+					}
+					else {
+						if (bluChargeReleased || bluChargeReady) {
+							StartAnimationSequence("MedigunInfoBluChargeStop");
+						}
+					
+						bluChargeReleased = false;
+						bluChargeReady = false;
+					}
+
+					break;
+				}
+			}
+
+			switch(medigunInfo[TFTeam_Blue].itemDefinitionIndex) {
+				case 29:	// Medi Gun
+				case 211:
+				case 663:
+				case 796:
+				case 805:
+				case 885:
+				case 894:
+				case 903:
+				case 912:
+				case 961:
+				case 970:
+				{
+					medigunInfoBluChargeTypeIcon->SetImage(TEXTURE_UBERCHARGEICON);
+
+					medigunInfoBluChargeTypeIcon->SetVisible(true);
+
+					break;
+				}
+				case 35:	// Kritzkrieg
+				{
+					medigunInfoBluChargeTypeIcon->SetImage(TEXTURE_CRITBOOSTICON);
+
+					medigunInfoBluChargeTypeIcon->SetVisible(true);
+
+					break;
+				}
+				case 411:	// Quick-Fix
+				{
+					medigunInfoBluChargeTypeIcon->SetImage(TEXTURE_MEGAHEALRED);
+
+					medigunInfoBluChargeTypeIcon->SetVisible(true);
+
+					break;
+				}
+				case 998:	// Vaccinator
+				{
+					switch(medigunInfo[TFTeam_Blue].chargeResistType) {
+						case TFResistType_Bullet:
+							medigunInfoBluChargeTypeIcon->SetImage(TEXTURE_BULLETRESISTRED);
+
+							medigunInfoBluChargeTypeIcon->SetVisible(true);
+
+							break;
+						case TFResistType_Explosive:
+							medigunInfoBluChargeTypeIcon->SetImage(TEXTURE_BLASTRESISTRED);
+
+							medigunInfoBluChargeTypeIcon->SetVisible(true);
+
+							break;
+						case TFResistType_Fire:
+							medigunInfoBluChargeTypeIcon->SetImage(TEXTURE_FIRERESISTRED);
+
+							medigunInfoBluChargeTypeIcon->SetVisible(true);
+
+							break;
+						default:
+							medigunInfoBluChargeTypeIcon->SetImage(TEXTURE_NULL);
+
+							medigunInfoBluChargeTypeIcon->SetVisible(false);
+
+							break;
+					}
+
+					break;
+				}
+				default:
+				{
+					medigunInfoBluChargeTypeIcon->SetImage(TEXTURE_NULL);
+
+					medigunInfoBluChargeTypeIcon->SetVisible(false);
+
+					break;
+				}
+			}
+		}
+		else {
+			medigunInfoBluNameLabel->SetText("N/A");
+			medigunInfoBluChargeMeter->SetProgress(0.0f);
+			medigunInfoBluChargeMeter1->SetProgress(0.0f);
+			medigunInfoBluChargeMeter2->SetProgress(0.0f);
+			medigunInfoBluChargeMeter3->SetProgress(0.0f);
+			medigunInfoBluChargeMeter4->SetProgress(0.0f);
+			medigunInfoBluChargeLabel->SetText("");
+			medigunInfoBluIndividualChargesLabel->SetText("");
+			medigunInfoBluChargeTypeIcon->SetImage(TEXTURE_NULL);
+		
+			medigunInfoBluNameLabel->SetVisible(true);
+			medigunInfoBluChargeMeter->SetVisible(false);
+			medigunInfoBluChargeMeter1->SetVisible(false);
+			medigunInfoBluChargeMeter2->SetVisible(false);
+			medigunInfoBluChargeMeter3->SetVisible(false);
+			medigunInfoBluChargeMeter4->SetVisible(false);
+			medigunInfoBluChargeLabel->SetVisible(false);
+			medigunInfoBluIndividualChargesLabel->SetVisible(false);
+			medigunInfoBluChargeTypeIcon->SetVisible(false);
+
+			if (bluChargeReady || bluChargeReleased) {
+				bluChargeReady = false;
+				bluChargeReleased = false;
+
+				StartAnimationSequence("MedigunInfoBluChargeNormal");
+			}
+		}
+	}
+	else {
+		medigunInfoPanel->SetVisible(false);
+		medigunInfoBackground->SetVisible(false);
+		medigunInfoRedBackground->SetVisible(false);
+		medigunInfoRedNameLabel->SetVisible(false);
+		medigunInfoRedChargeMeter->SetVisible(false);
+		medigunInfoRedChargeMeter1->SetVisible(false);
+		medigunInfoRedChargeMeter2->SetVisible(false);
+		medigunInfoRedChargeMeter3->SetVisible(false);
+		medigunInfoRedChargeMeter4->SetVisible(false);
+		medigunInfoRedChargeLabel->SetVisible(false);
+		medigunInfoRedIndividualChargesLabel->SetVisible(false);
+		medigunInfoRedChargeTypeIcon->SetVisible(false);
+		medigunInfoBluBackground->SetVisible(false);
+		medigunInfoBluNameLabel->SetVisible(false);
+		medigunInfoBluChargeMeter->SetVisible(false);
+		medigunInfoBluChargeMeter1->SetVisible(false);
+		medigunInfoBluChargeMeter2->SetVisible(false);
+		medigunInfoBluChargeMeter3->SetVisible(false);
+		medigunInfoBluChargeMeter4->SetVisible(false);
+		medigunInfoBluChargeLabel->SetVisible(false);
+		medigunInfoBluIndividualChargesLabel->SetVisible(false);
+		medigunInfoBluChargeTypeIcon->SetVisible(false);
+	}
 }
 
 int FindOrCreateTexture(const char *textureFile) {
@@ -257,7 +951,7 @@ void UpdateEntities() {
 				m_iTextureItemIcon[itemDefinitionIndex] = FindOrCreateTexture(itemSchema->GetItemKeyData(itemDefinitionIndex, "image_inventory"));
 			}
 
-			if (medigun_charge_info_enabled.GetBool() && Offsets::CheckClassBaseclass(cEntity->GetClientClass(), "DT_WeaponMedigun")) {
+			if (medigun_info_enabled.GetBool() && Offsets::CheckClassBaseclass(cEntity->GetClientClass(), "DT_WeaponMedigun")) {
 				TFTeam team = (TFTeam) *MAKE_PTR(int*, playerEntity, Offsets::pCTFPlayer__m_iTeamNum);
 
 				medigunInfo[team].itemDefinitionIndex = itemDefinitionIndex;
@@ -452,6 +1146,7 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 
 	if (topPanelHandle == panelHandle) {
 		UpdateEntities();
+		DisplayMedigunInfo();
 	}
 
 	if (Interfaces::pEngineClient->IsDrawingLoadingImage() || !Interfaces::pEngineClient->IsInGame() || !Interfaces::pEngineClient->IsConnected() || Interfaces::pEngineClient->Con_IsVisible())
@@ -977,6 +1672,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	
 	itemSchema = new ItemSchema();
 	
+	m_iTextureNull = FindOrCreateTexture(TEXTURE_NULL);
 	m_iTextureUbercharged = FindOrCreateTexture(TEXTURE_UBERCHARGEICON);
 	m_iTextureCritBoosted = FindOrCreateTexture(TEXTURE_CRITBOOSTICON);
 	m_iTextureMegaHealedRed = FindOrCreateTexture(TEXTURE_MEGAHEALRED);

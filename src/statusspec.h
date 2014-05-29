@@ -12,6 +12,7 @@
 
 #include "stdafx.h"
 
+#include <cmath>
 #include <cstdint>
 #include <cstdlib>
 #include <vector>
@@ -31,7 +32,7 @@
 #include "vgui/IPanel.h"
 #include "vgui/IScheme.h"
 #include "vgui/ISurface.h"
-#include "vgui_controls/AnimationController.h"
+#include "vgui_controls/pch_vgui_controls.h"
 
 #define PLUGIN_DESC "StatusSpec v0.8"
 
@@ -141,6 +142,13 @@ enum TFCond
 	TFCond_HalloweenGhostMode
 };
 
+enum TFResistType {
+	TFResistType_Bullet,
+	TFResistType_Explosive,
+	TFResistType_Fire
+};
+
+#define TEXTURE_NULL "vgui/replay/thumbnails/null"
 #define TEXTURE_UBERCHARGEICON "vgui/replay/thumbnails/ubercharge"
 #define TEXTURE_CRITBOOSTICON "vgui/replay/thumbnails/critboost"
 #define TEXTURE_MEGAHEALRED "vgui/replay/thumbnails/megaheal_red"
@@ -165,6 +173,7 @@ enum TFCond
 #define TEXTURE_BLEEDING "vgui/bleed_drop"
 #define TEXTURE_ONFIRE "hud/leaderboard_class_pyro"
 
+int m_iTextureNull;
 int m_iTextureUbercharged;
 int m_iTextureCritBoosted;
 int m_iTextureMegaHealedRed;
