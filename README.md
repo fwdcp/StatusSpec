@@ -1,12 +1,19 @@
 StatusSpec
 ==========
 
-a client plugin that shows certain player statuses via icons next to a tournament HUD
+a client plugin that:
+* almost fixes HUD freeze issues
+* displays loadout icons
+* displays medigun info
+* displays status icons
 
-![screenshot](http://i.imgur.com/XS9VQaV.png)
+![screenshot](http://i.imgur.com/HliUKLk.png)
 
 Changelog
 ---------
+
+**0.9.0**
+* implement medigun info box
 
 **0.8.0**
 * implement player aliasing
@@ -42,6 +49,9 @@ This plugin is not signed by Valve, and therefore will not load unless TF2 is lo
 * `statusspec_force_refresh_specgui` - whether to force the spectator GUI to refresh
 * `statusspec_loadout_icons_enabled` - enable loadout icons
 * `statusspec_loadout_icons_nonloadout` - enable loadout icons for nonloadout items
+* `statusspec_medigun_info_charge_label_text` - text for charge label in medigun info ('%charge%' is replaced with the current charge percentage number)
+* `statusspec_medigun_info_enabled` - enable medigun info
+* `statusspec_medigun_info_individual_charges_label_text` - text for individual charges label (for Vaccinator) in medigun info ('%charges%' is replaced with the current number of charges)
 * `statusspec_player_alias_enabled` - enable player aliases
 * `statusspec_status_icons_enabled` - enable status icons
 * `statusspec_status_icons_max` - max number of status icons to be rendered
@@ -49,28 +59,12 @@ This plugin is not signed by Valve, and therefore will not load unless TF2 is lo
 ### Console Commands
 * `statusspec_loadout_filter_active <red> <green> <blue> <alpha>` - the RGBA filter applied to the icon when the item is active
 * `statusspec_loadout_filter_nonactive <red> <green> <blue> <alpha>` - the RGBA filter applied to the icon when the item is not active
+* `statusspec_medigun_info_reload_settings` - reload settings for the medigun info HUD from the resource file
 * `statusspec_player_alias_get <steamid>` - get an alias for a player
 * `statusspec_player_alias_remove <steamid>` - remove an alias for a player
 * `statusspec_player_alias_set <steamid> <alias>` - set an alias for a player
 
 ### UI Resource Files
-
-#### Status Icons
-To properly support status icons, add something similar to the following section within the `playerpanels_kv` section of the `specgui` section in `Resource/UI/SpectatorTournament.res`. The icons will appear on the right of `xpos` with a square size of `tall`, and the player panel will also be expanded to accommodate these icons. The rendering of this panel assumes that this element is on the right edge of the player panel and will not appear if status icons are disabled.
-```
-"statusicons"
-{
-	"ControlName"	"Panel"
-	"fieldName"		"statusicons"
-	"xpos"			"160"
-	"ypos"			"0"
-	"zpos"			"8"
-	"wide"			"0"
-	"tall"			"15"
-	"visible"		"1"
-	"enabled"		"1"
-}
-```
 
 #### Loadout Icons
 To properly support loadout icons, add something similar to the following section within the `playerpanels_kv` section of the `specgui` section in `Resource/UI/SpectatorTournament.res` and adjust the rest of the file as if this were a normal GUI panel. The icons will be entirely contained within this element as defined in this configuration, and each icon will be a square size of `tall`. The rendering of this panel only displays icons and will not adjust anything else, no matter whether this feature is enabled or disabled - thus, you will be required to manually adjust your HUD as appropriate when enabling or disabling this feature.
@@ -86,6 +80,26 @@ To properly support loadout icons, add something similar to the following sectio
 	"tall"          "15"
 	"visible"       "1"
 	"enabled"       "1"
+}
+```
+
+#### Medigun Info Box
+An example file for the medigun info box is included under `Resource/UI/MedigunInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_medigun_info_reload_settings` is provided as a replacement.
+
+#### Status Icons
+To properly support status icons, add something similar to the following section within the `playerpanels_kv` section of the `specgui` section in `Resource/UI/SpectatorTournament.res`. The icons will appear on the right of `xpos` with a square size of `tall`, and the player panel will also be expanded to accommodate these icons. The rendering of this panel assumes that this element is on the right edge of the player panel and will not appear if status icons are disabled.
+```
+"statusicons"
+{
+	"ControlName"	"Panel"
+	"fieldName"		"statusicons"
+	"xpos"			"160"
+	"ypos"			"0"
+	"zpos"			"8"
+	"wide"			"0"
+	"tall"			"15"
+	"visible"		"1"
+	"enabled"		"1"
 }
 ```
 

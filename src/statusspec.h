@@ -34,7 +34,7 @@
 #include "vgui/ISurface.h"
 #include "vgui_controls/pch_vgui_controls.h"
 
-#define PLUGIN_DESC "StatusSpec v0.8"
+#define PLUGIN_DESC "StatusSpec v0.9"
 
 // taken from SourceMod
 
