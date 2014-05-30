@@ -86,6 +86,14 @@ To properly support loadout icons, add something similar to the following sectio
 #### Medigun Info Box
 An example file for the medigun info box is included under `Resource/UI/MedigunInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_medigun_info_reload_settings` is provided as a replacement.
 
+In addition, the following HUD animations are triggered by this plugin and may be used to show events on the HUD:
+* MedigunInfoBluChargeReady - triggered when a BLU medigun charge is ready for use
+* MedigunInfoBluChargeReleased - triggered when a BLU medigun charge has been released/popped
+* MedigunInfoBluChargeStop - triggered when the BLU medigun charge is no longer ready/released
+* MedigunInfoRedChargeReady - triggered when a RED medigun charge is ready for use
+* MedigunInfoRedChargeReleased - triggered when a RED medigun charge has been released/popped
+* MedigunInfoRedChargeStop - triggered when the RED medigun charge is no longer ready/released (after a charge is completed/dropped)
+
 #### Status Icons
 To properly support status icons, add something similar to the following section within the `playerpanels_kv` section of the `specgui` section in `Resource/UI/SpectatorTournament.res`. The icons will appear on the right of `xpos` with a square size of `tall`, and the player panel will also be expanded to accommodate these icons. The rendering of this panel assumes that this element is on the right edge of the player panel and will not appear if status icons are disabled.
 ```
