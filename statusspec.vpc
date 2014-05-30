@@ -13,7 +13,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE,$SRCDIR\game\client,$SRCDIR\game\shared,$SRCDIR\public,..\mmsource\core"
+		$AdditionalIncludeDirectories		"$BASE,$SRCDIR\game\client,$SRCDIR\game\shared,$SRCDIR\public,..\metamod-source\core"
 		$PreprocessorDefinitions			"$BASE;statusspecONLY;_MBCS"
 	}
 
@@ -31,13 +31,13 @@ $Project "StatusSpec"
 		$File	"src\ifaces.cpp"
 		$File	"src\itemschema.cpp"
 		$File	"src\offsets.cpp"
-		$File	"..\mmsource\core\sourcehook\sourcehook.cpp"
-		$File	"..\mmsource\core\sourcehook\sourcehook.cpp"
-		$File	"..\mmsource\core\sourcehook\sourcehook_hookmangen.cpp"
-		$File	"..\mmsource\core\sourcehook\sourcehook_impl_chookidman.cpp"
-		$File	"..\mmsource\core\sourcehook\sourcehook_impl_chookmaninfo.cpp"
-		$File	"..\mmsource\core\sourcehook\sourcehook_impl_cproto.cpp"
-		$File	"..\mmsource\core\sourcehook\sourcehook_impl_cvfnptr.cpp"
+		$File	"..\metamod-source\core\sourcehook\sourcehook.cpp"
+		$File	"..\metamod-source\core\sourcehook\sourcehook.cpp"
+		$File	"..\metamod-source\core\sourcehook\sourcehook_hookmangen.cpp"
+		$File	"..\metamod-source\core\sourcehook\sourcehook_impl_chookidman.cpp"
+		$File	"..\metamod-source\core\sourcehook\sourcehook_impl_chookmaninfo.cpp"
+		$File	"..\metamod-source\core\sourcehook\sourcehook_impl_cproto.cpp"
+		$File	"..\metamod-source\core\sourcehook\sourcehook_impl_cvfnptr.cpp"
 		$File	"..\..\public\vgui_controls\vgui_controls.cpp"
 	}
 	
