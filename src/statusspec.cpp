@@ -213,7 +213,7 @@ void DisplayMedigunInfo() {
 		medigunInfoBluChargeTypeIcon = new vgui::ImagePanel(medigunInfoPanel, "MedigunInfoBluChargeTypeIcon");
 		g_pVGuiPanel->Init(medigunInfoBluChargeTypeIconVPanel, medigunInfoBluChargeTypeIcon);
 
-		medigunInfoPanel->LoadControlSettings("Resource/UI/MedigunInfo.res");
+		medigunInfoPanel->LoadControlSettings("Resource/UI/StatusSpecMedigunInfo.res");
 	}
 	
 	if (medigun_info_enabled.GetBool()) {
@@ -1035,7 +1035,7 @@ CON_COMMAND(statusspec_loadout_filter_nonactive, "the RGBA filter applied to the
 }
 
 CON_COMMAND(statusspec_medigun_info_reload_settings, "reload settings for the medigun info HUD from the resource file") {
-	medigunInfoPanel->LoadControlSettings("Resource/UI/MedigunInfo.res");
+	medigunInfoPanel->LoadControlSettings("Resource/UI/StatusSpecMedigunInfo.res");
 }
 
 CON_COMMAND(statusspec_player_alias_get, "get an alias for a player") {

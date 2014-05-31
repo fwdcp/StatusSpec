@@ -1,4 +1,4 @@
-"Resource/UI/MedigunInfo.res"
+"Resource/UI/StatusSpecMedigunInfo.res"
 {
 	"MedigunInfo"
 	{
