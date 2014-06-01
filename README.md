@@ -67,19 +67,34 @@ This plugin is not signed by Valve, and therefore will not load unless TF2 is lo
 ### UI Resource Files
 
 #### Loadout Icons
-To properly support loadout icons, add something similar to the following section within the `playerpanels_kv` section of the `specgui` section in `Resource/UI/SpectatorTournament.res` and adjust the rest of the file as if this were a normal GUI panel. The icons will be entirely contained within this element as defined in this configuration, and each icon will be a square size of `tall`. The rendering of this panel only displays icons and will not adjust anything else, no matter whether this feature is enabled or disabled - thus, you will be required to manually adjust your HUD as appropriate when enabling or disabling this feature.
+To properly support loadout icons, adjust `Resource/UI/SpectatorTournament.res` so that it includes something similar to the `loadouticons` section below contained within the `playerpanels_kv` section of the `specgui` section, as demonstrated below. You will also need to adjust the rest of the file as necessary, since this will act as a normal GUI panel. The icons will be entirely contained within this element as defined in this configuration, and each icon will be a square size of `tall`. The rendering of this panel only displays icons and will not adjust anything else, no matter whether this feature is enabled or disabled - thus, you will be required to manually adjust your HUD as appropriate when enabling or disabling this feature.
 ```
-"loadouticons"
+"Resource/UI/SpectatorTournament.res"
 {
-	"ControlName"   "Panel"
-	"fieldName"     "loadouticons"
-	"xpos"          "16"
-	"ypos"          "0"
-	"zpos"          "2"
-	"wide"          "60"
-	"tall"          "15"
-	"visible"       "1"
-	"enabled"       "1"
+	"specgui"
+	{
+		...
+	       
+		"playerpanels_kv"
+		{
+			...
+			
+			"loadouticons"
+			{
+				"ControlName"	"Panel"
+				"fieldName"		"loadouticons"
+				"xpos"			"16"
+				"ypos"			"0"
+				"zpos"			"2"
+				"wide"			"60"
+				"tall"			"15"
+				"visible"		"1"
+				"enabled"		"1"
+			}
+		}
+	}
+	
+	...	
 }
 ```
 
@@ -95,19 +110,34 @@ In addition, the following HUD animations are triggered by this plugin and may b
 * `MedigunInfoRedChargeStop` - triggered when the RED medigun charge is no longer ready/released (after a charge is completed/dropped)
 
 #### Status Icons
-To properly support status icons, add something similar to the following section within the `playerpanels_kv` section of the `specgui` section in `Resource/UI/SpectatorTournament.res`. The icons will appear on the right of `xpos` with a square size of `tall`, and the player panel will also be expanded to accommodate these icons. The rendering of this panel assumes that this element is on the right edge of the player panel and will not appear if status icons are disabled.
+To properly support status icons, adjust `Resource/UI/SpectatorTournament.res` so that it includes something similar to the `statusicons` section below contained within the `playerpanels_kv` section of the `specgui` section, as demonstrated below. The icons will appear on the right of `xpos` with a square size of `tall`, and the player panel will also be expanded to accommodate these icons. The rendering of this panel assumes that this element is on the right edge of the player panel and will not appear if status icons are disabled.
 ```
-"statusicons"
+"Resource/UI/SpectatorTournament.res"
 {
-	"ControlName"	"Panel"
-	"fieldName"		"statusicons"
-	"xpos"			"160"
-	"ypos"			"0"
-	"zpos"			"8"
-	"wide"			"0"
-	"tall"			"15"
-	"visible"		"1"
-	"enabled"		"1"
+	"specgui"
+	{
+		...
+	       
+		"playerpanels_kv"
+		{
+			...
+			
+			"statusicons"
+			{
+				"ControlName"	"Panel"
+				"fieldName"		"statusicons"
+				"xpos"			"160"
+				"ypos"			"0"
+				"zpos"			"8"
+				"wide"			"0"
+				"tall"			"15"
+				"visible"		"1"
+				"enabled"		"1"
+			}
+		}
+	}
+	
+	...	
 }
 ```
 
