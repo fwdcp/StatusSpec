@@ -84,7 +84,7 @@ To properly support loadout icons, add something similar to the following sectio
 ```
 
 #### Medigun Info Box
-An example file for the medigun info box is included under `Resource/UI/StatusSpecMedigunInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_medigun_info_reload_settings` is provided as a replacement.
+An example file for the medigun info box is included under `Resource/UI/MedigunInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_medigun_info_reload_settings` is provided as a replacement.
 
 In addition, the following HUD animations are triggered by this plugin and may be used to show events on the HUD:
 * `MedigunInfoBluChargeReady` - triggered when a BLU medigun charge is ready for use
