@@ -50,7 +50,7 @@
 	"MedigunInfoRedNameLabel"
 	{
 		"ControlName"	"Label"
-		"fieldName"		"ChargeLabel"
+		"fieldName"		"MedigunInfoRedNameLabel"
 		"xpos"			"165"
 		"ypos"			"21"
 		"zpos"			"2"
@@ -70,7 +70,7 @@
 	"MedigunInfoRedChargeLabel"
 	{
 		"ControlName"	"Label"
-		"fieldName"		"ChargeLabel"
+		"fieldName"		"MedigunInfoRedChargeLabel"
 		"xpos"			"147"
 		"ypos"			"21"
 		"zpos"			"2"
@@ -89,8 +89,8 @@
 
 	"MedigunInfoRedIndividualChargesLabel"
 	{
-		"ControlName"	"CExLabel"
-		"fieldName"		"IndividualChargesLabel"
+		"ControlName"	"Label"
+		"fieldName"		"MedigunInfoRedIndividualChargesLabel"
 		"xpos"			"147"
 		"ypos"			"21"
 		"zpos"			"2"
@@ -245,7 +245,7 @@
 	"MedigunInfoBluNameLabel"
 	{
 		"ControlName"	"Label"
-		"fieldName"		"ChargeLabel"
+		"fieldName"		"MedigunInfoBluNameLabel"
 		"xpos"			"165"
 		"ypos"			"3"
 		"zpos"			"2"
@@ -265,7 +265,7 @@
 	"MedigunInfoBluChargeLabel"
 	{
 		"ControlName"	"Label"
-		"fieldName"		"ChargeLabel"
+		"fieldName"		"MedigunInfoBluChargeLabel"
 		"xpos"			"147"
 		"ypos"			"3"
 		"zpos"			"2"
@@ -284,8 +284,8 @@
 
 	"MedigunInfoBluIndividualChargesLabel"
 	{
-		"ControlName"	"CExLabel"
-		"fieldName"		"IndividualChargesLabel"
+		"ControlName"	"Label"
+		"fieldName"		"MedigunInfoBluIndividualChargesLabel"
 		"xpos"			"147"
 		"ypos"			"3"
 		"zpos"			"2"
