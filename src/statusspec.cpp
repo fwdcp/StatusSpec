@@ -1015,7 +1015,7 @@ CON_COMMAND(statusspec_loadout_filter_active, "the RGBA filter applied to the ic
 	int alpha = ColorRangeRestrict(std::stoi(args.Arg(4)));
 	
 	loadout_active_filter.SetColor(red, green, blue, alpha);
-	Msg("Set nonactive loadout icon filter to rgba(%i, %i, %i, %i).", red, green, blue, alpha);
+	Msg("Set nonactive loadout icon filter to rgba(%i, %i, %i, %i).\n", red, green, blue, alpha);
 }
 
 CON_COMMAND(statusspec_loadout_filter_nonactive, "the RGBA filter applied to the icon when the item is not active") {
@@ -1031,7 +1031,7 @@ CON_COMMAND(statusspec_loadout_filter_nonactive, "the RGBA filter applied to the
 	int alpha = ColorRangeRestrict(std::stoi(args.Arg(4)));
 	
 	loadout_nonactive_filter.SetColor(red, green, blue, alpha);
-	Msg("Set nonactive loadout item icon filter to rgba(%i, %i, %i, %i).", red, green, blue, alpha);
+	Msg("Set nonactive loadout item icon filter to rgba(%i, %i, %i, %i).\n", red, green, blue, alpha);
 }
 
 CON_COMMAND(statusspec_medigun_info_reload_settings, "reload settings for the medigun info HUD from the resource file") {
@@ -1635,12 +1635,12 @@ StatusSpecPlugin::~StatusSpecPlugin()
 bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory)
 {
 	if (!Interfaces::Load(interfaceFactory, gameServerFactory)) {
-		Warning("[%s] Unable to load required libraries!", PLUGIN_DESC);
+		Warning("[%s] Unable to load required libraries!\n", PLUGIN_DESC);
 		return false;
 	}
 
 	if (!Offsets::PrepareOffsets()) {
-		Warning("[%s] Unable to determine proper offsets!", PLUGIN_DESC);
+		Warning("[%s] Unable to determine proper offsets!\n", PLUGIN_DESC);
 		return false;
 	}
 	

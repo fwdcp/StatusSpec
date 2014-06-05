@@ -66,7 +66,7 @@ bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 	ConnectTier3Libraries(&interfaceFactory, 1);
 	
 	if (!vgui::VGui_InitInterfacesList("statusspec", &interfaceFactory, 1)) {
-		Warning("[StatusSpec] Could not initialize VGUI interfaces!");
+		Warning("[StatusSpec] Could not initialize VGUI interfaces!\n");
 		return false;
 	}
 	
@@ -84,7 +84,7 @@ bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 
 	pSteamAPIContext = new CSteamAPIContext();
 	if (!SteamAPI_InitSafe() || !pSteamAPIContext->Init()) {
-		Warning("[StatusSpec] Could not initialize Steam API!");
+		Warning("[StatusSpec] Could not initialize Steam API!\n");
 		return false;
 	}
 	
