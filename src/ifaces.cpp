@@ -72,11 +72,12 @@ bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 	
 	pEngineClient = (IVEngineClient*) interfaceFactory(VENGINE_CLIENT_INTERFACE_VERSION, NULL);
 	
-	#ifdef _POSIX
+	#if defined __linux__
 	pClientModule = new CDllDemandLoader("tf/bin/client.so");
-	#else
+	#elif defined _WIN32
 	pClientModule = new CDllDemandLoader("tf/bin/client.dll");
 	#endif
+
 	CreateInterfaceFn gameClientFactory = pClientModule->GetFactory();
 	
 	pClientDLL = (IBaseClientDLL*) gameClientFactory(CLIENT_DLL_INTERFACE_VERSION, NULL);
