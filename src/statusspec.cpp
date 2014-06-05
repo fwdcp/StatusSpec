@@ -790,7 +790,7 @@ int FindOrCreateTexture(const char *textureFile) {
 CSteamID GetClientSteamID(int client) {
 	player_info_t playerInfo;
 
-	if (Interfaces::pEngineClient->GetPlayerInfo(client, &playerInfo))
+	if (SH_CALL(Interfaces::pEngineClient, &IVEngineClient::GetPlayerInfo)(client, &playerInfo))
 	{
 		if (playerInfo.friendsID)
 		{
