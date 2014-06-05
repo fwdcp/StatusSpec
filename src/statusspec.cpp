@@ -1620,6 +1620,23 @@ void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VP
 	}
 }
 
+bool Hook_IVEngineClient_GetPlayerInfo(int ent_num, player_info_t *pinfo) {
+	bool result = SH_CALL(Interfaces::pEngineClient, &IVEngineClient::GetPlayerInfo)(ent_num, pinfo);
+
+	if (player_aliases_enabled.GetBool()) {
+		CSteamID playerSteamID = GetClientSteamID(ent_num);
+
+		if (playerAliases.find(playerSteamID) != playerAliases.end()) {
+			strcpy(pinfo->name, playerAliases[playerSteamID].c_str());
+
+			RETURN_META_VALUE(MRES_SUPERCEDE, result);
+		}
+	}
+
+	RETURN_META_VALUE(MRES_IGNORED, result);
+
+}
+
 // The plugin is a static singleton that is exported as an interface
 StatusSpecPlugin g_StatusSpecPlugin;
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(StatusSpecPlugin, IServerPluginCallbacks, INTERFACEVERSION_ISERVERPLUGINCALLBACKS, g_StatusSpecPlugin);
@@ -1673,6 +1690,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	
 	SH_ADD_HOOK(IPanel, PaintTraverse, g_pVGuiPanel, Hook_IPanel_PaintTraverse, true);
 	SH_ADD_HOOK(IPanel, SendMessage, g_pVGuiPanel, Hook_IPanel_SendMessage, true);
+	SH_ADD_HOOK(IVEngineClient, GetPlayerInfo, Interfaces::pEngineClient, Hook_IVEngineClient_GetPlayerInfo, false);
 	
 	ConVar_Register();
 	
