@@ -1702,6 +1702,7 @@ void StatusSpecPlugin::Unload(void)
 {
 	SH_REMOVE_HOOK(IPanel, PaintTraverse, g_pVGuiPanel, Hook_IPanel_PaintTraverse, true);
 	SH_REMOVE_HOOK(IPanel, SendMessage, g_pVGuiPanel, Hook_IPanel_SendMessage, true);
+	SH_REMOVE_HOOK(IVEngineClient, GetPlayerInfo, Interface::pEngineClient, Hook_IVEngineClient_GetPlayerInfo, false);
 
 	ConVar_Unregister();
 	Interfaces::Unload();
