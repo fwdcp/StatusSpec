@@ -12,6 +12,10 @@ a client plugin that:
 Changelog
 ---------
 
+**0.10.0**
+* fix player alias incompatibility with Spec Tools
+* add utility command for setting the direction of a progress bar
+
 **0.9.0**
 * implement medigun info box
 
@@ -63,6 +67,7 @@ This plugin is not signed by Valve, and therefore will not load unless TF2 is lo
 * `statusspec_player_alias_get <steamid>` - get an alias for a player
 * `statusspec_player_alias_remove <steamid>` - remove an alias for a player
 * `statusspec_player_alias_set <steamid> <alias>` - set an alias for a player
+* `statusspec_utility_set_progress_bar_direction <name> <direction>` - set the progress direction for a StatusSpec progress bar
 
 ### UI Resource Files
 
