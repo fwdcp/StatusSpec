@@ -1075,6 +1075,51 @@ CON_COMMAND(statusspec_player_alias_set, "set an alias for a player") {
 	Msg("Steam ID %llu has been associated with alias '%s'.\n", playerSteamID.ConvertToUint64(), playerAliases[playerSteamID].c_str());
 }
 
+CON_COMMAND(statusspec_utility_set_progress_bar_direction, "set the progress direction for a StatusSpec progress bar") {
+	if (args.ArgC() < 2)
+	{
+		Warning("Usage: statusspec_utility_set_progress_bar_direction <name> <direction>\n");
+		return;
+	}
+
+	if (panels.find(args.Arg(1)) == panels.end()) {
+		Warning("Invalid panel specified!\n");
+		return;
+	}
+
+	vgui::ProgressBar *progressBar = dynamic_cast<vgui::ProgressBar *>(panels[args.Arg(1)]);
+
+	if (!progressBar) {
+		Warning("Panel is not a progress bar!\n");
+		return;
+	}
+
+	if (stricmp(args.Arg(2), "east") == 0) {
+		progressBar->SetProgressDirection(vgui::ProgressBar::PROGRESS_EAST);
+		Msg("Direction of progress bar %s set to east.\n", args.Arg(1));
+		return;
+	}
+	else if (stricmp(args.Arg(2), "west") == 0) {
+		progressBar->SetProgressDirection(vgui::ProgressBar::PROGRESS_WEST);
+		Msg("Direction of progress bar %s set to west.\n", args.Arg(1));
+		return;
+	}
+	else if (stricmp(args.Arg(2), "north") == 0) {
+		progressBar->SetProgressDirection(vgui::ProgressBar::PROGRESS_NORTH);
+		Msg("Direction of progress bar %s set to north.\n", args.Arg(1));
+		return;
+	}
+	else if (stricmp(args.Arg(2), "south") == 0) {
+		progressBar->SetProgressDirection(vgui::ProgressBar::PROGRESS_SOUTH);
+		Msg("Direction of progress bar %s set to south.\n", args.Arg(1));
+		return;
+	}
+	else {
+		Warning("Invalid direction! (Valid directions are east, west, north, south.)\n");
+		return;
+	}
+}
+
 const char * Hook_IGameResources_GetPlayerName(int client) {
 	if (player_aliases_enabled.GetBool()) {
 		CSteamID playerSteamID = GetClientSteamID(client);
