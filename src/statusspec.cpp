@@ -12,20 +12,20 @@
 
 #define SHOW_SLOT_ICON(slot) \
 	if (playerInfo[i].slot != -1) { \
-		g_pVGuiSurface->DrawSetTexture(m_iTextureItemIcon[playerInfo[i].slot]); \
 		if (playerInfo[i].activeWeaponSlot.compare(#slot) == 0) { \
-			g_pVGuiSurface->DrawSetColor(loadout_active_filter.r(), loadout_active_filter.g(), loadout_active_filter.b(), loadout_active_filter.a()); \
+			Paint::DrawTexture(itemIconTextures[playerInfo[i].slot], iconsWide, 0, iconSize, iconSize, loadout_active_filter); \
 		} \
 		else { \
-			g_pVGuiSurface->DrawSetColor(loadout_nonactive_filter.r(), loadout_nonactive_filter.g(), loadout_nonactive_filter.b(), loadout_nonactive_filter.a()); \
+			Paint::DrawTexture(itemIconTextures[playerInfo[i].slot], iconsWide, 0, iconSize, iconSize, loadout_nonactive_filter); \
 		} \
-		g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize); \
 	} \
 	 \
 	iconsWide += iconSize;
 
 SourceHook::ISourceHook *g_SHPtr = &g_SourceHook;
 int g_PLID = 0;
+
+std::map<int, std::string> itemIconTextures;
 
 ConVar force_refresh_specgui("statusspec_force_specgui_refresh", "0", 0, "whether to force the spectator GUI to refresh");
 ConVar loadout_icons_enabled("statusspec_loadout_icons_enabled", "0", 0, "enable loadout icons");
@@ -755,17 +755,6 @@ void DisplayMedigunInfo() {
 	}
 }
 
-int FindOrCreateTexture(const char *textureFile) {
-	int textureId = g_pVGuiSurface->DrawGetTextureId(textureFile);
-	
-	if (textureId == -1) {
-		textureId = g_pVGuiSurface->CreateNewTextureID();
-		g_pVGuiSurface->DrawSetTextureFile(textureId, textureFile, 0, false);
-	}
-
-	return textureId;
-}
-
 CSteamID GetClientSteamID(int client) {
 	player_info_t playerInfo;
 
@@ -896,8 +885,10 @@ void UpdateEntities() {
 				else if (strcmp(itemSlot, "action") == 0) {
 					playerInfo[player].action = itemDefinitionIndex;
 				}
-			
-				m_iTextureItemIcon[itemDefinitionIndex] = FindOrCreateTexture(itemSchema->GetItemKeyData(itemDefinitionIndex, "image_inventory"));
+				
+				const char *itemIcon = itemSchema->GetItemKeyData(itemDefinitionIndex, "image_inventory");
+				Paint::InitializeTexture(itemIcon);
+				itemIconTextures[itemDefinitionIndex] = itemIcon;
 			}
 
 			if (medigun_info_enabled.GetBool() && Offsets::CheckClassBaseclass(cEntity->GetClientClass(), "DT_WeaponMedigun")) {
@@ -1186,9 +1177,7 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
-			g_pVGuiSurface->DrawSetTexture(m_iTextureUbercharge);
-			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
+			Paint::DrawTexture(TEXTURE_UBERCHARGE, iconsWide, 0, iconSize, iconSize);
 			
 			playerWide += iconSize;
 			iconsWide += iconSize;
@@ -1204,9 +1193,7 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
-			g_pVGuiSurface->DrawSetTexture(m_iTextureCritBoost);
-			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
+			Paint::DrawTexture(TEXTURE_CRITBOOST, iconsWide, 0, iconSize, iconSize);
 			
 			playerWide += iconSize;
 			iconsWide += iconSize;
@@ -1223,14 +1210,10 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
 			if (playerInfo[i].team == TFTeam_Red) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureMegaHealRed);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
+				Paint::DrawTexture(TEXTURE_MEGAHEALRED, iconsWide, 0, iconSize, iconSize);
 			}
 			else if (playerInfo[i].team == TFTeam_Blue) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureMegaHealBlu);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
+				Paint::DrawTexture(TEXTURE_MEGAHEALBLU, iconsWide, 0, iconSize, iconSize);
 			}
 			
 			playerWide += iconSize;
@@ -1248,20 +1231,12 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
 			if (playerInfo[i].team == TFTeam_Red) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldRed);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
-				g_pVGuiSurface->DrawSetTexture(m_iTextureBulletResistRed);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
+				Paint::DrawTexture(TEXTURE_RESISTSHIELDRED, iconsWide, 0, iconSize, iconSize);
+				Paint::DrawTexture(TEXTURE_BULLETRESISTRED, iconsWide, 0, iconSize, iconSize);
 			}
 			else if (playerInfo[i].team == TFTeam_Blue) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldBlu);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
-				g_pVGuiSurface->DrawSetTexture(m_iTextureBulletResistBlu);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
+				Paint::DrawTexture(TEXTURE_RESISTSHIELDBLU, iconsWide, 0, iconSize, iconSize);
+				Paint::DrawTexture(TEXTURE_BULLETRESISTBLU, iconsWide, 0, iconSize, iconSize);
 			}
 			
 			playerWide += iconSize;
@@ -1274,14 +1249,10 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
 			if (playerInfo[i].team == TFTeam_Red) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureBulletResistRed);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
+				Paint::DrawTexture(TEXTURE_BULLETRESISTRED, iconsWide, 0, iconSize, iconSize);
 			}
 			else if (playerInfo[i].team == TFTeam_Blue) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureBulletResistBlu);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
+				Paint::DrawTexture(TEXTURE_BULLETRESISTBLU, iconsWide, 0, iconSize, iconSize);
 			}
 			
 			playerWide += iconSize;
@@ -1299,20 +1270,12 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
 			if (playerInfo[i].team == TFTeam_Red) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldRed);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
-				g_pVGuiSurface->DrawSetTexture(m_iTextureBlastResistRed);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
+				Paint::DrawTexture(TEXTURE_RESISTSHIELDRED, iconsWide, 0, iconSize, iconSize);
+				Paint::DrawTexture(TEXTURE_BLASTRESISTRED, iconsWide, 0, iconSize, iconSize);
 			}
 			else if (playerInfo[i].team == TFTeam_Blue) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldBlu);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
-				g_pVGuiSurface->DrawSetTexture(m_iTextureBlastResistBlu);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
+				Paint::DrawTexture(TEXTURE_RESISTSHIELDBLU, iconsWide, 0, iconSize, iconSize);
+				Paint::DrawTexture(TEXTURE_BLASTRESISTBLU, iconsWide, 0, iconSize, iconSize);
 			}
 			
 			playerWide += iconSize;
@@ -1325,14 +1288,10 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
 			if (playerInfo[i].team == TFTeam_Red) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureBlastResistRed);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
+				Paint::DrawTexture(TEXTURE_BLASTRESISTRED, iconsWide, 0, iconSize, iconSize);
 			}
 			else if (playerInfo[i].team == TFTeam_Blue) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureBlastResistBlu);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
+				Paint::DrawTexture(TEXTURE_BLASTRESISTBLU, iconsWide, 0, iconSize, iconSize);
 			}
 			
 			playerWide += iconSize;
@@ -1350,20 +1309,12 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
 			if (playerInfo[i].team == TFTeam_Red) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldRed);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
-				g_pVGuiSurface->DrawSetTexture(m_iTextureFireResistRed);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
+				Paint::DrawTexture(TEXTURE_RESISTSHIELDRED, iconsWide, 0, iconSize, iconSize);
+				Paint::DrawTexture(TEXTURE_FIRERESISTRED, iconsWide, 0, iconSize, iconSize);
 			}
 			else if (playerInfo[i].team == TFTeam_Blue) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureResistShieldBlu);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
-				g_pVGuiSurface->DrawSetTexture(m_iTextureFireResistBlu);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
+				Paint::DrawTexture(TEXTURE_RESISTSHIELDBLU, iconsWide, 0, iconSize, iconSize);
+				Paint::DrawTexture(TEXTURE_FIRERESISTBLU, iconsWide, 0, iconSize, iconSize);
 			}
 			
 			playerWide += iconSize;
@@ -1376,14 +1327,10 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
 			if (playerInfo[i].team == TFTeam_Red) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureFireResistRed);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
+				Paint::DrawTexture(TEXTURE_FIRERESISTRED, iconsWide, 0, iconSize, iconSize);
 			}
 			else if (playerInfo[i].team == TFTeam_Blue) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureFireResistBlu);
-				g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-				g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
+				Paint::DrawTexture(TEXTURE_FIRERESISTBLU, iconsWide, 0, iconSize, iconSize);
 			}
 			
 			playerWide += iconSize;
@@ -1401,14 +1348,11 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
 			if (playerInfo[i].team == TFTeam_Red) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureBuffBannerRed);
+				Paint::DrawTexture(TEXTURE_BUFFBANNERRED, iconsWide, 0, iconSize, iconSize);
 			}
 			else if (playerInfo[i].team == TFTeam_Blue) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureBuffBannerBlu);
+				Paint::DrawTexture(TEXTURE_BUFFBANNERBLU, iconsWide, 0, iconSize, iconSize);
 			}
-			
-			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
 			
 			playerWide += iconSize;
 			iconsWide += iconSize;
@@ -1425,14 +1369,11 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
 			if (playerInfo[i].team == TFTeam_Red) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureBattalionsBackupRed);
+				Paint::DrawTexture(TEXTURE_BATTALIONSBACKUPRED, iconsWide, 0, iconSize, iconSize);
 			}
 			else if (playerInfo[i].team == TFTeam_Blue) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureBattalionsBackupBlu);
+				Paint::DrawTexture(TEXTURE_BATTALIONSBACKUPBLU, iconsWide, 0, iconSize, iconSize);
 			}
-			
-			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
 			
 			playerWide += iconSize;
 			iconsWide += iconSize;
@@ -1449,14 +1390,11 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
 			if (playerInfo[i].team == TFTeam_Red) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureConcherorRed);
+				Paint::DrawTexture(TEXTURE_CONCHERORRED, iconsWide, 0, iconSize, iconSize);
 			}
 			else if (playerInfo[i].team == TFTeam_Blue) {
-				g_pVGuiSurface->DrawSetTexture(m_iTextureConcherorBlu);
+				Paint::DrawTexture(TEXTURE_CONCHERORBLU, iconsWide, 0, iconSize, iconSize);
 			}
-			
-			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
 			
 			playerWide += iconSize;
 			iconsWide += iconSize;
@@ -1472,9 +1410,7 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
-			g_pVGuiSurface->DrawSetTexture(m_iTextureJarate);
-			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
+			Paint::DrawTexture(TEXTURE_JARATE, iconsWide, 0, iconSize, iconSize);
 			
 			playerWide += iconSize;
 			iconsWide += iconSize;
@@ -1490,9 +1426,7 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
-			g_pVGuiSurface->DrawSetTexture(m_iTextureMilk);
-			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
+			Paint::DrawTexture(TEXTURE_MADMILK, iconsWide, 0, iconSize, iconSize);
 			
 			playerWide += iconSize;
 			iconsWide += iconSize;
@@ -1508,9 +1442,7 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
-			g_pVGuiSurface->DrawSetTexture(m_iTextureMarkForDeath);
-			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
+			Paint::DrawTexture(TEXTURE_MARKFORDEATH, iconsWide, 0, iconSize, iconSize);
 			
 			playerWide += iconSize;
 			iconsWide += iconSize;
@@ -1526,9 +1458,7 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
-			g_pVGuiSurface->DrawSetTexture(m_iTextureBleed);
-			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
+			Paint::DrawTexture(TEXTURE_BLEEDING, iconsWide, 0, iconSize, iconSize, Color(255, 0, 0, 0));
 			
 			playerWide += iconSize;
 			iconsWide += iconSize;
@@ -1544,9 +1474,7 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
-			g_pVGuiSurface->DrawSetTexture(m_iTextureFire);
-			g_pVGuiSurface->DrawSetColor(255, 255, 255, 255);
-			g_pVGuiSurface->DrawTexturedRect(iconsWide, 0, iconsWide + iconSize, iconSize);
+			Paint::DrawTexture(TEXTURE_FIRE, iconsWide, 0, iconSize, iconSize);
 			
 			playerWide += iconSize;
 			iconsWide += iconSize;
@@ -1687,30 +1615,30 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	
 	itemSchema = new ItemSchema();
 	
-	m_iTextureNull = FindOrCreateTexture(TEXTURE_NULL);
-	m_iTextureUbercharge = FindOrCreateTexture(TEXTURE_UBERCHARGE);
-	m_iTextureCritBoost = FindOrCreateTexture(TEXTURE_CRITBOOST);
-	m_iTextureMegaHealRed = FindOrCreateTexture(TEXTURE_MEGAHEALRED);
-	m_iTextureMegaHealBlu = FindOrCreateTexture(TEXTURE_MEGAHEALBLU);
-	m_iTextureResistShieldRed = FindOrCreateTexture(TEXTURE_RESISTSHIELDRED);
-	m_iTextureResistShieldBlu = FindOrCreateTexture(TEXTURE_RESISTSHIELDBLU);
-	m_iTextureBulletResistRed = FindOrCreateTexture(TEXTURE_BULLETRESISTRED);
-	m_iTextureBlastResistRed = FindOrCreateTexture(TEXTURE_BLASTRESISTRED);
-	m_iTextureFireResistRed = FindOrCreateTexture(TEXTURE_FIRERESISTRED);
-	m_iTextureBulletResistBlu = FindOrCreateTexture(TEXTURE_BULLETRESISTBLU);
-	m_iTextureBlastResistBlu = FindOrCreateTexture(TEXTURE_BLASTRESISTBLU);
-	m_iTextureFireResistBlu = FindOrCreateTexture(TEXTURE_FIRERESISTBLU);
-	m_iTextureBuffBannerRed = FindOrCreateTexture(TEXTURE_BUFFBANNERRED);
-	m_iTextureBuffBannerBlu = FindOrCreateTexture(TEXTURE_BUFFBANNERBLU);
-	m_iTextureBattalionsBackupRed = FindOrCreateTexture(TEXTURE_BATTALIONSBACKUPRED);
-	m_iTextureBattalionsBackupBlu = FindOrCreateTexture(TEXTURE_BATTALIONSBACKUPBLU);
-	m_iTextureConcherorRed = FindOrCreateTexture(TEXTURE_CONCHERORRED);
-	m_iTextureConcherorBlu = FindOrCreateTexture(TEXTURE_CONCHERORBLU);
-	m_iTextureJarate = FindOrCreateTexture(TEXTURE_JARATE);
-	m_iTextureMilk = FindOrCreateTexture(TEXTURE_MADMILK);
-	m_iTextureMarkForDeath = FindOrCreateTexture(TEXTURE_MARKFORDEATH);
-	m_iTextureBleed = FindOrCreateTexture(TEXTURE_BLEEDING);
-	m_iTextureFire = FindOrCreateTexture(TEXTURE_FIRE);
+	Paint::InitializeTexture(TEXTURE_NULL);
+	Paint::InitializeTexture(TEXTURE_UBERCHARGE);
+	Paint::InitializeTexture(TEXTURE_CRITBOOST);
+	Paint::InitializeTexture(TEXTURE_MEGAHEALRED);
+	Paint::InitializeTexture(TEXTURE_MEGAHEALBLU);
+	Paint::InitializeTexture(TEXTURE_RESISTSHIELDRED);
+	Paint::InitializeTexture(TEXTURE_RESISTSHIELDBLU);
+	Paint::InitializeTexture(TEXTURE_BULLETRESISTRED);
+	Paint::InitializeTexture(TEXTURE_BLASTRESISTRED);
+	Paint::InitializeTexture(TEXTURE_FIRERESISTRED);
+	Paint::InitializeTexture(TEXTURE_BULLETRESISTBLU);
+	Paint::InitializeTexture(TEXTURE_BLASTRESISTBLU);
+	Paint::InitializeTexture(TEXTURE_FIRERESISTBLU);
+	Paint::InitializeTexture(TEXTURE_BUFFBANNERRED);
+	Paint::InitializeTexture(TEXTURE_BUFFBANNERBLU);
+	Paint::InitializeTexture(TEXTURE_BATTALIONSBACKUPRED);
+	Paint::InitializeTexture(TEXTURE_BATTALIONSBACKUPBLU);
+	Paint::InitializeTexture(TEXTURE_CONCHERORRED);
+	Paint::InitializeTexture(TEXTURE_CONCHERORBLU);
+	Paint::InitializeTexture(TEXTURE_JARATE);
+	Paint::InitializeTexture(TEXTURE_MADMILK);
+	Paint::InitializeTexture(TEXTURE_MARKFORDEATH);
+	Paint::InitializeTexture(TEXTURE_BLEEDING);
+	Paint::InitializeTexture(TEXTURE_FIRE);
 	
 	SH_ADD_HOOK(IPanel, PaintTraverse, g_pVGuiPanel, Hook_IPanel_PaintTraverse, true);
 	SH_ADD_HOOK(IPanel, SendMessage, g_pVGuiPanel, Hook_IPanel_SendMessage, true);

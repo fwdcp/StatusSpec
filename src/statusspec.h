@@ -34,6 +34,7 @@
 #include "ifaces.h"
 #include "itemschema.h"
 #include "offsets.h"
+#include "paint.h"
 
 #define PLUGIN_DESC "StatusSpec v0.10.0"
 
@@ -74,31 +75,7 @@
 #define VGUI_TEXTURE_BLASTRESISTBLU "replay/thumbnails/defense_buff_explosion_blue"
 #define VGUI_TEXTURE_FIRERESISTBLU "replay/thumbnails/defense_buff_fire_blue"
 
-int m_iTextureNull;
-int m_iTextureUbercharge;
-int m_iTextureCritBoost;
-int m_iTextureMegaHealRed;
-int m_iTextureMegaHealBlu;
-int m_iTextureResistShieldRed;
-int m_iTextureResistShieldBlu;
-int m_iTextureBulletResistRed;
-int m_iTextureBlastResistRed;
-int m_iTextureFireResistRed;
-int m_iTextureBulletResistBlu;
-int m_iTextureBlastResistBlu;
-int m_iTextureFireResistBlu;
-int m_iTextureBuffBannerRed;
-int m_iTextureBuffBannerBlu;
-int m_iTextureBattalionsBackupRed;
-int m_iTextureBattalionsBackupBlu;
-int m_iTextureConcherorRed;
-int m_iTextureConcherorBlu;
-int m_iTextureJarate;
-int m_iTextureMilk;
-int m_iTextureMarkForDeath;
-int m_iTextureBleed;
-int m_iTextureFire;
-std::map<int, int> m_iTextureItemIcon;
+extern std::map<int, std::string> itemIconTextures;
 
 KeyValues *performlayoutCommand = new KeyValues("Command", "Command", "performlayout");
 vgui::HPanel specguiPanel;
