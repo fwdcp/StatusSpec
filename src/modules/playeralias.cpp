@@ -66,9 +66,9 @@ inline CSteamID GetClientSteamID(int client) {
 }
 
 ConVar PlayerAlias::enabled("statusspec_playeralias_enabled", "0", FCVAR_NONE, "enable player aliases", PlayerAlias::ToggleState);
-ConCommand PlayerAlias::get("statusspec_playeralias_get", PlayerAlias::GetPlayerAlias, "get a player alias", 0, PlayerAlias::GetCurrentAliasedPlayers);
-ConCommand PlayerAlias::remove("statusspec_playeralias_remove", PlayerAlias::RemovePlayerAlias, "remove a player alias", 0, PlayerAlias::GetCurrentAliasedPlayers);
-ConCommand PlayerAlias::set("statusspec_playeralias_set", PlayerAlias::SetPlayerAlias, "set a player alias", 0, PlayerAlias::GetCurrentGamePlayers);
+ConCommand PlayerAlias::get("statusspec_playeralias_get", PlayerAlias::GetPlayerAlias, "get a player alias", FCVAR_NONE, PlayerAlias::GetCurrentAliasedPlayers);
+ConCommand PlayerAlias::remove("statusspec_playeralias_remove", PlayerAlias::RemovePlayerAlias, "remove a player alias", FCVAR_NONE, PlayerAlias::GetCurrentAliasedPlayers);
+ConCommand PlayerAlias::set("statusspec_playeralias_set", PlayerAlias::SetPlayerAlias, "set a player alias", FCVAR_NONE, PlayerAlias::GetCurrentGamePlayers);
 
 bool PlayerAlias::GetPlayerInfoOverride(int ent_num, player_info_t *pinfo) {
 	bool result = SH_CALL(Interfaces::pEngineClient, &IVEngineClient::GetPlayerInfo)(ent_num, pinfo);
