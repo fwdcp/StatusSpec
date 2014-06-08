@@ -26,6 +26,11 @@ SourceHook::Impl::CSourceHookImpl g_SourceHook;
 SourceHook::ISourceHook *g_SHPtr = &g_SourceHook;
 int g_PLID = 0;
 
+SH_DECL_HOOK1(IGameResources, GetPlayerName, SH_NOATTRIB, 0, const char *, int);
+SH_DECL_HOOK3_void(IPanel, PaintTraverse, SH_NOATTRIB, 0, VPANEL, bool, bool);
+SH_DECL_HOOK3_void(IPanel, SendMessage, SH_NOATTRIB, 0, VPANEL, KeyValues *, VPANEL);
+SH_DECL_HOOK2(IVEngineClient, GetPlayerInfo, SH_NOATTRIB, 0, bool, int, player_info_t *);
+
 std::map<int, std::string> itemIconTextures;
 
 ConVar loadout_icons_enabled("statusspec_loadout_icons_enabled", "0", 0, "enable loadout icons");
