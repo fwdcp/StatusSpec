@@ -36,6 +36,8 @@
 #include "offsets.h"
 #include "paint.h"
 
+#include "modules/antifreeze.h"
+
 #define PLUGIN_DESC "StatusSpec v0.10.0"
 
 #define TEXTURE_NULL "vgui/replay/thumbnails/null"
@@ -76,9 +78,6 @@
 #define VGUI_TEXTURE_FIRERESISTBLU "replay/thumbnails/defense_buff_fire_blue"
 
 extern std::map<int, std::string> itemIconTextures;
-
-KeyValues *performlayoutCommand = new KeyValues("Command", "Command", "performlayout");
-vgui::HPanel specguiPanel;
 
 #define MAX_COSMETIC_SLOTS 3
 

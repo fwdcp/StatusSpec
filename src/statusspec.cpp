@@ -27,7 +27,6 @@ int g_PLID = 0;
 
 std::map<int, std::string> itemIconTextures;
 
-ConVar force_refresh_specgui("statusspec_force_specgui_refresh", "0", 0, "whether to force the spectator GUI to refresh");
 ConVar loadout_icons_enabled("statusspec_loadout_icons_enabled", "0", 0, "enable loadout icons");
 ConVar loadout_icons_nonloadout("statusspec_loadout_icons_nonloadout", "0", 0, "enable loadout icons for nonloadout items");
 ConVar medigun_info_charge_label_text("statusspec_medigun_info_charge_label_text", "%charge%%", 0, "text for charge label in medigun info ('%charge%' is replaced with the current charge percentage number)");
@@ -1124,6 +1123,10 @@ const char * Hook_IGameResources_GetPlayerName(int client) {
 }
 	
 void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
+	if (g_AntiFreeze) {
+		g_AntiFreeze->Paint(vguiPanel);
+	}
+
 	const char* panelName = g_pVGuiPanel->GetName(vguiPanel);
 	vgui::HPanel panelHandle = g_pVGui->PanelToHandle(vguiPanel);
 
@@ -1141,10 +1144,7 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 	if (Interfaces::pEngineClient->IsDrawingLoadingImage() || !Interfaces::pEngineClient->IsInGame() || !Interfaces::pEngineClient->IsConnected() || Interfaces::pEngineClient->Con_IsVisible())
 		return;
 	
-	if (strcmp(panelName, "specgui") == 0) {
-		specguiPanel = g_pVGui->PanelToHandle(vguiPanel);
-	}
-	else if (strcmp(panelName, "statusicons") == 0) {
+	if (strcmp(panelName, "statusicons") == 0) {
 		vgui::VPANEL playerPanel = g_pVGuiPanel->GetParent(vguiPanel);
 		int iconsWide, iconsTall, playerWide, playerTall;
 		
@@ -1533,11 +1533,6 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			SHOW_SLOT_ICON(primary);
 			SHOW_SLOT_ICON(secondary);
 			SHOW_SLOT_ICON(melee);
-		}
-	}
-	else if (strcmp(panelName, "MatSystemTopPanel") == 0) {
-		if (force_refresh_specgui.GetBool() && specguiPanel) {
-			g_pVGuiPanel->SendMessage(g_pVGui->HandleToPanel(specguiPanel), performlayoutCommand, g_pVGui->HandleToPanel(specguiPanel));
 		}
 	}
 }
