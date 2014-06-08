@@ -15,9 +15,9 @@
 #include <string>
 
 #include "convar.h"
-#include "KeyValues.h"
 #include "vgui/IPanel.h"
 #include "vgui/IVGui.h"
+#include "KeyValues.h"
 
 #include "../ifaces.h"
 

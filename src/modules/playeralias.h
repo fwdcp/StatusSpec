@@ -12,15 +12,21 @@
 
 #include "../stdafx.h"
 
+#include <algorithm>
+#include <cstdint>
 #include <map>
+#include <sstream>
 #include <string>
 
 #include "convar.h"
 #include "sourcehook/sourcehook.h"
 
-#include "../statusspec.h"
 #include "../hooks.h"
 #include "../ifaces.h"
+
+#if defined _WIN32
+#define strtoull _strtoui64
+#endif
 
 class PlayerAlias {
 public:

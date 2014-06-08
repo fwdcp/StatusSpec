@@ -324,7 +324,6 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 	}
 
 	const char* panelName = g_pVGuiPanel->GetName(vguiPanel);
-	vgui::HPanel panelHandle = g_pVGui->PanelToHandle(vguiPanel);
 
 	if (Interfaces::pEngineClient->IsDrawingLoadingImage() || !Interfaces::pEngineClient->IsInGame() || !Interfaces::pEngineClient->IsConnected() || Interfaces::pEngineClient->Con_IsVisible())
 		return;

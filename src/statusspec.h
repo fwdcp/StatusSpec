@@ -12,13 +12,9 @@
 
 #include "stdafx.h"
 
-#include <cmath>
-#include <cstdint>
-#include <cstdlib>
-#include <vector>
-#include <map>
-#include <string>
 #include <array>
+#include <map>
+#include <vector>
 
 #include "Color.h"
 #include "ehandle.h"
@@ -39,6 +35,10 @@
 #include "modules/antifreeze.h"
 #include "modules/mediguninfo.h"
 #include "modules/playeralias.h"
+
+#if defined _WIN32
+#define strtoull _strtoui64
+#endif
 
 #define PLUGIN_DESC "StatusSpec v0.10.0"
 

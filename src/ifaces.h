@@ -10,21 +10,17 @@
 
 #pragma once
 
-#if defined _WIN32
-#define strtoull _strtoui64
-#endif
-
 #include "stdafx.h"
 
 #define CLIENT_DLL
 #define VERSION_SAFE_STEAM_API_INTERFACES
 
-#include "tier3/tier3.h"
-#include "steam/steam_api.h"
 #include "cdll_int.h"
 #include "icliententitylist.h"
-#include "igameresources.h"
 #include "iclientmode.h"
+#include "igameresources.h"
+#include "steam/steam_api.h"
+#include "tier3/tier3.h"
 #include "vgui_controls/Controls.h"
 
 #if defined __linux__

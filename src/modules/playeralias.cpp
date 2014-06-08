@@ -14,6 +14,15 @@ PlayerAlias *g_PlayerAlias;
 
 std::map<CSteamID, std::string> PlayerAlias::playerAliases;
 
+inline bool IsInteger(const std::string &s) {
+   if (s.empty() || !isdigit(s[0])) return false;
+
+   char *p;
+   strtoull(s.c_str(), &p, 10);
+
+   return (*p == 0);
+}
+
 inline CSteamID ConvertTextToSteamID(std::string textID) {
 	if (textID.substr(0, 6).compare("STEAM_") == 0 && std::count(textID.begin(), textID.end(), ':') == 2) {
 		std::stringstream ss(textID);
