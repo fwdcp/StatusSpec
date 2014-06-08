@@ -18,8 +18,6 @@
 #include "vgui_controls/AnimationController.h"
 #include "convar.h"
 #include "vgui_controls/EditablePanel.h"
-#include "ehandle.h"
-#include "icliententity.h"
 #include "iclientmode.h"
 #include "vgui_controls/ImagePanel.h"
 #include "vgui/IPanel.h"

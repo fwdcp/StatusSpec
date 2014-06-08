@@ -13,10 +13,12 @@
 
 #include "stdafx.h"
 
-#include "ifaces.h"
-
 #include "cdll_client_int.h"
 #include "client_class.h"
+#include "ehandle.h"
+#include "icliententity.h"
+
+#include "ifaces.h"
 
 #define INVALID_OFFSET -1
 

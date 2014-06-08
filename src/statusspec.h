@@ -16,7 +16,6 @@
 
 #include "Color.h"
 #include "ehandle.h"
-#include "icliententity.h"
 #include "vgui/IVGui.h"
 #include "vgui/IPanel.h"
 #include "vgui/IScheme.h"
