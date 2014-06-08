@@ -1,11 +1,7 @@
 StatusSpec
 ==========
 
-a client plugin that:
-* almost fixes HUD freeze issues
-* displays loadout icons
-* displays medigun info
-* displays status icons
+a client plugin that aims to add many useful features for TF2 spectating
 
 ![screenshot](http://i.imgur.com/HliUKLk.png)
 
@@ -49,8 +45,12 @@ Usage
 -----
 This plugin is not signed by Valve, and therefore will not load unless TF2 is loaded with the "-insecure" flag.
 
+### AntiFreeze
+forces spectator GUI to refresh constantly, eliminating many HUD issues after game unpauses
+#### Console Variables
+* `statusspec_antifreeze_enabled` - enable antifreeze (forces the spectator GUI to refresh)
+
 ### Console Variables
-* `statusspec_force_refresh_specgui` - whether to force the spectator GUI to refresh
 * `statusspec_loadout_icons_enabled` - enable loadout icons
 * `statusspec_loadout_icons_nonloadout` - enable loadout icons for nonloadout items
 * `statusspec_medigun_info_charge_label_text` - text for charge label in medigun info ('%charge%' is replaced with the current charge percentage number)
