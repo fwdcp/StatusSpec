@@ -36,12 +36,17 @@
 #endif
 
 #if defined _WIN32
+#define CLIENT_MODULE_FILE "tf/bin/client.dll"
 #define CLIENT_MODULE_SIZE 0xC74EC0
 #define GAMERESOURCES_SIG "\xA1\x00\x00\x00\x00\x85\xC0\x74\x06\x05"
 #define GAMERESOURCES_MASK "x????xxxxx"
 #define CLIENTMODE_SIG "\xC7\x05\x00\x00\x00\x00\x00\x00\x00\x00\xE8\x00\x00\x00\x00\x68\x00\x00\x00\x00\x8B\xC8"
 #define CLIENTMODE_MASK "xx????????x????x????xx"
 #define CLIENTMODE_OFFSET 2
+#elif defined __APPLE__
+#define CLIENT_MODULE_FILE "tf/bin/client.dylib"
+#elif defined __linux__
+#define CLIENT_MODULE_FILE "tf/bin/client.so"
 #endif
 
 class Interfaces {

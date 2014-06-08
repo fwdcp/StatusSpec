@@ -45,19 +45,27 @@ inline DWORD FindPattern(DWORD dwAddress, DWORD dwSize, BYTE* pbSig, const char*
 }
 
 IGameResources* Interfaces::GetGameResources() {
+#if defined _WIN32
 	static DWORD pointer = NULL;
 	if (!pointer)
 		pointer = FindPattern((DWORD) GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE) GAMERESOURCES_SIG, GAMERESOURCES_MASK);
 	typedef IGameResources* (*GGR_t) (void);
 	GGR_t GGR = (GGR_t) pointer;
 	return GGR();
+#else
+	return NULL;
+#endif
 }
 
 IClientMode* Interfaces::GetClientMode() {
+#if defined _WIN32
 	static DWORD pointer = NULL;
 	if (!pointer)
 		pointer = FindPattern((DWORD) GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE) CLIENTMODE_SIG, CLIENTMODE_MASK) + CLIENTMODE_OFFSET;
 	return **(IClientMode***)(pointer);
+#else
+	return NULL;
+#endif
 }
 
 bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory) {
@@ -72,11 +80,7 @@ bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 	
 	pEngineClient = (IVEngineClient*) interfaceFactory(VENGINE_CLIENT_INTERFACE_VERSION, NULL);
 	
-	#if defined __linux__
-	pClientModule = new CDllDemandLoader("tf/bin/client.so");
-	#elif defined _WIN32
-	pClientModule = new CDllDemandLoader("tf/bin/client.dll");
-	#endif
+	pClientModule = new CDllDemandLoader(CLIENT_MODULE_FILE);
 
 	CreateInterfaceFn gameClientFactory = pClientModule->GetFactory();
 	
