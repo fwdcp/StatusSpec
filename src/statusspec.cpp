@@ -22,6 +22,7 @@
 	 \
 	iconsWide += iconSize;
 
+SourceHook::Impl::CSourceHookImpl g_SourceHook;
 SourceHook::ISourceHook *g_SHPtr = &g_SourceHook;
 int g_PLID = 0;
 

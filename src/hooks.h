@@ -23,8 +23,6 @@
 
 using namespace vgui;
 
-SourceHook::Impl::CSourceHookImpl g_SourceHook;
-
 extern SourceHook::ISourceHook *g_SHPtr;
 extern int g_PLID;
 
