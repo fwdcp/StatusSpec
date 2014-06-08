@@ -12,6 +12,9 @@
 
 #include "stdafx.h"
 
+#include <array>
+#include <string>
+
 // taken from SourceMod
 
 enum TFClassType
@@ -123,3 +126,9 @@ enum TFResistType {
 	TFResistType_Explosive,
 	TFResistType_Fire
 };
+
+static std::array<std::string, 10> tfclassNames = {"", "scout", "sniper", "soldier", "demoman", "medic", "heavy", "pyro", "spy", "engineer"};
+
+// taken from the item schema
+
+static std::array<std::string, 9> itemSlots = {"primary", "secondary", "melee", "pda", "pda2", "building", "head", "misc", "action"};

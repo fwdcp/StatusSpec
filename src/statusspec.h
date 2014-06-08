@@ -12,9 +12,7 @@
 
 #include "stdafx.h"
 
-#include <array>
 #include <map>
-#include <vector>
 
 #include "Color.h"
 #include "ehandle.h"
@@ -85,9 +83,6 @@ typedef struct Player {
 	int action;
 	std::string activeWeaponSlot;
 } Player;
-
-std::array<std::string, 10> tfclassNames = {"", "scout", "sniper", "soldier", "demoman", "medic", "heavy", "pyro", "spy", "engineer"};
-std::array<std::string, 9> itemSlots = {"primary", "secondary", "melee", "pda", "pda2", "building", "head", "misc", "action"};
 
 std::map<std::string, int> playerPanels;
 std::map<int, Player> playerInfo;
