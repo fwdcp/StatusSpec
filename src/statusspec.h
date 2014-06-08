@@ -37,6 +37,7 @@
 #include "paint.h"
 
 #include "modules/antifreeze.h"
+#include "modules/playeralias.h"
 
 #define PLUGIN_DESC "StatusSpec v0.10.0"
 

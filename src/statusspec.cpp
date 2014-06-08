@@ -38,7 +38,6 @@ ConVar loadout_icons_nonloadout("statusspec_loadout_icons_nonloadout", "0", 0, "
 ConVar medigun_info_charge_label_text("statusspec_medigun_info_charge_label_text", "%charge%%", 0, "text for charge label in medigun info ('%charge%' is replaced with the current charge percentage number)");
 ConVar medigun_info_enabled("statusspec_medigun_info_enabled", "0", 0, "enable medigun info");
 ConVar medigun_info_individual_charges_label_text("statusspec_medigun_info_individual_charges_label_text", "%charges%", 0, "text for individual charges label (for Vaccinator) in medigun info ('%charges%' is replaced with the current number of charges)");
-ConVar player_aliases_enabled("statusspec_player_alias_enabled", "0", 0, "enable player aliases");
 ConVar status_icons_enabled("statusspec_status_icons_enabled", "0", 0, "enable status icons");
 ConVar status_icons_max("statusspec_status_icons_max", "5", 0, "max number of status icons to be rendered");
 
@@ -91,39 +90,6 @@ bool CheckCondition(uint32_t conditions[3], int condition) {
 	}
 	
 	return false;
-}
-
-CSteamID ConvertTextToSteamID(std::string textID) {
-	if (textID.substr(0, 6).compare("STEAM_") == 0 && std::count(textID.begin(), textID.end(), ':') == 2) {
-		std::stringstream ss(textID);
-		std::string universe;
-		std::string server;
-		std::string authID;
-		std::getline(ss, universe, ':');
-		std::getline(ss, server, ':');
-		std::getline(ss, authID, ':');
-
-		if (IsInteger(server) && IsInteger(authID)) {
-			uint32_t accountID = (2 * strtoul(authID.c_str(), NULL, 10)) + strtoul(server.c_str(), NULL, 10);
-
-			static EUniverse universe = k_EUniverseInvalid;
-
-			if (universe == k_EUniverseInvalid) {
-				universe = Interfaces::pSteamAPIContext->SteamUtils()->GetConnectedUniverse();
-			}
-
-			return CSteamID(accountID, universe, k_EAccountTypeIndividual);
-		}
-
-		return CSteamID();
-	}
-	else if (IsInteger(textID)) {
-		uint64_t steamID = strtoull(textID.c_str(), NULL, 10);
-
-		return CSteamID(steamID);
-	}
-
-	return CSteamID();
 }
 
 void DisplayMedigunInfo() {
@@ -760,26 +726,6 @@ void DisplayMedigunInfo() {
 	}
 }
 
-CSteamID GetClientSteamID(int client) {
-	player_info_t playerInfo;
-
-	if (SH_CALL(Interfaces::pEngineClient, &IVEngineClient::GetPlayerInfo)(client, &playerInfo))
-	{
-		if (playerInfo.friendsID)
-		{
-			static EUniverse universe = k_EUniverseInvalid;
-
-			if (universe == k_EUniverseInvalid) {
-				universe = Interfaces::pSteamAPIContext->SteamUtils()->GetConnectedUniverse();
-			}
-
-			return CSteamID(playerInfo.friendsID, 1, universe, k_EAccountTypeIndividual);
-		}
-	}
-
-	return CSteamID();
-}
-
 void UpdateEntities() {
 	static IGameResources* gameResources = NULL;
 	static int getPlayerNameHook;
@@ -1013,64 +959,6 @@ CON_COMMAND(statusspec_medigun_info_reload_settings, "reload settings for the me
 	((vgui::EditablePanel *) panels["MedigunInfo"])->LoadControlSettings("Resource/UI/MedigunInfo.res");
 }
 
-CON_COMMAND(statusspec_player_alias_get, "get an alias for a player") {
-	if (args.ArgC() < 1)
-	{
-		Warning("Usage: statusspec_player_alias_get <steamid>\n");
-		return;
-	}
-
-	CSteamID playerSteamID = ConvertTextToSteamID(args.Arg(1));
-
-	if (!playerSteamID.IsValid()) {
-		Warning("The Steam ID entered is invalid.\n");
-		return;
-	}
-
-	if (playerAliases.find(playerSteamID) != playerAliases.end()) {
-		Msg("Steam ID %llu has an associated alias '%s'.\n", playerSteamID.ConvertToUint64(), playerAliases[playerSteamID].c_str());
-	}
-	else {
-		Msg("Steam ID %llu does not have an associated alias.\n", playerSteamID.ConvertToUint64());
-	}
-}
-
-CON_COMMAND(statusspec_player_alias_remove, "remove an alias for a player") {
-	if (args.ArgC() < 1)
-	{
-		Warning("Usage: statusspec_player_alias_remove <steamid>\n");
-		return;
-	}
-
-	CSteamID playerSteamID = ConvertTextToSteamID(args.Arg(1));
-
-	if (!playerSteamID.IsValid()) {
-		Warning("The Steam ID entered is invalid.\n");
-		return;
-	}
-
-	playerAliases.erase(playerSteamID);
-	Msg("Alias associated with Steam ID %llu erased.\n", playerSteamID.ConvertToUint64());
-}
-
-CON_COMMAND(statusspec_player_alias_set, "set an alias for a player") {
-	if (args.ArgC() < 2)
-	{
-		Warning("Usage: statusspec_player_alias_set <steamid> <alias>\n");
-		return;
-	}
-
-	CSteamID playerSteamID = ConvertTextToSteamID(args.Arg(1));
-
-	if (!playerSteamID.IsValid()) {
-		Warning("The Steam ID entered is invalid.\n");
-		return;
-	}
-
-	playerAliases[playerSteamID] = args.Arg(2);
-	Msg("Steam ID %llu has been associated with alias '%s'.\n", playerSteamID.ConvertToUint64(), playerAliases[playerSteamID].c_str());
-}
-
 CON_COMMAND(statusspec_utility_set_progress_bar_direction, "set the progress direction for a StatusSpec progress bar") {
 	if (args.ArgC() < 2)
 	{
@@ -1117,15 +1005,12 @@ CON_COMMAND(statusspec_utility_set_progress_bar_direction, "set the progress dir
 }
 
 const char * Hook_IGameResources_GetPlayerName(int client) {
-	if (player_aliases_enabled.GetBool()) {
-		CSteamID playerSteamID = GetClientSteamID(client);
-
-		if (playerAliases.find(playerSteamID) != playerAliases.end()) {
-			RETURN_META_VALUE(MRES_SUPERCEDE, playerAliases[playerSteamID].c_str());
-		}
+	if (g_PlayerAlias) {
+		RETURN_META_VALUE(MRES_SUPERCEDE, g_PlayerAlias->GetPlayerNameOverride(client));
 	}
-
-	RETURN_META_VALUE(MRES_IGNORED, "");
+	else {
+		RETURN_META_VALUE(MRES_IGNORED, "");
+	}
 }
 	
 void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
@@ -1574,20 +1459,12 @@ void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VP
 }
 
 bool Hook_IVEngineClient_GetPlayerInfo(int ent_num, player_info_t *pinfo) {
-	bool result = SH_CALL(Interfaces::pEngineClient, &IVEngineClient::GetPlayerInfo)(ent_num, pinfo);
-
-	if (player_aliases_enabled.GetBool()) {
-		CSteamID playerSteamID = GetClientSteamID(ent_num);
-
-		if (playerAliases.find(playerSteamID) != playerAliases.end()) {
-			V_strcpy_safe(pinfo->name, playerAliases[playerSteamID].c_str());
-
-			RETURN_META_VALUE(MRES_SUPERCEDE, result);
-		}
+	if (g_PlayerAlias) {
+		RETURN_META_VALUE(MRES_SUPERCEDE, g_PlayerAlias->GetPlayerInfoOverride(ent_num, pinfo));
 	}
-
-	RETURN_META_VALUE(MRES_IGNORED, result);
-
+	else {
+		RETURN_META_VALUE(MRES_IGNORED, false);
+	}
 }
 
 // The plugin is a static singleton that is exported as an interface
