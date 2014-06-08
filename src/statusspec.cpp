@@ -1574,7 +1574,7 @@ bool Hook_IVEngineClient_GetPlayerInfo(int ent_num, player_info_t *pinfo) {
 		CSteamID playerSteamID = GetClientSteamID(ent_num);
 
 		if (playerAliases.find(playerSteamID) != playerAliases.end()) {
-			strncpy(pinfo->name, playerAliases[playerSteamID].c_str(), sizeof(pinfo->name));
+			V_strcpy_safe(pinfo->name, playerAliases[playerSteamID].c_str());
 
 			RETURN_META_VALUE(MRES_SUPERCEDE, result);
 		}
