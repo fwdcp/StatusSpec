@@ -1,5 +1,5 @@
 /*
- *  offsets.h
+ *  entities.h
  *  WebSpec project
  *  Modified for AdvSpec, used in StatusSpec
  *  
@@ -25,7 +25,7 @@
 #define MAKE_PTR(cast, ptr, addValue) (cast)((unsigned long) (ptr) + (unsigned long) (addValue))
 #define ENTITY_INDEX_FROM_ENTITY_OFFSET(entity, offset) reinterpret_cast<CHandle<C_BaseEntity>*>(MAKE_PTR(char*, entity, offset))->GetEntryIndex()
 
-class Offsets {
+class Entities {
 public:
 	static int pCTFPlayer__m_iClass;
 	static int pCTFPlayer__m_iTeamNum;

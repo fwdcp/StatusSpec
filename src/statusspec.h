@@ -29,11 +29,11 @@
 #include "vgui/ISurface.h"
 #include "vgui_controls/pch_vgui_controls.h"
 
+#include "entities.h"
 #include "enums.h"
 #include "hooks.h"
 #include "ifaces.h"
 #include "itemschema.h"
-#include "offsets.h"
 #include "paint.h"
 
 #include "modules/antifreeze.h"
