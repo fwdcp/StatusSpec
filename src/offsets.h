@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include "stdafx.h"
+
 #include "ifaces.h"
 
 #include "cdll_client_int.h"

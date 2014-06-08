@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "stdafx.h"
+
 // taken from SourceMod
 
 enum TFClassType
