@@ -37,6 +37,7 @@
 #include "paint.h"
 
 #include "modules/antifreeze.h"
+#include "modules/mediguninfo.h"
 #include "modules/playeralias.h"
 
 #define PLUGIN_DESC "StatusSpec v0.10.0"
@@ -66,18 +67,6 @@
 #define TEXTURE_BLEEDING "vgui/bleed_drop"
 #define TEXTURE_FIRE "hud/leaderboard_class_pyro"
 
-#define VGUI_TEXTURE_NULL "replay/thumbnails/null"
-#define VGUI_TEXTURE_UBERCHARGE "replay/thumbnails/ubercharge"
-#define VGUI_TEXTURE_CRITBOOST "replay/thumbnails/critboost"
-#define VGUI_TEXTURE_MEGAHEALRED "replay/thumbnails/megaheal_red"
-#define VGUI_TEXTURE_MEGAHEALBLU "replay/thumbnails/megaheal_blue"
-#define VGUI_TEXTURE_BULLETRESISTRED "replay/thumbnails/defense_buff_bullet_red"
-#define VGUI_TEXTURE_BLASTRESISTRED "replay/thumbnails/defense_buff_explosion_red"
-#define VGUI_TEXTURE_FIRERESISTRED "replay/thumbnails/defense_buff_fire_red"
-#define VGUI_TEXTURE_BULLETRESISTBLU "replay/thumbnails/defense_buff_bullet_blue"
-#define VGUI_TEXTURE_BLASTRESISTBLU "replay/thumbnails/defense_buff_explosion_blue"
-#define VGUI_TEXTURE_FIRERESISTBLU "replay/thumbnails/defense_buff_fire_blue"
-
 extern std::map<int, std::string> itemIconTextures;
 
 #define MAX_COSMETIC_SLOTS 3
@@ -97,36 +86,25 @@ typedef struct Player {
 	std::string activeWeaponSlot;
 } Player;
 
-typedef struct Medigun {
-	int itemDefinitionIndex;
-	float chargeLevel;
-	int chargeResistType;
-	bool chargeRelease;
-} Medigun;
-
 std::array<std::string, 10> tfclassNames = {"", "scout", "sniper", "soldier", "demoman", "medic", "heavy", "pyro", "spy", "engineer"};
 std::array<std::string, 9> itemSlots = {"primary", "secondary", "melee", "pda", "pda2", "building", "head", "misc", "action"};
 
-std::map<CSteamID, std::string> playerAliases;
 std::map<std::string, int> playerPanels;
 std::map<int, Player> playerInfo;
-std::map<TFTeam, Medigun> medigunInfo;
 
 ItemSchema *itemSchema;
 
 Color loadout_nonactive_filter(127, 127, 127, 255);
 Color loadout_active_filter(255, 255, 255, 255);
 
-std::map<std::string, vgui::Panel *> panels;
 
+void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage);
 const char *Hook_IGameResources_GetPlayerName(int client);
 void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce);
 void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel);
 
 inline int ColorRangeRestrict(int color);
-inline void FindAndReplaceInString(std::string &str, const std::string &find, const std::string &replace);
 inline bool IsInteger(const std::string &s);
-inline void StartAnimationSequence(const char *sequenceName);
 
 class StatusSpecPlugin: public IServerPluginCallbacks
 {
