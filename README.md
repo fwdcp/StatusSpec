@@ -47,8 +47,20 @@ This plugin is not signed by Valve, and therefore will not load unless TF2 is lo
 
 ### AntiFreeze
 forces spectator GUI to refresh constantly, eliminating many HUD issues after game unpauses
+
 #### Console Variables
 * `statusspec_antifreeze_enabled` - enable antifreeze (forces the spectator GUI to refresh)
+
+### Player Alias
+substitutes in user-defined aliases for player names
+
+#### Console Variables
+* `statusspec_playeralias_enabled` - enable player aliases
+
+#### Console Commands
+* `statusspec_playeralias_get <steamid>` - get an alias for a player
+* `statusspec_playeralias_remove <steamid>` - remove an alias for a player
+* `statusspec_playeralias_set <steamid> <alias>` - set an alias for a player
 
 ### Console Variables
 * `statusspec_loadout_icons_enabled` - enable loadout icons
@@ -56,7 +68,6 @@ forces spectator GUI to refresh constantly, eliminating many HUD issues after ga
 * `statusspec_medigun_info_charge_label_text` - text for charge label in medigun info ('%charge%' is replaced with the current charge percentage number)
 * `statusspec_medigun_info_enabled` - enable medigun info
 * `statusspec_medigun_info_individual_charges_label_text` - text for individual charges label (for Vaccinator) in medigun info ('%charges%' is replaced with the current number of charges)
-* `statusspec_player_alias_enabled` - enable player aliases
 * `statusspec_status_icons_enabled` - enable status icons
 * `statusspec_status_icons_max` - max number of status icons to be rendered
 
@@ -64,9 +75,6 @@ forces spectator GUI to refresh constantly, eliminating many HUD issues after ga
 * `statusspec_loadout_filter_active <red> <green> <blue> <alpha>` - the RGBA filter applied to the icon when the item is active
 * `statusspec_loadout_filter_nonactive <red> <green> <blue> <alpha>` - the RGBA filter applied to the icon when the item is not active
 * `statusspec_medigun_info_reload_settings` - reload settings for the medigun info HUD from the resource file
-* `statusspec_player_alias_get <steamid>` - get an alias for a player
-* `statusspec_player_alias_remove <steamid>` - remove an alias for a player
-* `statusspec_player_alias_set <steamid> <alias>` - set an alias for a player
 * `statusspec_utility_set_progress_bar_direction <name> <direction>` - set the progress direction for a StatusSpec progress bar
 
 ### UI Resource Files
