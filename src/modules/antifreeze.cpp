@@ -29,7 +29,7 @@ void AntiFreeze::Paint(vgui::VPANEL vguiPanel) {
 	}
 
 	if (g_pVGui->HandleToPanel(topPanel) == vguiPanel && specguiPanel != vgui::INVALID_PANEL) {
-		g_pVGuiPanel->SendMessage(g_pVGui->HandleToPanel(specguiPanel), new KeyValues("Command", "Command", "performlayout"), g_pVGui->HandleToPanel(specguiPanel));
+		g_pVGuiPanel->SendMessage(g_pVGui->HandleToPanel(specguiPanel), PERFORM_LAYOUT_COMMAND, g_pVGui->HandleToPanel(specguiPanel));
 	}
 }
 

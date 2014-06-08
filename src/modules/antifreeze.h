@@ -21,6 +21,7 @@
 
 #include "../ifaces.h"
 
+#define PERFORM_LAYOUT_COMMAND new KeyValues("Command", "Command", "performlayout")
 #define SPEC_GUI_NAME "specgui"
 #define TOP_PANEL_NAME "MatSystemTopPanel"
 
