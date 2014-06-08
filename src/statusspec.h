@@ -30,6 +30,7 @@
 #include "paint.h"
 
 #include "modules/antifreeze.h"
+#include "modules/loadouticons.h"
 #include "modules/mediguninfo.h"
 #include "modules/playeralias.h"
 
@@ -64,41 +65,19 @@
 #define TEXTURE_BLEEDING "vgui/bleed_drop"
 #define TEXTURE_FIRE "hud/leaderboard_class_pyro"
 
-extern std::map<int, std::string> itemIconTextures;
-
-#define MAX_COSMETIC_SLOTS 3
-
 typedef struct Player {
 	TFClassType tfclass;
 	TFTeam team;
 	uint32_t conditions[3];
-	int primary;
-	int secondary;
-	int melee;
-	int pda;
-	int pda2;
-	int building;
-	int cosmetic[MAX_COSMETIC_SLOTS];
-	int action;
-	std::string activeWeaponSlot;
 } Player;
 
 std::map<std::string, int> playerPanels;
 std::map<int, Player> playerInfo;
 
-ItemSchema *itemSchema;
-
-Color loadout_nonactive_filter(127, 127, 127, 255);
-Color loadout_active_filter(255, 255, 255, 255);
-
-
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage);
 const char *Hook_IGameResources_GetPlayerName(int client);
 void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce);
 void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel);
-
-inline int ColorRangeRestrict(int color);
-inline bool IsInteger(const std::string &s);
 
 class StatusSpecPlugin: public IServerPluginCallbacks
 {

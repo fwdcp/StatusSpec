@@ -10,18 +10,6 @@
 
 #include "statusspec.h"
 
-#define SHOW_SLOT_ICON(slot) \
-	if (playerInfo[i].slot != -1) { \
-		if (playerInfo[i].activeWeaponSlot.compare(#slot) == 0) { \
-			Paint::DrawTexture(itemIconTextures[playerInfo[i].slot], iconsWide, 0, iconSize, iconSize, loadout_active_filter); \
-		} \
-		else { \
-			Paint::DrawTexture(itemIconTextures[playerInfo[i].slot], iconsWide, 0, iconSize, iconSize, loadout_nonactive_filter); \
-		} \
-	} \
-	 \
-	iconsWide += iconSize;
-
 SourceHook::Impl::CSourceHookImpl g_SourceHook;
 SourceHook::ISourceHook *g_SHPtr = &g_SourceHook;
 int g_PLID = 0;
@@ -32,27 +20,8 @@ SH_DECL_HOOK3_void(IPanel, PaintTraverse, SH_NOATTRIB, 0, VPANEL, bool, bool);
 SH_DECL_HOOK3_void(IPanel, SendMessage, SH_NOATTRIB, 0, VPANEL, KeyValues *, VPANEL);
 SH_DECL_HOOK2(IVEngineClient, GetPlayerInfo, SH_NOATTRIB, 0, bool, int, player_info_t *);
 
-std::map<int, std::string> itemIconTextures;
-
-ConVar loadout_icons_enabled("statusspec_loadout_icons_enabled", "0", 0, "enable loadout icons");
-ConVar loadout_icons_nonloadout("statusspec_loadout_icons_nonloadout", "0", 0, "enable loadout icons for nonloadout items");
 ConVar status_icons_enabled("statusspec_status_icons_enabled", "0", 0, "enable status icons");
 ConVar status_icons_max("statusspec_status_icons_max", "5", 0, "max number of status icons to be rendered");
-
-inline int ColorRangeRestrict(int color) {
-	if (color < 0) return 0;
-	else if (color > 255) return 255;
-	else return color;
-}
-
-inline bool IsInteger(const std::string &s) {
-   if (s.empty() || !isdigit(s[0])) return false;
-
-   char *p;
-   strtoull(s.c_str(), &p, 10);
-
-   return (*p == 0);
-}
 
 bool CheckCondition(uint32_t conditions[3], int condition) {
 	if (condition < 32) {
@@ -106,175 +75,8 @@ void UpdateEntities() {
 			playerInfo[i].conditions[0] = playerCond|condBits;
 			playerInfo[i].conditions[1] = playerCondEx;
 			playerInfo[i].conditions[2] = playerCondEx2;
-			playerInfo[i].primary = -1;
-			playerInfo[i].secondary = -1;
-			playerInfo[i].melee = -1;
-			playerInfo[i].pda = -1;
-			playerInfo[i].pda2 = -1;
-			playerInfo[i].building = -1;
-			std::fill(playerInfo[i].cosmetic, playerInfo[i].cosmetic + MAX_COSMETIC_SLOTS, -1);
-			playerInfo[i].action = -1;
-		}
-		else if (Entities::CheckClassBaseclass(cEntity->GetClientClass(), "DT_EconEntity")) {
-			int player = ENTITY_INDEX_FROM_ENTITY_OFFSET(cEntity, Entities::pCEconEntity__m_hOwnerEntity);
-			IClientEntity *playerEntity = Interfaces::pClientEntityList->GetClientEntity(player);
-			int itemDefinitionIndex = *MAKE_PTR(int*, cEntity, Entities::pCEconEntity__m_iItemDefinitionIndex);
-
-			if (loadout_icons_enabled.GetBool()) {
-				int activeWeapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(playerEntity, Entities::pCTFPlayer__m_hActiveWeapon);
-
-				const char *itemSlot = itemSchema->GetItemKeyData(itemDefinitionIndex, "item_slot");
-			
-				KeyValues *classUses = itemSchema->GetItemKey(itemDefinitionIndex, "used_by_classes");
-				if (classUses) {
-					const char *classUse = classUses->GetString(tfclassNames[playerInfo[player].tfclass].c_str(), "");
-
-					if (std::find(std::begin(itemSlots), std::end(itemSlots), classUse) != std::end(itemSlots)) {
-						itemSlot = classUse;
-					}
-				}
-
-				if (activeWeapon == i) {
-					playerInfo[player].activeWeaponSlot = itemSlot;
-				}
-			
-				if (strcmp(itemSlot, "primary") == 0) {
-					playerInfo[player].primary = itemDefinitionIndex;
-				}
-				else if (strcmp(itemSlot, "secondary") == 0) {
-					playerInfo[player].secondary = itemDefinitionIndex;
-				}
-				else if (strcmp(itemSlot, "melee") == 0) {
-					playerInfo[player].melee = itemDefinitionIndex;
-				}
-				else if (strcmp(itemSlot, "pda") == 0) {
-					playerInfo[player].pda = itemDefinitionIndex;
-				}
-				else if (strcmp(itemSlot, "pda2") == 0) {
-					playerInfo[player].pda2 = itemDefinitionIndex;
-				}
-				else if (strcmp(itemSlot, "building") == 0) {
-					playerInfo[player].building = itemDefinitionIndex;
-				}
-				else if (strcmp(itemSlot, "head") == 0 || strcmp(itemSlot, "misc") == 0) {
-					for (int slot = 0; slot < 3; slot++) {
-						if (playerInfo[player].cosmetic[slot] == -1) {
-							playerInfo[player].cosmetic[slot] = itemDefinitionIndex;
-							break;
-						}
-					}
-				}
-				else if (strcmp(itemSlot, "action") == 0) {
-					playerInfo[player].action = itemDefinitionIndex;
-				}
-				
-				const char *itemIcon = itemSchema->GetItemKeyData(itemDefinitionIndex, "image_inventory");
-				Paint::InitializeTexture(itemIcon);
-				itemIconTextures[itemDefinitionIndex] = itemIcon;
-			}
 		}
 	}
-	
-	if (loadout_icons_enabled.GetBool()) {
-		for (std::map<int, Player>::iterator iterator = playerInfo.begin(); iterator != playerInfo.end(); iterator++) {
-			int player = iterator->first;
-			IClientEntity *playerEntity = Interfaces::pClientEntityList->GetClientEntity(player);
-			
-			if (!playerEntity) {
-				continue;
-			}
-			
-			int activeWeapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(playerEntity, Entities::pCTFPlayer__m_hActiveWeapon);
-			
-			for (int i = 0; i < MAX_WEAPONS; i++) {
-				int weapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(playerEntity, Entities::pCTFPlayer__m_hMyWeapons[i]);
-				IClientEntity *weaponEntity = Interfaces::pClientEntityList->GetClientEntity(weapon);
-			
-				if (!weaponEntity || !Entities::CheckClassBaseclass(weaponEntity->GetClientClass(), "DT_EconEntity")) {
-					continue;
-				}
-				
-				int itemDefinitionIndex = *MAKE_PTR(int*, weaponEntity, Entities::pCEconEntity__m_iItemDefinitionIndex);
-			
-				const char *itemSlot = itemSchema->GetItemKeyData(itemDefinitionIndex, "item_slot");
-				
-				KeyValues *classUses = itemSchema->GetItemKey(itemDefinitionIndex, "used_by_classes");
-				if (classUses) {
-					const char *classUse = classUses->GetString(tfclassNames[playerInfo[player].tfclass].c_str(), "");
-
-					if (std::find(std::begin(itemSlots), std::end(itemSlots), classUse) != std::end(itemSlots)) {
-						itemSlot = classUse;
-					}
-				}
-
-				if (activeWeapon == i) {
-					playerInfo[player].activeWeaponSlot = itemSlot;
-				}
-				
-				if (strcmp(itemSlot, "primary") == 0) {
-					playerInfo[player].primary = itemDefinitionIndex;
-				}
-				else if (strcmp(itemSlot, "secondary") == 0) {
-					playerInfo[player].secondary = itemDefinitionIndex;
-				}
-				else if (strcmp(itemSlot, "melee") == 0) {
-					playerInfo[player].melee = itemDefinitionIndex;
-				}
-				else if (strcmp(itemSlot, "pda") == 0) {
-					playerInfo[player].pda = itemDefinitionIndex;
-				}
-				else if (strcmp(itemSlot, "pda2") == 0) {
-					playerInfo[player].pda2 = itemDefinitionIndex;
-				}
-				else if (strcmp(itemSlot, "building") == 0) {
-					playerInfo[player].building = itemDefinitionIndex;
-				}
-				else if (strcmp(itemSlot, "head") == 0 || strcmp(itemSlot, "misc") == 0) {
-					for (int slot = 0; slot < 3; slot++) {
-						if (playerInfo[player].cosmetic[slot] == -1) {
-							playerInfo[player].cosmetic[slot] = itemDefinitionIndex;
-							break;
-						}
-					}
-				}
-				else if (strcmp(itemSlot, "action") == 0) {
-					playerInfo[player].action = itemDefinitionIndex;
-				}
-			}
-		}
-	}
-}
-
-CON_COMMAND(statusspec_loadout_filter_active, "the RGBA filter applied to the icon when the item is active") {
-	if (args.ArgC() < 4 || !IsInteger(args.Arg(1)) || !IsInteger(args.Arg(2)) || !IsInteger(args.Arg(3)) || !IsInteger(args.Arg(4)))
-	{
-		Warning("Usage: statusspec_loadout_filter_active <red> <green> <blue> <alpha>\n");
-		return;
-	}
-	
-	int red = ColorRangeRestrict(std::stoi(args.Arg(1)));
-	int green = ColorRangeRestrict(std::stoi(args.Arg(2)));
-	int blue = ColorRangeRestrict(std::stoi(args.Arg(3)));
-	int alpha = ColorRangeRestrict(std::stoi(args.Arg(4)));
-	
-	loadout_active_filter.SetColor(red, green, blue, alpha);
-	Msg("Set nonactive loadout icon filter to rgba(%i, %i, %i, %i).\n", red, green, blue, alpha);
-}
-
-CON_COMMAND(statusspec_loadout_filter_nonactive, "the RGBA filter applied to the icon when the item is not active") {
-	if (args.ArgC() < 4 || !IsInteger(args.Arg(1)) || !IsInteger(args.Arg(2)) || !IsInteger(args.Arg(3)) || !IsInteger(args.Arg(4)))
-	{
-		Warning("Usage: statusspec_loadout_filter_nonactive <red> <green> <blue> <alpha>\n");
-		return;
-	}
-	
-	int red = ColorRangeRestrict(std::stoi(args.Arg(1)));
-	int green = ColorRangeRestrict(std::stoi(args.Arg(2)));
-	int blue = ColorRangeRestrict(std::stoi(args.Arg(3)));
-	int alpha = ColorRangeRestrict(std::stoi(args.Arg(4)));
-	
-	loadout_nonactive_filter.SetColor(red, green, blue, alpha);
-	Msg("Set nonactive loadout item icon filter to rgba(%i, %i, %i, %i).\n", red, green, blue, alpha);
 }
 
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
@@ -297,6 +99,10 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 	if (curStage == FRAME_RENDER_START) {
 		UpdateEntities();
 
+		if (g_LoadoutIcons) {
+			g_LoadoutIcons->Update();
+		}
+
 		if (g_MedigunInfo) {
 			g_MedigunInfo->Update();
 		}
@@ -317,6 +123,10 @@ const char * Hook_IGameResources_GetPlayerName(int client) {
 void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
 	if (g_AntiFreeze) {
 		g_AntiFreeze->Paint(vguiPanel);
+	}
+
+	if (g_LoadoutIcons) {
+		g_LoadoutIcons->Paint(vguiPanel);
 	}
 
 	if (g_MedigunInfo) {
@@ -670,58 +480,13 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 			return;
 		}
 	}
-	else if (strcmp(panelName, "loadouticons") == 0) {
-		if (!loadout_icons_enabled.GetBool()) {
-			return;
-		}
-
-		vgui::VPANEL playerPanel = g_pVGuiPanel->GetParent(vguiPanel);
-		const char *playerPanelName = g_pVGuiPanel->GetName(playerPanel);
-		
-		if (playerPanels.find(playerPanelName) == playerPanels.end()) {
-			return;
-		}
-		
-		int i = playerPanels[playerPanelName];
-		
-		int iconsWide, iconsTall;
-		
-		g_pVGuiPanel->GetSize(vguiPanel, iconsWide, iconsTall);
-		
-		int iconSize = iconsTall;
-		iconsWide = 0;
-
-		if (playerInfo[i].tfclass == TFClass_Engineer) {
-			SHOW_SLOT_ICON(primary);
-			SHOW_SLOT_ICON(secondary);
-			SHOW_SLOT_ICON(melee);
-			SHOW_SLOT_ICON(pda);
-			
-			if (loadout_icons_nonloadout.GetBool()) {
-				SHOW_SLOT_ICON(pda2);
-				SHOW_SLOT_ICON(building);
-			}
-		}
-		else if (playerInfo[i].tfclass == TFClass_Spy) {
-			SHOW_SLOT_ICON(secondary);
-			SHOW_SLOT_ICON(building);
-			SHOW_SLOT_ICON(melee);
-			
-			if (loadout_icons_nonloadout.GetBool()) {
-				SHOW_SLOT_ICON(pda);
-			}
-			
-			SHOW_SLOT_ICON(pda2);
-		}
-		else {
-			SHOW_SLOT_ICON(primary);
-			SHOW_SLOT_ICON(secondary);
-			SHOW_SLOT_ICON(melee);
-		}
-	}
 }
 
 void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel) {
+	if (g_LoadoutIcons) {
+		g_LoadoutIcons->InterceptMessage(vguiPanel, params, ifromPanel);
+	}
+
 	std::string originPanelName = g_pVGuiPanel->GetName(ifromPanel);
 	std::string destinationPanelName = g_pVGuiPanel->GetName(vguiPanel);
 	
@@ -783,8 +548,6 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 		Warning("[%s] Unable to determine proper offsets!\n", PLUGIN_DESC);
 		return false;
 	}
-	
-	itemSchema = new ItemSchema();
 	
 	Paint::InitializeTexture(TEXTURE_NULL);
 	Paint::InitializeTexture(TEXTURE_UBERCHARGE);
