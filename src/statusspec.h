@@ -33,46 +33,13 @@
 #include "modules/loadouticons.h"
 #include "modules/mediguninfo.h"
 #include "modules/playeralias.h"
+#include "modules/statusicons.h"
 
 #if defined _WIN32
 #define strtoull _strtoui64
 #endif
 
 #define PLUGIN_DESC "StatusSpec v0.10.0"
-
-#define TEXTURE_NULL "vgui/replay/thumbnails/null"
-#define TEXTURE_UBERCHARGE "vgui/replay/thumbnails/ubercharge"
-#define TEXTURE_CRITBOOST "vgui/replay/thumbnails/critboost"
-#define TEXTURE_MEGAHEALRED "vgui/replay/thumbnails/megaheal_red"
-#define TEXTURE_MEGAHEALBLU "vgui/replay/thumbnails/megaheal_blue"
-#define TEXTURE_RESISTSHIELDRED "vgui/replay/thumbnails/resist_shield"
-#define TEXTURE_RESISTSHIELDBLU "vgui/replay/thumbnails/resist_shield_blue"
-#define TEXTURE_BULLETRESISTRED "vgui/replay/thumbnails/defense_buff_bullet_red"
-#define TEXTURE_BLASTRESISTRED "vgui/replay/thumbnails/defense_buff_explosion_red"
-#define TEXTURE_FIRERESISTRED "vgui/replay/thumbnails/defense_buff_fire_red"
-#define TEXTURE_BULLETRESISTBLU "vgui/replay/thumbnails/defense_buff_bullet_blue"
-#define TEXTURE_BLASTRESISTBLU "vgui/replay/thumbnails/defense_buff_explosion_blue"
-#define TEXTURE_FIRERESISTBLU "vgui/replay/thumbnails/defense_buff_fire_blue"
-#define TEXTURE_BUFFBANNERRED "effects/soldier_buff_offense_red"
-#define TEXTURE_BUFFBANNERBLU "effects/soldier_buff_offense_blue"
-#define TEXTURE_BATTALIONSBACKUPRED "effects/soldier_buff_defense_red"
-#define TEXTURE_BATTALIONSBACKUPBLU "effects/soldier_buff_defense_blue"
-#define TEXTURE_CONCHERORRED "effects/soldier_buff_healonhit_red"
-#define TEXTURE_CONCHERORBLU "effects/soldier_buff_healonhit_blue"
-#define TEXTURE_JARATE "vgui/replay/thumbnails/jarated"
-#define TEXTURE_MADMILK "vgui/bleed_drop"
-#define TEXTURE_MARKFORDEATH "vgui/marked_for_death"
-#define TEXTURE_BLEEDING "vgui/bleed_drop"
-#define TEXTURE_FIRE "hud/leaderboard_class_pyro"
-
-typedef struct Player {
-	TFClassType tfclass;
-	TFTeam team;
-	uint32_t conditions[3];
-} Player;
-
-std::map<std::string, int> playerPanels;
-std::map<int, Player> playerInfo;
 
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage);
 const char *Hook_IGameResources_GetPlayerName(int client);
