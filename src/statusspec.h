@@ -12,16 +12,6 @@
 
 #include "stdafx.h"
 
-#include <map>
-
-#include "Color.h"
-#include "ehandle.h"
-#include "vgui/IVGui.h"
-#include "vgui/IPanel.h"
-#include "vgui/IScheme.h"
-#include "vgui/ISurface.h"
-#include "vgui_controls/pch_vgui_controls.h"
-
 #include "entities.h"
 #include "enums.h"
 #include "hooks.h"
@@ -34,10 +24,6 @@
 #include "modules/mediguninfo.h"
 #include "modules/playeraliases.h"
 #include "modules/statusicons.h"
-
-#if defined _WIN32
-#define strtoull _strtoui64
-#endif
 
 #define PLUGIN_DESC "StatusSpec v0.10.0"
 
