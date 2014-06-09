@@ -62,17 +62,19 @@ typedef struct Status_s {
 class StatusIcons {
 public:
 	StatusIcons();
+	
+	bool IsEnabled();
 
 	void InterceptMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel);
+	void NoPaint(vgui::VPANEL vguiPanel);
 	void Paint(vgui::VPANEL vguiPanel);
 	void Update();
 private:
 	std::map<std::string, int> playerPanels;
 	std::map<int, Status_t> statusInfo;
 
-	static ConVar enabled;
-	static ConVar max_icons;
-	static void ToggleState(IConVar *var, const char *pOldValue, float flOldValue);
+	ConVar* enabled;
+	ConVar* max_icons;
 };
 
 extern StatusIcons *g_StatusIcons;

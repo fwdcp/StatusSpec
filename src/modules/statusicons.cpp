@@ -10,8 +10,6 @@
 
 #include "statusicons.h"
 
-StatusIcons *g_StatusIcons;
-
 inline bool CheckCondition(uint32_t conditions[3], int condition) {
 	if (condition < 32) {
 		if (conditions[0] & (1 << condition)) {
@@ -32,10 +30,10 @@ inline bool CheckCondition(uint32_t conditions[3], int condition) {
 	return false;
 }
 
-ConVar StatusIcons::enabled("statusspec_statusicons_enabled", "0", FCVAR_NONE, "enable status icons", StatusIcons::ToggleState);
-ConVar StatusIcons::max_icons("statusspec_statusicons_max_icons", "5", FCVAR_NONE, "maximum number of icons to show");
-
 StatusIcons::StatusIcons() {
+	enabled = new ConVar("statusspec_statusicons_enabled", "0", FCVAR_NONE, "enable status icons");
+	max_icons = new ConVar("statusspec_statusicons_max_icons", "5", FCVAR_NONE, "maximum number of icons to show");
+
 	Paint::InitializeTexture(TEXTURE_NULL);
 	Paint::InitializeTexture(TEXTURE_UBERCHARGE);
 	Paint::InitializeTexture(TEXTURE_CRITBOOST);
@@ -60,6 +58,10 @@ StatusIcons::StatusIcons() {
 	Paint::InitializeTexture(TEXTURE_MARKFORDEATH);
 	Paint::InitializeTexture(TEXTURE_BLEEDING);
 	Paint::InitializeTexture(TEXTURE_FIRE);
+}
+
+bool StatusIcons::IsEnabled() {
+	return enabled->GetBool();
 }
 
 void StatusIcons::InterceptMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel) {
@@ -88,6 +90,28 @@ void StatusIcons::InterceptMessage(vgui::VPANEL vguiPanel, KeyValues *params, vg
 	}
 }
 
+void StatusIcons::NoPaint(vgui::VPANEL vguiPanel) {
+	const char *panelName = g_pVGuiPanel->GetName(vguiPanel);
+	
+	if (strcmp(panelName, "statusicons") == 0) {
+		vgui::VPANEL playerPanel = g_pVGuiPanel->GetParent(vguiPanel);
+		int iconsWide, iconsTall, playerWide, playerTall;
+		
+		g_pVGuiPanel->GetSize(vguiPanel, iconsWide, iconsTall);
+		g_pVGuiPanel->GetSize(playerPanel, playerWide, playerTall);
+		
+		playerWide -= iconsWide;
+		iconsWide -= iconsWide;
+		
+		int iconSize = iconsTall;
+		int icons = 0;
+		int maxIcons = max_icons->GetInt();
+		
+		g_pVGuiPanel->SetSize(vguiPanel, iconsWide, iconsTall);
+		g_pVGuiPanel->SetSize(playerPanel, playerWide, playerTall);
+	}
+}
+
 void StatusIcons::Paint(vgui::VPANEL vguiPanel) {
 	const char *panelName = g_pVGuiPanel->GetName(vguiPanel);
 	
@@ -103,7 +127,7 @@ void StatusIcons::Paint(vgui::VPANEL vguiPanel) {
 		
 		int iconSize = iconsTall;
 		int icons = 0;
-		int maxIcons = max_icons.GetInt();
+		int maxIcons = max_icons->GetInt();
 		
 		g_pVGuiPanel->SetSize(vguiPanel, iconsWide, iconsTall);
 		g_pVGuiPanel->SetSize(playerPanel, playerWide, playerTall);
@@ -459,14 +483,5 @@ void StatusIcons::Update() {
 		statusInfo[i].conditions[0] = playerCond|condBits;
 		statusInfo[i].conditions[1] = playerCondEx;
 		statusInfo[i].conditions[2] = playerCondEx2;
-	}
-}
-
-void StatusIcons::ToggleState(IConVar *var, const char *pOldValue, float flOldValue) {
-	if (enabled.GetBool() && !g_StatusIcons) {
-		g_StatusIcons = new StatusIcons();
-	}
-	else if (!enabled.GetBool() && g_StatusIcons) {
-		delete g_StatusIcons;
 	}
 }

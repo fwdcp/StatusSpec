@@ -51,25 +51,27 @@ typedef struct Medigun_s {
 
 class MedigunInfo {
 public:
-	void Paint(vgui::VPANEL vguiPanel);
-	void Update();
-private:
 	MedigunInfo();
 	~MedigunInfo();
 
-	std::map<TFTeam, Medigun_t> medigunInfo;
-	
-	static vgui::HPanel mainPanel;
-	static std::map<std::string, vgui::Panel *> panels;
+	bool IsEnabled();
 
-	static ConVar charge_label_text;
-	static ConVar enabled;
-	static ConVar individual_charges_label_text;
-	static ConCommand reload_settings;
-	static ConCommand set_progress_bar_direction;
+	void InitHud();
+	void NoPaint(vgui::VPANEL vguiPanel);
+	void Paint(vgui::VPANEL vguiPanel);
+	void Update();
+private:
+	vgui::HPanel mainPanel;
+	std::map<TFTeam, Medigun_t> medigunInfo;
+	std::map<std::string, vgui::Panel *> panels;
+	
+	ConVar* charge_label_text;
+	ConVar* enabled;
+	ConVar* individual_charges_label_text;
+	ConCommand* reload_settings;
+	ConCommand* set_progress_bar_direction;
 	static void ReloadSettings();
 	static void SetProgressBarDirection(const CCommand &command);
-	static void ToggleState(IConVar *var, const char *pOldValue, float flOldValue);
 };
 
 extern MedigunInfo *g_MedigunInfo;

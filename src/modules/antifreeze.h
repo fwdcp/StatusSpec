@@ -27,14 +27,16 @@
 
 class AntiFreeze {
 public:
+	AntiFreeze();
+
+	bool IsEnabled();
+
 	void Paint(vgui::VPANEL vguiPanel);
 private:
-	static KeyValues* performLayoutCommand;
-	static vgui::HPanel specguiPanel;
-	static vgui::HPanel topPanel;
+	vgui::HPanel specguiPanel;
+	vgui::HPanel topPanel;
 
-	static ConVar enabled;
-	static void ToggleState(IConVar *var, const char *pOldValue, float flOldValue);
+	ConVar* enabled;
 };
 
 extern AntiFreeze *g_AntiFreeze;

@@ -10,6 +10,12 @@
 
 #include "statusspec.h"
 
+AntiFreeze *g_AntiFreeze = NULL;
+LoadoutIcons *g_LoadoutIcons = NULL;
+MedigunInfo *g_MedigunInfo = NULL;
+PlayerAlias *g_PlayerAlias = NULL;
+StatusIcons *g_StatusIcons = NULL;
+
 SourceHook::Impl::CSourceHookImpl g_SourceHook;
 SourceHook::ISourceHook *g_SHPtr = &g_SourceHook;
 int g_PLID = 0;
@@ -39,15 +45,22 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 
 	if (curStage == FRAME_RENDER_START) {
 		if (g_LoadoutIcons) {
-			g_LoadoutIcons->Update();
+			if (g_LoadoutIcons->IsEnabled()) {
+				g_LoadoutIcons->Update();
+			}
 		}
 
 		if (g_MedigunInfo) {
-			g_MedigunInfo->Update();
+			if (g_MedigunInfo->IsEnabled()) {
+				g_MedigunInfo->Update();
+				g_MedigunInfo->InitHud();
+			}
 		}
 
 		if (g_StatusIcons) {
-			g_StatusIcons->Update();
+			if (g_StatusIcons->IsEnabled()) {
+				g_StatusIcons->Update();
+			}
 		}
 	}
 
@@ -56,11 +69,12 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 
 const char * Hook_IGameResources_GetPlayerName(int client) {
 	if (g_PlayerAlias) {
-		RETURN_META_VALUE(MRES_SUPERCEDE, g_PlayerAlias->GetPlayerNameOverride(client));
+		if (g_PlayerAlias->IsEnabled()) {
+			RETURN_META_VALUE(MRES_SUPERCEDE, g_PlayerAlias->GetPlayerNameOverride(client));
+		}
 	}
-	else {
-		RETURN_META_VALUE(MRES_IGNORED, "");
-	}
+
+	RETURN_META_VALUE(MRES_IGNORED, "");
 }
 	
 void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
@@ -69,39 +83,62 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 	}
 
 	if (g_AntiFreeze) {
-		g_AntiFreeze->Paint(vguiPanel);
+		if (g_AntiFreeze->IsEnabled()) {
+			g_AntiFreeze->Paint(vguiPanel);
+		}
 	}
 
 	if (g_LoadoutIcons) {
-		g_LoadoutIcons->Paint(vguiPanel);
+		if (g_LoadoutIcons->IsEnabled()) {
+			g_LoadoutIcons->Paint(vguiPanel);
+		}
 	}
 
 	if (g_MedigunInfo) {
-		g_MedigunInfo->Paint(vguiPanel);
+		if (g_MedigunInfo->IsEnabled()) {
+			g_MedigunInfo->Paint(vguiPanel);
+		}
+		else {
+			g_MedigunInfo->NoPaint(vguiPanel);
+		}
 	}
 
 	if (g_StatusIcons) {
-		g_StatusIcons->Paint(vguiPanel);
+		if (g_StatusIcons->IsEnabled()) {
+			g_StatusIcons->Paint(vguiPanel);
+		}
+		else {
+			g_StatusIcons->NoPaint(vguiPanel);
+		}
 	}
+
+	RETURN_META(MRES_IGNORED);
 }
 
 void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel) {
 	if (g_LoadoutIcons) {
-		g_LoadoutIcons->InterceptMessage(vguiPanel, params, ifromPanel);
+		if (g_LoadoutIcons->IsEnabled()) {
+			g_LoadoutIcons->InterceptMessage(vguiPanel, params, ifromPanel);
+		}
 	}
-		
+	
 	if (g_StatusIcons) {
-		g_StatusIcons->InterceptMessage(vguiPanel, params, ifromPanel);
+		if (g_StatusIcons->IsEnabled()) {
+			g_StatusIcons->InterceptMessage(vguiPanel, params, ifromPanel);
+		}
 	}
+
+	RETURN_META(MRES_IGNORED);
 }
 
 bool Hook_IVEngineClient_GetPlayerInfo(int ent_num, player_info_t *pinfo) {
 	if (g_PlayerAlias) {
-		RETURN_META_VALUE(MRES_SUPERCEDE, g_PlayerAlias->GetPlayerInfoOverride(ent_num, pinfo));
+		if (g_PlayerAlias->IsEnabled()) {
+			RETURN_META_VALUE(MRES_SUPERCEDE, g_PlayerAlias->GetPlayerInfoOverride(ent_num, pinfo));
+		}
 	}
-	else {
-		RETURN_META_VALUE(MRES_IGNORED, false);
-	}
+	
+	RETURN_META_VALUE(MRES_IGNORED, false);
 }
 
 // The plugin is a static singleton that is exported as an interface
@@ -134,6 +171,12 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	SH_ADD_HOOK(IVEngineClient, GetPlayerInfo, Interfaces::pEngineClient, Hook_IVEngineClient_GetPlayerInfo, false);
 	
 	ConVar_Register();
+
+	g_AntiFreeze = new AntiFreeze();
+	g_LoadoutIcons = new LoadoutIcons();
+	g_MedigunInfo = new MedigunInfo();
+	g_PlayerAlias = new PlayerAlias();
+	g_StatusIcons = new StatusIcons();
 	
 	Msg("%s loaded!\n", PLUGIN_DESC);
 	return true;
@@ -141,6 +184,12 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 
 void StatusSpecPlugin::Unload(void)
 {
+	delete g_AntiFreeze;
+	delete g_LoadoutIcons;
+	delete g_MedigunInfo;
+	delete g_PlayerAlias;
+	delete g_StatusIcons;
+
 	SH_REMOVE_HOOK(IBaseClientDLL, FrameStageNotify, Interfaces::pClientDLL, Hook_IBaseClientDLL_FrameStageNotify, false);
 	SH_REMOVE_HOOK(IPanel, PaintTraverse, g_pVGuiPanel, Hook_IPanel_PaintTraverse, true);
 	SH_REMOVE_HOOK(IPanel, SendMessage, g_pVGuiPanel, Hook_IPanel_SendMessage, true);

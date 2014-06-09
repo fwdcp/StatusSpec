@@ -30,15 +30,19 @@
 
 class PlayerAlias {
 public:
+	PlayerAlias();
+
+	bool IsEnabled();
+
 	bool GetPlayerInfoOverride(int ent_num, player_info_t *pinfo);
 	const char * GetPlayerNameOverride(int client);
 private:
-	static std::map<CSteamID, std::string> playerAliases;
+	std::map<CSteamID, std::string> playerAliases;
 
-	static ConVar enabled;
-	static ConCommand get;
-	static ConCommand remove;
-	static ConCommand set;
+	ConVar* enabled;
+	ConCommand* get;
+	ConCommand* remove;
+	ConCommand* set;
 	static int GetCurrentAliasedPlayers(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]);
 	static int GetCurrentGamePlayers(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]);
 	static void GetPlayerAlias(const CCommand &command);

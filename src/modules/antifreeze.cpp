@@ -10,11 +10,16 @@
 
 #include "antifreeze.h"
 
-AntiFreeze *g_AntiFreeze;
+AntiFreeze::AntiFreeze() {
+	specguiPanel = vgui::INVALID_PANEL;
+	topPanel = vgui::INVALID_PANEL;
 
-ConVar AntiFreeze::enabled("statusspec_antifreeze_enabled", "0", FCVAR_NONE, "enable antifreeze (forces the spectator GUI to refresh)", AntiFreeze::ToggleState);
-vgui::HPanel AntiFreeze::specguiPanel = vgui::INVALID_PANEL;
-vgui::HPanel AntiFreeze::topPanel = vgui::INVALID_PANEL;
+	enabled = new ConVar("statusspec_antifreeze_enabled", "0", FCVAR_NONE, "enable antifreeze (forces the spectator GUI to refresh)");
+}
+
+bool AntiFreeze::IsEnabled() {
+	return enabled->GetBool();
+}
 
 void AntiFreeze::Paint(vgui::VPANEL vguiPanel) {
 	if (specguiPanel == vgui::INVALID_PANEL || topPanel == vgui::INVALID_PANEL) {
@@ -30,14 +35,5 @@ void AntiFreeze::Paint(vgui::VPANEL vguiPanel) {
 
 	if (g_pVGui->HandleToPanel(topPanel) == vguiPanel && specguiPanel != vgui::INVALID_PANEL) {
 		g_pVGuiPanel->SendMessage(g_pVGui->HandleToPanel(specguiPanel), PERFORM_LAYOUT_COMMAND, g_pVGui->HandleToPanel(specguiPanel));
-	}
-}
-
-void AntiFreeze::ToggleState(IConVar *var, const char *pOldValue, float flOldValue) {
-	if (enabled.GetBool() && !g_AntiFreeze) {
-		g_AntiFreeze = new AntiFreeze();
-	}
-	else if (!enabled.GetBool() && g_AntiFreeze) {
-		delete g_AntiFreeze;
 	}
 }

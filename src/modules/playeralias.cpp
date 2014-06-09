@@ -10,10 +10,6 @@
 
 #include "playeralias.h"
 
-PlayerAlias *g_PlayerAlias;
-
-std::map<CSteamID, std::string> PlayerAlias::playerAliases;
-
 inline bool IsInteger(const std::string &s) {
    if (s.empty() || !isdigit(s[0])) return false;
 
@@ -74,10 +70,18 @@ inline CSteamID GetClientSteamID(int client) {
 	return CSteamID();
 }
 
-ConVar PlayerAlias::enabled("statusspec_playeralias_enabled", "0", FCVAR_NONE, "enable player aliases", PlayerAlias::ToggleState);
-ConCommand PlayerAlias::get("statusspec_playeralias_get", PlayerAlias::GetPlayerAlias, "get a player alias", FCVAR_NONE, PlayerAlias::GetCurrentAliasedPlayers);
-ConCommand PlayerAlias::remove("statusspec_playeralias_remove", PlayerAlias::RemovePlayerAlias, "remove a player alias", FCVAR_NONE, PlayerAlias::GetCurrentAliasedPlayers);
-ConCommand PlayerAlias::set("statusspec_playeralias_set", PlayerAlias::SetPlayerAlias, "set a player alias", FCVAR_NONE, PlayerAlias::GetCurrentGamePlayers);
+PlayerAlias::PlayerAlias() {
+	std::map<CSteamID, std::string> playerAliases;
+
+	enabled = new ConVar("statusspec_playeralias_enabled", "0", FCVAR_NONE, "enable player aliases");
+	get = new ConCommand("statusspec_playeralias_get", PlayerAlias::GetPlayerAlias, "get a player alias", FCVAR_NONE, PlayerAlias::GetCurrentAliasedPlayers);
+	remove = new ConCommand("statusspec_playeralias_remove", PlayerAlias::RemovePlayerAlias, "remove a player alias", FCVAR_NONE, PlayerAlias::GetCurrentAliasedPlayers);
+	set = new ConCommand("statusspec_playeralias_set", PlayerAlias::SetPlayerAlias, "set a player alias", FCVAR_NONE, PlayerAlias::GetCurrentGamePlayers);
+}
+
+bool PlayerAlias::IsEnabled() {
+	return enabled->GetBool();
+}
 
 bool PlayerAlias::GetPlayerInfoOverride(int ent_num, player_info_t *pinfo) {
 	bool result = SH_CALL(Interfaces::pEngineClient, &IVEngineClient::GetPlayerInfo)(ent_num, pinfo);
@@ -109,7 +113,7 @@ int PlayerAlias::GetCurrentAliasedPlayers(const char *partial, char commands[COM
 	std::string command;
 	std::getline(ss, command, ' ');
 
-	for (auto playerAlias = playerAliases.begin(); playerAlias != playerAliases.end() && playerCount < COMMAND_COMPLETION_MAXITEMS; ++playerAlias) {
+	for (auto playerAlias = g_PlayerAlias->playerAliases.begin(); playerAlias != g_PlayerAlias->playerAliases.end() && playerCount < COMMAND_COMPLETION_MAXITEMS; ++playerAlias) {
 		CSteamID playerSteamID = playerAlias->first;
 
 		V_snprintf(commands[playerCount], COMMAND_COMPLETION_ITEM_LENGTH, "%s %llu", command.c_str(), playerSteamID.ConvertToUint64());
@@ -156,8 +160,8 @@ void PlayerAlias::GetPlayerAlias(const CCommand &command) {
 		return;
 	}
 
-	if (playerAliases.find(playerSteamID) != playerAliases.end()) {
-		Msg("Steam ID %llu has an associated alias '%s'.\n", playerSteamID.ConvertToUint64(), playerAliases[playerSteamID].c_str());
+	if (g_PlayerAlias->playerAliases.find(playerSteamID) != g_PlayerAlias->playerAliases.end()) {
+		Msg("Steam ID %llu has an associated alias '%s'.\n", playerSteamID.ConvertToUint64(), g_PlayerAlias->playerAliases[playerSteamID].c_str());
 	}
 	else {
 		Msg("Steam ID %llu does not have an associated alias.\n", playerSteamID.ConvertToUint64());
@@ -178,7 +182,7 @@ void PlayerAlias::RemovePlayerAlias(const CCommand &command) {
 		return;
 	}
 
-	playerAliases.erase(playerSteamID);
+	g_PlayerAlias->playerAliases.erase(playerSteamID);
 	Msg("Alias associated with Steam ID %llu erased.\n", playerSteamID.ConvertToUint64());
 }
 
@@ -196,15 +200,6 @@ void PlayerAlias::SetPlayerAlias(const CCommand &command) {
 		return;
 	}
 
-	playerAliases[playerSteamID] = command.Arg(2);
-	Msg("Steam ID %llu has been associated with alias '%s'.\n", playerSteamID.ConvertToUint64(), playerAliases[playerSteamID].c_str());
-}
-
-void PlayerAlias::ToggleState(IConVar *var, const char *pOldValue, float flOldValue) {
-	if (enabled.GetBool() && !g_PlayerAlias) {
-		g_PlayerAlias = new PlayerAlias();
-	}
-	else if (!enabled.GetBool() && g_PlayerAlias) {
-		delete g_PlayerAlias;
-	}
+	g_PlayerAlias->playerAliases[playerSteamID] = command.Arg(2);
+	Msg("Steam ID %llu has been associated with alias '%s'.\n", playerSteamID.ConvertToUint64(), g_PlayerAlias->playerAliases[playerSteamID].c_str());
 }
