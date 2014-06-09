@@ -1,5 +1,5 @@
 /*
- *  playeralias.h
+ *  playeraliases.h
  *  StatusSpec project
  *  
  *  Copyright (c) 2014 thesupremecommander
@@ -28,9 +28,9 @@
 #define strtoull _strtoui64
 #endif
 
-class PlayerAlias {
+class PlayerAliases {
 public:
-	PlayerAlias();
+	PlayerAliases();
 
 	bool IsEnabled();
 
@@ -51,4 +51,4 @@ private:
 	static void ToggleState(IConVar *var, const char *pOldValue, float flOldValue);
 };
 
-extern PlayerAlias *g_PlayerAlias;
+extern PlayerAliases *g_PlayerAliases;

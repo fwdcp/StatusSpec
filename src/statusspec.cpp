@@ -13,7 +13,7 @@
 AntiFreeze *g_AntiFreeze = NULL;
 LoadoutIcons *g_LoadoutIcons = NULL;
 MedigunInfo *g_MedigunInfo = NULL;
-PlayerAlias *g_PlayerAlias = NULL;
+PlayerAliases *g_PlayerAliases = NULL;
 StatusIcons *g_StatusIcons = NULL;
 
 SourceHook::Impl::CSourceHookImpl g_SourceHook;
@@ -68,9 +68,9 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 }
 
 const char * Hook_IGameResources_GetPlayerName(int client) {
-	if (g_PlayerAlias) {
-		if (g_PlayerAlias->IsEnabled()) {
-			RETURN_META_VALUE(MRES_SUPERCEDE, g_PlayerAlias->GetPlayerNameOverride(client));
+	if (g_PlayerAliases) {
+		if (g_PlayerAliases->IsEnabled()) {
+			RETURN_META_VALUE(MRES_SUPERCEDE, g_PlayerAliases->GetPlayerNameOverride(client));
 		}
 	}
 
@@ -132,9 +132,9 @@ void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VP
 }
 
 bool Hook_IVEngineClient_GetPlayerInfo(int ent_num, player_info_t *pinfo) {
-	if (g_PlayerAlias) {
-		if (g_PlayerAlias->IsEnabled()) {
-			RETURN_META_VALUE(MRES_SUPERCEDE, g_PlayerAlias->GetPlayerInfoOverride(ent_num, pinfo));
+	if (g_PlayerAliases) {
+		if (g_PlayerAliases->IsEnabled()) {
+			RETURN_META_VALUE(MRES_SUPERCEDE, g_PlayerAliases->GetPlayerInfoOverride(ent_num, pinfo));
 		}
 	}
 	
@@ -175,7 +175,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_AntiFreeze = new AntiFreeze();
 	g_LoadoutIcons = new LoadoutIcons();
 	g_MedigunInfo = new MedigunInfo();
-	g_PlayerAlias = new PlayerAlias();
+	g_PlayerAliases = new PlayerAliases();
 	g_StatusIcons = new StatusIcons();
 	
 	Msg("%s loaded!\n", PLUGIN_DESC);
@@ -187,7 +187,7 @@ void StatusSpecPlugin::Unload(void)
 	delete g_AntiFreeze;
 	delete g_LoadoutIcons;
 	delete g_MedigunInfo;
-	delete g_PlayerAlias;
+	delete g_PlayerAliases;
 	delete g_StatusIcons;
 
 	SH_REMOVE_HOOK(IBaseClientDLL, FrameStageNotify, Interfaces::pClientDLL, Hook_IBaseClientDLL_FrameStageNotify, false);

@@ -32,7 +32,7 @@
 #include "modules/antifreeze.h"
 #include "modules/loadouticons.h"
 #include "modules/mediguninfo.h"
-#include "modules/playeralias.h"
+#include "modules/playeraliases.h"
 #include "modules/statusicons.h"
 
 #if defined _WIN32
