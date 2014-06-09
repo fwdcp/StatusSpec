@@ -55,15 +55,19 @@ public:
 	~MedigunInfo();
 
 	bool IsEnabled();
-
-	void InitHud();
+	
 	void NoPaint(vgui::VPANEL vguiPanel);
 	void Paint(vgui::VPANEL vguiPanel);
-	void Update();
+	
+	void PreEntityUpdate();
+	void ProcessEntity(IClientEntity* entity);
+	void PostEntityUpdate();
 private:
 	vgui::HPanel mainPanel;
 	std::map<TFTeam, Medigun_t> medigunInfo;
 	std::map<std::string, vgui::Panel *> panels;
+
+	void InitHud();
 	
 	ConVar* charge_label_text;
 	ConVar* enabled;

@@ -451,33 +451,31 @@ void StatusIcons::Paint(vgui::VPANEL vguiPanel) {
 	}
 }
 
-void StatusIcons::Update() {
+void StatusIcons::PreEntityUpdate() {
 	statusInfo.clear();
+}
 
-	int maxEntity = Interfaces::pClientEntityList->GetHighestEntityIndex();
+void StatusIcons::ProcessEntity(IClientEntity* entity) {
+	int player = entity->entindex();
 
-	for (int i = 0; i < maxEntity; i++) {
-		IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
-
-		if (!entity || !Interfaces::GetGameResources()->IsConnected(i)) {
-			continue;
-		}
-		
-		int tfclass = *MAKE_PTR(int*, entity, Entities::pCTFPlayer__m_iClass);
-		int team = *MAKE_PTR(int*, entity, Entities::pCTFPlayer__m_iTeamNum);
-		uint32_t playerCond = *MAKE_PTR(uint32_t*, entity, Entities::pCTFPlayer__m_nPlayerCond);
-		uint32_t condBits = *MAKE_PTR(uint32_t*, entity, Entities::pCTFPlayer___condition_bits);
-		uint32_t playerCondEx = *MAKE_PTR(uint32_t*, entity, Entities::pCTFPlayer__m_nPlayerCondEx);
-		uint32_t playerCondEx2 = *MAKE_PTR(uint32_t*, entity, Entities::pCTFPlayer__m_nPlayerCondEx2);
-			
-		if (team != TFTeam_Red && team != TFTeam_Blue) {
-			continue;
-		}
-
-		statusInfo[i].tfclass = (TFClassType) tfclass;
-		statusInfo[i].team = (TFTeam) team;
-		statusInfo[i].conditions[0] = playerCond|condBits;
-		statusInfo[i].conditions[1] = playerCondEx;
-		statusInfo[i].conditions[2] = playerCondEx2;
+	if (!Interfaces::GetGameResources()->IsConnected(player)) {
+		return;
 	}
+		
+	int tfclass = *MAKE_PTR(int*, entity, Entities::pCTFPlayer__m_iClass);
+	int team = *MAKE_PTR(int*, entity, Entities::pCTFPlayer__m_iTeamNum);
+	uint32_t playerCond = *MAKE_PTR(uint32_t*, entity, Entities::pCTFPlayer__m_nPlayerCond);
+	uint32_t condBits = *MAKE_PTR(uint32_t*, entity, Entities::pCTFPlayer___condition_bits);
+	uint32_t playerCondEx = *MAKE_PTR(uint32_t*, entity, Entities::pCTFPlayer__m_nPlayerCondEx);
+	uint32_t playerCondEx2 = *MAKE_PTR(uint32_t*, entity, Entities::pCTFPlayer__m_nPlayerCondEx2);
+			
+	if (team != TFTeam_Red && team != TFTeam_Blue) {
+		return;
+	}
+
+	statusInfo[player].tfclass = (TFClassType) tfclass;
+	statusInfo[player].team = (TFTeam) team;
+	statusInfo[player].conditions[0] = playerCond|condBits;
+	statusInfo[player].conditions[1] = playerCondEx;
+	statusInfo[player].conditions[2] = playerCondEx2;
 }

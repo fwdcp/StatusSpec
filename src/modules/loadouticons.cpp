@@ -132,75 +132,73 @@ void LoadoutIcons::Paint(vgui::VPANEL vguiPanel) {
 	}
 }
 
-void LoadoutIcons::Update() {
+void LoadoutIcons::PreEntityUpdate() {
 	loadoutInfo.clear();
+}
 
-	int maxEntity = Interfaces::pClientEntityList->GetHighestEntityIndex();
-
-	for (int i = 0; i < maxEntity; i++) {
-		IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
-		
-		if (!entity || !Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_EconEntity")) {
-			continue;
-		}
-
-		int itemDefinitionIndex = *MAKE_PTR(int*, entity, Entities::pCEconEntity__m_iItemDefinitionIndex);
-
-		int player = ENTITY_INDEX_FROM_ENTITY_OFFSET(entity, Entities::pCEconEntity__m_hOwnerEntity);
-		IClientEntity *playerEntity = Interfaces::pClientEntityList->GetClientEntity(player);
-		TFClassType tfclass = (TFClassType) *MAKE_PTR(int*, playerEntity, Entities::pCTFPlayer__m_iClass);
-		int activeWeapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(playerEntity, Entities::pCTFPlayer__m_hActiveWeapon);
-
-		const char *itemSlot = itemSchema->GetItemKeyData(itemDefinitionIndex, "item_slot");
-			
-		KeyValues *classUses = itemSchema->GetItemKey(itemDefinitionIndex, "used_by_classes");
-		if (classUses) {
-			const char *classUse = classUses->GetString(tfclassNames[tfclass].c_str(), "");
-
-			if (std::find(std::begin(itemSlots), std::end(itemSlots), classUse) != std::end(itemSlots)) {
-				itemSlot = classUse;
-			}
-		}
-
-		if (activeWeapon == i) {
-			loadoutInfo[player].activeWeaponSlot = itemSlot;
-		}
-			
-		if (strcmp(itemSlot, "primary") == 0) {
-			loadoutInfo[player].primary = itemDefinitionIndex;
-		}
-		else if (strcmp(itemSlot, "secondary") == 0) {
-			loadoutInfo[player].secondary = itemDefinitionIndex;
-		}
-		else if (strcmp(itemSlot, "melee") == 0) {
-			loadoutInfo[player].melee = itemDefinitionIndex;
-		}
-		else if (strcmp(itemSlot, "pda") == 0) {
-			loadoutInfo[player].pda = itemDefinitionIndex;
-		}
-		else if (strcmp(itemSlot, "pda2") == 0) {
-			loadoutInfo[player].pda2 = itemDefinitionIndex;
-		}
-		else if (strcmp(itemSlot, "building") == 0) {
-			loadoutInfo[player].building = itemDefinitionIndex;
-		}
-		else if (strcmp(itemSlot, "head") == 0 || strcmp(itemSlot, "misc") == 0) {
-			for (int slot = 0; slot < 3; slot++) {
-				if (loadoutInfo[player].cosmetic[slot] == -1) {
-					loadoutInfo[player].cosmetic[slot] = itemDefinitionIndex;
-					break;
-				}
-			}
-		}
-		else if (strcmp(itemSlot, "action") == 0) {
-			loadoutInfo[player].action = itemDefinitionIndex;
-		}
-				
-		const char *itemIcon = itemSchema->GetItemKeyData(itemDefinitionIndex, "image_inventory");
-		Paint::InitializeTexture(itemIcon);
-		itemIconTextures[itemDefinitionIndex] = itemIcon;
+void LoadoutIcons::ProcessEntity(IClientEntity* entity) {
+	if (!Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_EconEntity")) {
+		return;
 	}
-	
+
+	int itemDefinitionIndex = *MAKE_PTR(int*, entity, Entities::pCEconEntity__m_iItemDefinitionIndex);
+
+	int player = ENTITY_INDEX_FROM_ENTITY_OFFSET(entity, Entities::pCEconEntity__m_hOwnerEntity);
+	IClientEntity *playerEntity = Interfaces::pClientEntityList->GetClientEntity(player);
+	TFClassType tfclass = (TFClassType) *MAKE_PTR(int*, playerEntity, Entities::pCTFPlayer__m_iClass);
+	int activeWeapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(playerEntity, Entities::pCTFPlayer__m_hActiveWeapon);
+
+	const char *itemSlot = itemSchema->GetItemKeyData(itemDefinitionIndex, "item_slot");
+			
+	KeyValues *classUses = itemSchema->GetItemKey(itemDefinitionIndex, "used_by_classes");
+	if (classUses) {
+		const char *classUse = classUses->GetString(tfclassNames[tfclass].c_str(), "");
+
+		if (std::find(std::begin(itemSlots), std::end(itemSlots), classUse) != std::end(itemSlots)) {
+			itemSlot = classUse;
+		}
+	}
+
+	if (activeWeapon == entity->entindex()) {
+		loadoutInfo[player].activeWeaponSlot = itemSlot;
+	}
+			
+	if (strcmp(itemSlot, "primary") == 0) {
+		loadoutInfo[player].primary = itemDefinitionIndex;
+	}
+	else if (strcmp(itemSlot, "secondary") == 0) {
+		loadoutInfo[player].secondary = itemDefinitionIndex;
+	}
+	else if (strcmp(itemSlot, "melee") == 0) {
+		loadoutInfo[player].melee = itemDefinitionIndex;
+	}
+	else if (strcmp(itemSlot, "pda") == 0) {
+		loadoutInfo[player].pda = itemDefinitionIndex;
+	}
+	else if (strcmp(itemSlot, "pda2") == 0) {
+		loadoutInfo[player].pda2 = itemDefinitionIndex;
+	}
+	else if (strcmp(itemSlot, "building") == 0) {
+		loadoutInfo[player].building = itemDefinitionIndex;
+	}
+	else if (strcmp(itemSlot, "head") == 0 || strcmp(itemSlot, "misc") == 0) {
+		for (int slot = 0; slot < 3; slot++) {
+			if (loadoutInfo[player].cosmetic[slot] == -1) {
+				loadoutInfo[player].cosmetic[slot] = itemDefinitionIndex;
+				break;
+			}
+		}
+	}
+	else if (strcmp(itemSlot, "action") == 0) {
+		loadoutInfo[player].action = itemDefinitionIndex;
+	}
+				
+	const char *itemIcon = itemSchema->GetItemKeyData(itemDefinitionIndex, "image_inventory");
+	Paint::InitializeTexture(itemIcon);
+	itemIconTextures[itemDefinitionIndex] = itemIcon;
+}
+
+void LoadoutIcons::PostEntityUpdate() {
 	for (auto iterator = loadoutInfo.begin(); iterator != loadoutInfo.end(); iterator++) {
 		int player = iterator->first;
 		IClientEntity *playerEntity = Interfaces::pClientEntityList->GetClientEntity(player);

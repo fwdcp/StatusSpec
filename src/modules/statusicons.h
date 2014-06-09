@@ -66,9 +66,12 @@ public:
 	bool IsEnabled();
 
 	void InterceptMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel);
+	
 	void NoPaint(vgui::VPANEL vguiPanel);
 	void Paint(vgui::VPANEL vguiPanel);
-	void Update();
+	
+	void PreEntityUpdate();
+	void ProcessEntity(IClientEntity* entity);
 private:
 	std::map<std::string, int> playerPanels;
 	std::map<int, Status_t> statusInfo;

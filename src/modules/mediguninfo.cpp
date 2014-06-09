@@ -685,36 +685,36 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 	}
 }
 
-void MedigunInfo::Update() {
+void MedigunInfo::PreEntityUpdate() {
 	medigunInfo.clear();
+}
 
-	int maxEntity = Interfaces::pClientEntityList->GetHighestEntityIndex();
-
-	for (int i = 0; i < maxEntity; i++) {
-		IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
-		
-		if (!entity || !Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_WeaponMedigun")) {
-			continue;
-		}
-
-		int player = ENTITY_INDEX_FROM_ENTITY_OFFSET(entity, Entities::pCEconEntity__m_hOwnerEntity);
-		IClientEntity *playerEntity = Interfaces::pClientEntityList->GetClientEntity(player);
-
-		if (!playerEntity) {
-			continue;
-		}
-
-		TFTeam team = (TFTeam) *MAKE_PTR(int*, playerEntity, Entities::pCTFPlayer__m_iTeamNum);
-
-		if (team != TFTeam_Red && team != TFTeam_Blue) {
-			continue;
-		}
-
-		medigunInfo[team].itemDefinitionIndex = *MAKE_PTR(int*, entity, Entities::pCEconEntity__m_iItemDefinitionIndex);
-		medigunInfo[team].chargeRelease = *MAKE_PTR(bool*, entity, Entities::pCWeaponMedigun__m_bChargeRelease);
-		medigunInfo[team].chargeResistType = *MAKE_PTR(int*, entity, Entities::pCWeaponMedigun__m_nChargeResistType);
-		medigunInfo[team].chargeLevel = *MAKE_PTR(float*, entity, Entities::pCWeaponMedigun__m_flChargeLevel);
+void MedigunInfo::ProcessEntity(IClientEntity* entity) {
+	if (!Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_WeaponMedigun")) {
+		return;
 	}
+
+	int player = ENTITY_INDEX_FROM_ENTITY_OFFSET(entity, Entities::pCEconEntity__m_hOwnerEntity);
+	IClientEntity *playerEntity = Interfaces::pClientEntityList->GetClientEntity(player);
+
+	if (!playerEntity) {
+		return;
+	}
+
+	TFTeam team = (TFTeam) *MAKE_PTR(int*, playerEntity, Entities::pCTFPlayer__m_iTeamNum);
+
+	if (team != TFTeam_Red && team != TFTeam_Blue) {
+		return;
+	}
+
+	medigunInfo[team].itemDefinitionIndex = *MAKE_PTR(int*, entity, Entities::pCEconEntity__m_iItemDefinitionIndex);
+	medigunInfo[team].chargeRelease = *MAKE_PTR(bool*, entity, Entities::pCWeaponMedigun__m_bChargeRelease);
+	medigunInfo[team].chargeResistType = *MAKE_PTR(int*, entity, Entities::pCWeaponMedigun__m_nChargeResistType);
+	medigunInfo[team].chargeLevel = *MAKE_PTR(float*, entity, Entities::pCWeaponMedigun__m_flChargeLevel);
+}
+
+void MedigunInfo::PostEntityUpdate() {
+	InitHud();
 }
 
 void MedigunInfo::ReloadSettings() {

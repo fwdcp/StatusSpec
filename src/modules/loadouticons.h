@@ -54,8 +54,12 @@ public:
 	bool IsEnabled();
 
 	void InterceptMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel);
+
 	void Paint(vgui::VPANEL vguiPanel);
-	void Update();
+	
+	void PreEntityUpdate();
+	void ProcessEntity(IClientEntity* entity);
+	void PostEntityUpdate();
 private:
 	Color filter_active_color;
 	Color filter_nonactive_color;

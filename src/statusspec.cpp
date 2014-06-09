@@ -46,20 +46,59 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 	if (curStage == FRAME_RENDER_START) {
 		if (g_LoadoutIcons) {
 			if (g_LoadoutIcons->IsEnabled()) {
-				g_LoadoutIcons->Update();
+				g_LoadoutIcons->PreEntityUpdate();
 			}
 		}
 
 		if (g_MedigunInfo) {
 			if (g_MedigunInfo->IsEnabled()) {
-				g_MedigunInfo->Update();
-				g_MedigunInfo->InitHud();
+				g_MedigunInfo->PreEntityUpdate();
 			}
 		}
 
 		if (g_StatusIcons) {
 			if (g_StatusIcons->IsEnabled()) {
-				g_StatusIcons->Update();
+				g_StatusIcons->PreEntityUpdate();
+			}
+		}
+
+		int maxEntity = Interfaces::pClientEntityList->GetHighestEntityIndex();
+
+		for (int i = 0; i < maxEntity; i++) {
+			IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
+		
+			if (!entity) {
+				continue;
+			}
+
+			if (g_LoadoutIcons) {
+				if (g_LoadoutIcons->IsEnabled()) {
+					g_LoadoutIcons->ProcessEntity(entity);
+				}
+			}
+
+			if (g_MedigunInfo) {
+				if (g_MedigunInfo->IsEnabled()) {
+					g_MedigunInfo->ProcessEntity(entity);
+				}
+			}
+
+			if (g_StatusIcons) {
+				if (g_StatusIcons->IsEnabled()) {
+					g_StatusIcons->ProcessEntity(entity);
+				}
+			}
+		}
+
+		if (g_LoadoutIcons) {
+			if (g_LoadoutIcons->IsEnabled()) {
+				g_LoadoutIcons->PostEntityUpdate();
+			}
+		}
+
+		if (g_MedigunInfo) {
+			if (g_MedigunInfo->IsEnabled()) {
+				g_MedigunInfo->PostEntityUpdate();
 			}
 		}
 	}
