@@ -31,6 +31,7 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage);
 const char *Hook_IGameResources_GetPlayerName(int client);
 void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce);
 void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel);
+bool Hook_IVEngineClient_GetPlayerInfo(int ent_num, player_info_t *pinfo);
 
 class StatusSpecPlugin: public IServerPluginCallbacks
 {

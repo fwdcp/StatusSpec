@@ -48,7 +48,6 @@ private:
 	static void GetPlayerAlias(const CCommand &command);
 	static void RemovePlayerAlias(const CCommand &command);
 	static void SetPlayerAlias(const CCommand &command);
-	static void ToggleState(IConVar *var, const char *pOldValue, float flOldValue);
 };
 
 extern PlayerAliases *g_PlayerAliases;
