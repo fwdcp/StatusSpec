@@ -43,8 +43,8 @@ LoadoutIcons::LoadoutIcons() {
 	itemSchema = new ItemSchema();
 
 	enabled = new ConVar("statusspec_loadouticons_enabled", "0", FCVAR_NONE, "enable loadout icons");
-	filter_active = new ConCommand("statusspec_loadouticons_filter_active", LoadoutIcons::SetFilter, "set the RGBA filter applied to the icon for an active item", FCVAR_NONE, LoadoutIcons::GetCurrentFilter);
-	filter_nonactive = new ConCommand("statusspec_loadouticons_filter_nonactive", LoadoutIcons::SetFilter, "set the RGBA filter applied to the icon for a nonactive item", FCVAR_NONE, LoadoutIcons::GetCurrentFilter);
+	filter_active = new ConCommand("statusspec_loadouticons_filter_active", LoadoutIcons::SetFilter, "the RGBA filter applied to the icon for an active item", FCVAR_NONE, LoadoutIcons::GetCurrentFilter);
+	filter_nonactive = new ConCommand("statusspec_loadouticons_filter_nonactive", LoadoutIcons::SetFilter, "the RGBA filter applied to the icon for a nonactive item", FCVAR_NONE, LoadoutIcons::GetCurrentFilter);
 	nonloadout = new ConVar("statusspec_loadouticons_nonloadout", "0", FCVAR_NONE, "enable loadout icons for nonloadout items");
 }
 
@@ -293,7 +293,17 @@ int LoadoutIcons::GetCurrentFilter(const char *partial, char commands[COMMAND_CO
 }
 
 void LoadoutIcons::SetFilter(const CCommand &command) {
-	if (command.ArgC() < 4 || !IsInteger(command.Arg(1)) || !IsInteger(command.Arg(2)) || !IsInteger(command.Arg(3)) || !IsInteger(command.Arg(4)))
+	if (command.ArgC() == 0) {
+		if (stricmp(command.Arg(0), "statusspec_loadouticons_filter_active")) {
+			Msg("The current active loadout item icon filter is rgba(%i, %i, %i, %i).\n", g_LoadoutIcons->filter_active_color.r(), g_LoadoutIcons->filter_active_color.g(), g_LoadoutIcons->filter_active_color.b(), g_LoadoutIcons->filter_active_color.a());
+			return;
+		}
+		else if (stricmp(command.Arg(0), "statusspec_loadouticons_filter_nonactive")) {
+			Msg("The current nonactive loadout item icon filter is rgba(%i, %i, %i, %i).\n", g_LoadoutIcons->filter_nonactive_color.r(), g_LoadoutIcons->filter_nonactive_color.g(), g_LoadoutIcons->filter_nonactive_color.b(), g_LoadoutIcons->filter_nonactive_color.a());
+			return;
+		}
+	}
+	else if (command.ArgC() < 4 || !IsInteger(command.Arg(1)) || !IsInteger(command.Arg(2)) || !IsInteger(command.Arg(3)) || !IsInteger(command.Arg(4)))
 	{
 		Warning("Usage: %s <red> <green> <blue> <alpha>\n", command.Arg(0));
 		return;
