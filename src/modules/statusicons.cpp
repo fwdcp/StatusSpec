@@ -103,10 +103,6 @@ void StatusIcons::NoPaint(vgui::VPANEL vguiPanel) {
 		playerWide -= iconsWide;
 		iconsWide -= iconsWide;
 		
-		int iconSize = iconsTall;
-		int icons = 0;
-		int maxIcons = max_icons->GetInt();
-		
 		g_pVGuiPanel->SetSize(vguiPanel, iconsWide, iconsTall);
 		g_pVGuiPanel->SetSize(playerPanel, playerWide, playerTall);
 	}
