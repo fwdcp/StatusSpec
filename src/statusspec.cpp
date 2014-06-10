@@ -292,8 +292,24 @@ void StatusSpecPlugin::Unload(void)
 	Interfaces::Unload();
 }
 
-void StatusSpecPlugin::Pause(void) {}
-void StatusSpecPlugin::UnPause(void) {}
+void StatusSpecPlugin::Pause(void) {
+	SH_REMOVE_HOOK(IBaseClientDLL, FrameStageNotify, Interfaces::pClientDLL, Hook_IBaseClientDLL_FrameStageNotify, false);
+	SH_REMOVE_HOOK(IPanel, PaintTraverse, g_pVGuiPanel, Hook_IPanel_PaintTraverse, true);
+	SH_REMOVE_HOOK(IPanel, SendMessage, g_pVGuiPanel, Hook_IPanel_SendMessage, true);
+	SH_REMOVE_HOOK(IVEngineClient, GetPlayerInfo, Interfaces::pEngineClient, Hook_IVEngineClient_GetPlayerInfo, false);
+
+	if (getPlayerNameHook) {
+		SH_REMOVE_HOOK_ID(getPlayerNameHook);
+	}
+}
+
+void StatusSpecPlugin::UnPause(void) {
+	SH_ADD_HOOK(IBaseClientDLL, FrameStageNotify, Interfaces::pClientDLL, Hook_IBaseClientDLL_FrameStageNotify, false);
+	SH_ADD_HOOK(IPanel, PaintTraverse, g_pVGuiPanel, Hook_IPanel_PaintTraverse, true);
+	SH_ADD_HOOK(IPanel, SendMessage, g_pVGuiPanel, Hook_IPanel_SendMessage, true);
+	SH_ADD_HOOK(IVEngineClient, GetPlayerInfo, Interfaces::pEngineClient, Hook_IVEngineClient_GetPlayerInfo, false);
+}
+
 const char *StatusSpecPlugin::GetPluginDescription(void) { return PLUGIN_DESC; }
 void StatusSpecPlugin::LevelInit(char const *pMapName) {}
 void StatusSpecPlugin::ServerActivate(edict_t *pEdictList, int edictCount, int clientMax) {}
