@@ -8,6 +8,10 @@ a client plugin that aims to add many useful features for TF2 spectating
 Changelog
 ---------
 
+**0.11.0**
+* reorganize entire plugin into modules (changing many console variables and commands)
+* add player outlines module
+
 **0.10.0**
 * fix player alias incompatibility with Spec Tools
 * add utility command for setting the direction of a progress bar
@@ -51,35 +55,18 @@ forces spectator GUI to refresh constantly, eliminating many HUD issues after ga
 #### Console Variables
 * `statusspec_antifreeze_enabled` - enable antifreeze (forces the spectator GUI to refresh)
 
-### Player Alias
-substitutes in user-defined aliases for player names
+### Loadout Icons
+displays icons to represent weapons in a player's loadout
 
 #### Console Variables
-* `statusspec_playeralias_enabled` - enable player aliases
+* `statusspec_loadouticons_enabled` - enable loadout icons
+* `statusspec_loadouticons_nonloadout` - enable loadout icons for nonloadout items
 
 #### Console Commands
-* `statusspec_playeralias_get <steamid>` - get an alias for a player
-* `statusspec_playeralias_remove <steamid>` - remove an alias for a player
-* `statusspec_playeralias_set <steamid> <alias>` - set an alias for a player
+* `statusspec_loadouticons_filter_active <red> <green> <blue> <alpha>` - the RGBA filter applied to the icon for an active item
+* `statusspec_loadouticons_filter_nonactive <red> <green> <blue> <alpha>` - the RGBA filter applied to the icon for a nonactive item
 
-### Console Variables
-* `statusspec_loadout_icons_enabled` - enable loadout icons
-* `statusspec_loadout_icons_nonloadout` - enable loadout icons for nonloadout items
-* `statusspec_medigun_info_charge_label_text` - text for charge label in medigun info ('%charge%' is replaced with the current charge percentage number)
-* `statusspec_medigun_info_enabled` - enable medigun info
-* `statusspec_medigun_info_individual_charges_label_text` - text for individual charges label (for Vaccinator) in medigun info ('%charges%' is replaced with the current number of charges)
-* `statusspec_status_icons_enabled` - enable status icons
-* `statusspec_status_icons_max` - max number of status icons to be rendered
-
-### Console Commands
-* `statusspec_loadout_filter_active <red> <green> <blue> <alpha>` - the RGBA filter applied to the icon when the item is active
-* `statusspec_loadout_filter_nonactive <red> <green> <blue> <alpha>` - the RGBA filter applied to the icon when the item is not active
-* `statusspec_medigun_info_reload_settings` - reload settings for the medigun info HUD from the resource file
-* `statusspec_utility_set_progress_bar_direction <name> <direction>` - set the progress direction for a StatusSpec progress bar
-
-### UI Resource Files
-
-#### Loadout Icons
+#### UI Resource Files
 To properly support loadout icons, adjust `Resource/UI/SpectatorTournament.res` so that it includes something similar to the `loadouticons` section below contained within the `playerpanels_kv` section of the `specgui` section, as demonstrated below. You will also need to adjust the rest of the file as necessary, since this will act as a normal GUI panel. The icons will be entirely contained within this element as defined in this configuration, and each icon will be a square size of `tall`. The rendering of this panel only displays icons and will not adjust anything else, no matter whether this feature is enabled or disabled - thus, you will be required to manually adjust your HUD as appropriate when enabling or disabling this feature.
 ```
 "Resource/UI/SpectatorTournament.res"
@@ -111,7 +98,18 @@ To properly support loadout icons, adjust `Resource/UI/SpectatorTournament.res` 
 }
 ```
 
-#### Medigun Info Box
+### Medigun Info
+
+#### Console Variables
+* `statusspec_mediguninfo_charge_label_text` - text for charge label in medigun info ('%charge%' is replaced with the current charge percentage number)
+* `statusspec_mediguninfo_enabled` - enable medigun info
+* `statusspec_mediguninfo_individual_charges_label_text` - text for individual charges label (for Vaccinator) in medigun info ('%charges%' is replaced with the current number of charges)
+
+#### Console Commands
+* `statusspec_mediguninfo_reload_settings` - reload settings for the medigun info HUD from the resource file
+* `statusspec_mediguninfo_set_progress_bar_direction <name> <direction>` - set the progress direction for a medigun info progress bar
+
+#### UI Resource Files
 An example file for the medigun info box is included under `Resource/UI/MedigunInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_medigun_info_reload_settings` is provided as a replacement.
 
 In addition, the following HUD animations are triggered by this plugin and may be used to show events on the HUD:
@@ -122,7 +120,35 @@ In addition, the following HUD animations are triggered by this plugin and may b
 * `MedigunInfoRedChargeReleased` - triggered when a RED medigun charge has been released/popped
 * `MedigunInfoRedChargeStop` - triggered when the RED medigun charge is no longer ready/released (after a charge is completed/dropped)
 
-#### Status Icons
+### Player Aliases
+substitutes in user-defined aliases for player names
+
+#### Console Variables
+* `statusspec_playeraliases_enabled` - enable player aliases
+
+#### Console Commands
+* `statusspec_playeraliases_get <steamid>` - get an alias for a player
+* `statusspec_playeraliases_remove <steamid>` - remove an alias for a player
+* `statusspec_playeraliases_set <steamid> <alias>` - set an alias for a player
+
+### Player Outlines
+
+#### Console Variables
+* `statusspec_playeroutlines_enabled` - enable player outlines
+* `statusspec_playeroutlines_team_colors` - override default health-based outline colors with team colors
+
+#### Console Commands
+* `statusspec_playeroutlines_color_blu <red> <green> <blue>` - the color used for BLU team player outlines
+* `statusspec_playeroutlines_color_red <red> <green> <blue>` - the color used for RED team player outlines
+* `statusspec_playeroutlines_force_refresh` - force the player outlines to refresh
+
+### Status Icons
+
+#### Console Variables
+* `statusspec_statusicons_enabled` - enable status icons
+* `statusspec_statusicons_max_icons` - maximum number of icons to show
+
+#### UI Resource Files
 To properly support status icons, adjust `Resource/UI/SpectatorTournament.res` so that it includes something similar to the `statusicons` section below contained within the `playerpanels_kv` section of the `specgui` section, as demonstrated below. The icons will appear on the right of `xpos` with a square size of `tall`, and the player panel will also be expanded to accommodate these icons. The rendering of this panel assumes that this element is on the right edge of the player panel and will not appear if status icons are disabled.
 ```
 "Resource/UI/SpectatorTournament.res"
