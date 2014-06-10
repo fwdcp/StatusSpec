@@ -18,6 +18,7 @@
 		return false; \
 	}
 
+int Entities::pCTFPlayer__m_bGlowEnabled = 0;
 int Entities::pCTFPlayer__m_iClass = 0;
 int Entities::pCTFPlayer__m_iTeamNum = 0;
 int Entities::pCTFPlayer__m_nPlayerCond = 0;
@@ -36,6 +37,7 @@ int Entities::pCWeaponMedigun__m_flChargeLevel = 0;
 // Find the offsets for all stored NetVars
 //=================================================================================
 bool Entities::PrepareOffsets() {
+	RetrieveAndCheckOffsetAndWarn(pCTFPlayer__m_bGlowEnabled, Entities::FindOffsetOfClassProp("CTFPlayer", "m_bGlowEnabled"));
 	RetrieveAndCheckOffsetAndWarn(pCTFPlayer__m_iClass, Entities::FindOffsetOfClassProp("CTFPlayer", "m_iClass"));
 	RetrieveAndCheckOffsetAndWarn(pCTFPlayer__m_iTeamNum, Entities::FindOffsetOfClassProp("CTFPlayer", "m_iTeamNum"));
 	RetrieveAndCheckOffsetAndWarn(pCTFPlayer__m_nPlayerCond, Entities::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCond"));

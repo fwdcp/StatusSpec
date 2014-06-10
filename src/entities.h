@@ -29,6 +29,7 @@
 
 class Entities {
 public:
+	static int pCTFPlayer__m_bGlowEnabled;
 	static int pCTFPlayer__m_iClass;
 	static int pCTFPlayer__m_iTeamNum;
 	static int pCTFPlayer__m_nPlayerCond;

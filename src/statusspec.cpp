@@ -14,22 +14,66 @@ AntiFreeze *g_AntiFreeze = NULL;
 LoadoutIcons *g_LoadoutIcons = NULL;
 MedigunInfo *g_MedigunInfo = NULL;
 PlayerAliases *g_PlayerAliases = NULL;
+PlayerOutlines *g_PlayerOutlines = NULL;
 StatusIcons *g_StatusIcons = NULL;
+
+static IGameResources* gameResources = NULL;
+static int getPlayerNameHook;
 
 SourceHook::Impl::CSourceHookImpl g_SourceHook;
 SourceHook::ISourceHook *g_SHPtr = &g_SourceHook;
 int g_PLID = 0;
 
+SH_DECL_HOOK1_void(C_BaseCombatCharacter, OnDataChanged, SH_NOATTRIB, 0, DataUpdateType_t);
+SH_DECL_MANUALHOOK3_void(C_TFPlayer_GetGlowEffectColor, OFFSET_GETGLOWEFFECTCOLOR, 0, 0, float *, float *, float *);
+SH_DECL_MANUALHOOK0_void(C_TFPlayer_UpdateGlowEffect, OFFSET_UPDATEGLOWEFFECT, 0, 0);
 SH_DECL_HOOK1_void(IBaseClientDLL, FrameStageNotify, SH_NOATTRIB, 0, ClientFrameStage_t);
 SH_DECL_HOOK1(IGameResources, GetPlayerName, SH_NOATTRIB, 0, const char *, int);
 SH_DECL_HOOK3_void(IPanel, PaintTraverse, SH_NOATTRIB, 0, VPANEL, bool, bool);
 SH_DECL_HOOK3_void(IPanel, SendMessage, SH_NOATTRIB, 0, VPANEL, KeyValues *, VPANEL);
 SH_DECL_HOOK2(IVEngineClient, GetPlayerInfo, SH_NOATTRIB, 0, bool, int, player_info_t *);
 
-void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
-	static IGameResources* gameResources = NULL;
-	static int getPlayerNameHook;
+int AddHook_C_BaseCombatCharacter_OnDataChanged(C_BaseCombatCharacter *baseCombatCharacter) {
+	return SH_ADD_HOOK(C_BaseCombatCharacter, OnDataChanged, baseCombatCharacter, Hook_C_BaseCombatCharacter_OnDataChanged, true);
+}
 
+int AddHook_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *tfPlayer) {
+	return SH_ADD_MANUALHOOK(C_TFPlayer_GetGlowEffectColor, tfPlayer, Hook_C_TFPlayer_GetGlowEffectColor, false);
+}
+
+void Call_C_TFPlayer_UpdateGlowEffect(C_TFPlayer *tfPlayer) {
+	SH_MCALL(tfPlayer, C_TFPlayer_UpdateGlowEffect)();
+}
+
+void Hook_C_BaseCombatCharacter_OnDataChanged(DataUpdateType_t type) {
+	if (g_PlayerOutlines) {
+		if (g_PlayerOutlines->IsEnabled()) {
+			C_BaseCombatCharacter *baseCombatCharacter = META_IFACEPTR(C_BaseCombatCharacter);
+
+			if (g_PlayerOutlines->DataChangeOverride(baseCombatCharacter)) {
+				RETURN_META(MRES_HANDLED);
+			}
+		}
+	}
+
+	RETURN_META(MRES_IGNORED);
+}
+
+void Hook_C_TFPlayer_GetGlowEffectColor(float *r, float *g, float *b) {
+	if (g_PlayerOutlines) {
+		if (g_PlayerOutlines->IsEnabled()) {
+			C_TFPlayer *tfPlayer = META_IFACEPTR(C_TFPlayer);
+
+			if (g_PlayerOutlines->GetGlowEffectColorOverride(tfPlayer, r, g, b)) {
+				RETURN_META(MRES_SUPERCEDE);
+			}
+		}
+	}
+
+	RETURN_META(MRES_IGNORED);
+}
+
+void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 	if (gameResources != Interfaces::GetGameResources()) {
 		if (getPlayerNameHook) {
 			SH_REMOVE_HOOK_ID(getPlayerNameHook);
@@ -81,6 +125,10 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 				if (g_MedigunInfo->IsEnabled()) {
 					g_MedigunInfo->ProcessEntity(entity);
 				}
+			}
+
+			if (g_PlayerOutlines) {
+				g_PlayerOutlines->ProcessEntity(entity);
 			}
 
 			if (g_StatusIcons) {
@@ -215,6 +263,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_LoadoutIcons = new LoadoutIcons();
 	g_MedigunInfo = new MedigunInfo();
 	g_PlayerAliases = new PlayerAliases();
+	g_PlayerOutlines = new PlayerOutlines();
 	g_StatusIcons = new StatusIcons();
 	
 	Msg("%s loaded!\n", PLUGIN_DESC);
@@ -227,12 +276,17 @@ void StatusSpecPlugin::Unload(void)
 	delete g_LoadoutIcons;
 	delete g_MedigunInfo;
 	delete g_PlayerAliases;
+	delete g_PlayerOutlines;
 	delete g_StatusIcons;
 
 	SH_REMOVE_HOOK(IBaseClientDLL, FrameStageNotify, Interfaces::pClientDLL, Hook_IBaseClientDLL_FrameStageNotify, false);
 	SH_REMOVE_HOOK(IPanel, PaintTraverse, g_pVGuiPanel, Hook_IPanel_PaintTraverse, true);
 	SH_REMOVE_HOOK(IPanel, SendMessage, g_pVGuiPanel, Hook_IPanel_SendMessage, true);
 	SH_REMOVE_HOOK(IVEngineClient, GetPlayerInfo, Interfaces::pEngineClient, Hook_IVEngineClient_GetPlayerInfo, false);
+
+	if (getPlayerNameHook) {
+		SH_REMOVE_HOOK_ID(getPlayerNameHook);
+	}
 
 	ConVar_Unregister();
 	Interfaces::Unload();

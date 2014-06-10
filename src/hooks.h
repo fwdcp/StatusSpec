@@ -12,16 +12,35 @@
 
 #include "stdafx.h"
 
+#include <map>
+
+#define CLIENT_DLL
+#define GLOWS_ENABLE
+
 #include "cdll_int.h"
 #include "KeyValues.h"
+#include "igameresources.h"
 #include "vgui/vgui.h"
 #include "vgui/IPanel.h"
-#include "igameresources.h"
+#include "cbase.h"
+#include "c_basecombatcharacter.h"
+#include "glow_outline_effect.h"
 
 #include <sourcehook/sourcehook_impl.h>
 #include <sourcehook/sourcehook.h>
 
 using namespace vgui;
+
+class C_TFPlayer;
+
+#if defined _WIN32
+#define OFFSET_GETGLOWOBJECT 220
+#define OFFSET_GETGLOWEFFECTCOLOR 221
+#define OFFSET_UPDATEGLOWEFFECT 222
+#define OFFSET_DESTROYGLOWEFFECT 223
+#endif
+
+static std::map<EHANDLE, int> onDataChangedHooks;
 
 extern SourceHook::ISourceHook *g_SHPtr;
 extern int g_PLID;
