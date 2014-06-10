@@ -310,7 +310,10 @@ void StatusSpecPlugin::UnPause(void) {
 	SH_ADD_HOOK(IVEngineClient, GetPlayerInfo, Interfaces::pEngineClient, Hook_IVEngineClient_GetPlayerInfo, false);
 }
 
-const char *StatusSpecPlugin::GetPluginDescription(void) { return PLUGIN_DESC; }
+const char *StatusSpecPlugin::GetPluginDescription(void) {
+	return PLUGIN_DESC;
+}
+
 void StatusSpecPlugin::LevelInit(char const *pMapName) {}
 void StatusSpecPlugin::ServerActivate(edict_t *pEdictList, int edictCount, int clientMax) {}
 void StatusSpecPlugin::GameFrame(bool simulating) {}
