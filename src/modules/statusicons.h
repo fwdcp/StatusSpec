@@ -54,7 +54,6 @@
 #define TEXTURE_FIRE "hud/leaderboard_class_pyro"
 
 typedef struct Status_s {
-	TFClassType tfclass;
 	TFTeam team;
 	uint32_t conditions[3];
 } Status_t;
