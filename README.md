@@ -50,13 +50,13 @@ Usage
 This plugin is not signed by Valve, and therefore will not load unless TF2 is loaded with the "-insecure" flag.
 
 ### AntiFreeze
-forces spectator GUI to refresh constantly, eliminating many HUD issues after game unpauses
+*forces spectator GUI to refresh constantly, eliminating many HUD issues after game unpauses*
 
 #### Console Variables
 * `statusspec_antifreeze_enabled` - enable antifreeze (forces the spectator GUI to refresh)
 
 ### Loadout Icons
-displays icons to represent weapons in a player's loadout
+*displays icons to represent weapons in a player's loadout*
 
 #### Console Variables
 * `statusspec_loadouticons_enabled` - enable loadout icons
@@ -99,6 +99,7 @@ To properly support loadout icons, adjust `Resource/UI/SpectatorTournament.res` 
 ```
 
 ### Medigun Info
+*displays info about mediguns for both teams*
 
 #### Console Variables
 * `statusspec_mediguninfo_charge_label_text` - text for charge label in medigun info ('%charge%' is replaced with the current charge percentage number)
@@ -121,7 +122,7 @@ In addition, the following HUD animations are triggered by this plugin and may b
 * `MedigunInfoRedChargeStop` - triggered when the RED medigun charge is no longer ready/released (after a charge is completed/dropped)
 
 ### Player Aliases
-substitutes in user-defined aliases for player names
+*substitutes in user-defined aliases for player names*
 
 #### Console Variables
 * `statusspec_playeraliases_enabled` - enable player aliases
@@ -132,6 +133,7 @@ substitutes in user-defined aliases for player names
 * `statusspec_playeraliases_set <steamid> <alias>` - set an alias for a player
 
 ### Player Outlines
+*displays bright outlines around players that can be seen through walls*
 
 #### Console Variables
 * `statusspec_playeroutlines_enabled` - enable player outlines
@@ -143,6 +145,7 @@ substitutes in user-defined aliases for player names
 * `statusspec_playeroutlines_force_refresh` - force the player outlines to refresh
 
 ### Status Icons
+*displays icons representing special statuses of a player*
 
 #### Console Variables
 * `statusspec_statusicons_enabled` - enable status icons
