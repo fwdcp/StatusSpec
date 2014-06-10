@@ -33,7 +33,7 @@ MedigunInfo::MedigunInfo() {
 	enabled = new ConVar("statusspec_mediguninfo_enabled", "0", FCVAR_NONE, "enable medigun info");
 	individual_charges_label_text = new ConVar("statusspec_mediguninfo_individual_charges_label_text", "%charges%", FCVAR_PRINTABLEONLY, "text for individual charges label (for Vaccinator) in medigun info ('%charges%' is replaced with the current number of charges)");
 	reload_settings = new ConCommand("statusspec_mediguninfo_reload_settings", MedigunInfo::ReloadSettings, "reload settings for the medigun info HUD from the resource file", FCVAR_NONE);
-	set_progress_bar_direction = new ConCommand("statusspec_mediguninfo_set_progress_bar_direction", MedigunInfo::SetProgressBarDirection, "set the progress direction for a StatusSpec progress bar", FCVAR_NONE);
+	set_progress_bar_direction = new ConCommand("statusspec_mediguninfo_set_progress_bar_direction", MedigunInfo::SetProgressBarDirection, "set the progress direction for a medigun info progress bar", FCVAR_NONE);
 }
 
 MedigunInfo::~MedigunInfo() {
