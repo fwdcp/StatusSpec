@@ -8,6 +8,9 @@ a client plugin that aims to add many useful features for TF2 spectating
 Changelog
 ---------
 
+**0.11.1**
+* update offsets for TF2 update on 2014-06-11
+
 **0.11.0**
 * reorganize entire plugin into modules (changing many console variables and commands)
 * add player outlines module
