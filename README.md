@@ -8,6 +8,9 @@ a client plugin that aims to add many useful features for TF2 spectating
 Changelog
 ---------
 
+**0.11.2**
+* fix player outline issues with players not being hooked/unhooked properly
+
 **0.11.1**
 * update offsets for TF2 update on 2014-06-11
 
