@@ -22,6 +22,8 @@ IVEngineClient* Interfaces::pEngineClient = NULL;
 CSteamAPIContext* Interfaces::pSteamAPIContext = NULL;
 CDllDemandLoader *Interfaces::pClientModule = NULL;
 
+CBaseEntityList *g_pEntityList;
+
 inline bool DataCompare(const BYTE* pData, const BYTE* bSig, const char* szMask)
 {
 	for (; *szMask; ++szMask, ++pData, ++bSig)
@@ -101,6 +103,8 @@ bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 	CheckPointerAndWarn(g_pVGuiPanel, vgui::IPanel);
 	CheckPointerAndWarn(g_pVGuiSchemeManager, vgui::ISchemeManager);
 	CheckPointerAndWarn(g_pFullFileSystem, IFileSystem);
+
+	g_pEntityList = dynamic_cast<CBaseEntityList *>(Interfaces::pClientEntityList);
 	
 	return true;
 }

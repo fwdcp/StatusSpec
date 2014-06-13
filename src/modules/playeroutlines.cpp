@@ -38,20 +38,21 @@ PlayerOutlines::PlayerOutlines() {
 
 PlayerOutlines::~PlayerOutlines() {
 	for (auto iterator = glowHooks.begin(); iterator != glowHooks.end(); iterator++) {
-		C_BaseCombatCharacter *baseCombatCharacter = dynamic_cast<C_BaseCombatCharacter *>(Interfaces::pClientEntityList->GetClientEntity(iterator->first.GetEntryIndex())->GetBaseEntity());
-		GlowHooks_t hooks = iterator->second;
-
-		if (hooks.glowColorHook) {
-			SH_REMOVE_HOOK_ID(hooks.glowColorHook);
-		}
-
-		if (hooks.glowForceHook) {
-			SH_REMOVE_HOOK_ID(hooks.glowForceHook);
-		}
+		C_BaseCombatCharacter *baseCombatCharacter = dynamic_cast<C_BaseCombatCharacter *>(iterator->first.Get());
 
 		if (baseCombatCharacter) {
 			bool* glowEnabled = MAKE_PTR(bool*, baseCombatCharacter, Entities::pCTFPlayer__m_bGlowEnabled);
 			*glowEnabled = false;
+			
+			GlowHooks_t hooks = iterator->second;
+
+			if (hooks.glowColorHook) {
+				SH_REMOVE_HOOK_ID(hooks.glowColorHook);
+			}
+
+			if (hooks.glowForceHook) {
+				SH_REMOVE_HOOK_ID(hooks.glowForceHook);
+			}
 		}
 
 		glowHooks.erase(iterator);
@@ -106,11 +107,11 @@ void PlayerOutlines::ProcessEntity(IClientEntity* entity) {
 	}
 
 	C_BaseCombatCharacter *baseCombatCharacter = dynamic_cast<C_BaseCombatCharacter *>(entity->GetBaseEntity());
-	CHandle<C_BaseCombatCharacter> baseCombatCharacterHandle = baseCombatCharacter;
+	EHANDLE entityHandle = entity->GetBaseEntity();
 
-	if (glowHooks.find(baseCombatCharacterHandle) == glowHooks.end()) {
-		glowHooks[baseCombatCharacter].glowColorHook = AddHook_C_TFPlayer_GetGlowEffectColor((C_TFPlayer *) baseCombatCharacter);
-		glowHooks[baseCombatCharacter].glowForceHook = AddHook_C_BaseCombatCharacter_OnDataChanged(baseCombatCharacter);
+	if (glowHooks.find(entityHandle) == glowHooks.end()) {
+		glowHooks[entityHandle].glowColorHook = AddHook_C_TFPlayer_GetGlowEffectColor((C_TFPlayer *) baseCombatCharacter);
+		glowHooks[entityHandle].glowForceHook = AddHook_C_BaseCombatCharacter_OnDataChanged(baseCombatCharacter);
 	}
 
 	bool* glowEnabled = MAKE_PTR(bool*, baseCombatCharacter, Entities::pCTFPlayer__m_bGlowEnabled);
