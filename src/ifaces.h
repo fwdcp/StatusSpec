@@ -16,6 +16,7 @@
 #define VERSION_SAFE_STEAM_API_INTERFACES
 
 #include "cdll_int.h"
+#include "entitylist_base.h"
 #include "icliententitylist.h"
 #include "iclientmode.h"
 #include "igameresources.h"

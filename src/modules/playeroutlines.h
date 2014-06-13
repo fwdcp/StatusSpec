@@ -17,6 +17,7 @@
 #include <string>
 
 #include "convar.h"
+#include "ehandle.h"
 
 #include "../statusspec.h"
 #include "../enums.h"
@@ -46,7 +47,7 @@ public:
 
 	void ProcessEntity(IClientEntity* entity);
 private:
-	std::map<CHandle<C_BaseCombatCharacter>, GlowHooks_t> glowHooks;
+	std::map<EHANDLE, GlowHooks_t> glowHooks;
 	Color team_blu;
 	Color team_red;
 	
