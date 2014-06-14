@@ -24,7 +24,6 @@ SourceHook::Impl::CSourceHookImpl g_SourceHook;
 SourceHook::ISourceHook *g_SHPtr = &g_SourceHook;
 int g_PLID = 0;
 
-SH_DECL_HOOK1_void(C_BaseCombatCharacter, OnDataChanged, SH_NOATTRIB, 0, DataUpdateType_t);
 SH_DECL_MANUALHOOK3_void(C_TFPlayer_GetGlowEffectColor, OFFSET_GETGLOWEFFECTCOLOR, 0, 0, float *, float *, float *);
 SH_DECL_MANUALHOOK0_void(C_TFPlayer_UpdateGlowEffect, OFFSET_UPDATEGLOWEFFECT, 0, 0);
 SH_DECL_HOOK1_void(IBaseClientDLL, FrameStageNotify, SH_NOATTRIB, 0, ClientFrameStage_t);
@@ -33,30 +32,12 @@ SH_DECL_HOOK3_void(IPanel, PaintTraverse, SH_NOATTRIB, 0, VPANEL, bool, bool);
 SH_DECL_HOOK3_void(IPanel, SendMessage, SH_NOATTRIB, 0, VPANEL, KeyValues *, VPANEL);
 SH_DECL_HOOK2(IVEngineClient, GetPlayerInfo, SH_NOATTRIB, 0, bool, int, player_info_t *);
 
-int AddHook_C_BaseCombatCharacter_OnDataChanged(C_BaseCombatCharacter *baseCombatCharacter) {
-	return SH_ADD_HOOK(C_BaseCombatCharacter, OnDataChanged, baseCombatCharacter, Hook_C_BaseCombatCharacter_OnDataChanged, true);
-}
-
 int AddHook_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *tfPlayer) {
-	return SH_ADD_MANUALHOOK(C_TFPlayer_GetGlowEffectColor, tfPlayer, Hook_C_TFPlayer_GetGlowEffectColor, false);
+	return SH_ADD_MANUALVPHOOK(C_TFPlayer_GetGlowEffectColor, tfPlayer, Hook_C_TFPlayer_GetGlowEffectColor, false);
 }
 
 void Call_C_TFPlayer_UpdateGlowEffect(C_TFPlayer *tfPlayer) {
 	SH_MCALL(tfPlayer, C_TFPlayer_UpdateGlowEffect)();
-}
-
-void Hook_C_BaseCombatCharacter_OnDataChanged(DataUpdateType_t type) {
-	if (g_PlayerOutlines) {
-		if (g_PlayerOutlines->IsEnabled()) {
-			C_BaseCombatCharacter *baseCombatCharacter = META_IFACEPTR(C_BaseCombatCharacter);
-
-			if (g_PlayerOutlines->DataChangeOverride(baseCombatCharacter)) {
-				RETURN_META(MRES_HANDLED);
-			}
-		}
-	}
-
-	RETURN_META(MRES_IGNORED);
 }
 
 void Hook_C_TFPlayer_GetGlowEffectColor(float *r, float *g, float *b) {

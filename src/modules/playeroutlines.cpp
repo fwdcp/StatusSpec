@@ -37,45 +37,13 @@ PlayerOutlines::PlayerOutlines() {
 }
 
 PlayerOutlines::~PlayerOutlines() {
-	for (auto iterator = glowHooks.begin(); iterator != glowHooks.end(); iterator++) {
-		C_BaseCombatCharacter *baseCombatCharacter = dynamic_cast<C_BaseCombatCharacter *>(iterator->first.Get());
+	enabled->SetValue(0);
 
-		if (baseCombatCharacter) {
-			bool* glowEnabled = MAKE_PTR(bool*, baseCombatCharacter, Entities::pCTFPlayer__m_bGlowEnabled);
-			*glowEnabled = false;
-			
-			GlowHooks_t hooks = iterator->second;
-
-			if (hooks.glowColorHook) {
-				SH_REMOVE_HOOK_ID(hooks.glowColorHook);
-			}
-
-			if (hooks.glowForceHook) {
-				SH_REMOVE_HOOK_ID(hooks.glowForceHook);
-			}
-		}
-
-		glowHooks.erase(iterator);
-	}
+	ForceRefresh();
 }
 
 bool PlayerOutlines::IsEnabled() {
 	return enabled->GetBool();
-}
-
-bool PlayerOutlines::DataChangeOverride(C_BaseCombatCharacter *baseCombatCharacter) {
-	if (baseCombatCharacter) {
-		bool* glowEnabled = MAKE_PTR(bool*, baseCombatCharacter, Entities::pCTFPlayer__m_bGlowEnabled);
-
-		if (enabled->GetBool()) {
-			*glowEnabled = true;
-		}
-
-		return true;
-	}
-	else {
-		return false;
-	}
 }
 
 bool PlayerOutlines::GetGlowEffectColorOverride(C_TFPlayer *tfPlayer, float *r, float *g, float *b) {
@@ -102,6 +70,8 @@ bool PlayerOutlines::GetGlowEffectColorOverride(C_TFPlayer *tfPlayer, float *r, 
 }
 
 void PlayerOutlines::ProcessEntity(IClientEntity* entity) {
+	static bool getGlowEffectColorHooked = false;
+
 	if (!Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFPlayer")) {
 		return;
 	}
@@ -109,9 +79,9 @@ void PlayerOutlines::ProcessEntity(IClientEntity* entity) {
 	C_BaseCombatCharacter *baseCombatCharacter = dynamic_cast<C_BaseCombatCharacter *>(entity->GetBaseEntity());
 	EHANDLE entityHandle = entity->GetBaseEntity();
 
-	if (glowHooks.find(entityHandle) == glowHooks.end()) {
-		glowHooks[entityHandle].glowColorHook = AddHook_C_TFPlayer_GetGlowEffectColor((C_TFPlayer *) baseCombatCharacter);
-		glowHooks[entityHandle].glowForceHook = AddHook_C_BaseCombatCharacter_OnDataChanged(baseCombatCharacter);
+	if (!getGlowEffectColorHooked) {
+		AddHook_C_TFPlayer_GetGlowEffectColor((C_TFPlayer *) baseCombatCharacter);
+		getGlowEffectColorHooked = true;
 	}
 
 	bool* glowEnabled = MAKE_PTR(bool*, baseCombatCharacter, Entities::pCTFPlayer__m_bGlowEnabled);
