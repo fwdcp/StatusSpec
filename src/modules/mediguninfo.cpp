@@ -690,27 +690,39 @@ void MedigunInfo::PreEntityUpdate() {
 }
 
 void MedigunInfo::ProcessEntity(IClientEntity* entity) {
-	if (!Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_WeaponMedigun")) {
+	if (!Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFPlayer")) {
 		return;
 	}
 
-	int player = ENTITY_INDEX_FROM_ENTITY_OFFSET(entity, Entities::pCEconEntity__m_hOwnerEntity);
-	IClientEntity *playerEntity = Interfaces::pClientEntityList->GetClientEntity(player);
-
-	if (!playerEntity) {
-		return;
-	}
-
-	TFTeam team = (TFTeam) *MAKE_PTR(int*, playerEntity, Entities::pCTFPlayer__m_iTeamNum);
+	TFTeam team = (TFTeam) *MAKE_PTR(int*, entity, Entities::pCTFPlayer__m_iTeamNum);
 
 	if (team != TFTeam_Red && team != TFTeam_Blue) {
 		return;
 	}
 
-	medigunInfo[team].itemDefinitionIndex = *MAKE_PTR(int*, entity, Entities::pCEconEntity__m_iItemDefinitionIndex);
-	medigunInfo[team].chargeRelease = *MAKE_PTR(bool*, entity, Entities::pCWeaponMedigun__m_bChargeRelease);
-	medigunInfo[team].chargeResistType = *MAKE_PTR(int*, entity, Entities::pCWeaponMedigun__m_nChargeResistType);
-	medigunInfo[team].chargeLevel = *MAKE_PTR(float*, entity, Entities::pCWeaponMedigun__m_flChargeLevel);
+	if (!Interfaces::GetGameResources()->IsAlive(entity->entindex())) {
+		return;
+	}
+
+	for (int i = 0; i < MAX_WEAPONS; i++) {
+		int weapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(entity, Entities::pCTFPlayer__m_hMyWeapons[i]);
+		IClientEntity *weaponEntity = Interfaces::pClientEntityList->GetClientEntity(weapon);
+
+		if (!weaponEntity || !Entities::CheckClassBaseclass(weaponEntity->GetClientClass(), "DT_WeaponMedigun")) {
+			continue;
+		}
+
+		Medigun_t medigun;
+
+		medigun.itemDefinitionIndex = *MAKE_PTR(int*, weaponEntity, Entities::pCEconEntity__m_iItemDefinitionIndex);
+		medigun.chargeRelease = *MAKE_PTR(bool*, weaponEntity, Entities::pCWeaponMedigun__m_bChargeRelease);
+		medigun.chargeResistType = *MAKE_PTR(int*, weaponEntity, Entities::pCWeaponMedigun__m_nChargeResistType);
+		medigun.chargeLevel = *MAKE_PTR(float*, weaponEntity, Entities::pCWeaponMedigun__m_flChargeLevel);
+
+		if (medigunInfo.find(team) == medigunInfo.end() || medigunInfo[team].chargeLevel <= 0.0f && medigun.chargeLevel >= 0.0f) {
+			medigunInfo[team] = medigun;
+		}
+	}
 }
 
 void MedigunInfo::PostEntityUpdate() {
