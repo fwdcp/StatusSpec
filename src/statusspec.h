@@ -26,9 +26,8 @@
 #include "modules/playeroutlines.h"
 #include "modules/statusicons.h"
 
-#define PLUGIN_DESC "StatusSpec v0.11.2"
+#define PLUGIN_DESC "StatusSpec v0.11.3"
 
-int AddHook_C_BaseCombatCharacter_OnDataChanged(C_BaseCombatCharacter *baseCombatCharacter);
 int AddHook_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *tfPlayer);
 
 void Call_C_TFPlayer_UpdateGlowEffect(C_TFPlayer *tfPlayer);

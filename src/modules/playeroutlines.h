@@ -29,11 +29,6 @@
 #define strtoull _strtoui64
 #endif
 
-typedef struct GlowHooks_s {
-	int glowColorHook;
-	int glowForceHook;
-} GlowHooks_t;
-
 class PlayerOutlines {
 public:
 	PlayerOutlines();
@@ -41,13 +36,10 @@ public:
 
 	bool IsEnabled();
 
-	bool DataChangeOverride(C_BaseCombatCharacter *baseCombatCharacter);
-
 	bool GetGlowEffectColorOverride(C_TFPlayer *tfPlayer, float *r, float *g, float *b);
 
 	void ProcessEntity(IClientEntity* entity);
 private:
-	std::map<EHANDLE, GlowHooks_t> glowHooks;
 	Color team_blu;
 	Color team_red;
 	
