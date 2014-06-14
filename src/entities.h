@@ -13,14 +13,14 @@
 
 #include "stdafx.h"
 
+#include <cstdarg>
+
 #include "cdll_client_int.h"
 #include "client_class.h"
 #include "ehandle.h"
 #include "icliententity.h"
 
 #include "ifaces.h"
-
-#define INVALID_OFFSET -1
 
 #define MAX_WEAPONS 48
 
@@ -45,8 +45,8 @@ public:
 	static int pCWeaponMedigun__m_flChargeLevel;
 
 	static bool PrepareOffsets();
-	static int FindOffsetOfClassProp(const char *className, const char *propName);
-	static int FindOffsetOfArrayEnt(const char *classname, const char *arrayName, int element);
+	static bool GetClassPropOffset(const char *className, int &offset, int depth, ...);
+	static bool GetSubProp(RecvTable *table, const char *propName, RecvProp *&prop, int &offset);
 	static bool CheckClassBaseclass(ClientClass *clientClass, const char *baseclassDataTableName);
 
 private:
