@@ -8,6 +8,9 @@ a client plugin that aims to add many useful features for TF2 spectating
 Changelog
 ---------
 
+**0.11.3**
+* fix issues with player outlines not changing color after reloads
+
 **0.11.2**
 * fix player outline issues with players not being hooked/unhooked properly
 
