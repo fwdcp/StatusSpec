@@ -30,7 +30,7 @@ inline CSteamID ConvertTextToSteamID(std::string textID) {
 		std::getline(ss, authID, ':');
 
 		if (IsInteger(server) && IsInteger(authID)) {
-			uint32_t accountID = (2 * strtoul(authID.c_str(), NULL, 10)) + strtoul(server.c_str(), NULL, 10);
+			uint32_t accountID = (2 * strtoul(authID.c_str(), nullptr, 10)) + strtoul(server.c_str(), nullptr, 10);
 
 			static EUniverse universe = k_EUniverseInvalid;
 
@@ -44,7 +44,7 @@ inline CSteamID ConvertTextToSteamID(std::string textID) {
 		return CSteamID();
 	}
 	else if (IsInteger(textID)) {
-		uint64_t steamID = strtoull(textID.c_str(), NULL, 10);
+		uint64_t steamID = strtoull(textID.c_str(), nullptr, 10);
 
 		return CSteamID(steamID);
 	}

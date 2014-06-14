@@ -10,14 +10,14 @@
 
 #include "statusspec.h"
 
-AntiFreeze *g_AntiFreeze = NULL;
-LoadoutIcons *g_LoadoutIcons = NULL;
-MedigunInfo *g_MedigunInfo = NULL;
-PlayerAliases *g_PlayerAliases = NULL;
-PlayerOutlines *g_PlayerOutlines = NULL;
-StatusIcons *g_StatusIcons = NULL;
+AntiFreeze *g_AntiFreeze = nullptr;
+LoadoutIcons *g_LoadoutIcons = nullptr;
+MedigunInfo *g_MedigunInfo = nullptr;
+PlayerAliases *g_PlayerAliases = nullptr;
+PlayerOutlines *g_PlayerOutlines = nullptr;
+StatusIcons *g_StatusIcons = nullptr;
 
-static IGameResources* gameResources = NULL;
+static IGameResources* gameResources = nullptr;
 static int getPlayerNameHook;
 
 SourceHook::Impl::CSourceHookImpl g_SourceHook;
