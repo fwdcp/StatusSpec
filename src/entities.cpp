@@ -1,9 +1,8 @@
 /*
  *  entities.cpp
- *  WebSpec project
- *  Modified for AdvSpec, used in StatusSpec
+ *  StatusSpec project
  *  
- *  Copyright (c) 2013 Matthew McNamara
+ *  Copyright (c) 2014 thesupremecommander
  *  BSD 2-Clause License
  *  http://opensource.org/licenses/BSD-2-Clause
  *
