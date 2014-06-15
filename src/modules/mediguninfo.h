@@ -76,9 +76,7 @@ private:
 	ConVar* enabled;
 	ConVar* individual_charges_label_text;
 	ConCommand* reload_settings;
-	ConCommand* set_progress_bar_direction;
 	static void ReloadSettings();
-	static void SetProgressBarDirection(const CCommand &command);
 };
 
 extern MedigunInfo *g_MedigunInfo;

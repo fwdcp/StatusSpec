@@ -33,7 +33,6 @@ MedigunInfo::MedigunInfo() {
 	enabled = new ConVar("statusspec_mediguninfo_enabled", "0", FCVAR_NONE, "enable medigun info");
 	individual_charges_label_text = new ConVar("statusspec_mediguninfo_individual_charges_label_text", "%charges%", FCVAR_PRINTABLEONLY, "text for individual charges label (for Vaccinator) in medigun info ('%charges%' is replaced with the current number of charges)");
 	reload_settings = new ConCommand("statusspec_mediguninfo_reload_settings", MedigunInfo::ReloadSettings, "reload settings for the medigun info HUD from the resource file", FCVAR_NONE);
-	set_progress_bar_direction = new ConCommand("statusspec_mediguninfo_set_progress_bar_direction", MedigunInfo::SetProgressBarDirection, "set the progress direction for a medigun info progress bar", FCVAR_NONE);
 }
 
 MedigunInfo::~MedigunInfo() {
@@ -732,50 +731,5 @@ void MedigunInfo::PostEntityUpdate() {
 void MedigunInfo::ReloadSettings() {
 	if (g_MedigunInfo->panels.find("MedigunInfo") != g_MedigunInfo->panels.end()) {
 		((vgui::EditablePanel *) g_MedigunInfo->panels["MedigunInfo"])->LoadControlSettings("Resource/UI/MedigunInfo.res");
-	}
-}
-
-void MedigunInfo::SetProgressBarDirection(const CCommand &command) {
-	if (command.ArgC() < 2)
-	{
-		Warning("Usage: statusspec_medigun_set_progress_bar_direction <name> <direction>\n");
-		return;
-	}
-
-	if (g_MedigunInfo->panels.find(command.Arg(1)) == g_MedigunInfo->panels.end()) {
-		Warning("Invalid panel specified!\n");
-		return;
-	}
-
-	vgui::ProgressBar *progressBar = dynamic_cast<vgui::ProgressBar *>(g_MedigunInfo->panels[command.Arg(1)]);
-
-	if (!progressBar) {
-		Warning("Panel is not a progress bar!\n");
-		return;
-	}
-
-	if (stricmp(command.Arg(2), "east") == 0) {
-		progressBar->SetProgressDirection(vgui::ProgressBar::PROGRESS_EAST);
-		Msg("Direction of progress bar %s set to east.\n", command.Arg(1));
-		return;
-	}
-	else if (stricmp(command.Arg(2), "west") == 0) {
-		progressBar->SetProgressDirection(vgui::ProgressBar::PROGRESS_WEST);
-		Msg("Direction of progress bar %s set to west.\n", command.Arg(1));
-		return;
-	}
-	else if (stricmp(command.Arg(2), "north") == 0) {
-		progressBar->SetProgressDirection(vgui::ProgressBar::PROGRESS_NORTH);
-		Msg("Direction of progress bar %s set to north.\n", command.Arg(1));
-		return;
-	}
-	else if (stricmp(command.Arg(2), "south") == 0) {
-		progressBar->SetProgressDirection(vgui::ProgressBar::PROGRESS_SOUTH);
-		Msg("Direction of progress bar %s set to south.\n", command.Arg(1));
-		return;
-	}
-	else {
-		Warning("Invalid direction! (Valid directions are east, west, north, south.)\n");
-		return;
 	}
 }
