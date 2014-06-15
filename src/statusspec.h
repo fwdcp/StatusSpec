@@ -26,7 +26,7 @@
 #include "modules/playeroutlines.h"
 #include "modules/statusicons.h"
 
-#define PLUGIN_DESC "StatusSpec v0.11.3"
+#define PLUGIN_DESC "StatusSpec v0.12.0"
 
 int AddHook_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *tfPlayer);
 
