@@ -70,10 +70,10 @@ void MedigunInfo::InitHud() {
 		panels["MedigunInfo"] = medigunInfoPanel;
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), medigunInfoPanel);
 		
-		panels["MedigunInfoBackground"] = new vgui::ScalableImagePanel(medigunInfoPanel, "MedigunInfoBackground");
+		panels["MedigunInfoBackground"] = new vgui::ImagePanel(medigunInfoPanel, "MedigunInfoBackground");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBackground"]);
 		
-		panels["MedigunInfoRedBackground"] = new vgui::ImagePanel(medigunInfoPanel, "MedigunInfoRedBackground");
+		panels["MedigunInfoRedBackground"] = new vgui::ScalableImagePanel(medigunInfoPanel, "MedigunInfoRedBackground");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedBackground"]);
 		
 		panels["MedigunInfoRedNameLabel"] = new vgui::Label(medigunInfoPanel, "MedigunInfoRedNameLabel", "");
@@ -103,7 +103,7 @@ void MedigunInfo::InitHud() {
 		panels["MedigunInfoRedChargeTypeIcon"] = new vgui::ImagePanel(medigunInfoPanel, "MedigunInfoRedChargeTypeIcon");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeTypeIcon"]);
 		
-		panels["MedigunInfoBluBackground"] = new vgui::ImagePanel(medigunInfoPanel, "MedigunInfoBluBackground");
+		panels["MedigunInfoBluBackground"] = new vgui::ScalableImagePanel(medigunInfoPanel, "MedigunInfoBluBackground");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluBackground"]);
 		
 		panels["MedigunInfoBluNameLabel"] = new vgui::Label(medigunInfoPanel, "MedigunInfoBluNameLabel", "");
