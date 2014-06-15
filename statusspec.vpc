@@ -45,6 +45,7 @@ $Project "StatusSpec"
 		$File	"..\metamod-source\core\sourcehook\sourcehook_impl_cproto.cpp"
 		$File	"..\metamod-source\core\sourcehook\sourcehook_impl_cvfnptr.cpp"
 		$File	"..\..\public\vgui_controls\vgui_controls.cpp"
+		$File	"src\vgui_controls\ImageProgressBar.cpp"
 	}
 	
 	$Folder	"Header Files"
@@ -62,6 +63,7 @@ $Project "StatusSpec"
 		$File	"src\ifaces.h"
 		$File	"src\itemschema.h"
 		$File	"src\paint.h"
+		$File	"src\vgui_controls\ImageProgressBar.h"
 	}
 	
 	$Folder	"Link Libraries"

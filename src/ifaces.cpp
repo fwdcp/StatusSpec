@@ -12,15 +12,15 @@
 
 #define CheckPointerAndWarn(pPointer, className) \
 	if (pPointer == nullptr) { \
-		Warning("[StatusSpec] %s is NULL!\n", #className); \
+		Warning("[StatusSpec] %s is not initialized!\n", #className); \
 		return false; \
 	}
 
-IBaseClientDLL* Interfaces::pClientDLL = NULL;
-IClientEntityList* Interfaces::pClientEntityList = NULL;
-IVEngineClient* Interfaces::pEngineClient = NULL;
-CSteamAPIContext* Interfaces::pSteamAPIContext = NULL;
-CDllDemandLoader *Interfaces::pClientModule = NULL;
+IBaseClientDLL* Interfaces::pClientDLL = nullptr;
+IClientEntityList* Interfaces::pClientEntityList = nullptr;
+IVEngineClient* Interfaces::pEngineClient = nullptr;
+CSteamAPIContext* Interfaces::pSteamAPIContext = nullptr;
+CDllDemandLoader *Interfaces::pClientModule = nullptr;
 
 CBaseEntityList *g_pEntityList;
 
@@ -55,7 +55,7 @@ IGameResources* Interfaces::GetGameResources() {
 	GGR_t GGR = (GGR_t) pointer;
 	return GGR();
 #else
-	return NULL;
+	return nullptr;
 #endif
 }
 
@@ -66,7 +66,7 @@ IClientMode* Interfaces::GetClientMode() {
 		pointer = FindPattern((DWORD) GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE) CLIENTMODE_SIG, CLIENTMODE_MASK) + CLIENTMODE_OFFSET;
 	return **(IClientMode***)(pointer);
 #else
-	return NULL;
+	return nullptr;
 #endif
 }
 
@@ -80,14 +80,14 @@ bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 		return false;
 	}
 	
-	pEngineClient = (IVEngineClient*) interfaceFactory(VENGINE_CLIENT_INTERFACE_VERSION, NULL);
+	pEngineClient = (IVEngineClient*) interfaceFactory(VENGINE_CLIENT_INTERFACE_VERSION, nullptr);
 	
 	pClientModule = new CDllDemandLoader(CLIENT_MODULE_FILE);
 
 	CreateInterfaceFn gameClientFactory = pClientModule->GetFactory();
 	
-	pClientDLL = (IBaseClientDLL*) gameClientFactory(CLIENT_DLL_INTERFACE_VERSION, NULL);
-	pClientEntityList = (IClientEntityList*) gameClientFactory(VCLIENTENTITYLIST_INTERFACE_VERSION, NULL);
+	pClientDLL = (IBaseClientDLL*) gameClientFactory(CLIENT_DLL_INTERFACE_VERSION, nullptr);
+	pClientEntityList = (IClientEntityList*) gameClientFactory(VCLIENTENTITYLIST_INTERFACE_VERSION, nullptr);
 
 	pSteamAPIContext = new CSteamAPIContext();
 	if (!SteamAPI_InitSafe() || !pSteamAPIContext->Init()) {
@@ -117,9 +117,9 @@ void Interfaces::Unload() {
 	pSteamAPIContext->Clear();
 
 	pClientModule->Unload();
-	pClientModule = NULL;
+	pClientModule = nullptr;
 	
-	pClientDLL = NULL;
-	pClientEntityList = NULL;
-	pEngineClient = NULL;
+	pClientDLL = nullptr;
+	pClientEntityList = nullptr;
+	pEngineClient = nullptr;
 }

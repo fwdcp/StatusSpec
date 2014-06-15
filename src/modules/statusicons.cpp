@@ -76,7 +76,7 @@ void StatusIcons::InterceptMessage(vgui::VPANEL vguiPanel, KeyValues *params, vg
 			for (int i = 0; i < maxEntity; i++) {
 				IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
 			
-				if (entity == NULL || !Interfaces::GetGameResources()->IsConnected(i)) {
+				if (entity == nullptr || !Interfaces::GetGameResources()->IsConnected(i)) {
 					continue;
 				}
 			

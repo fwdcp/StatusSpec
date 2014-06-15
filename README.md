@@ -8,6 +8,13 @@ a client plugin that aims to add many useful features for TF2 spectating
 Changelog
 ---------
 
+**0.12.0**
+* add support for HUD features required for casting HUDs
+* add ability to set progress direction via resource file and removed command
+* add setting to allow Vaccinator to have only one charge meter
+* add ability to view medigun charge advantage
+* fix issues with medigun finding
+
 **0.11.3**
 * fix issues with player outlines not changing color after reloads
 
@@ -111,13 +118,14 @@ To properly support loadout icons, adjust `Resource/UI/SpectatorTournament.res` 
 *displays info about mediguns for both teams*
 
 #### Console Variables
+* `statusspec_mediguninfo_charge_advantage_label_text` - text for charge advantage label in medigun info ('%advantage%' is replaced with the current charge advantage percentage number)
 * `statusspec_mediguninfo_charge_label_text` - text for charge label in medigun info ('%charge%' is replaced with the current charge percentage number)
 * `statusspec_mediguninfo_enabled` - enable medigun info
+* `statusspec_mediguninfo_individual_charge_meters` - enable individual charge meters (for Vaccinator)
 * `statusspec_mediguninfo_individual_charges_label_text` - text for individual charges label (for Vaccinator) in medigun info ('%charges%' is replaced with the current number of charges)
 
 #### Console Commands
 * `statusspec_mediguninfo_reload_settings` - reload settings for the medigun info HUD from the resource file
-* `statusspec_mediguninfo_set_progress_bar_direction <name> <direction>` - set the progress direction for a medigun info progress bar
 
 #### UI Resource Files
 An example file for the medigun info box is included under `Resource/UI/MedigunInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_medigun_info_reload_settings` is provided as a replacement.

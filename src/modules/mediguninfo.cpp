@@ -29,11 +29,12 @@ inline void StartAnimationSequence(const char *sequenceName) {
 MedigunInfo::MedigunInfo() {
 	mainPanel = vgui::INVALID_PANEL;
 
+	charge_advantage_label_text = new ConVar("statusspec_mediguninfo_charge_advantage_label_text", "+%advantage%%", FCVAR_PRINTABLEONLY, "text for charge advantage label in medigun info ('%advantage%' is replaced with the current charge advantage percentage number)");
 	charge_label_text = new ConVar("statusspec_mediguninfo_charge_label_text", "%charge%%", FCVAR_PRINTABLEONLY, "text for charge label in medigun info ('%charge%' is replaced with the current charge percentage number)");
 	enabled = new ConVar("statusspec_mediguninfo_enabled", "0", FCVAR_NONE, "enable medigun info");
+	individual_charge_meters = new ConVar("statusspec_mediguninfo_individual_charge_meters", "1", FCVAR_NONE, "enable individual charge meters (for Vaccinator)");
 	individual_charges_label_text = new ConVar("statusspec_mediguninfo_individual_charges_label_text", "%charges%", FCVAR_PRINTABLEONLY, "text for individual charges label (for Vaccinator) in medigun info ('%charges%' is replaced with the current number of charges)");
 	reload_settings = new ConCommand("statusspec_mediguninfo_reload_settings", MedigunInfo::ReloadSettings, "reload settings for the medigun info HUD from the resource file", FCVAR_NONE);
-	set_progress_bar_direction = new ConCommand("statusspec_mediguninfo_set_progress_bar_direction", MedigunInfo::SetProgressBarDirection, "set the progress direction for a medigun info progress bar", FCVAR_NONE);
 }
 
 MedigunInfo::~MedigunInfo() {
@@ -73,25 +74,25 @@ void MedigunInfo::InitHud() {
 		panels["MedigunInfoBackground"] = new vgui::ImagePanel(medigunInfoPanel, "MedigunInfoBackground");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBackground"]);
 		
-		panels["MedigunInfoRedBackground"] = new vgui::ImagePanel(medigunInfoPanel, "MedigunInfoRedBackground");
+		panels["MedigunInfoRedBackground"] = new vgui::ScalableImagePanel(medigunInfoPanel, "MedigunInfoRedBackground");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedBackground"]);
 		
 		panels["MedigunInfoRedNameLabel"] = new vgui::Label(medigunInfoPanel, "MedigunInfoRedNameLabel", "");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedNameLabel"]);
 		
-		panels["MedigunInfoRedChargeMeter"] = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter");
+		panels["MedigunInfoRedChargeMeter"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeMeter"]);
 		
-		panels["MedigunInfoRedChargeMeter1"] = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter1");
+		panels["MedigunInfoRedChargeMeter1"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter1");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeMeter1"]);
 		
-		panels["MedigunInfoRedChargeMeter2"] = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter2");
+		panels["MedigunInfoRedChargeMeter2"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter2");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeMeter2"]);
 		
-		panels["MedigunInfoRedChargeMeter3"] = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter3");
+		panels["MedigunInfoRedChargeMeter3"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter3");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeMeter3"]);
 		
-		panels["MedigunInfoRedChargeMeter4"] = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter4");
+		panels["MedigunInfoRedChargeMeter4"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter4");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeMeter4"]);
 		
 		panels["MedigunInfoRedChargeLabel"] = new vgui::Label(medigunInfoPanel, "MedigunInfoRedChargeLabel", "");
@@ -99,29 +100,32 @@ void MedigunInfo::InitHud() {
 		
 		panels["MedigunInfoRedIndividualChargesLabel"] = new vgui::Label(medigunInfoPanel, "MedigunInfoRedIndividualChargesLabel", "");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedIndividualChargesLabel"]);
+
+		panels["MedigunInfoRedChargeAdvantageLabel"] = new vgui::Label(medigunInfoPanel, "MedigunInfoRedChargeAdvantageLabel", "");
+		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeAdvantageLabel"]);
 		
 		panels["MedigunInfoRedChargeTypeIcon"] = new vgui::ImagePanel(medigunInfoPanel, "MedigunInfoRedChargeTypeIcon");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeTypeIcon"]);
 		
-		panels["MedigunInfoBluBackground"] = new vgui::ImagePanel(medigunInfoPanel, "MedigunInfoBluBackground");
+		panels["MedigunInfoBluBackground"] = new vgui::ScalableImagePanel(medigunInfoPanel, "MedigunInfoBluBackground");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluBackground"]);
 		
 		panels["MedigunInfoBluNameLabel"] = new vgui::Label(medigunInfoPanel, "MedigunInfoBluNameLabel", "");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluNameLabel"]);
 		
-		panels["MedigunInfoBluChargeMeter"] = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter");
+		panels["MedigunInfoBluChargeMeter"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeMeter"]);
 		
-		panels["MedigunInfoBluChargeMeter1"] = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter1");
+		panels["MedigunInfoBluChargeMeter1"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter1");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeMeter1"]);
 		
-		panels["MedigunInfoBluChargeMeter2"] = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter2");
+		panels["MedigunInfoBluChargeMeter2"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter2");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeMeter2"]);
 		
-		panels["MedigunInfoBluChargeMeter3"] = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter3");
+		panels["MedigunInfoBluChargeMeter3"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter3");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeMeter3"]);
 		
-		panels["MedigunInfoBluChargeMeter4"] = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter4");
+		panels["MedigunInfoBluChargeMeter4"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter4");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeMeter4"]);
 		
 		panels["MedigunInfoBluChargeLabel"] = new vgui::Label(medigunInfoPanel, "MedigunInfoBluChargeLabel", "");
@@ -129,6 +133,9 @@ void MedigunInfo::InitHud() {
 		
 		panels["MedigunInfoBluIndividualChargesLabel"] = new vgui::Label(medigunInfoPanel, "MedigunInfoBluIndividualChargesLabel", "");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluIndividualChargesLabel"]);
+
+		panels["MedigunInfoBluChargeAdvantageLabel"] = new vgui::Label(medigunInfoPanel, "MedigunInfoBluChargeAdvantageLabel", "");
+		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeAdvantageLabel"]);
 		
 		panels["MedigunInfoBluChargeTypeIcon"] = new vgui::ImagePanel(medigunInfoPanel, "MedigunInfoBluChargeTypeIcon");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeTypeIcon"]);
@@ -206,21 +213,61 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 					std::string redIndividualChargesLabelText = individual_charges_label_text->GetString();
 					FindAndReplaceInString(redIndividualChargesLabelText, "%charges%", std::to_string(static_cast<long long>(floor(medigunInfo[TFTeam_Red].chargeLevel * 4.0f))));
 
-					((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter"])->SetProgress(0.0f);
-					((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter1"])->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 0.0f);
-					((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter2"])->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 1.0f);
-					((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter3"])->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 2.0f);
-					((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter4"])->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 3.0f);
 					((vgui::Label *) panels["MedigunInfoRedChargeLabel"])->SetText("");
 					((vgui::Label *) panels["MedigunInfoRedIndividualChargesLabel"])->SetText(redIndividualChargesLabelText.c_str());
-				
-					panels["MedigunInfoRedChargeMeter"]->SetVisible(false);
-					panels["MedigunInfoRedChargeMeter1"]->SetVisible(true);
-					panels["MedigunInfoRedChargeMeter2"]->SetVisible(true);
-					panels["MedigunInfoRedChargeMeter3"]->SetVisible(true);
-					panels["MedigunInfoRedChargeMeter4"]->SetVisible(true);
+
 					panels["MedigunInfoRedChargeLabel"]->SetVisible(false);
 					panels["MedigunInfoRedIndividualChargesLabel"]->SetVisible(true);
+
+					float redChargeAdvantage;
+
+					if (medigunInfo.find(TFTeam_Blue) != medigunInfo.end()) {
+						redChargeAdvantage = medigunInfo[TFTeam_Red].chargeLevel - medigunInfo[TFTeam_Blue].chargeLevel;
+					}
+					else {
+						redChargeAdvantage = medigunInfo[TFTeam_Red].chargeLevel;
+					}
+
+					if (floor(redChargeAdvantage * 100) > 0.0f) {
+						std::string redChargeAdvantageLabelText = charge_advantage_label_text->GetString();
+						FindAndReplaceInString(redChargeAdvantageLabelText, "%advantage%", std::to_string(static_cast<long long>(floor(redChargeAdvantage * 100))));
+
+						((vgui::Label *) panels["MedigunInfoRedChargeAdvantageLabel"])->SetText(redChargeAdvantageLabelText.c_str());
+
+						panels["MedigunInfoRedChargeAdvantageLabel"]->SetVisible(true);
+					}
+					else {
+						((vgui::Label *) panels["MedigunInfoRedChargeAdvantageLabel"])->SetText("");
+
+						panels["MedigunInfoRedChargeAdvantageLabel"]->SetVisible(false);
+					}
+
+					if (individual_charge_meters->GetBool()) {
+						((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter"])->SetProgress(0.0f);
+						((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter1"])->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 0.0f);
+						((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter2"])->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 1.0f);
+						((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter3"])->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 2.0f);
+						((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter4"])->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 3.0f);
+
+						panels["MedigunInfoRedChargeMeter"]->SetVisible(false);
+						panels["MedigunInfoRedChargeMeter1"]->SetVisible(true);
+						panels["MedigunInfoRedChargeMeter2"]->SetVisible(true);
+						panels["MedigunInfoRedChargeMeter3"]->SetVisible(true);
+						panels["MedigunInfoRedChargeMeter4"]->SetVisible(true);
+					}
+					else {
+						((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter"])->SetProgress(medigunInfo[TFTeam_Red].chargeLevel);
+						((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter1"])->SetProgress(0.0f);
+						((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter2"])->SetProgress(0.0f);
+						((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter3"])->SetProgress(0.0f);
+						((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter4"])->SetProgress(0.0f);
+
+						panels["MedigunInfoRedChargeMeter"]->SetVisible(true);
+						panels["MedigunInfoRedChargeMeter1"]->SetVisible(false);
+						panels["MedigunInfoRedChargeMeter2"]->SetVisible(false);
+						panels["MedigunInfoRedChargeMeter3"]->SetVisible(false);
+						panels["MedigunInfoRedChargeMeter4"]->SetVisible(false);
+					}
 
 					if (medigunInfo[TFTeam_Red].chargeRelease) {
 						if (!redChargeReleased) {
@@ -266,6 +313,29 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 				{
 					std::string redChargeLabelText = charge_label_text->GetString();
 					FindAndReplaceInString(redChargeLabelText, "%charge%", std::to_string(static_cast<long long>(floor(medigunInfo[TFTeam_Red].chargeLevel * 100))));
+
+					float redChargeAdvantage;
+
+					if (medigunInfo.find(TFTeam_Blue) != medigunInfo.end()) {
+						redChargeAdvantage = medigunInfo[TFTeam_Red].chargeLevel - medigunInfo[TFTeam_Blue].chargeLevel;
+					}
+					else {
+						redChargeAdvantage = medigunInfo[TFTeam_Red].chargeLevel;
+					}
+
+					if (floor(redChargeAdvantage * 100) > 0.0f) {
+						std::string redChargeAdvantageLabelText = charge_advantage_label_text->GetString();
+						FindAndReplaceInString(redChargeAdvantageLabelText, "%advantage%", std::to_string(static_cast<long long>(floor(redChargeAdvantage * 100))));
+
+						((vgui::Label *) panels["MedigunInfoRedChargeAdvantageLabel"])->SetText(redChargeAdvantageLabelText.c_str());
+
+						panels["MedigunInfoRedChargeAdvantageLabel"]->SetVisible(true);
+					}
+					else {
+						((vgui::Label *) panels["MedigunInfoRedChargeAdvantageLabel"])->SetText("");
+
+						panels["MedigunInfoRedChargeAdvantageLabel"]->SetVisible(false);
+					}
 				
 					((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter"])->SetProgress(medigunInfo[TFTeam_Red].chargeLevel);
 					((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter1"])->SetProgress(0.0f);
@@ -472,21 +542,61 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 					std::string bluIndividualChargesLabelText = individual_charges_label_text->GetString();
 					FindAndReplaceInString(bluIndividualChargesLabelText, "%charges%", std::to_string(static_cast<long long>(floor(medigunInfo[TFTeam_Blue].chargeLevel * 4.0f))));
 
-					((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter"])->SetProgress(0.0f);
-					((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter1"])->SetProgress((medigunInfo[TFTeam_Blue].chargeLevel * 4.0f) - 0.0f);
-					((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter2"])->SetProgress((medigunInfo[TFTeam_Blue].chargeLevel * 4.0f) - 1.0f);
-					((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter3"])->SetProgress((medigunInfo[TFTeam_Blue].chargeLevel * 4.0f) - 2.0f);
-					((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter4"])->SetProgress((medigunInfo[TFTeam_Blue].chargeLevel * 4.0f) - 3.0f);
 					((vgui::Label *) panels["MedigunInfoBluChargeLabel"])->SetText("");
 					((vgui::Label *) panels["MedigunInfoBluIndividualChargesLabel"])->SetText(bluIndividualChargesLabelText.c_str());
-				
-					panels["MedigunInfoBluChargeMeter"]->SetVisible(false);
-					panels["MedigunInfoBluChargeMeter1"]->SetVisible(true);
-					panels["MedigunInfoBluChargeMeter2"]->SetVisible(true);
-					panels["MedigunInfoBluChargeMeter3"]->SetVisible(true);
-					panels["MedigunInfoBluChargeMeter4"]->SetVisible(true);
+
 					panels["MedigunInfoBluChargeLabel"]->SetVisible(false);
 					panels["MedigunInfoBluIndividualChargesLabel"]->SetVisible(true);
+
+					float bluChargeAdvantage;
+
+					if (medigunInfo.find(TFTeam_Red) != medigunInfo.end()) {
+						bluChargeAdvantage = medigunInfo[TFTeam_Blue].chargeLevel - medigunInfo[TFTeam_Red].chargeLevel;
+					}
+					else {
+						bluChargeAdvantage = medigunInfo[TFTeam_Blue].chargeLevel;
+					}
+
+					if (floor(bluChargeAdvantage * 100) > 0.0f) {
+						std::string bluChargeAdvantageLabelText = charge_advantage_label_text->GetString();
+						FindAndReplaceInString(bluChargeAdvantageLabelText, "%advantage%", std::to_string(static_cast<long long>(floor(bluChargeAdvantage * 100))));
+
+						((vgui::Label *) panels["MedigunInfoBluChargeAdvantageLabel"])->SetText(bluChargeAdvantageLabelText.c_str());
+
+						panels["MedigunInfoBluChargeAdvantageLabel"]->SetVisible(true);
+					}
+					else {
+						((vgui::Label *) panels["MedigunInfoBluChargeAdvantageLabel"])->SetText("");
+
+						panels["MedigunInfoBluChargeAdvantageLabel"]->SetVisible(false);
+					}
+
+					if (individual_charge_meters->GetBool()) {
+						((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter"])->SetProgress(0.0f);
+						((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter1"])->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 0.0f);
+						((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter2"])->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 1.0f);
+						((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter3"])->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 2.0f);
+						((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter4"])->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 3.0f);
+
+						panels["MedigunInfoBluChargeMeter"]->SetVisible(false);
+						panels["MedigunInfoBluChargeMeter1"]->SetVisible(true);
+						panels["MedigunInfoBluChargeMeter2"]->SetVisible(true);
+						panels["MedigunInfoBluChargeMeter3"]->SetVisible(true);
+						panels["MedigunInfoBluChargeMeter4"]->SetVisible(true);
+					}
+					else {
+						((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter"])->SetProgress(medigunInfo[TFTeam_Red].chargeLevel);
+						((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter1"])->SetProgress(0.0f);
+						((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter2"])->SetProgress(0.0f);
+						((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter3"])->SetProgress(0.0f);
+						((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter4"])->SetProgress(0.0f);
+
+						panels["MedigunInfoBluChargeMeter"]->SetVisible(true);
+						panels["MedigunInfoBluChargeMeter1"]->SetVisible(false);
+						panels["MedigunInfoBluChargeMeter2"]->SetVisible(false);
+						panels["MedigunInfoBluChargeMeter3"]->SetVisible(false);
+						panels["MedigunInfoBluChargeMeter4"]->SetVisible(false);
+					}
 
 					if (medigunInfo[TFTeam_Blue].chargeRelease) {
 						if (!bluChargeReleased) {
@@ -532,6 +642,29 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 				{
 					std::string bluChargeLabelText = charge_label_text->GetString();
 					FindAndReplaceInString(bluChargeLabelText, "%charge%", std::to_string(static_cast<long long>(floor(medigunInfo[TFTeam_Blue].chargeLevel * 100))));
+
+					float bluChargeAdvantage;
+
+					if (medigunInfo.find(TFTeam_Red) != medigunInfo.end()) {
+						bluChargeAdvantage = medigunInfo[TFTeam_Blue].chargeLevel - medigunInfo[TFTeam_Red].chargeLevel;
+					}
+					else {
+						bluChargeAdvantage = medigunInfo[TFTeam_Blue].chargeLevel;
+					}
+
+					if (floor(bluChargeAdvantage * 100) > 0.0f) {
+						std::string bluChargeAdvantageLabelText = charge_advantage_label_text->GetString();
+						FindAndReplaceInString(bluChargeAdvantageLabelText, "%advantage%", std::to_string(static_cast<long long>(floor(bluChargeAdvantage * 100))));
+
+						((vgui::Label *) panels["MedigunInfoBluChargeAdvantageLabel"])->SetText(bluChargeAdvantageLabelText.c_str());
+
+						panels["MedigunInfoBluChargeAdvantageLabel"]->SetVisible(true);
+					}
+					else {
+						((vgui::Label *) panels["MedigunInfoBluChargeAdvantageLabel"])->SetText("");
+
+						panels["MedigunInfoBluChargeAdvantageLabel"]->SetVisible(false);
+					}
 				
 					((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter"])->SetProgress(medigunInfo[TFTeam_Blue].chargeLevel);
 					((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter1"])->SetProgress(0.0f);
@@ -690,27 +823,39 @@ void MedigunInfo::PreEntityUpdate() {
 }
 
 void MedigunInfo::ProcessEntity(IClientEntity* entity) {
-	if (!Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_WeaponMedigun")) {
+	if (!Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFPlayer")) {
 		return;
 	}
 
-	int player = ENTITY_INDEX_FROM_ENTITY_OFFSET(entity, Entities::pCEconEntity__m_hOwnerEntity);
-	IClientEntity *playerEntity = Interfaces::pClientEntityList->GetClientEntity(player);
-
-	if (!playerEntity) {
-		return;
-	}
-
-	TFTeam team = (TFTeam) *MAKE_PTR(int*, playerEntity, Entities::pCTFPlayer__m_iTeamNum);
+	TFTeam team = (TFTeam) *MAKE_PTR(int*, entity, Entities::pCTFPlayer__m_iTeamNum);
 
 	if (team != TFTeam_Red && team != TFTeam_Blue) {
 		return;
 	}
 
-	medigunInfo[team].itemDefinitionIndex = *MAKE_PTR(int*, entity, Entities::pCEconEntity__m_iItemDefinitionIndex);
-	medigunInfo[team].chargeRelease = *MAKE_PTR(bool*, entity, Entities::pCWeaponMedigun__m_bChargeRelease);
-	medigunInfo[team].chargeResistType = *MAKE_PTR(int*, entity, Entities::pCWeaponMedigun__m_nChargeResistType);
-	medigunInfo[team].chargeLevel = *MAKE_PTR(float*, entity, Entities::pCWeaponMedigun__m_flChargeLevel);
+	if (!Interfaces::GetGameResources()->IsAlive(entity->entindex())) {
+		return;
+	}
+
+	for (int i = 0; i < MAX_WEAPONS; i++) {
+		int weapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(entity, Entities::pCTFPlayer__m_hMyWeapons[i]);
+		IClientEntity *weaponEntity = Interfaces::pClientEntityList->GetClientEntity(weapon);
+
+		if (!weaponEntity || !Entities::CheckClassBaseclass(weaponEntity->GetClientClass(), "DT_WeaponMedigun")) {
+			continue;
+		}
+
+		Medigun_t medigun;
+
+		medigun.itemDefinitionIndex = *MAKE_PTR(int*, weaponEntity, Entities::pCEconEntity__m_iItemDefinitionIndex);
+		medigun.chargeRelease = *MAKE_PTR(bool*, weaponEntity, Entities::pCWeaponMedigun__m_bChargeRelease);
+		medigun.chargeResistType = *MAKE_PTR(int*, weaponEntity, Entities::pCWeaponMedigun__m_nChargeResistType);
+		medigun.chargeLevel = *MAKE_PTR(float*, weaponEntity, Entities::pCWeaponMedigun__m_flChargeLevel);
+
+		if (medigunInfo.find(team) == medigunInfo.end() || medigunInfo[team].chargeLevel <= 0.0f && medigun.chargeLevel >= 0.0f) {
+			medigunInfo[team] = medigun;
+		}
+	}
 }
 
 void MedigunInfo::PostEntityUpdate() {
@@ -720,50 +865,5 @@ void MedigunInfo::PostEntityUpdate() {
 void MedigunInfo::ReloadSettings() {
 	if (g_MedigunInfo->panels.find("MedigunInfo") != g_MedigunInfo->panels.end()) {
 		((vgui::EditablePanel *) g_MedigunInfo->panels["MedigunInfo"])->LoadControlSettings("Resource/UI/MedigunInfo.res");
-	}
-}
-
-void MedigunInfo::SetProgressBarDirection(const CCommand &command) {
-	if (command.ArgC() < 2)
-	{
-		Warning("Usage: statusspec_medigun_set_progress_bar_direction <name> <direction>\n");
-		return;
-	}
-
-	if (g_MedigunInfo->panels.find(command.Arg(1)) == g_MedigunInfo->panels.end()) {
-		Warning("Invalid panel specified!\n");
-		return;
-	}
-
-	vgui::ProgressBar *progressBar = dynamic_cast<vgui::ProgressBar *>(g_MedigunInfo->panels[command.Arg(1)]);
-
-	if (!progressBar) {
-		Warning("Panel is not a progress bar!\n");
-		return;
-	}
-
-	if (stricmp(command.Arg(2), "east") == 0) {
-		progressBar->SetProgressDirection(vgui::ProgressBar::PROGRESS_EAST);
-		Msg("Direction of progress bar %s set to east.\n", command.Arg(1));
-		return;
-	}
-	else if (stricmp(command.Arg(2), "west") == 0) {
-		progressBar->SetProgressDirection(vgui::ProgressBar::PROGRESS_WEST);
-		Msg("Direction of progress bar %s set to west.\n", command.Arg(1));
-		return;
-	}
-	else if (stricmp(command.Arg(2), "north") == 0) {
-		progressBar->SetProgressDirection(vgui::ProgressBar::PROGRESS_NORTH);
-		Msg("Direction of progress bar %s set to north.\n", command.Arg(1));
-		return;
-	}
-	else if (stricmp(command.Arg(2), "south") == 0) {
-		progressBar->SetProgressDirection(vgui::ProgressBar::PROGRESS_SOUTH);
-		Msg("Direction of progress bar %s set to south.\n", command.Arg(1));
-		return;
-	}
-	else {
-		Warning("Invalid direction! (Valid directions are east, west, north, south.)\n");
-		return;
 	}
 }

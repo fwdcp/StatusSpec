@@ -1,9 +1,8 @@
 /*
  *  entities.cpp
- *  WebSpec project
- *  Modified for AdvSpec, used in StatusSpec
+ *  StatusSpec project
  *  
- *  Copyright (c) 2013 Matthew McNamara
+ *  Copyright (c) 2014 thesupremecommander
  *  BSD 2-Clause License
  *  http://opensource.org/licenses/BSD-2-Clause
  *
@@ -11,9 +10,8 @@
 
 #include "entities.h"
 
-#define RetrieveAndCheckOffsetAndWarn(offset, retrieve) \
-	Entities::offset = retrieve; \
-	if (Entities::offset == INVALID_OFFSET) { \
+#define RETRIEVE_OFFSET(offset, retrieve) \
+	if (!retrieve) { \
 		Warning("[StatusSpec] Offset %s is invalid!\n", #offset); \
 		return false; \
 	}
@@ -33,177 +31,95 @@ int Entities::pCWeaponMedigun__m_bChargeRelease = 0;
 int Entities::pCWeaponMedigun__m_nChargeResistType = 0;
 int Entities::pCWeaponMedigun__m_flChargeLevel = 0;
 
-//=================================================================================
-// Find the offsets for all stored NetVars
-//=================================================================================
 bool Entities::PrepareOffsets() {
-	RetrieveAndCheckOffsetAndWarn(pCTFPlayer__m_bGlowEnabled, Entities::FindOffsetOfClassProp("CTFPlayer", "m_bGlowEnabled"));
-	RetrieveAndCheckOffsetAndWarn(pCTFPlayer__m_iClass, Entities::FindOffsetOfClassProp("CTFPlayer", "m_iClass"));
-	RetrieveAndCheckOffsetAndWarn(pCTFPlayer__m_iTeamNum, Entities::FindOffsetOfClassProp("CTFPlayer", "m_iTeamNum"));
-	RetrieveAndCheckOffsetAndWarn(pCTFPlayer__m_nPlayerCond, Entities::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCond"));
-	RetrieveAndCheckOffsetAndWarn(pCTFPlayer___condition_bits, Entities::FindOffsetOfClassProp("CTFPlayer", "_condition_bits"));
-	RetrieveAndCheckOffsetAndWarn(pCTFPlayer__m_nPlayerCondEx, Entities::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCondEx"));
-	RetrieveAndCheckOffsetAndWarn(pCTFPlayer__m_nPlayerCondEx2, Entities::FindOffsetOfClassProp("CTFPlayer", "m_nPlayerCondEx2"));
-	RetrieveAndCheckOffsetAndWarn(pCTFPlayer__m_hActiveWeapon, Entities::FindOffsetOfClassProp("CTFPlayer", "m_hActiveWeapon"));
+	RETRIEVE_OFFSET(pCTFPlayer__m_bGlowEnabled, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_bGlowEnabled, 1, "m_bGlowEnabled"));
+	RETRIEVE_OFFSET(pCTFPlayer__m_iClass, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_iClass, 1, "m_iClass"));
+	RETRIEVE_OFFSET(pCTFPlayer__m_iTeamNum, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_iTeamNum, 1, "m_iTeamNum"));
+	RETRIEVE_OFFSET(pCTFPlayer__m_nPlayerCond, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_nPlayerCond, 1, "m_nPlayerCond"));
+	RETRIEVE_OFFSET(pCTFPlayer___condition_bits, GetClassPropOffset("CTFPlayer", pCTFPlayer___condition_bits, 1, "_condition_bits"));
+	RETRIEVE_OFFSET(pCTFPlayer__m_nPlayerCondEx, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_nPlayerCondEx, 1, "m_nPlayerCondEx"));
+	RETRIEVE_OFFSET(pCTFPlayer__m_nPlayerCondEx2, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_nPlayerCondEx2, 1, "m_nPlayerCondEx2"));
+	RETRIEVE_OFFSET(pCTFPlayer__m_hActiveWeapon, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_hActiveWeapon, 1, "m_hActiveWeapon"));
 	for (int i = 0; i < MAX_WEAPONS; i++) {
-		RetrieveAndCheckOffsetAndWarn(pCTFPlayer__m_hMyWeapons[i], Entities::FindOffsetOfArrayEnt("CTFPlayer", "m_hMyWeapons", i));
+		char elementName[4] = "";
+		sprintf(elementName, "%03i", i);
+		RETRIEVE_OFFSET(pCTFPlayer__m_hMyWeapons[i], GetClassPropOffset("CTFPlayer", pCTFPlayer__m_hMyWeapons[i], 2, "m_hMyWeapons", elementName));
 	}
-	RetrieveAndCheckOffsetAndWarn(pCEconEntity__m_hOwnerEntity, Entities::FindOffsetOfClassProp("CEconEntity", "m_hOwnerEntity"));
-	RetrieveAndCheckOffsetAndWarn(pCEconEntity__m_iItemDefinitionIndex, Entities::FindOffsetOfClassProp("CEconEntity", "m_iItemDefinitionIndex"));
-	RetrieveAndCheckOffsetAndWarn(pCWeaponMedigun__m_bChargeRelease, Entities::FindOffsetOfClassProp("CWeaponMedigun", "m_bChargeRelease"));
-	RetrieveAndCheckOffsetAndWarn(pCWeaponMedigun__m_nChargeResistType, Entities::FindOffsetOfClassProp("CWeaponMedigun", "m_nChargeResistType"));
-	RetrieveAndCheckOffsetAndWarn(pCWeaponMedigun__m_flChargeLevel, Entities::FindOffsetOfClassProp("CWeaponMedigun", "m_flChargeLevel"));
-	
+	RETRIEVE_OFFSET(pCEconEntity__m_hOwnerEntity, GetClassPropOffset("CEconEntity", pCEconEntity__m_hOwnerEntity, 1, "m_hOwnerEntity"));
+	RETRIEVE_OFFSET(pCEconEntity__m_iItemDefinitionIndex, GetClassPropOffset("CEconEntity", pCEconEntity__m_iItemDefinitionIndex, 1, "m_iItemDefinitionIndex"));
+	RETRIEVE_OFFSET(pCWeaponMedigun__m_bChargeRelease, GetClassPropOffset("CWeaponMedigun", pCWeaponMedigun__m_bChargeRelease, 1, "m_bChargeRelease"));
+	RETRIEVE_OFFSET(pCWeaponMedigun__m_nChargeResistType, GetClassPropOffset("CWeaponMedigun", pCWeaponMedigun__m_nChargeResistType, 1, "m_nChargeResistType"));
+	RETRIEVE_OFFSET(pCWeaponMedigun__m_flChargeLevel, GetClassPropOffset("CWeaponMedigun", pCWeaponMedigun__m_flChargeLevel, 1, "m_flChargeLevel"));
+
 	return true;
 }
 
-//=================================================================================
-// Loop through all server classes until className is found, then crawl through the
-// class to find the property
-//=================================================================================
-int Entities::FindOffsetOfClassProp(const char *className, const char *propName) {
-	//ServerClass *sc = serverGameDLL->GetAllServerClasses();
+bool Entities::GetClassPropOffset(const char *className, int &offset, int depth, ...) {
 	ClientClass *cc = Interfaces::pClientDLL->GetAllClasses();
+
 	while (cc) {
 		if (Q_strcmp(cc->GetName(), className) == 0) {
-			//SendTable *sTable = sc->m_pTable;
-			RecvTable *sTable = cc->m_pRecvTable;
-			if (sTable) {
-				int offset = 0;
-				bool found = Entities::CrawlForPropOffset(sTable, propName, offset);
-				if (!found)
-					offset = -1;
-				return offset;
-			}
-		}
-		cc = cc->m_pNext;
-	}
-	return -1;
-}
+			RecvTable *table = cc->m_pRecvTable;
 
-int Entities::FindOffsetOfArrayEnt(const char *classname, const char *arrayName, int element) {
-	ClientClass *cc = Interfaces::pClientDLL->GetAllClasses();
-	while (cc) {
-		if (Q_strcmp(cc->GetName(), classname) == 0) {
-			RecvTable *rTable = cc->m_pRecvTable;
-			if (rTable) {
-				int offset = 0;
-				bool found = Entities::CrawlForArrayEnt(rTable, arrayName, element, offset);
-				if (!found)
-					offset = -1;
-				return offset;
-			}
-		}
-		cc = cc->m_pNext;
-	}
+			offset = 0;
+			RecvProp *prop = nullptr;
 
-	return -1;
-}
+			if (table) {
+				va_list args;
+				va_start(args, depth);
 
-//=================================================================================
-// Search through a class table, and any subtables, for a given property name
-//=================================================================================
-bool Entities::CrawlForPropOffset(RecvTable *sTable, const char *propName, int &offset) {
-	for (int i=0; i < sTable->GetNumProps(); i++) {
-		//SendProp *sProp = sTable->GetProp(i);
-		RecvProp *sProp = sTable->GetProp(i);
-		if (strcmp(sProp->GetName(),"000") == 0) //End of an array
-			continue;
+				for (int i = 0; i < depth; i++) {
+					int subOffset = 0;
 
-		//SendTable *sChildTable = sProp->GetDataTable();
-		RecvTable *sChildTable = sProp->GetDataTable();
+					if (prop && prop->GetType() == DPT_DataTable) {
+						table = prop->GetDataTable();
+					}
 
-		//Check if it is an array, don't care for these atm so skip them
-		bool isArray = false;
-		if (sChildTable && sChildTable->GetNumProps() > 0) {
-			if (!strcmp(sChildTable->GetProp(0)->GetName(), "000")
-				|| !strcmp(sChildTable->GetProp(0)->GetName(), "lengthproxy"))
-				isArray = true;
-		}
+					if (!table) {
+						return false;
+					}
 
-		if (!isArray) {
-			//If we have our property, add to the offset and start returning
-			if (strcmp(sProp->GetName(), propName) == 0) {
-				offset += sProp->GetOffset();
+					if (GetSubProp(table, va_arg(args, const char *), prop, subOffset)) {
+						offset += subOffset;
+					}
+					else {
+						return false;
+					}
+
+					table = nullptr;
+				}
+
+				va_end(args);
+
 				return true;
 			}
-			
-			//If we find a subtable, search it for the property, 
-			//but keep current offset in case it isn't found here
-			if (sProp->GetType() == DPT_DataTable) {
-				int origOffset = offset;
-				offset += sProp->GetOffset();
-				bool found = Entities::CrawlForPropOffset(sChildTable, propName, offset);
-				if (found) {
-					return true;
-				} else {
-					offset = origOffset;
-				}
-			}
-		} else {
-			continue;
 		}
-
-		if (strcmp(sProp->GetName(), "000") == 0) //More array stuff from dumping function, may not be needed here
-			break;
+		cc = cc->m_pNext;
 	}
+
 	return false;
 }
 
-bool Entities::CrawlForArrayEnt(RecvTable *sTable, const char *propName, int element, int &offset) {
-	for (int i=0; i < sTable->GetNumProps(); i++) {
-		RecvProp *sProp = sTable->GetProp(i);
-		if (strcmp(sProp->GetName(),"000") == 0) //End of an array
-			continue;
+bool Entities::GetSubProp(RecvTable *table, const char *propName, RecvProp *&prop, int &offset) {
+	for (int i = 0; i < table->GetNumProps(); i++) {
+		offset = 0;
 
-		//SendTable *sChildTable = sProp->GetDataTable();
-		RecvTable *sChildTable = sProp->GetDataTable();
+		RecvProp *currentProp = table->GetProp(i);
 
-		//Check if it is an array, don't care for these atm so skip them
-		bool isArray = false;
-		if (sChildTable && sChildTable->GetNumProps() > 0) {
-			if (!strcmp(sChildTable->GetProp(0)->GetName(), "000")
-				|| !strcmp(sChildTable->GetProp(0)->GetName(), "lengthproxy"))
-				isArray = true;
-		}
-
-		if (!isArray) {
-			//If we have our property, add to the offset and start returning
-			if (strcmp(sProp->GetName(), propName) == 0) {
-				offset += sProp->GetOffset();
-				return true;
-			}
-			
-			//If we find a subtable, search it for the property, 
-			//but keep current offset in case it isn't found here
-			if (sProp->GetType() == DPT_DataTable) {
-				int origOffset = offset;
-				offset += sProp->GetOffset();
-				bool found = Entities::CrawlForArrayEnt(sChildTable, propName, element, offset);
-				if (found) {
-					return true;
-				} else {
-					offset = origOffset;
-				}
-			}
-		} else {
-			if (strcmp(sProp->GetName(), propName) != 0)
-				continue;
-
-			//We have our array
-			offset += sProp->GetOffset();
-
-			int elements = sProp->GetDataTable()->GetNumProps();
-			if (element < 0 || element >= elements)
-				return false;
-
-			offset += sProp->GetDataTable()->GetProp(element)->GetOffset();
+		if (strcmp(currentProp->GetName(), propName) == 0) {
+			prop = currentProp;
+			offset = currentProp->GetOffset();
 			return true;
 		}
 
-		if (strcmp(sProp->GetName(), "000") == 0) //More array stuff from dumping function, may not be needed here
-			break;
+		if (currentProp->GetType() == DPT_DataTable) {
+			if (GetSubProp(currentProp->GetDataTable(), propName, prop, offset)) {
+				offset += currentProp->GetOffset();
+				return true;
+			}
+		}
 	}
+
 	return false;
 }
 
