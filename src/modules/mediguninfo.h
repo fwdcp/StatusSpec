@@ -72,6 +72,7 @@ private:
 
 	void InitHud();
 	
+	ConVar *charge_advantage_label_text;
 	ConVar *charge_label_text;
 	ConVar *enabled;
 	ConVar *individual_charge_meters;

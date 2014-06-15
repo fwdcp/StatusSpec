@@ -29,6 +29,7 @@ inline void StartAnimationSequence(const char *sequenceName) {
 MedigunInfo::MedigunInfo() {
 	mainPanel = vgui::INVALID_PANEL;
 
+	charge_advantage_label_text = new ConVar("statusspec_mediguninfo_charge_advantage_label_text", "+%advantage%%", FCVAR_PRINTABLEONLY, "text for charge advantage label in medigun info ('%advantage%' is replaced with the current charge advantage percentage number)");
 	charge_label_text = new ConVar("statusspec_mediguninfo_charge_label_text", "%charge%%", FCVAR_PRINTABLEONLY, "text for charge label in medigun info ('%charge%' is replaced with the current charge percentage number)");
 	enabled = new ConVar("statusspec_mediguninfo_enabled", "0", FCVAR_NONE, "enable medigun info");
 	individual_charge_meters = new ConVar("statusspec_mediguninfo_individual_charge_meters", "1", FCVAR_NONE, "enable individual charge meters (for Vaccinator)");
@@ -99,6 +100,9 @@ void MedigunInfo::InitHud() {
 		
 		panels["MedigunInfoRedIndividualChargesLabel"] = new vgui::Label(medigunInfoPanel, "MedigunInfoRedIndividualChargesLabel", "");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedIndividualChargesLabel"]);
+
+		panels["MedigunInfoRedChargeAdvantageLabel"] = new vgui::Label(medigunInfoPanel, "MedigunInfoRedChargeAdvantageLabel", "");
+		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeAdvantageLabel"]);
 		
 		panels["MedigunInfoRedChargeTypeIcon"] = new vgui::ImagePanel(medigunInfoPanel, "MedigunInfoRedChargeTypeIcon");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeTypeIcon"]);
@@ -129,6 +133,9 @@ void MedigunInfo::InitHud() {
 		
 		panels["MedigunInfoBluIndividualChargesLabel"] = new vgui::Label(medigunInfoPanel, "MedigunInfoBluIndividualChargesLabel", "");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluIndividualChargesLabel"]);
+
+		panels["MedigunInfoBluChargeAdvantageLabel"] = new vgui::Label(medigunInfoPanel, "MedigunInfoBluChargeAdvantageLabel", "");
+		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeAdvantageLabel"]);
 		
 		panels["MedigunInfoBluChargeTypeIcon"] = new vgui::ImagePanel(medigunInfoPanel, "MedigunInfoBluChargeTypeIcon");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeTypeIcon"]);
@@ -212,6 +219,29 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 					panels["MedigunInfoRedChargeLabel"]->SetVisible(false);
 					panels["MedigunInfoRedIndividualChargesLabel"]->SetVisible(true);
 
+					float redChargeAdvantage;
+
+					if (medigunInfo.find(TFTeam_Blue) != medigunInfo.end()) {
+						redChargeAdvantage = medigunInfo[TFTeam_Red].chargeLevel - medigunInfo[TFTeam_Blue].chargeLevel;
+					}
+					else {
+						redChargeAdvantage = medigunInfo[TFTeam_Red].chargeLevel;
+					}
+
+					if (floor(redChargeAdvantage * 100) > 0.0f) {
+						std::string redChargeAdvantageLabelText = charge_advantage_label_text->GetString();
+						FindAndReplaceInString(redChargeAdvantageLabelText, "%advantage%", std::to_string(static_cast<long long>(floor(redChargeAdvantage * 100))));
+
+						((vgui::Label *) panels["MedigunInfoRedChargeAdvantageLabel"])->SetText(redChargeAdvantageLabelText.c_str());
+
+						panels["MedigunInfoRedChargeAdvantageLabel"]->SetVisible(true);
+					}
+					else {
+						((vgui::Label *) panels["MedigunInfoRedChargeAdvantageLabel"])->SetText("");
+
+						panels["MedigunInfoRedChargeAdvantageLabel"]->SetVisible(false);
+					}
+
 					if (individual_charge_meters->GetBool()) {
 						((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter"])->SetProgress(0.0f);
 						((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter1"])->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 0.0f);
@@ -283,6 +313,29 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 				{
 					std::string redChargeLabelText = charge_label_text->GetString();
 					FindAndReplaceInString(redChargeLabelText, "%charge%", std::to_string(static_cast<long long>(floor(medigunInfo[TFTeam_Red].chargeLevel * 100))));
+
+					float redChargeAdvantage;
+
+					if (medigunInfo.find(TFTeam_Blue) != medigunInfo.end()) {
+						redChargeAdvantage = medigunInfo[TFTeam_Red].chargeLevel - medigunInfo[TFTeam_Blue].chargeLevel;
+					}
+					else {
+						redChargeAdvantage = medigunInfo[TFTeam_Red].chargeLevel;
+					}
+
+					if (floor(redChargeAdvantage * 100) > 0.0f) {
+						std::string redChargeAdvantageLabelText = charge_advantage_label_text->GetString();
+						FindAndReplaceInString(redChargeAdvantageLabelText, "%advantage%", std::to_string(static_cast<long long>(floor(redChargeAdvantage * 100))));
+
+						((vgui::Label *) panels["MedigunInfoRedChargeAdvantageLabel"])->SetText(redChargeAdvantageLabelText.c_str());
+
+						panels["MedigunInfoRedChargeAdvantageLabel"]->SetVisible(true);
+					}
+					else {
+						((vgui::Label *) panels["MedigunInfoRedChargeAdvantageLabel"])->SetText("");
+
+						panels["MedigunInfoRedChargeAdvantageLabel"]->SetVisible(false);
+					}
 				
 					((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter"])->SetProgress(medigunInfo[TFTeam_Red].chargeLevel);
 					((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter1"])->SetProgress(0.0f);
@@ -495,6 +548,29 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 					panels["MedigunInfoBluChargeLabel"]->SetVisible(false);
 					panels["MedigunInfoBluIndividualChargesLabel"]->SetVisible(true);
 
+					float bluChargeAdvantage;
+
+					if (medigunInfo.find(TFTeam_Red) != medigunInfo.end()) {
+						bluChargeAdvantage = medigunInfo[TFTeam_Blue].chargeLevel - medigunInfo[TFTeam_Red].chargeLevel;
+					}
+					else {
+						bluChargeAdvantage = medigunInfo[TFTeam_Blue].chargeLevel;
+					}
+
+					if (floor(bluChargeAdvantage * 100) > 0.0f) {
+						std::string bluChargeAdvantageLabelText = charge_advantage_label_text->GetString();
+						FindAndReplaceInString(bluChargeAdvantageLabelText, "%advantage%", std::to_string(static_cast<long long>(floor(bluChargeAdvantage * 100))));
+
+						((vgui::Label *) panels["MedigunInfoBluChargeAdvantageLabel"])->SetText(bluChargeAdvantageLabelText.c_str());
+
+						panels["MedigunInfoBluChargeAdvantageLabel"]->SetVisible(true);
+					}
+					else {
+						((vgui::Label *) panels["MedigunInfoBluChargeAdvantageLabel"])->SetText("");
+
+						panels["MedigunInfoBluChargeAdvantageLabel"]->SetVisible(false);
+					}
+
 					if (individual_charge_meters->GetBool()) {
 						((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter"])->SetProgress(0.0f);
 						((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter1"])->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 0.0f);
@@ -566,6 +642,29 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 				{
 					std::string bluChargeLabelText = charge_label_text->GetString();
 					FindAndReplaceInString(bluChargeLabelText, "%charge%", std::to_string(static_cast<long long>(floor(medigunInfo[TFTeam_Blue].chargeLevel * 100))));
+
+					float bluChargeAdvantage;
+
+					if (medigunInfo.find(TFTeam_Red) != medigunInfo.end()) {
+						bluChargeAdvantage = medigunInfo[TFTeam_Blue].chargeLevel - medigunInfo[TFTeam_Red].chargeLevel;
+					}
+					else {
+						bluChargeAdvantage = medigunInfo[TFTeam_Blue].chargeLevel;
+					}
+
+					if (floor(bluChargeAdvantage * 100) > 0.0f) {
+						std::string bluChargeAdvantageLabelText = charge_advantage_label_text->GetString();
+						FindAndReplaceInString(bluChargeAdvantageLabelText, "%advantage%", std::to_string(static_cast<long long>(floor(bluChargeAdvantage * 100))));
+
+						((vgui::Label *) panels["MedigunInfoBluChargeAdvantageLabel"])->SetText(bluChargeAdvantageLabelText.c_str());
+
+						panels["MedigunInfoBluChargeAdvantageLabel"]->SetVisible(true);
+					}
+					else {
+						((vgui::Label *) panels["MedigunInfoBluChargeAdvantageLabel"])->SetText("");
+
+						panels["MedigunInfoBluChargeAdvantageLabel"]->SetVisible(false);
+					}
 				
 					((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter"])->SetProgress(medigunInfo[TFTeam_Blue].chargeLevel);
 					((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter1"])->SetProgress(0.0f);

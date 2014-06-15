@@ -107,6 +107,26 @@
 		"fgcolor"		"NotoWhite"
 	}
 	
+	"MedigunInfoRedChargeAdvantageLabel"
+	{
+		"ControlName"	"Label"
+		"fieldName"		"MedigunInfoRedChargeAdvantageLabel"
+		"xpos"			"165"
+		"ypos"			"21"
+		"zpos"			"2"
+		"wide"			"50"
+		"tall"			"14"
+		"autoResize"	"1"
+		"visible"		"1"
+		"enabled"		"1"
+		"tabPosition"	"0"
+		"textAlignment"	"center"
+		"dulltext"		"0"
+		"brighttext"	"0"
+		"font"			"Noto8"
+		"fgcolor"		"NotoWhite"
+	}
+	
 	"MedigunInfoRedChargeMeter"
 	{
 		"ControlName"		"ImageProgressBar"
@@ -295,6 +315,26 @@
 		"ypos"			"3"
 		"zpos"			"2"
 		"wide"			"14"
+		"tall"			"14"
+		"autoResize"	"1"
+		"visible"		"1"
+		"enabled"		"1"
+		"tabPosition"	"0"
+		"textAlignment"	"center"
+		"dulltext"		"0"
+		"brighttext"	"0"
+		"font"			"Noto8"
+		"fgcolor"		"NotoWhite"
+	}
+	
+	"MedigunInfoBluChargeAdvantageLabel"
+	{
+		"ControlName"	"Label"
+		"fieldName"		"MedigunInfoBluChargeAdvantageLabel"
+		"xpos"			"165"
+		"ypos"			"3"
+		"zpos"			"2"
+		"wide"			"50"
 		"tall"			"14"
 		"autoResize"	"1"
 		"visible"		"1"
