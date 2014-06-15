@@ -15,17 +15,18 @@
 #include <map>
 #include <string>
 
-#include "vgui_controls/AnimationController.h"
 #include "convar.h"
-#include "vgui_controls/EditablePanel.h"
-#include "iclientmode.h"
-#include "vgui_controls/ImagePanel.h"
-#include "vgui_controls/ScalableImagePanel.h"
 #include "vgui/IPanel.h"
 #include "vgui/IVGui.h"
+#include "vgui_controls/Controls.h"
+#include "iclientmode.h"
+#include "vgui_controls/AnimationController.h"
+#include "vgui_controls/EditablePanel.h"
 #include "vgui_controls/Label.h"
+#include "vgui_controls/ImagePanel.h"
+#include "../vgui_controls/ImageProgressBar.h"
 #include "vgui_controls/ProgressBar.h"
-#include "../ui/ImageProgressBar.h"
+#include "vgui_controls/ScalableImagePanel.h"
 
 #include "../entities.h"
 #include "../enums.h"
