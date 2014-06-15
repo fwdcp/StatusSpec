@@ -72,9 +72,10 @@ private:
 
 	void InitHud();
 	
-	ConVar* charge_label_text;
-	ConVar* enabled;
-	ConVar* individual_charges_label_text;
+	ConVar *charge_label_text;
+	ConVar *enabled;
+	ConVar *individual_charge_meters;
+	ConVar *individual_charges_label_text;
 	ConCommand* reload_settings;
 	static void ReloadSettings();
 };
