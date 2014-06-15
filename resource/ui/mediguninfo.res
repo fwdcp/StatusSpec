@@ -126,6 +126,7 @@
 		"brighttext"		"0"
 		"bgcolor_override"	"NotoMedicBarBG"
 		"fgcolor_override" 	"NotoMedicBarNormal"
+		"direction"			"east"
 	}
 	
 	"MedigunInfoRedChargeMeter1"
@@ -147,6 +148,7 @@
 		"brighttext"		"0"
 		"bgcolor_override"	"NotoMedicBarBG"
 		"fgcolor_override" 	"NotoMedicBarNormal"
+		"direction"			"east"
 	}
 	
 	"MedigunInfoRedChargeMeter2"
@@ -168,6 +170,7 @@
 		"brighttext"		"0"
 		"bgcolor_override"	"NotoMedicBarBG"
 		"fgcolor_override" 	"NotoMedicBarNormal"
+		"direction"			"east"
 	}
 	
 	"MedigunInfoRedChargeMeter3"
@@ -189,6 +192,7 @@
 		"brighttext"		"0"
 		"bgcolor_override"	"NotoMedicBarBG"
 		"fgcolor_override" 	"NotoMedicBarNormal"
+		"direction"			"east"
 	}
 	
 	"MedigunInfoRedChargeMeter4"
@@ -210,6 +214,7 @@
 		"brighttext"		"0"
 		"bgcolor_override"	"NotoMedicBarBG"
 		"fgcolor_override" 	"NotoMedicBarNormal"
+		"direction"			"east"
 	}
 	
 	"MedigunInfoRedChargeTypeIcon"
@@ -321,6 +326,7 @@
 		"brighttext"		"0"
 		"bgcolor_override"	"NotoMedicBarBG"
 		"fgcolor_override" 	"NotoMedicBarNormal"
+		"direction"			"east"
 	}
 	
 	"MedigunInfoBluChargeMeter1"
@@ -342,6 +348,7 @@
 		"brighttext"		"0"
 		"bgcolor_override"	"NotoMedicBarBG"
 		"fgcolor_override" 	"NotoMedicBarNormal"
+		"direction"			"east"
 	}
 	
 	"MedigunInfoBluChargeMeter2"
@@ -363,6 +370,7 @@
 		"brighttext"		"0"
 		"bgcolor_override"	"NotoMedicBarBG"
 		"fgcolor_override" 	"NotoMedicBarNormal"
+		"direction"			"east"
 	}
 	
 	"MedigunInfoBluChargeMeter3"
@@ -384,6 +392,7 @@
 		"brighttext"		"0"
 		"bgcolor_override"	"NotoMedicBarBG"
 		"fgcolor_override" 	"NotoMedicBarNormal"
+		"direction"			"east"
 	}
 	
 	"MedigunInfoBluChargeMeter4"
@@ -405,6 +414,7 @@
 		"brighttext"		"0"
 		"bgcolor_override"	"NotoMedicBarBG"
 		"fgcolor_override" 	"NotoMedicBarNormal"
+		"direction"			"east"
 	}
 	
 	"MedigunInfoBluChargeTypeIcon"

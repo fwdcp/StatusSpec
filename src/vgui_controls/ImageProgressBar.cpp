@@ -73,6 +73,20 @@ namespace vgui {
 		const char *bottomTextureName = inResourceData->GetString("BottomImage", "");
 		SetBottomTexture(bottomTextureName);
 
+		const char *directionName = inResourceData->GetString("direction", "");
+		if (stricmp(directionName, "east") == 0) {
+			SetProgressDirection(PROGRESS_EAST);
+		}
+		else if (stricmp(directionName, "west") == 0) {
+			SetProgressDirection(PROGRESS_WEST);
+		}
+		else if (stricmp(directionName, "north") == 0) {
+			SetProgressDirection(PROGRESS_NORTH);
+		}
+		else if (stricmp(directionName, "south") == 0) {
+			SetProgressDirection(PROGRESS_SOUTH);
+		}
+
 		BaseClass::ApplySettings(inResourceData);
 	}
 
@@ -81,6 +95,18 @@ namespace vgui {
 		BaseClass::GetSettings(outResourceData);
 		outResourceData->SetString("TopImage", m_szTopTextureName);
 		outResourceData->SetString("BottomImage", m_szBottomTextureName);
+		if (GetProgressDirection() == PROGRESS_EAST) {
+			outResourceData->SetString("direction", "east");
+		}
+		else if (GetProgressDirection() == PROGRESS_WEST) {
+			outResourceData->SetString("direction", "west");
+		}
+		else if (GetProgressDirection() == PROGRESS_NORTH) {
+			outResourceData->SetString("direction", "north");
+		}
+		else if (GetProgressDirection() == PROGRESS_SOUTH) {
+			outResourceData->SetString("direction", "south");
+		}
 	}
 
 	void ImageProgressBar::Paint(void)
