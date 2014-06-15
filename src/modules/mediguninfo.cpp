@@ -206,6 +206,12 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 					std::string redIndividualChargesLabelText = individual_charges_label_text->GetString();
 					FindAndReplaceInString(redIndividualChargesLabelText, "%charges%", std::to_string(static_cast<long long>(floor(medigunInfo[TFTeam_Red].chargeLevel * 4.0f))));
 
+					((vgui::Label *) panels["MedigunInfoRedChargeLabel"])->SetText("");
+					((vgui::Label *) panels["MedigunInfoRedIndividualChargesLabel"])->SetText(redIndividualChargesLabelText.c_str());
+
+					panels["MedigunInfoRedChargeLabel"]->SetVisible(false);
+					panels["MedigunInfoRedIndividualChargesLabel"]->SetVisible(true);
+
 					if (individual_charge_meters->GetBool()) {
 						((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter"])->SetProgress(0.0f);
 						((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter1"])->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 0.0f);
@@ -232,12 +238,6 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 						panels["MedigunInfoRedChargeMeter3"]->SetVisible(false);
 						panels["MedigunInfoRedChargeMeter4"]->SetVisible(false);
 					}
-
-					((vgui::Label *) panels["MedigunInfoRedChargeLabel"])->SetText("");
-					((vgui::Label *) panels["MedigunInfoRedIndividualChargesLabel"])->SetText(redIndividualChargesLabelText.c_str());
-
-					panels["MedigunInfoRedChargeLabel"]->SetVisible(false);
-					panels["MedigunInfoRedIndividualChargesLabel"]->SetVisible(true);
 
 					if (medigunInfo[TFTeam_Red].chargeRelease) {
 						if (!redChargeReleased) {
@@ -489,6 +489,12 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 					std::string bluIndividualChargesLabelText = individual_charges_label_text->GetString();
 					FindAndReplaceInString(bluIndividualChargesLabelText, "%charges%", std::to_string(static_cast<long long>(floor(medigunInfo[TFTeam_Blue].chargeLevel * 4.0f))));
 
+					((vgui::Label *) panels["MedigunInfoBluChargeLabel"])->SetText("");
+					((vgui::Label *) panels["MedigunInfoBluIndividualChargesLabel"])->SetText(bluIndividualChargesLabelText.c_str());
+
+					panels["MedigunInfoBluChargeLabel"]->SetVisible(false);
+					panels["MedigunInfoBluIndividualChargesLabel"]->SetVisible(true);
+
 					if (individual_charge_meters->GetBool()) {
 						((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter"])->SetProgress(0.0f);
 						((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter1"])->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 0.0f);
@@ -515,12 +521,6 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 						panels["MedigunInfoBluChargeMeter3"]->SetVisible(false);
 						panels["MedigunInfoBluChargeMeter4"]->SetVisible(false);
 					}
-
-					((vgui::Label *) panels["MedigunInfoBluChargeLabel"])->SetText("");
-					((vgui::Label *) panels["MedigunInfoBluIndividualChargesLabel"])->SetText(bluIndividualChargesLabelText.c_str());
-
-					panels["MedigunInfoBluChargeLabel"]->SetVisible(false);
-					panels["MedigunInfoBluIndividualChargesLabel"]->SetVisible(true);
 
 					if (medigunInfo[TFTeam_Blue].chargeRelease) {
 						if (!bluChargeReleased) {
