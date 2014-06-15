@@ -33,7 +33,7 @@
 	
 	"MedigunInfoRedBackground"
 	{
-		"ControlName" 	"ImagePanel"
+		"ControlName" 	"ScalableImagePanel"
 		"fieldName" 	"MedigunInfoRedBackground"
 		"xpos" 			"2"
 		"ypos"			"20"
@@ -44,7 +44,7 @@
 		"pinCorner"		"0"
 		"visible" 		"1"
 		"enabled" 		"1"
-		"fillcolor" 	"HUDRedTeam"
+		"drawcolor" 	"HUDRedTeam"
 	}
 	
 	"MedigunInfoRedNameLabel"
@@ -109,7 +109,7 @@
 	
 	"MedigunInfoRedChargeMeter"
 	{
-		"ControlName"		"ContinuousProgressBar"
+		"ControlName"		"ImageProgressBar"
 		"fieldName"			"MedigunInfoRedChargeMeter"
 		"font"				"Default"
 		"xpos"				"19"
@@ -130,7 +130,7 @@
 	
 	"MedigunInfoRedChargeMeter1"
 	{
-		"ControlName"		"ContinuousProgressBar"
+		"ControlName"		"ImageProgressBar"
 		"fieldName"			"MedigunInfoRedChargeMeter1"
 		"font"				"Default"
 		"xpos"				"19"
@@ -151,7 +151,7 @@
 	
 	"MedigunInfoRedChargeMeter2"
 	{
-		"ControlName"		"ContinuousProgressBar"
+		"ControlName"		"ImageProgressBar"
 		"fieldName"			"MedigunInfoRedChargeMeter2"
 		"font"				"Default"
 		"xpos"				"51"
@@ -172,7 +172,7 @@
 	
 	"MedigunInfoRedChargeMeter3"
 	{
-		"ControlName"		"ContinuousProgressBar"
+		"ControlName"		"ImageProgressBar"
 		"fieldName"			"MedigunInfoRedChargeMeter3"
 		"font"				"Default"
 		"xpos"				"83"
@@ -193,7 +193,7 @@
 	
 	"MedigunInfoRedChargeMeter4"
 	{
-		"ControlName"		"ContinuousProgressBar"
+		"ControlName"		"ImageProgressBar"
 		"fieldName"			"MedigunInfoRedChargeMeter4"
 		"font"				"Default"
 		"xpos"				"115"
@@ -228,7 +228,7 @@
 	
 	"MedigunInfoBluBackground"
 	{
-		"ControlName" 	"ImagePanel"
+		"ControlName" 	"ScalableImagePanel"
 		"fieldName" 	"MedigunInfoBluBackground"
 		"xpos" 			"2"
 		"ypos"			"2"
@@ -239,7 +239,7 @@
 		"pinCorner"		"0"
 		"visible" 		"1"
 		"enabled" 		"1"
-		"fillcolor" 	"HUDBlueTeam"
+		"drawcolor" 	"HUDBlueTeam"
 	}
 	
 	"MedigunInfoBluNameLabel"
@@ -304,7 +304,7 @@
 	
 	"MedigunInfoBluChargeMeter"
 	{
-		"ControlName"		"ContinuousProgressBar"
+		"ControlName"		"ImageProgressBar"
 		"fieldName"			"MedigunInfoBluChargeMeter"
 		"font"				"Default"
 		"xpos"				"19"
@@ -325,7 +325,7 @@
 	
 	"MedigunInfoBluChargeMeter1"
 	{
-		"ControlName"		"ContinuousProgressBar"
+		"ControlName"		"ImageProgressBar"
 		"fieldName"			"MedigunInfoBluChargeMeter1"
 		"font"				"Default"
 		"xpos"				"19"
@@ -346,7 +346,7 @@
 	
 	"MedigunInfoBluChargeMeter2"
 	{
-		"ControlName"		"ContinuousProgressBar"
+		"ControlName"		"ImageProgressBar"
 		"fieldName"			"MedigunInfoBluChargeMeter2"
 		"font"				"Default"
 		"xpos"				"51"
@@ -367,7 +367,7 @@
 	
 	"MedigunInfoBluChargeMeter3"
 	{
-		"ControlName"		"ContinuousProgressBar"
+		"ControlName"		"ImageProgressBar"
 		"fieldName"			"MedigunInfoBluChargeMeter3"
 		"font"				"Default"
 		"xpos"				"83"
@@ -388,7 +388,7 @@
 	
 	"MedigunInfoBluChargeMeter4"
 	{
-		"ControlName"		"ContinuousProgressBar"
+		"ControlName"		"ImageProgressBar"
 		"fieldName"			"MedigunInfoBluChargeMeter4"
 		"font"				"Default"
 		"xpos"				"115"
