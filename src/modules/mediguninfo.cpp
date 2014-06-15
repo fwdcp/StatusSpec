@@ -70,7 +70,7 @@ void MedigunInfo::InitHud() {
 		panels["MedigunInfo"] = medigunInfoPanel;
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), medigunInfoPanel);
 		
-		panels["MedigunInfoBackground"] = new vgui::ImagePanel(medigunInfoPanel, "MedigunInfoBackground");
+		panels["MedigunInfoBackground"] = new vgui::ScalableImagePanel(medigunInfoPanel, "MedigunInfoBackground");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBackground"]);
 		
 		panels["MedigunInfoRedBackground"] = new vgui::ImagePanel(medigunInfoPanel, "MedigunInfoRedBackground");
@@ -79,19 +79,19 @@ void MedigunInfo::InitHud() {
 		panels["MedigunInfoRedNameLabel"] = new vgui::Label(medigunInfoPanel, "MedigunInfoRedNameLabel", "");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedNameLabel"]);
 		
-		panels["MedigunInfoRedChargeMeter"] = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter");
+		panels["MedigunInfoRedChargeMeter"] = new ImageProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeMeter"]);
 		
-		panels["MedigunInfoRedChargeMeter1"] = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter1");
+		panels["MedigunInfoRedChargeMeter1"] = new ImageProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter1");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeMeter1"]);
 		
-		panels["MedigunInfoRedChargeMeter2"] = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter2");
+		panels["MedigunInfoRedChargeMeter2"] = new ImageProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter2");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeMeter2"]);
 		
-		panels["MedigunInfoRedChargeMeter3"] = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter3");
+		panels["MedigunInfoRedChargeMeter3"] = new ImageProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter3");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeMeter3"]);
 		
-		panels["MedigunInfoRedChargeMeter4"] = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter4");
+		panels["MedigunInfoRedChargeMeter4"] = new ImageProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter4");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeMeter4"]);
 		
 		panels["MedigunInfoRedChargeLabel"] = new vgui::Label(medigunInfoPanel, "MedigunInfoRedChargeLabel", "");
@@ -109,19 +109,19 @@ void MedigunInfo::InitHud() {
 		panels["MedigunInfoBluNameLabel"] = new vgui::Label(medigunInfoPanel, "MedigunInfoBluNameLabel", "");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluNameLabel"]);
 		
-		panels["MedigunInfoBluChargeMeter"] = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter");
+		panels["MedigunInfoBluChargeMeter"] = new ImageProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeMeter"]);
 		
-		panels["MedigunInfoBluChargeMeter1"] = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter1");
+		panels["MedigunInfoBluChargeMeter1"] = new ImageProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter1");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeMeter1"]);
 		
-		panels["MedigunInfoBluChargeMeter2"] = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter2");
+		panels["MedigunInfoBluChargeMeter2"] = new ImageProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter2");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeMeter2"]);
 		
-		panels["MedigunInfoBluChargeMeter3"] = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter3");
+		panels["MedigunInfoBluChargeMeter3"] = new ImageProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter3");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeMeter3"]);
 		
-		panels["MedigunInfoBluChargeMeter4"] = new vgui::ContinuousProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter4");
+		panels["MedigunInfoBluChargeMeter4"] = new ImageProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter4");
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeMeter4"]);
 		
 		panels["MedigunInfoBluChargeLabel"] = new vgui::Label(medigunInfoPanel, "MedigunInfoBluChargeLabel", "");
