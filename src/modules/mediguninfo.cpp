@@ -459,7 +459,7 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 			}
 		}
 		else {
-			((vgui::Label *) panels["MedigunInfoRedNameLabel"])->SetText("N/A");
+			((vgui::Label *) panels["MedigunInfoRedNameLabel"])->SetText("");
 			((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter"])->SetProgress(0.0f);
 			((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter1"])->SetProgress(0.0f);
 			((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter2"])->SetProgress(0.0f);
@@ -467,9 +467,10 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 			((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter4"])->SetProgress(0.0f);
 			((vgui::Label *) panels["MedigunInfoRedChargeLabel"])->SetText("");
 			((vgui::Label *) panels["MedigunInfoRedIndividualChargesLabel"])->SetText("");
+			((vgui::Label *) panels["MedigunInfoRedChargeAdvantageLabel"])->SetText("");
 			((vgui::ImagePanel *) panels["MedigunInfoRedChargeTypeIcon"])->SetImage(VGUI_TEXTURE_NULL);
 		
-			panels["MedigunInfoRedNameLabel"]->SetVisible(true);
+			panels["MedigunInfoRedNameLabel"]->SetVisible(false);
 			panels["MedigunInfoRedChargeMeter"]->SetVisible(false);
 			panels["MedigunInfoRedChargeMeter1"]->SetVisible(false);
 			panels["MedigunInfoRedChargeMeter2"]->SetVisible(false);
@@ -477,6 +478,7 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 			panels["MedigunInfoRedChargeMeter4"]->SetVisible(false);
 			panels["MedigunInfoRedChargeLabel"]->SetVisible(false);
 			panels["MedigunInfoRedIndividualChargesLabel"]->SetVisible(false);
+			panels["MedigunInfoRedChargeAdvantageLabel"]->SetVisible(false);
 			panels["MedigunInfoRedChargeTypeIcon"]->SetVisible(false);
 
 			if (redChargeReady || redChargeReleased) {
@@ -788,7 +790,7 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 			}
 		}
 		else {
-			((vgui::Label *) panels["MedigunInfoBluNameLabel"])->SetText("N/A");
+			((vgui::Label *) panels["MedigunInfoBluNameLabel"])->SetText("");
 			((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter"])->SetProgress(0.0f);
 			((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter1"])->SetProgress(0.0f);
 			((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter2"])->SetProgress(0.0f);
@@ -796,9 +798,10 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 			((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter4"])->SetProgress(0.0f);
 			((vgui::Label *) panels["MedigunInfoBluChargeLabel"])->SetText("");
 			((vgui::Label *) panels["MedigunInfoBluIndividualChargesLabel"])->SetText("");
+			((vgui::Label *) panels["MedigunInfoBluChargeAdvantageLabel"])->SetText("");
 			((vgui::ImagePanel *) panels["MedigunInfoBluChargeTypeIcon"])->SetImage(VGUI_TEXTURE_NULL);
 		
-			panels["MedigunInfoBluNameLabel"]->SetVisible(true);
+			panels["MedigunInfoBluNameLabel"]->SetVisible(false);
 			panels["MedigunInfoBluChargeMeter"]->SetVisible(false);
 			panels["MedigunInfoBluChargeMeter1"]->SetVisible(false);
 			panels["MedigunInfoBluChargeMeter2"]->SetVisible(false);
@@ -806,6 +809,7 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 			panels["MedigunInfoBluChargeMeter4"]->SetVisible(false);
 			panels["MedigunInfoBluChargeLabel"]->SetVisible(false);
 			panels["MedigunInfoBluIndividualChargesLabel"]->SetVisible(false);
+			panels["MedigunInfoBluChargeAdvantageLabel"]->SetVisible(false);
 			panels["MedigunInfoBluChargeTypeIcon"]->SetVisible(false);
 
 			if (bluChargeReady || bluChargeReleased) {
