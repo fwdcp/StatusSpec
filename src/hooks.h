@@ -39,7 +39,6 @@ class C_TFPlayer;
 #define OFFSET_DESTROYGLOWEFFECT 225
 #endif
 
-static std::map<EHANDLE, int> onDataChangedHooks;
 
 extern SourceHook::ISourceHook *g_SHPtr;
 extern int g_PLID;
