@@ -18,6 +18,7 @@
 #include "client_class.h"
 #include "ehandle.h"
 #include "icliententity.h"
+#include "shareddefs.h"
 
 #include "ifaces.h"
 
@@ -42,6 +43,9 @@ public:
 	static int pCWeaponMedigun__m_bChargeRelease;
 	static int pCWeaponMedigun__m_nChargeResistType;
 	static int pCWeaponMedigun__m_flChargeLevel;
+	static int pCTFPlayerResource__m_iHealth[MAX_PLAYERS];
+	static int pCTFPlayerResource__m_iMaxHealth[MAX_PLAYERS];
+	static int pCTFPlayerResource__m_iMaxBuffedHealth[MAX_PLAYERS];
 
 	static bool PrepareOffsets();
 	static bool GetClassPropOffset(const char *className, int &offset, int depth, ...);

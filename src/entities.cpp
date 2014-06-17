@@ -24,12 +24,15 @@ int Entities::pCTFPlayer___condition_bits = 0;
 int Entities::pCTFPlayer__m_nPlayerCondEx = 0;
 int Entities::pCTFPlayer__m_nPlayerCondEx2 = 0;
 int Entities::pCTFPlayer__m_hActiveWeapon = 0;
-int Entities::pCTFPlayer__m_hMyWeapons[MAX_WEAPONS] = {0};
+int Entities::pCTFPlayer__m_hMyWeapons[MAX_WEAPONS] = { 0 };
 int Entities::pCEconEntity__m_hOwnerEntity = 0;
 int Entities::pCEconEntity__m_iItemDefinitionIndex = 0;
 int Entities::pCWeaponMedigun__m_bChargeRelease = 0;
 int Entities::pCWeaponMedigun__m_nChargeResistType = 0;
 int Entities::pCWeaponMedigun__m_flChargeLevel = 0;
+int Entities::pCTFPlayerResource__m_iHealth[MAX_PLAYERS] = { 0 };
+int Entities::pCTFPlayerResource__m_iMaxHealth[MAX_PLAYERS] = { 0 };
+int Entities::pCTFPlayerResource__m_iMaxBuffedHealth[MAX_PLAYERS] = { 0 };
 
 bool Entities::PrepareOffsets() {
 	RETRIEVE_OFFSET(pCTFPlayer__m_bGlowEnabled, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_bGlowEnabled, 1, "m_bGlowEnabled"));
@@ -41,7 +44,7 @@ bool Entities::PrepareOffsets() {
 	RETRIEVE_OFFSET(pCTFPlayer__m_nPlayerCondEx2, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_nPlayerCondEx2, 1, "m_nPlayerCondEx2"));
 	RETRIEVE_OFFSET(pCTFPlayer__m_hActiveWeapon, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_hActiveWeapon, 1, "m_hActiveWeapon"));
 	for (int i = 0; i < MAX_WEAPONS; i++) {
-		char elementName[4] = "";
+		char *elementName = new char[4];
 		sprintf(elementName, "%03i", i);
 		RETRIEVE_OFFSET(pCTFPlayer__m_hMyWeapons[i], GetClassPropOffset("CTFPlayer", pCTFPlayer__m_hMyWeapons[i], 2, "m_hMyWeapons", elementName));
 	}
@@ -50,6 +53,21 @@ bool Entities::PrepareOffsets() {
 	RETRIEVE_OFFSET(pCWeaponMedigun__m_bChargeRelease, GetClassPropOffset("CWeaponMedigun", pCWeaponMedigun__m_bChargeRelease, 1, "m_bChargeRelease"));
 	RETRIEVE_OFFSET(pCWeaponMedigun__m_nChargeResistType, GetClassPropOffset("CWeaponMedigun", pCWeaponMedigun__m_nChargeResistType, 1, "m_nChargeResistType"));
 	RETRIEVE_OFFSET(pCWeaponMedigun__m_flChargeLevel, GetClassPropOffset("CWeaponMedigun", pCWeaponMedigun__m_flChargeLevel, 1, "m_flChargeLevel"));
+	for (int i = 0; i <= MAX_PLAYERS; i++) {
+		char *elementName = new char[4];
+		sprintf(elementName, "%03i", i);
+		RETRIEVE_OFFSET(pCTFPlayerResource__m_iHealth[i], GetClassPropOffset("CTFPlayerResource", pCTFPlayerResource__m_iHealth[i], 2, "m_iHealth", elementName));
+	}
+	for (int i = 0; i <= MAX_PLAYERS; i++) {
+		char *elementName = new char[4];
+		sprintf(elementName, "%03i", i);
+		RETRIEVE_OFFSET(pCTFPlayerResource__m_iMaxHealth[i], GetClassPropOffset("CTFPlayerResource", pCTFPlayerResource__m_iMaxHealth[i], 2, "m_iMaxHealth", elementName));
+	}
+	for (int i = 0; i <= MAX_PLAYERS; i++) {
+		char *elementName = new char[4];
+		sprintf(elementName, "%03i", i);
+		RETRIEVE_OFFSET(pCTFPlayerResource__m_iMaxBuffedHealth[i], GetClassPropOffset("CTFPlayerResource", pCTFPlayerResource__m_iMaxBuffedHealth[i], 2, "m_iMaxBuffedHealth", elementName));
+	}
 
 	return true;
 }
