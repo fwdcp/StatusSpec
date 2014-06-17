@@ -29,6 +29,11 @@
 #define strtoull _strtoui64
 #endif
 
+typedef struct ColorConCommand_s {
+	Color color;
+	ConCommand *command;
+} ColorConCommand_t;
+
 class PlayerOutlines {
 public:
 	PlayerOutlines();
@@ -40,17 +45,14 @@ public:
 
 	void ProcessEntity(IClientEntity* entity);
 private:
-	Color team_blu;
-	Color team_red;
+	std::map<std::string, ColorConCommand_t> colors;
 	
-	ConCommand* color_blu;
-	ConCommand* color_red;
-	ConVar* enabled;
-	ConCommand* force_refresh;
-	ConVar* team_colors;
+	ConVar *enabled;
+	ConCommand *force_refresh;
+	ConVar *team_colors;
 	static void ForceRefresh();
+	static void ColorCommand(const CCommand &command);
 	static int GetCurrentColor(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]);
-	static void SetColor(const CCommand &command);
 	static void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
 

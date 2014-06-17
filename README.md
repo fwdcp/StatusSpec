@@ -8,6 +8,9 @@ a client plugin that aims to add many useful features for TF2 spectating
 Changelog
 ---------
 
+**0.13.0**
+* add support for health-based team colored outlines
+
 **0.12.1**
 * fix medigun info not disappearing properly
 * make unloading/pausing/unpausing cleaner and hopefully less error-prone
@@ -161,8 +164,14 @@ In addition, the following HUD animations are triggered by this plugin and may b
 * `statusspec_playeroutlines_team_colors` - override default health-based outline colors with team colors
 
 #### Console Commands
-* `statusspec_playeroutlines_color_blu <red> <green> <blue>` - the color used for BLU team player outlines
-* `statusspec_playeroutlines_color_red <red> <green> <blue>` - the color used for RED team player outlines
+* `statusspec_playeroutlines_color_blu_buff <red> <green> <blue>` - the color used for outlines for BLU team players at max buffed health
+* `statusspec_playeroutlines_color_blu_full <red> <green> <blue>` - the color used for outlines for BLU team players at full health
+* `statusspec_playeroutlines_color_blu_low <red> <green> <blue>` - the color used for outlines for BLU team players at low health
+* `statusspec_playeroutlines_color_blu_medium <red> <green> <blue>` - the color used for outlines for BLU team players at medium health
+* `statusspec_playeroutlines_color_red_buff <red> <green> <blue>` - the color used for outlines for RED team players at max buffed health
+* `statusspec_playeroutlines_color_red_full <red> <green> <blue>` - the color used for outlines for RED team players at full health
+* `statusspec_playeroutlines_color_red_low <red> <green> <blue>` - the color used for outlines for RED team players at low health
+* `statusspec_playeroutlines_color_red_medium <red> <green> <blue>` - the color used for outlines for RED team players at medium health
 * `statusspec_playeroutlines_force_refresh` - force the player outlines to refresh
 
 ### Status Icons

@@ -24,6 +24,7 @@
 #include "vgui/IPanel.h"
 #include "cbase.h"
 #include "c_basecombatcharacter.h"
+#include "c_playerresource.h"
 #include "glow_outline_effect.h"
 
 #include <sourcehook/sourcehook_impl.h>
