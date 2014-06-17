@@ -10,6 +10,14 @@
 
 #include "playeroutlines.h"
 
+inline float ChangeScale(float currentValue, float currentMin, float currentMax, float newMin, float newMax) {
+	float deltaScaler = ((newMax - newMin) / (currentMax - currentMin));
+	float newDelta = ((currentValue - currentMin) * deltaScaler);
+	float newValue = newMin + newDelta;
+
+	return newValue;
+}
+
 inline int ColorRangeRestrict(int color) {
 	if (color < 0) return 0;
 	else if (color > 255) return 255;
@@ -26,11 +34,23 @@ inline bool IsInteger(const std::string &s) {
 }
 
 PlayerOutlines::PlayerOutlines() {
-	team_blu = Color(88, 133, 162);
-	team_red = Color(184, 56, 59);
+	colors["blu_low"].color = Color(88, 133, 162);
+	colors["blu_low"].command = new ConCommand("statusspec_playeroutlines_color_blu_low", PlayerOutlines::ColorCommand, "the color used for outlines for BLU team players at low health", FCVAR_NONE, PlayerOutlines::GetCurrentColor);
+	colors["blu_medium"].color = Color(88, 133, 162);
+	colors["blu_medium"].command = new ConCommand("statusspec_playeroutlines_color_blu_medium", PlayerOutlines::ColorCommand, "the color used for outlines for BLU team players at medium health", FCVAR_NONE, PlayerOutlines::GetCurrentColor);
+	colors["blu_full"].color = Color(88, 133, 162);
+	colors["blu_full"].command = new ConCommand("statusspec_playeroutlines_color_blu_full", PlayerOutlines::ColorCommand, "the color used for outlines for BLU team players at full health", FCVAR_NONE, PlayerOutlines::GetCurrentColor);
+	colors["blu_buff"].color = Color(88, 133, 162);
+	colors["blu_buff"].command = new ConCommand("statusspec_playeroutlines_color_blu_buff", PlayerOutlines::ColorCommand, "the color used for outlines for BLU team players at max buffed health", FCVAR_NONE, PlayerOutlines::GetCurrentColor);
+	colors["red_low"].color = Color(184, 56, 59);
+	colors["red_low"].command = new ConCommand("statusspec_playeroutlines_color_red_low", PlayerOutlines::ColorCommand, "the color used for outlines for RED team players at low health", FCVAR_NONE, PlayerOutlines::GetCurrentColor);
+	colors["red_medium"].color = Color(184, 56, 59);
+	colors["red_medium"].command = new ConCommand("statusspec_playeroutlines_color_red_medium", PlayerOutlines::ColorCommand, "the color used for outlines for RED team players at medium health", FCVAR_NONE, PlayerOutlines::GetCurrentColor);
+	colors["red_full"].color = Color(184, 56, 59);
+	colors["red_full"].command = new ConCommand("statusspec_playeroutlines_color_red_full", PlayerOutlines::ColorCommand, "the color used for outlines for RED team players at full health", FCVAR_NONE, PlayerOutlines::GetCurrentColor);
+	colors["red_buff"].color = Color(184, 56, 59);
+	colors["red_buff"].command = new ConCommand("statusspec_playeroutlines_color_red_buff", PlayerOutlines::ColorCommand, "the color used for outlines for RED team players at max buffed health", FCVAR_NONE, PlayerOutlines::GetCurrentColor);
 	
-	color_blu = new ConCommand("statusspec_playeroutlines_color_blu", PlayerOutlines::SetColor, "the color used for BLU team player outlines", FCVAR_NONE, PlayerOutlines::GetCurrentColor);
-	color_red = new ConCommand("statusspec_playeroutlines_color_red", PlayerOutlines::SetColor, "the color used for RED team player outlines", FCVAR_NONE, PlayerOutlines::GetCurrentColor);
 	enabled = new ConVar("statusspec_playeroutlines_enabled", "0", FCVAR_NONE, "enable player outlines", PlayerOutlines::ToggleEnabled);
 	force_refresh = new ConCommand("statusspec_playeroutlines_force_refresh", PlayerOutlines::ForceRefresh, "force the player outlines to refresh", FCVAR_NONE);
 	team_colors = new ConVar("statusspec_playeroutlines_team_colors", "0", FCVAR_NONE, "override default health-based outline colors with team colors");
@@ -48,21 +68,102 @@ bool PlayerOutlines::IsEnabled() {
 
 bool PlayerOutlines::GetGlowEffectColorOverride(C_TFPlayer *tfPlayer, float *r, float *g, float *b) {
 	if (team_colors->GetBool()) {
-		TFTeam team = (TFTeam) *MAKE_PTR(int*, tfPlayer, Entities::pCTFPlayer__m_iTeamNum);
-	
-		if (team == TFTeam_Red) {
-			*r = float(team_red.r() / 255.0f);
-			*g = float(team_red.g() / 255.0f);
-			*b = float(team_red.b() / 255.0f);
+		TFTeam team = (TFTeam)*MAKE_PTR(int*, tfPlayer, Entities::pCTFPlayer__m_iTeamNum);
+		C_BasePlayer *basePlayer = reinterpret_cast<C_BasePlayer *>(tfPlayer);
 
-			return true;
-		}
-		else if (team == TFTeam_Blue) {
-			*r = float(team_blu.r() / 255.0f);
-			*g = float(team_blu.g() / 255.0f);
-			*b = float(team_blu.b() / 255.0f);
+		if (basePlayer) {
+			C_PlayerResource *playerResource = dynamic_cast<C_PlayerResource *>(Interfaces::GetGameResources());
 
-			return true;
+			if (playerResource) {
+				int health = *MAKE_PTR(int*, playerResource, Entities::pCTFPlayerResource__m_iHealth[basePlayer->entindex()]);
+				int maxHealth = *MAKE_PTR(int*, playerResource, Entities::pCTFPlayerResource__m_iMaxHealth[basePlayer->entindex()]);
+
+				// CTFPlayerResource isn't giving us proper values so let's calculate it manually
+				int maxBuffedHealth = floor((maxHealth / 5.0f) * 1.5f) * 5;
+
+				if (team == TFTeam_Red) {
+					float red;
+					float green;
+					float blue;
+
+					if (health < 0) {
+						// this should never happen
+
+						 red = colors["red_low"].color.r();
+						 green = colors["red_low"].color.g();
+						 blue = colors["red_low"].color.b();
+					}
+					else if (health >= 0 && health < (maxHealth * 0.5f)) {
+						red = ChangeScale(health, 0, maxHealth * 0.5f, colors["red_low"].color.r(), colors["red_medium"].color.r());
+						green = ChangeScale(health, 0, maxHealth * 0.5f, colors["red_low"].color.g(), colors["red_medium"].color.g());
+						blue = ChangeScale(health, 0, maxHealth * 0.5f, colors["red_low"].color.b(), colors["red_medium"].color.b());
+					}
+					else if (health >= (maxHealth * 0.5f) && health < maxHealth) {
+						red = ChangeScale(health, maxHealth * 0.5f, maxHealth, colors["red_medium"].color.r(), colors["red_full"].color.r());
+						green = ChangeScale(health, maxHealth * 0.5f, maxHealth, colors["red_medium"].color.g(), colors["red_full"].color.g());
+						blue = ChangeScale(health, maxHealth * 0.5f, maxHealth, colors["red_medium"].color.b(), colors["red_full"].color.b());
+					}
+					else if (health >= maxHealth && health <= maxBuffedHealth) {
+						red = ChangeScale(health, maxHealth, maxBuffedHealth, colors["red_full"].color.r(), colors["red_buff"].color.r());
+						green = ChangeScale(health, maxHealth, maxBuffedHealth, colors["red_full"].color.g(), colors["red_buff"].color.g());
+						blue = ChangeScale(health, maxHealth, maxBuffedHealth, colors["red_full"].color.b(), colors["red_buff"].color.b());
+					}
+					else if (health >= maxBuffedHealth) {
+						// our max buffed health above does not take into account special cases so we have to compensate
+
+						red = colors["red_buff"].color.r();
+						green = colors["red_buff"].color.g();
+						blue = colors["red_buff"].color.b();
+					}
+
+					*r = red / 255.0f;
+					*g = green / 255.0f;
+					*b = blue / 255.0f;
+
+					return true;
+				}
+				else if (team == TFTeam_Blue) {
+					int red;
+					int green;
+					int blue;
+
+					if (health < 0) {
+						// this should never happen
+
+						red = colors["blu_low"].color.r();
+						green = colors["blu_low"].color.g();
+						blue = colors["blu_low"].color.b();
+					}
+					else if (health >= 0 && health < (maxHealth * 0.5f)) {
+						red = ChangeScale(health, 0, maxHealth * 0.5f, colors["blu_low"].color.r(), colors["blu_medium"].color.r());
+						green = ChangeScale(health, 0, maxHealth * 0.5f, colors["blu_low"].color.g(), colors["blu_medium"].color.g());
+						blue = ChangeScale(health, 0, maxHealth * 0.5f, colors["blu_low"].color.b(), colors["blu_medium"].color.b());
+					}
+					else if (health >= (maxHealth * 0.5f) && health < maxHealth) {
+						red = ChangeScale(health, maxHealth * 0.5f, maxHealth, colors["blu_medium"].color.r(), colors["blu_full"].color.r());
+						green = ChangeScale(health, maxHealth * 0.5f, maxHealth, colors["blu_medium"].color.g(), colors["blu_full"].color.g());
+						blue = ChangeScale(health, maxHealth * 0.5f, maxHealth, colors["blu_medium"].color.b(), colors["blu_full"].color.b());
+					}
+					else if (health >= maxHealth && health <= maxBuffedHealth) {
+						red = ChangeScale(health, maxHealth, maxBuffedHealth, colors["blu_full"].color.r(), colors["blu_buff"].color.r());
+						green = ChangeScale(health, maxHealth, maxBuffedHealth, colors["blu_full"].color.g(), colors["blu_buff"].color.g());
+						blue = ChangeScale(health, maxHealth, maxBuffedHealth, colors["blu_full"].color.b(), colors["blu_buff"].color.b());
+					}
+					else if (health >= maxBuffedHealth) {
+						// our max buffed health above does not take into account special cases so we have to compensate
+
+						red = colors["blu_buff"].color.r();
+						green = colors["blu_buff"].color.g();
+						blue = colors["blu_buff"].color.b();
+					}
+
+					*r = red / 255.0f;
+					*g = green / 255.0f;
+					*b = blue / 255.0f;
+
+					return true;
+				}
+			}
 		}
 	}
 	
@@ -112,58 +213,51 @@ void PlayerOutlines::ForceRefresh() {
 	}
 }
 
+void PlayerOutlines::ColorCommand(const CCommand &command) {
+	if (strncmp(command.Arg(0), "statusspec_playeroutlines_color_", 32) == 0) {
+		std::string mainCommand = command.Arg(0);
+		std::string colorType = mainCommand.substr(32);
+
+		if (g_PlayerOutlines->colors.find(colorType) != g_PlayerOutlines->colors.end()) {
+			if (command.ArgC() == 1) {
+				Warning("\"%s\" = %i %i %i\n", g_PlayerOutlines->colors[colorType].command->GetName(), g_PlayerOutlines->colors[colorType].color.r(), g_PlayerOutlines->colors[colorType].color.g(), g_PlayerOutlines->colors[colorType].color.b());
+				Msg(" - %s\n", g_PlayerOutlines->colors[colorType].command->GetHelpText());
+
+				return;
+			}
+			else if (command.ArgC() >= 4 && IsInteger(command.Arg(1)) && IsInteger(command.Arg(2)) && IsInteger(command.Arg(3)))
+			{
+				g_PlayerOutlines->colors[colorType].color.SetColor(ColorRangeRestrict(std::stoi(command.Arg(1))), ColorRangeRestrict(std::stoi(command.Arg(2))), ColorRangeRestrict(std::stoi(command.Arg(3))));
+
+				return;
+			}
+			else {
+				Warning("Usage: %s <red> <green> <blue>\n", command.Arg(0));
+
+				return;
+			}
+		}
+	}
+
+	Warning("Unrecognized command!\n");
+}
+
 int PlayerOutlines::GetCurrentColor(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]) {
 	std::stringstream ss(partial);
 	std::string command;
 	std::getline(ss, command, ' ');
 
-	if (stricmp(command.c_str(), "statusspec_playeroutlines_color_blu") == 0) {
-		V_snprintf(commands[0], COMMAND_COMPLETION_ITEM_LENGTH, "%s %i %i %i", command.c_str(), g_PlayerOutlines->team_blu.r(), g_PlayerOutlines->team_blu.g(), g_PlayerOutlines->team_blu.b());
-		
-		return 1;
-	}
-	else if (stricmp(command.c_str(), "statusspec_playeroutlines_color_red") == 0) {
-		V_snprintf(commands[0], COMMAND_COMPLETION_ITEM_LENGTH, "%s %i %i %i", command.c_str(), g_PlayerOutlines->team_red.r(), g_PlayerOutlines->team_red.g(), g_PlayerOutlines->team_red.b());
+	if (command.compare(0, 32, "statusspec_playeroutlines_color_") == 0) {
+		std::string colorType = command.substr(32);
 
-		return 1;
-	}
-	else {
-		return 0;
-	}
-}
+		if (g_PlayerOutlines->colors.find(colorType) != g_PlayerOutlines->colors.end()) {
+			V_snprintf(commands[0], sizeof(commands[0]), "%s %i %i %i", command.c_str(), g_PlayerOutlines->colors[colorType].color.r(), g_PlayerOutlines->colors[colorType].color.g(), g_PlayerOutlines->colors[colorType].color.b());
 
-void PlayerOutlines::SetColor(const CCommand &command) {
-	if (command.ArgC() == 0) {
-		if (stricmp(command.Arg(0), "statusspec_playeroutlines_color_blu")) {
-			Msg("The current BLU team player outline color is rgb(%i, %i, %i).\n", g_PlayerOutlines->team_blu.r(), g_PlayerOutlines->team_blu.g(), g_PlayerOutlines->team_blu.b());
-			return;
-		}
-		else if (stricmp(command.Arg(0), "statusspec_playeroutlines_color_red")) {
-			Msg("The current RED team player outline color is rgb(%i, %i, %i).\n", g_PlayerOutlines->team_red.r(), g_PlayerOutlines->team_red.g(), g_PlayerOutlines->team_red.b());
-			return;
+			return 1;
 		}
 	}
-	else if (command.ArgC() < 3 || !IsInteger(command.Arg(1)) || !IsInteger(command.Arg(2)) || !IsInteger(command.Arg(3)))
-	{
-		Warning("Usage: %s <red> <green> <blue>\n", command.Arg(0));
-		return;
-	}
 
-	int red = ColorRangeRestrict(std::stoi(command.Arg(1)));
-	int green = ColorRangeRestrict(std::stoi(command.Arg(2)));
-	int blue = ColorRangeRestrict(std::stoi(command.Arg(3)));
-
-	if (stricmp(command.Arg(0), "statusspec_loadouticons_filter_active")) {
-		g_PlayerOutlines->team_blu.SetColor(red, green, blue);
-		Msg("Set BLU team player outline color to rgb(%i, %i, %i).\n", red, green, blue);
-	}
-	else if (stricmp(command.Arg(0), "statusspec_loadouticons_filter_nonactive")) {
-		g_PlayerOutlines->team_red.SetColor(red, green, blue);
-		Msg("Set RED team player outline color to rgb(%i, %i, %i).\n", red, green, blue);
-	}
-	else {
-		Warning("Unrecognized command!\n");
-	}
+	return 0;
 }
 
 void PlayerOutlines::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
