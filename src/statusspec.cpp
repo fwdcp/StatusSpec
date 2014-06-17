@@ -260,35 +260,18 @@ void StatusSpecPlugin::Unload(void)
 	delete g_PlayerOutlines;
 	delete g_StatusIcons;
 
-	SH_REMOVE_HOOK(IBaseClientDLL, FrameStageNotify, Interfaces::pClientDLL, Hook_IBaseClientDLL_FrameStageNotify, false);
-	SH_REMOVE_HOOK(IPanel, PaintTraverse, g_pVGuiPanel, Hook_IPanel_PaintTraverse, true);
-	SH_REMOVE_HOOK(IPanel, SendMessage, g_pVGuiPanel, Hook_IPanel_SendMessage, true);
-	SH_REMOVE_HOOK(IVEngineClient, GetPlayerInfo, Interfaces::pEngineClient, Hook_IVEngineClient_GetPlayerInfo, false);
-
-	if (getPlayerNameHook) {
-		SH_REMOVE_HOOK_ID(getPlayerNameHook);
-	}
+	g_SourceHook.UnloadPlugin(g_PLID, new StatusSpecUnloader());
 
 	ConVar_Unregister();
 	Interfaces::Unload();
 }
 
 void StatusSpecPlugin::Pause(void) {
-	SH_REMOVE_HOOK(IBaseClientDLL, FrameStageNotify, Interfaces::pClientDLL, Hook_IBaseClientDLL_FrameStageNotify, false);
-	SH_REMOVE_HOOK(IPanel, PaintTraverse, g_pVGuiPanel, Hook_IPanel_PaintTraverse, true);
-	SH_REMOVE_HOOK(IPanel, SendMessage, g_pVGuiPanel, Hook_IPanel_SendMessage, true);
-	SH_REMOVE_HOOK(IVEngineClient, GetPlayerInfo, Interfaces::pEngineClient, Hook_IVEngineClient_GetPlayerInfo, false);
-
-	if (getPlayerNameHook) {
-		SH_REMOVE_HOOK_ID(getPlayerNameHook);
-	}
+	g_SourceHook.PausePlugin(g_PLID);
 }
 
 void StatusSpecPlugin::UnPause(void) {
-	SH_ADD_HOOK(IBaseClientDLL, FrameStageNotify, Interfaces::pClientDLL, Hook_IBaseClientDLL_FrameStageNotify, false);
-	SH_ADD_HOOK(IPanel, PaintTraverse, g_pVGuiPanel, Hook_IPanel_PaintTraverse, true);
-	SH_ADD_HOOK(IPanel, SendMessage, g_pVGuiPanel, Hook_IPanel_SendMessage, true);
-	SH_ADD_HOOK(IVEngineClient, GetPlayerInfo, Interfaces::pEngineClient, Hook_IVEngineClient_GetPlayerInfo, false);
+	g_SourceHook.UnpausePlugin(g_PLID);
 }
 
 const char *StatusSpecPlugin::GetPluginDescription(void) {

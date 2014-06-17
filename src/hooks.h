@@ -39,7 +39,13 @@ class C_TFPlayer;
 #define OFFSET_DESTROYGLOWEFFECT 225
 #endif
 
-static std::map<EHANDLE, int> onDataChangedHooks;
+class StatusSpecUnloader: public SourceHook::Impl::UnloadListener
+{
+public:
+	virtual void ReadyToUnload(SourceHook::Plugin plug);
+};
+
+inline void StatusSpecUnloader::ReadyToUnload(SourceHook::Plugin plug) {};
 
 extern SourceHook::ISourceHook *g_SHPtr;
 extern int g_PLID;
