@@ -8,6 +8,10 @@ a client plugin that aims to add many useful features for TF2 spectating
 Changelog
 ---------
 
+**0.12.1**
+* fix medigun info not disappearing properly
+* make unloading/pausing/unpausing cleaner and hopefully less error-prone
+
 **0.12.0**
 * add support for HUD features required for casting HUDs
 * add ability to set progress direction via resource file and removed command
