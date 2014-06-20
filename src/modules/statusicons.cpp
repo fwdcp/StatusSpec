@@ -421,7 +421,7 @@ void StatusIcons::Paint(vgui::VPANEL vguiPanel) {
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
-			Paint::DrawTexture(TEXTURE_BLEEDING, iconsWide, 0, iconSize, iconSize, Color(255, 0, 0, 0));
+			Paint::DrawTexture(TEXTURE_BLEEDING, iconsWide, 0, iconSize, iconSize, Color(255, 0, 0, 255));
 			
 			playerWide += iconSize;
 			iconsWide += iconSize;
