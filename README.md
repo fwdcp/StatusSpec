@@ -8,6 +8,9 @@ a client plugin that aims to add many useful features for TF2 spectating
 Changelog
 ---------
 
+**0.13.1**
+* fix bleed icons not showing up
+
 **0.13.0**
 * add support for health-based team colored outlines
 
