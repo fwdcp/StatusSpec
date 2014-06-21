@@ -115,6 +115,11 @@ bool PlayerOutlines::GetGlowEffectColorOverride(C_TFPlayer *tfPlayer, float *r, 
 						green = colors["red_buff"].color.g();
 						blue = colors["red_buff"].color.b();
 					}
+					else {
+						// this DEFINITELY shouldn't ever happen
+
+						return false;
+					}
 
 					*r = red / 255.0f;
 					*g = green / 255.0f;
@@ -155,6 +160,11 @@ bool PlayerOutlines::GetGlowEffectColorOverride(C_TFPlayer *tfPlayer, float *r, 
 						red = colors["blu_buff"].color.r();
 						green = colors["blu_buff"].color.g();
 						blue = colors["blu_buff"].color.b();
+					}
+					else {
+						// this DEFINITELY shouldn't ever happen
+
+						return false;
 					}
 
 					*r = red / 255.0f;
