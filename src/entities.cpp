@@ -30,9 +30,9 @@ int Entities::pCEconEntity__m_iItemDefinitionIndex = 0;
 int Entities::pCWeaponMedigun__m_bChargeRelease = 0;
 int Entities::pCWeaponMedigun__m_nChargeResistType = 0;
 int Entities::pCWeaponMedigun__m_flChargeLevel = 0;
-int Entities::pCTFPlayerResource__m_iHealth[MAX_PLAYERS] = { 0 };
-int Entities::pCTFPlayerResource__m_iMaxHealth[MAX_PLAYERS] = { 0 };
-int Entities::pCTFPlayerResource__m_iMaxBuffedHealth[MAX_PLAYERS] = { 0 };
+int Entities::pCTFPlayerResource__m_iHealth[MAX_PLAYERS + 1] = { 0 };
+int Entities::pCTFPlayerResource__m_iMaxHealth[MAX_PLAYERS + 1] = { 0 };
+int Entities::pCTFPlayerResource__m_iMaxBuffedHealth[MAX_PLAYERS + 1] = { 0 };
 
 bool Entities::PrepareOffsets() {
 	RETRIEVE_OFFSET(pCTFPlayer__m_bGlowEnabled, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_bGlowEnabled, 1, "m_bGlowEnabled"));

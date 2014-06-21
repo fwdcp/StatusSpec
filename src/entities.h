@@ -43,9 +43,9 @@ public:
 	static int pCWeaponMedigun__m_bChargeRelease;
 	static int pCWeaponMedigun__m_nChargeResistType;
 	static int pCWeaponMedigun__m_flChargeLevel;
-	static int pCTFPlayerResource__m_iHealth[MAX_PLAYERS];
-	static int pCTFPlayerResource__m_iMaxHealth[MAX_PLAYERS];
-	static int pCTFPlayerResource__m_iMaxBuffedHealth[MAX_PLAYERS];
+	static int pCTFPlayerResource__m_iHealth[MAX_PLAYERS + 1];
+	static int pCTFPlayerResource__m_iMaxHealth[MAX_PLAYERS + 1];
+	static int pCTFPlayerResource__m_iMaxBuffedHealth[MAX_PLAYERS + 1];
 
 	static bool PrepareOffsets();
 	static bool GetClassPropOffset(const char *className, int &offset, int depth, ...);
