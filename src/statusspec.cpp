@@ -20,6 +20,20 @@ StatusIcons *g_StatusIcons = nullptr;
 static IGameResources* gameResources = nullptr;
 static int getPlayerNameHook;
 
+ObserverInfo_t GetLocalPlayerObserverInfo() {
+	int player = Interfaces::pEngineClient->GetLocalPlayer();
+	IClientEntity *playerEntity = Interfaces::pClientEntityList->GetClientEntity(player);
+
+	ObserverInfo_t info;
+
+	if (dynamic_cast<C_BasePlayer *>(playerEntity->GetBaseEntity())) {
+		info.mode = Hooks::CallFunc_C_TFPlayer_GetObserverMode((C_TFPlayer *)playerEntity);
+		info.target = Hooks::CallFunc_C_TFPlayer_GetObserverTarget((C_TFPlayer *)playerEntity);
+	}
+
+	return info;
+}
+
 void Hook_C_TFPlayer_GetGlowEffectColor(float *r, float *g, float *b) {
 	if (g_PlayerOutlines) {
 		if (g_PlayerOutlines->IsEnabled()) {

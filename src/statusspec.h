@@ -28,6 +28,13 @@
 
 #define PLUGIN_DESC "StatusSpec v0.13.1"
 
+typedef struct ObserverInfo_s {
+	int mode;
+	EHANDLE target;
+} ObserverInfo_t;
+
+ObserverInfo_t GetLocalPlayerObserverInfo();
+
 void Hook_C_BaseCombatCharacter_OnDataChanged(DataUpdateType_t type);
 void Hook_C_TFPlayer_GetGlowEffectColor(float *r, float *g, float *b);
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage);
