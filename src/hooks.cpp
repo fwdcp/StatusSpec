@@ -17,6 +17,8 @@ SourceHook::ISourceHook *g_SHPtr = &g_SourceHook;
 int g_PLID = 0;
 
 SH_DECL_MANUALHOOK3_void(C_TFPlayer_GetGlowEffectColor, OFFSET_GETGLOWEFFECTCOLOR, 0, 0, float *, float *, float *);
+SH_DECL_MANUALHOOK0(C_TFPlayer_GetObserverMode, OFFSET_GETOBSERVERMODE, 0, 0, int);
+SH_DECL_MANUALHOOK0(C_TFPlayer_GetObserverTarget, OFFSET_GETOBSERVERTARGET, 0, 0, C_BaseEntity *);
 SH_DECL_MANUALHOOK0_void(C_TFPlayer_UpdateGlowEffect, OFFSET_UPDATEGLOWEFFECT, 0, 0);
 SH_DECL_HOOK1_void(IBaseClientDLL, FrameStageNotify, SH_NOATTRIB, 0, ClientFrameStage_t);
 SH_DECL_HOOK1(IGameResources, GetPlayerName, SH_NOATTRIB, 0, const char *, int);
@@ -46,6 +48,14 @@ int Hooks::AddHook_IPanel_SendMessage(vgui::IPanel *instance, void(*hook)(vgui::
 
 int Hooks::AddHook_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, bool(*hook)(int, player_info_t *)) {
 	return SH_ADD_HOOK(IVEngineClient, GetPlayerInfo, instance, hook, false);
+}
+
+int Hooks::CallFunc_C_TFPlayer_GetObserverMode(C_TFPlayer *instance) {
+	return SH_MCALL(instance, C_TFPlayer_GetObserverMode)();
+}
+
+C_BaseEntity *Hooks::CallFunc_C_TFPlayer_GetObserverTarget(C_TFPlayer *instance) {
+	return SH_MCALL(instance, C_TFPlayer_GetObserverTarget)();
 }
 
 void Hooks::CallFunc_C_TFPlayer_UpdateGlowEffect(C_TFPlayer *instance) {
