@@ -20,26 +20,6 @@ StatusIcons *g_StatusIcons = nullptr;
 static IGameResources* gameResources = nullptr;
 static int getPlayerNameHook;
 
-SourceHook::Impl::CSourceHookImpl g_SourceHook;
-SourceHook::ISourceHook *g_SHPtr = &g_SourceHook;
-int g_PLID = 0;
-
-SH_DECL_MANUALHOOK3_void(C_TFPlayer_GetGlowEffectColor, OFFSET_GETGLOWEFFECTCOLOR, 0, 0, float *, float *, float *);
-SH_DECL_MANUALHOOK0_void(C_TFPlayer_UpdateGlowEffect, OFFSET_UPDATEGLOWEFFECT, 0, 0);
-SH_DECL_HOOK1_void(IBaseClientDLL, FrameStageNotify, SH_NOATTRIB, 0, ClientFrameStage_t);
-SH_DECL_HOOK1(IGameResources, GetPlayerName, SH_NOATTRIB, 0, const char *, int);
-SH_DECL_HOOK3_void(IPanel, PaintTraverse, SH_NOATTRIB, 0, VPANEL, bool, bool);
-SH_DECL_HOOK3_void(IPanel, SendMessage, SH_NOATTRIB, 0, VPANEL, KeyValues *, VPANEL);
-SH_DECL_HOOK2(IVEngineClient, GetPlayerInfo, SH_NOATTRIB, 0, bool, int, player_info_t *);
-
-int AddHook_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *tfPlayer) {
-	return SH_ADD_MANUALVPHOOK(C_TFPlayer_GetGlowEffectColor, tfPlayer, Hook_C_TFPlayer_GetGlowEffectColor, false);
-}
-
-void Call_C_TFPlayer_UpdateGlowEffect(C_TFPlayer *tfPlayer) {
-	SH_MCALL(tfPlayer, C_TFPlayer_UpdateGlowEffect)();
-}
-
 void Hook_C_TFPlayer_GetGlowEffectColor(float *r, float *g, float *b) {
 	if (g_PlayerOutlines) {
 		if (g_PlayerOutlines->IsEnabled()) {
@@ -57,14 +37,14 @@ void Hook_C_TFPlayer_GetGlowEffectColor(float *r, float *g, float *b) {
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 	if (gameResources != Interfaces::GetGameResources()) {
 		if (getPlayerNameHook) {
-			SH_REMOVE_HOOK_ID(getPlayerNameHook);
+			Hooks::RemoveHook(getPlayerNameHook);
 			getPlayerNameHook = 0;
 		}
 
 		gameResources = Interfaces::GetGameResources();
 		
 		if (gameResources) {
-			getPlayerNameHook = SH_ADD_HOOK(IGameResources, GetPlayerName, gameResources, Hook_IGameResources_GetPlayerName, true);
+			getPlayerNameHook = Hooks::AddHook_IGameResources_GetPlayerName(gameResources, Hook_IGameResources_GetPlayerName);
 		}
 	}
 
@@ -233,10 +213,10 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 		return false;
 	}
 	
-	SH_ADD_HOOK(IBaseClientDLL, FrameStageNotify, Interfaces::pClientDLL, Hook_IBaseClientDLL_FrameStageNotify, false);
-	SH_ADD_HOOK(IPanel, PaintTraverse, g_pVGuiPanel, Hook_IPanel_PaintTraverse, true);
-	SH_ADD_HOOK(IPanel, SendMessage, g_pVGuiPanel, Hook_IPanel_SendMessage, true);
-	SH_ADD_HOOK(IVEngineClient, GetPlayerInfo, Interfaces::pEngineClient, Hook_IVEngineClient_GetPlayerInfo, false);
+	Hooks::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, Hook_IBaseClientDLL_FrameStageNotify);
+	Hooks::AddHook_IPanel_PaintTraverse(g_pVGuiPanel, Hook_IPanel_PaintTraverse);
+	Hooks::AddHook_IPanel_SendMessage(g_pVGuiPanel, Hook_IPanel_SendMessage);
+	Hooks::AddHook_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, Hook_IVEngineClient_GetPlayerInfo);
 	
 	ConVar_Register();
 
@@ -260,18 +240,18 @@ void StatusSpecPlugin::Unload(void)
 	delete g_PlayerOutlines;
 	delete g_StatusIcons;
 
-	g_SourceHook.UnloadPlugin(g_PLID, new StatusSpecUnloader());
+	Hooks::Unload();
 
 	ConVar_Unregister();
 	Interfaces::Unload();
 }
 
 void StatusSpecPlugin::Pause(void) {
-	g_SourceHook.PausePlugin(g_PLID);
+	Hooks::Pause();
 }
 
 void StatusSpecPlugin::UnPause(void) {
-	g_SourceHook.UnpausePlugin(g_PLID);
+	Hooks::Unpause();
 }
 
 const char *StatusSpecPlugin::GetPluginDescription(void) {

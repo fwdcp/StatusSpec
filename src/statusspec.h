@@ -28,10 +28,6 @@
 
 #define PLUGIN_DESC "StatusSpec v0.13.1"
 
-int AddHook_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *tfPlayer);
-
-void Call_C_TFPlayer_UpdateGlowEffect(C_TFPlayer *tfPlayer);
-
 void Hook_C_BaseCombatCharacter_OnDataChanged(DataUpdateType_t type);
 void Hook_C_TFPlayer_GetGlowEffectColor(float *r, float *g, float *b);
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage);

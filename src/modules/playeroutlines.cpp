@@ -191,7 +191,7 @@ void PlayerOutlines::ProcessEntity(IClientEntity* entity) {
 	EHANDLE entityHandle = entity->GetBaseEntity();
 
 	if (!getGlowEffectColorHooked) {
-		AddHook_C_TFPlayer_GetGlowEffectColor((C_TFPlayer *) baseCombatCharacter);
+		Hooks::AddHook_C_TFPlayer_GetGlowEffectColor((C_TFPlayer *)baseCombatCharacter, Hook_C_TFPlayer_GetGlowEffectColor);
 		getGlowEffectColorHooked = true;
 	}
 
@@ -219,7 +219,7 @@ void PlayerOutlines::ForceRefresh() {
 		bool* glowEnabled = MAKE_PTR(bool*, entity, Entities::pCTFPlayer__m_bGlowEnabled);
 		*glowEnabled = g_PlayerOutlines->enabled->GetBool();
 
-		Call_C_TFPlayer_UpdateGlowEffect((C_TFPlayer *) entity);
+		Hooks::CallFunc_C_TFPlayer_UpdateGlowEffect((C_TFPlayer *)entity);
 	}
 }
 
