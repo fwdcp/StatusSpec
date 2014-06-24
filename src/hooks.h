@@ -38,6 +38,7 @@ class C_TFPlayer;
 #define OFFSET_GETGLOWEFFECTCOLOR 223
 #define OFFSET_UPDATEGLOWEFFECT 224
 #define OFFSET_DESTROYGLOWEFFECT 225
+#define OFFSET_CALCVIEW 229
 #define OFFSET_GETOBSERVERMODE 240
 #define OFFSET_GETOBSERVERTARGET 241
 #endif
@@ -60,6 +61,7 @@ public:
 	static int AddHook_IPanel_SendMessage(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, KeyValues *, vgui::VPANEL));
 	static int AddHook_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, bool(*hook)(int, player_info_t *));
 
+	static void CallFunc_C_TFPlayer_CalcView(C_TFPlayer *instance, Vector &eyeOrigin, QAngle &eyeAngles, float &zNear, float &zFar, float &fov);
 	static int CallFunc_C_TFPlayer_GetObserverMode(C_TFPlayer *instance);
 	static C_BaseEntity *CallFunc_C_TFPlayer_GetObserverTarget(C_TFPlayer *instance);
 	static void CallFunc_C_TFPlayer_UpdateGlowEffect(C_TFPlayer *instance);
