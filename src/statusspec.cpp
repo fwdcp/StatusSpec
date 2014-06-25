@@ -11,6 +11,7 @@
 #include "statusspec.h"
 
 AntiFreeze *g_AntiFreeze = nullptr;
+Killstreaks *g_Killstreaks = nullptr;
 LoadoutIcons *g_LoadoutIcons = nullptr;
 MedigunInfo *g_MedigunInfo = nullptr;
 PlayerAliases *g_PlayerAliases = nullptr;
@@ -20,24 +21,18 @@ StatusIcons *g_StatusIcons = nullptr;
 static IGameResources* gameResources = nullptr;
 static int getPlayerNameHook;
 
-SourceHook::Impl::CSourceHookImpl g_SourceHook;
-SourceHook::ISourceHook *g_SHPtr = &g_SourceHook;
-int g_PLID = 0;
+ObserverInfo_t GetLocalPlayerObserverInfo() {
+	int player = Interfaces::pEngineClient->GetLocalPlayer();
+	IClientEntity *playerEntity = Interfaces::pClientEntityList->GetClientEntity(player);
 
-SH_DECL_MANUALHOOK3_void(C_TFPlayer_GetGlowEffectColor, OFFSET_GETGLOWEFFECTCOLOR, 0, 0, float *, float *, float *);
-SH_DECL_MANUALHOOK0_void(C_TFPlayer_UpdateGlowEffect, OFFSET_UPDATEGLOWEFFECT, 0, 0);
-SH_DECL_HOOK1_void(IBaseClientDLL, FrameStageNotify, SH_NOATTRIB, 0, ClientFrameStage_t);
-SH_DECL_HOOK1(IGameResources, GetPlayerName, SH_NOATTRIB, 0, const char *, int);
-SH_DECL_HOOK3_void(IPanel, PaintTraverse, SH_NOATTRIB, 0, VPANEL, bool, bool);
-SH_DECL_HOOK3_void(IPanel, SendMessage, SH_NOATTRIB, 0, VPANEL, KeyValues *, VPANEL);
-SH_DECL_HOOK2(IVEngineClient, GetPlayerInfo, SH_NOATTRIB, 0, bool, int, player_info_t *);
+	ObserverInfo_t info;
 
-int AddHook_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *tfPlayer) {
-	return SH_ADD_MANUALVPHOOK(C_TFPlayer_GetGlowEffectColor, tfPlayer, Hook_C_TFPlayer_GetGlowEffectColor, false);
-}
+	if (dynamic_cast<C_BasePlayer *>(playerEntity->GetBaseEntity())) {
+		info.mode = Hooks::CallFunc_C_TFPlayer_GetObserverMode((C_TFPlayer *)playerEntity);
+		info.target = Hooks::CallFunc_C_TFPlayer_GetObserverTarget((C_TFPlayer *)playerEntity);
+	}
 
-void Call_C_TFPlayer_UpdateGlowEffect(C_TFPlayer *tfPlayer) {
-	SH_MCALL(tfPlayer, C_TFPlayer_UpdateGlowEffect)();
+	return info;
 }
 
 void Hook_C_TFPlayer_GetGlowEffectColor(float *r, float *g, float *b) {
@@ -57,14 +52,14 @@ void Hook_C_TFPlayer_GetGlowEffectColor(float *r, float *g, float *b) {
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 	if (gameResources != Interfaces::GetGameResources()) {
 		if (getPlayerNameHook) {
-			SH_REMOVE_HOOK_ID(getPlayerNameHook);
+			Hooks::RemoveHook(getPlayerNameHook);
 			getPlayerNameHook = 0;
 		}
 
 		gameResources = Interfaces::GetGameResources();
 		
 		if (gameResources) {
-			getPlayerNameHook = SH_ADD_HOOK(IGameResources, GetPlayerName, gameResources, Hook_IGameResources_GetPlayerName, true);
+			getPlayerNameHook = Hooks::AddHook_IGameResources_GetPlayerName(gameResources, Hook_IGameResources_GetPlayerName);
 		}
 	}
 
@@ -119,6 +114,10 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 			}
 		}
 
+		if (g_Killstreaks) {
+			g_Killstreaks->PostEntityUpdate();
+		}
+
 		if (g_LoadoutIcons) {
 			if (g_LoadoutIcons->IsEnabled()) {
 				g_LoadoutIcons->PostEntityUpdate();
@@ -133,6 +132,36 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 	}
 
 	RETURN_META(MRES_IGNORED);
+}
+
+bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast) {
+	IGameEvent *newEvent = Interfaces::pGameEventManager->DuplicateEvent(event);
+
+	if (g_Killstreaks->FireEvent(newEvent)) {
+		Interfaces::pGameEventManager->FreeEvent(event);
+
+		RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEvent, (newEvent, bDontBroadcast));
+	}
+	else {
+		Interfaces::pGameEventManager->FreeEvent(newEvent);
+
+		RETURN_META_VALUE(MRES_IGNORED, false);
+	}
+}
+
+bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event) {
+	IGameEvent *newEvent = Interfaces::pGameEventManager->DuplicateEvent(event);
+
+	if (g_Killstreaks->FireEvent(newEvent)) {
+		Interfaces::pGameEventManager->FreeEvent(event);
+
+		RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEventClientSide, (newEvent));
+	}
+	else {
+		Interfaces::pGameEventManager->FreeEvent(newEvent);
+
+		RETURN_META_VALUE(MRES_IGNORED, false);
+	}
 }
 
 const char * Hook_IGameResources_GetPlayerName(int client) {
@@ -233,14 +262,17 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 		return false;
 	}
 	
-	SH_ADD_HOOK(IBaseClientDLL, FrameStageNotify, Interfaces::pClientDLL, Hook_IBaseClientDLL_FrameStageNotify, false);
-	SH_ADD_HOOK(IPanel, PaintTraverse, g_pVGuiPanel, Hook_IPanel_PaintTraverse, true);
-	SH_ADD_HOOK(IPanel, SendMessage, g_pVGuiPanel, Hook_IPanel_SendMessage, true);
-	SH_ADD_HOOK(IVEngineClient, GetPlayerInfo, Interfaces::pEngineClient, Hook_IVEngineClient_GetPlayerInfo, false);
+	Hooks::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, Hook_IBaseClientDLL_FrameStageNotify);
+	Hooks::AddHook_IGameEventManager2_FireEvent(Interfaces::pGameEventManager, Hook_IGameEventManager2_FireEvent);
+	Hooks::AddHook_IGameEventManager2_FireEventClientSide(Interfaces::pGameEventManager, Hook_IGameEventManager2_FireEventClientSide);
+	Hooks::AddHook_IPanel_PaintTraverse(g_pVGuiPanel, Hook_IPanel_PaintTraverse);
+	Hooks::AddHook_IPanel_SendMessage(g_pVGuiPanel, Hook_IPanel_SendMessage);
+	Hooks::AddHook_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, Hook_IVEngineClient_GetPlayerInfo);
 	
 	ConVar_Register();
 
 	g_AntiFreeze = new AntiFreeze();
+	g_Killstreaks = new Killstreaks();
 	g_LoadoutIcons = new LoadoutIcons();
 	g_MedigunInfo = new MedigunInfo();
 	g_PlayerAliases = new PlayerAliases();
@@ -254,24 +286,25 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 void StatusSpecPlugin::Unload(void)
 {
 	delete g_AntiFreeze;
+	delete g_Killstreaks;
 	delete g_LoadoutIcons;
 	delete g_MedigunInfo;
 	delete g_PlayerAliases;
 	delete g_PlayerOutlines;
 	delete g_StatusIcons;
 
-	g_SourceHook.UnloadPlugin(g_PLID, new StatusSpecUnloader());
+	Hooks::Unload();
 
 	ConVar_Unregister();
 	Interfaces::Unload();
 }
 
 void StatusSpecPlugin::Pause(void) {
-	g_SourceHook.PausePlugin(g_PLID);
+	Hooks::Pause();
 }
 
 void StatusSpecPlugin::UnPause(void) {
-	g_SourceHook.UnpausePlugin(g_PLID);
+	Hooks::Unpause();
 }
 
 const char *StatusSpecPlugin::GetPluginDescription(void) {

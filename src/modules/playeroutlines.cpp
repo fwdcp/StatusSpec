@@ -115,6 +115,11 @@ bool PlayerOutlines::GetGlowEffectColorOverride(C_TFPlayer *tfPlayer, float *r, 
 						green = colors["red_buff"].color.g();
 						blue = colors["red_buff"].color.b();
 					}
+					else {
+						// this DEFINITELY shouldn't ever happen
+
+						return false;
+					}
 
 					*r = red / 255.0f;
 					*g = green / 255.0f;
@@ -156,6 +161,11 @@ bool PlayerOutlines::GetGlowEffectColorOverride(C_TFPlayer *tfPlayer, float *r, 
 						green = colors["blu_buff"].color.g();
 						blue = colors["blu_buff"].color.b();
 					}
+					else {
+						// this DEFINITELY shouldn't ever happen
+
+						return false;
+					}
 
 					*r = red / 255.0f;
 					*g = green / 255.0f;
@@ -181,7 +191,7 @@ void PlayerOutlines::ProcessEntity(IClientEntity* entity) {
 	EHANDLE entityHandle = entity->GetBaseEntity();
 
 	if (!getGlowEffectColorHooked) {
-		AddHook_C_TFPlayer_GetGlowEffectColor((C_TFPlayer *) baseCombatCharacter);
+		Hooks::AddHook_C_TFPlayer_GetGlowEffectColor((C_TFPlayer *)baseCombatCharacter, Hook_C_TFPlayer_GetGlowEffectColor);
 		getGlowEffectColorHooked = true;
 	}
 
@@ -193,9 +203,7 @@ void PlayerOutlines::ProcessEntity(IClientEntity* entity) {
 }
 
 void PlayerOutlines::ForceRefresh() {
-	int maxEntity = Interfaces::pClientEntityList->GetHighestEntityIndex();
-	
-	for (int i = 0; i < maxEntity; i++) {
+	for (int i = 0; i <= MAX_PLAYERS; i++) {
 		IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
 		
 		if (!entity) {
@@ -209,7 +217,7 @@ void PlayerOutlines::ForceRefresh() {
 		bool* glowEnabled = MAKE_PTR(bool*, entity, Entities::pCTFPlayer__m_bGlowEnabled);
 		*glowEnabled = g_PlayerOutlines->enabled->GetBool();
 
-		Call_C_TFPlayer_UpdateGlowEffect((C_TFPlayer *) entity);
+		Hooks::CallFunc_C_TFPlayer_UpdateGlowEffect((C_TFPlayer *)entity);
 	}
 }
 
@@ -262,9 +270,7 @@ int PlayerOutlines::GetCurrentColor(const char *partial, char commands[COMMAND_C
 
 void PlayerOutlines::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
 	if (!g_PlayerOutlines->enabled->GetBool()) {
-		int maxEntity = Interfaces::pClientEntityList->GetHighestEntityIndex();
-	
-		for (int i = 0; i < maxEntity; i++) {
+		for (int i = 0; i <= MAX_PLAYERS; i++) {
 			IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
 		
 			if (!entity) {

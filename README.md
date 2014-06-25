@@ -8,6 +8,9 @@ a client plugin that aims to add many useful features for TF2 spectating
 Changelog
 ---------
 
+**0.14.0**
+* add killstreaks module
+
 **0.13.1**
 * fix bleed icons not showing up
 
@@ -80,6 +83,12 @@ This plugin is not signed by Valve, and therefore will not load unless TF2 is lo
 
 #### Console Variables
 * `statusspec_antifreeze_enabled` - enable antifreeze (forces the spectator GUI to refresh)
+
+### Killstreaks
+*enables killstreak tracking for all weapons, all players*
+
+#### Console Variables
+* `statusspec_killstreaks_enabled` - enable killstreaks display
 
 ### Loadout Icons
 *displays icons to represent weapons in a player's loadout*

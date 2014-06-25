@@ -19,6 +19,7 @@
 #include "entitylist_base.h"
 #include "icliententitylist.h"
 #include "iclientmode.h"
+#include "igameevents.h"
 #include "igameresources.h"
 #include "steam/steam_api.h"
 #include "tier3/tier3.h"
@@ -52,6 +53,7 @@ class Interfaces {
 		static void Unload();
 		static IBaseClientDLL* pClientDLL;
 		static IClientEntityList* pClientEntityList;
+		static IGameEventManager2 *pGameEventManager;
 		static IVEngineClient* pEngineClient;
 		static CSteamAPIContext* pSteamAPIContext; 
 		static IGameResources* GetGameResources();
