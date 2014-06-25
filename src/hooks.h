@@ -19,6 +19,7 @@
 
 #include "cdll_int.h"
 #include "KeyValues.h"
+#include "igameevents.h"
 #include "igameresources.h"
 #include "vgui/vgui.h"
 #include "vgui/IPanel.h"
@@ -56,6 +57,8 @@ class Hooks {
 public:
 	static int AddHook_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *instance, void(*hook)(float *, float *, float *));
 	static int AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, void(*hook)(ClientFrameStage_t));
+	static int AddHook_IGameEventManager2_FireEvent(IGameEventManager2 *instance, bool(*hook)(IGameEvent *, bool));
+	static int AddHook_IGameEventManager2_FireEventClientSide(IGameEventManager2 *instance, bool(*hook)(IGameEvent *));
 	static int AddHook_IGameResources_GetPlayerName(IGameResources *instance, const char *(*hook)(int));
 	static int AddHook_IPanel_PaintTraverse(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, bool, bool));
 	static int AddHook_IPanel_SendMessage(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, KeyValues *, vgui::VPANEL));

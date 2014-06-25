@@ -11,6 +11,7 @@
 #include "statusspec.h"
 
 AntiFreeze *g_AntiFreeze = nullptr;
+Killstreaks *g_Killstreaks = nullptr;
 LoadoutIcons *g_LoadoutIcons = nullptr;
 MedigunInfo *g_MedigunInfo = nullptr;
 PlayerAliases *g_PlayerAliases = nullptr;
@@ -113,6 +114,10 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 			}
 		}
 
+		if (g_Killstreaks) {
+			g_Killstreaks->PostEntityUpdate();
+		}
+
 		if (g_LoadoutIcons) {
 			if (g_LoadoutIcons->IsEnabled()) {
 				g_LoadoutIcons->PostEntityUpdate();
@@ -127,6 +132,36 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 	}
 
 	RETURN_META(MRES_IGNORED);
+}
+
+bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast) {
+	IGameEvent *newEvent = Interfaces::pGameEventManager->DuplicateEvent(event);
+
+	if (g_Killstreaks->FireEvent(newEvent)) {
+		Interfaces::pGameEventManager->FreeEvent(event);
+
+		RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEvent, (newEvent, bDontBroadcast));
+	}
+	else {
+		Interfaces::pGameEventManager->FreeEvent(newEvent);
+
+		RETURN_META_VALUE(MRES_IGNORED, false);
+	}
+}
+
+bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event) {
+	IGameEvent *newEvent = Interfaces::pGameEventManager->DuplicateEvent(event);
+
+	if (g_Killstreaks->FireEvent(newEvent)) {
+		Interfaces::pGameEventManager->FreeEvent(event);
+
+		RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEventClientSide, (newEvent));
+	}
+	else {
+		Interfaces::pGameEventManager->FreeEvent(newEvent);
+
+		RETURN_META_VALUE(MRES_IGNORED, false);
+	}
 }
 
 const char * Hook_IGameResources_GetPlayerName(int client) {
@@ -228,6 +263,8 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	}
 	
 	Hooks::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, Hook_IBaseClientDLL_FrameStageNotify);
+	Hooks::AddHook_IGameEventManager2_FireEvent(Interfaces::pGameEventManager, Hook_IGameEventManager2_FireEvent);
+	Hooks::AddHook_IGameEventManager2_FireEventClientSide(Interfaces::pGameEventManager, Hook_IGameEventManager2_FireEventClientSide);
 	Hooks::AddHook_IPanel_PaintTraverse(g_pVGuiPanel, Hook_IPanel_PaintTraverse);
 	Hooks::AddHook_IPanel_SendMessage(g_pVGuiPanel, Hook_IPanel_SendMessage);
 	Hooks::AddHook_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, Hook_IVEngineClient_GetPlayerInfo);
@@ -235,6 +272,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	ConVar_Register();
 
 	g_AntiFreeze = new AntiFreeze();
+	g_Killstreaks = new Killstreaks();
 	g_LoadoutIcons = new LoadoutIcons();
 	g_MedigunInfo = new MedigunInfo();
 	g_PlayerAliases = new PlayerAliases();
@@ -248,6 +286,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 void StatusSpecPlugin::Unload(void)
 {
 	delete g_AntiFreeze;
+	delete g_Killstreaks;
 	delete g_LoadoutIcons;
 	delete g_MedigunInfo;
 	delete g_PlayerAliases;
