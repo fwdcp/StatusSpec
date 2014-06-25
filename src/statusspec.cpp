@@ -11,6 +11,7 @@
 #include "statusspec.h"
 
 AntiFreeze *g_AntiFreeze = nullptr;
+Killstreaks *g_Killstreaks = nullptr;
 LoadoutIcons *g_LoadoutIcons = nullptr;
 MedigunInfo *g_MedigunInfo = nullptr;
 PlayerAliases *g_PlayerAliases = nullptr;
@@ -113,6 +114,10 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 			}
 		}
 
+		if (g_Killstreaks) {
+			g_Killstreaks->PostEntityUpdate();
+		}
+
 		if (g_LoadoutIcons) {
 			if (g_LoadoutIcons->IsEnabled()) {
 				g_LoadoutIcons->PostEntityUpdate();
@@ -130,10 +135,9 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 }
 
 bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast) {
-	bool changed = false;
 	IGameEvent *newEvent = Interfaces::pGameEventManager->DuplicateEvent(event);
 
-	if (changed) {
+	if (g_Killstreaks->FireEvent(newEvent)) {
 		Interfaces::pGameEventManager->FreeEvent(event);
 
 		RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEvent, (newEvent, bDontBroadcast));
@@ -146,10 +150,9 @@ bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast) {
 }
 
 bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event) {
-	bool changed = false;
 	IGameEvent *newEvent = Interfaces::pGameEventManager->DuplicateEvent(event);
 
-	if (changed) {
+	if (g_Killstreaks->FireEvent(newEvent)) {
 		Interfaces::pGameEventManager->FreeEvent(event);
 
 		RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEventClientSide, (newEvent));
@@ -269,6 +272,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	ConVar_Register();
 
 	g_AntiFreeze = new AntiFreeze();
+	g_Killstreaks = new Killstreaks();
 	g_LoadoutIcons = new LoadoutIcons();
 	g_MedigunInfo = new MedigunInfo();
 	g_PlayerAliases = new PlayerAliases();
@@ -282,6 +286,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 void StatusSpecPlugin::Unload(void)
 {
 	delete g_AntiFreeze;
+	delete g_Killstreaks;
 	delete g_LoadoutIcons;
 	delete g_MedigunInfo;
 	delete g_PlayerAliases;

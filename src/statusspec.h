@@ -20,6 +20,7 @@
 #include "paint.h"
 
 #include "modules/antifreeze.h"
+#include "modules/killstreaks.h"
 #include "modules/loadouticons.h"
 #include "modules/mediguninfo.h"
 #include "modules/playeraliases.h"

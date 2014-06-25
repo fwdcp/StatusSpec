@@ -33,6 +33,9 @@ int Entities::pCWeaponMedigun__m_flChargeLevel = 0;
 int Entities::pCTFPlayerResource__m_iHealth[MAX_PLAYERS + 1] = { 0 };
 int Entities::pCTFPlayerResource__m_iMaxHealth[MAX_PLAYERS + 1] = { 0 };
 int Entities::pCTFPlayerResource__m_iMaxBuffedHealth[MAX_PLAYERS + 1] = { 0 };
+int Entities::pCTFPlayerResource__m_iKillstreak[MAX_PLAYERS + 1] = { 0 };
+int Entities::pCWeaponMedigun__m_bHealing = 0;
+int Entities::pCWeaponMedigun__m_hHealingTarget = 0;
 
 bool Entities::PrepareOffsets() {
 	RETRIEVE_OFFSET(pCTFPlayer__m_bGlowEnabled, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_bGlowEnabled, 1, "m_bGlowEnabled"));
@@ -68,6 +71,13 @@ bool Entities::PrepareOffsets() {
 		sprintf(elementName, "%03i", i);
 		RETRIEVE_OFFSET(pCTFPlayerResource__m_iMaxBuffedHealth[i], GetClassPropOffset("CTFPlayerResource", pCTFPlayerResource__m_iMaxBuffedHealth[i], 2, "m_iMaxBuffedHealth", elementName));
 	}
+	for (int i = 0; i <= MAX_PLAYERS; i++) {
+		char *elementName = new char[4];
+		sprintf(elementName, "%03i", i);
+		RETRIEVE_OFFSET(pCTFPlayerResource__m_iKillstreak[i], GetClassPropOffset("CTFPlayerResource", pCTFPlayerResource__m_iKillstreak[i], 2, "m_iKillstreak", elementName));
+	}
+	RETRIEVE_OFFSET(pCWeaponMedigun__m_bHealing, GetClassPropOffset("CWeaponMedigun", pCWeaponMedigun__m_bHealing, 1, "m_bHealing"));
+	RETRIEVE_OFFSET(pCWeaponMedigun__m_hHealingTarget, GetClassPropOffset("CWeaponMedigun", pCWeaponMedigun__m_hHealingTarget, 1, "m_hHealingTarget"));
 
 	return true;
 }
