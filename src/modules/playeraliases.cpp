@@ -124,15 +124,13 @@ int PlayerAliases::GetCurrentAliasedPlayers(const char *partial, char commands[C
 }
 
 int PlayerAliases::GetCurrentGamePlayers(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]) {
-	int maxEntity = Interfaces::pClientEntityList->GetHighestEntityIndex();
-
 	int playerCount = 0;
 
 	std::stringstream ss(partial);
 	std::string command;
 	std::getline(ss, command, ' ');
 
-	for (int i = 0; i <= maxEntity; i++) {
+	for (int i = 0; i <= MAX_PLAYERS; i++) {
 		if (Interfaces::GetGameResources()->IsConnected(i)) {
 			CSteamID playerSteamID = GetClientSteamID(i);
 			

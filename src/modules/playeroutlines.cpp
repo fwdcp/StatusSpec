@@ -203,9 +203,7 @@ void PlayerOutlines::ProcessEntity(IClientEntity* entity) {
 }
 
 void PlayerOutlines::ForceRefresh() {
-	int maxEntity = Interfaces::pClientEntityList->GetHighestEntityIndex();
-	
-	for (int i = 0; i < maxEntity; i++) {
+	for (int i = 0; i <= MAX_PLAYERS; i++) {
 		IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
 		
 		if (!entity) {
@@ -272,9 +270,7 @@ int PlayerOutlines::GetCurrentColor(const char *partial, char commands[COMMAND_C
 
 void PlayerOutlines::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
 	if (!g_PlayerOutlines->enabled->GetBool()) {
-		int maxEntity = Interfaces::pClientEntityList->GetHighestEntityIndex();
-	
-		for (int i = 0; i < maxEntity; i++) {
+		for (int i = 0; i <= MAX_PLAYERS; i++) {
 			IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
 		
 			if (!entity) {

@@ -71,9 +71,7 @@ void StatusIcons::InterceptMessage(vgui::VPANEL vguiPanel, KeyValues *params, vg
 		const char *playerName = params->GetString("playername", NULL);
 		
 		if (playerName) {
-			int maxEntity = Interfaces::pClientEntityList->GetHighestEntityIndex();
-		
-			for (int i = 0; i < maxEntity; i++) {
+			for (int i = 0; i <= MAX_PLAYERS; i++) {
 				IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
 			
 				if (entity == nullptr || !Interfaces::GetGameResources()->IsConnected(i)) {
