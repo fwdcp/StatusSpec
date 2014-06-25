@@ -129,6 +129,38 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 	RETURN_META(MRES_IGNORED);
 }
 
+bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast) {
+	bool changed = false;
+	IGameEvent *newEvent = Interfaces::pGameEventManager->DuplicateEvent(event);
+
+	if (changed) {
+		Interfaces::pGameEventManager->FreeEvent(event);
+
+		RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEvent, (newEvent, bDontBroadcast));
+	}
+	else {
+		Interfaces::pGameEventManager->FreeEvent(newEvent);
+
+		RETURN_META_VALUE(MRES_IGNORED, false);
+	}
+}
+
+bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event) {
+	bool changed = false;
+	IGameEvent *newEvent = Interfaces::pGameEventManager->DuplicateEvent(event);
+
+	if (changed) {
+		Interfaces::pGameEventManager->FreeEvent(event);
+
+		RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEventClientSide, (newEvent));
+	}
+	else {
+		Interfaces::pGameEventManager->FreeEvent(newEvent);
+
+		RETURN_META_VALUE(MRES_IGNORED, false);
+	}
+}
+
 const char * Hook_IGameResources_GetPlayerName(int client) {
 	if (g_PlayerAliases) {
 		if (g_PlayerAliases->IsEnabled()) {
@@ -228,6 +260,8 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	}
 	
 	Hooks::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, Hook_IBaseClientDLL_FrameStageNotify);
+	Hooks::AddHook_IGameEventManager2_FireEvent(Interfaces::pGameEventManager, Hook_IGameEventManager2_FireEvent);
+	Hooks::AddHook_IGameEventManager2_FireEventClientSide(Interfaces::pGameEventManager, Hook_IGameEventManager2_FireEventClientSide);
 	Hooks::AddHook_IPanel_PaintTraverse(g_pVGuiPanel, Hook_IPanel_PaintTraverse);
 	Hooks::AddHook_IPanel_SendMessage(g_pVGuiPanel, Hook_IPanel_SendMessage);
 	Hooks::AddHook_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, Hook_IVEngineClient_GetPlayerInfo);
