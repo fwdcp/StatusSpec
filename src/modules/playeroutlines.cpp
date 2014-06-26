@@ -104,7 +104,10 @@ bool PlayerOutlines::GetGlowEffectColorOverride(C_TFPlayer *tfPlayer, float *r, 
 					int maxHealth = *MAKE_PTR(int*, playerResource, Entities::pCTFPlayerResource__m_iMaxHealth[basePlayer->entindex()]);
 
 					// CTFPlayerResource isn't giving us proper values so let's calculate it manually
-					int maxBuffedHealth = floor((maxHealth / 5.0f) * 1.5f) * 5;
+					int maxBuffedHealth = floor((float(maxHealth) / 5.0f) * 1.5f) * 5;
+
+					// calculate this once instead of several times
+					float halfHealth = float(maxHealth) / 2.0f;
 
 					if (team == TFTeam_Red) {
 						float red;
@@ -118,15 +121,15 @@ bool PlayerOutlines::GetGlowEffectColorOverride(C_TFPlayer *tfPlayer, float *r, 
 							green = colors["red_low"].color.g();
 							blue = colors["red_low"].color.b();
 						}
-						else if (health >= 0 && health < (maxHealth * 0.5f)) {
-							red = ChangeScale(health, 0, maxHealth * 0.5f, colors["red_low"].color.r(), colors["red_medium"].color.r());
-							green = ChangeScale(health, 0, maxHealth * 0.5f, colors["red_low"].color.g(), colors["red_medium"].color.g());
-							blue = ChangeScale(health, 0, maxHealth * 0.5f, colors["red_low"].color.b(), colors["red_medium"].color.b());
+						else if (health >= 0 && health < halfHealth) {
+							red = ChangeScale(health, 0, halfHealth, colors["red_low"].color.r(), colors["red_medium"].color.r());
+							green = ChangeScale(health, 0, halfHealth, colors["red_low"].color.g(), colors["red_medium"].color.g());
+							blue = ChangeScale(health, 0, halfHealth, colors["red_low"].color.b(), colors["red_medium"].color.b());
 						}
-						else if (health >= (maxHealth * 0.5f) && health < maxHealth) {
-							red = ChangeScale(health, maxHealth * 0.5f, maxHealth, colors["red_medium"].color.r(), colors["red_full"].color.r());
-							green = ChangeScale(health, maxHealth * 0.5f, maxHealth, colors["red_medium"].color.g(), colors["red_full"].color.g());
-							blue = ChangeScale(health, maxHealth * 0.5f, maxHealth, colors["red_medium"].color.b(), colors["red_full"].color.b());
+						else if (health >= halfHealth && health < maxHealth) {
+							red = ChangeScale(health, halfHealth, maxHealth, colors["red_medium"].color.r(), colors["red_full"].color.r());
+							green = ChangeScale(health, halfHealth, maxHealth, colors["red_medium"].color.g(), colors["red_full"].color.g());
+							blue = ChangeScale(health, halfHealth, maxHealth, colors["red_medium"].color.b(), colors["red_full"].color.b());
 						}
 						else if (health >= maxHealth && health <= maxBuffedHealth) {
 							red = ChangeScale(health, maxHealth, maxBuffedHealth, colors["red_full"].color.r(), colors["red_buff"].color.r());
