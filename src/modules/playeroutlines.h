@@ -40,15 +40,20 @@ public:
 	~PlayerOutlines();
 
 	bool IsEnabled();
+	bool IsFrequentOverrideEnabled();
 
 	bool GetGlowEffectColorOverride(C_TFPlayer *tfPlayer, float *r, float *g, float *b);
+
+	void Paint(vgui::VPANEL vguiPanel);
 
 	void ProcessEntity(IClientEntity* entity);
 private:
 	std::map<std::string, ColorConCommand_t> colors;
+	vgui::HPanel topPanel;
 	
 	ConVar *enabled;
 	ConCommand *force_refresh;
+	ConVar *frequent_override_enabled;
 	ConVar *team_colors;
 	static void ForceRefresh();
 	static void ColorCommand(const CCommand &command);

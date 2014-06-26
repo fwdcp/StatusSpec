@@ -19,7 +19,14 @@ bool Killstreaks::IsEnabled() {
 }
 
 bool Killstreaks::FireEvent(IGameEvent *event) {
-	if (strcmp(event->GetName(), "player_death") == 0) {
+	if (strcmp(event->GetName(), "player_spawn") == 0) {
+		int userID = event->GetInt("userid", -1);
+
+		if (userID != -1) {
+			currentKillstreaks.erase(userID);
+		}
+	}
+	else if (strcmp(event->GetName(), "player_death") == 0) {
 		int victimUserID = event->GetInt("userid", -1);
 		int attackerUserID = event->GetInt("attacker", -1);
 		int assisterUserID = event->GetInt("assister", -1);
@@ -87,8 +94,6 @@ bool Killstreaks::FireEvent(IGameEvent *event) {
 			if (IsEnabled()) {
 				event->SetInt("kill_streak_victim", GetCurrentKillstreak(victimUserID));
 			}
-
-			currentKillstreaks.erase(victimUserID);
 		}
 
 		if (IsEnabled()) {
@@ -130,7 +135,7 @@ void Killstreaks::PostEntityUpdate() {
 			continue;
 		}
 
-		if (IsEnabled() && playerResource) {
+		if (IsEnabled() && Interfaces::GetGameResources()->IsAlive(player) && playerResource) {
 			int *killstreak = MAKE_PTR(int *, playerResource, Entities::pCTFPlayerResource__m_iKillstreak[player]);
 			*killstreak = GetCurrentKillstreak(iterator->first);
 		}
