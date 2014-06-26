@@ -34,6 +34,8 @@ inline bool IsInteger(const std::string &s) {
 }
 
 PlayerOutlines::PlayerOutlines() {
+	topPanel = vgui::INVALID_PANEL;
+
 	colors["blu_low"].color = Color(88, 133, 162);
 	colors["blu_low"].command = new ConCommand("statusspec_playeroutlines_color_blu_low", PlayerOutlines::ColorCommand, "the color used for outlines for BLU team players at low health", FCVAR_NONE, PlayerOutlines::GetCurrentColor);
 	colors["blu_medium"].color = Color(88, 133, 162);
@@ -53,6 +55,7 @@ PlayerOutlines::PlayerOutlines() {
 	
 	enabled = new ConVar("statusspec_playeroutlines_enabled", "0", FCVAR_NONE, "enable player outlines", PlayerOutlines::ToggleEnabled);
 	force_refresh = new ConCommand("statusspec_playeroutlines_force_refresh", PlayerOutlines::ForceRefresh, "force the player outlines to refresh", FCVAR_NONE);
+	frequent_override_enabled = new ConVar("statusspec_playeroutlines_frequent_override_enabled", "0", FCVAR_NONE, "enable more frequent player outline overrides (helps stop flickering at cost of performance)");
 	team_colors = new ConVar("statusspec_playeroutlines_team_colors", "0", FCVAR_NONE, "override default health-based outline colors with team colors");
 }
 
@@ -64,6 +67,10 @@ PlayerOutlines::~PlayerOutlines() {
 
 bool PlayerOutlines::IsEnabled() {
 	return enabled->GetBool();
+}
+
+bool PlayerOutlines::IsFrequentOverrideEnabled() {
+	return frequent_override_enabled->GetBool();
 }
 
 bool PlayerOutlines::GetGlowEffectColorOverride(C_TFPlayer *tfPlayer, float *r, float *g, float *b) {
@@ -178,6 +185,33 @@ bool PlayerOutlines::GetGlowEffectColorOverride(C_TFPlayer *tfPlayer, float *r, 
 	}
 	
 	return false;
+}
+
+void PlayerOutlines::Paint(vgui::VPANEL vguiPanel) {
+	if (topPanel == vgui::INVALID_PANEL) {
+		std::string name = g_pVGuiPanel->GetName(vguiPanel);
+
+		if (name.compare(TOP_PANEL_NAME) == 0) {
+			topPanel = g_pVGui->PanelToHandle(vguiPanel);
+		}
+	}
+
+	if (g_pVGui->HandleToPanel(topPanel) == vguiPanel) {
+		for (int i = 0; i <= MAX_PLAYERS; i++) {
+			IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
+
+			if (!entity) {
+				continue;
+			}
+
+			if (!Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFPlayer")) {
+				continue;
+			}
+
+			bool* glowEnabled = MAKE_PTR(bool*, entity, Entities::pCTFPlayer__m_bGlowEnabled);
+			*glowEnabled = g_PlayerOutlines->enabled->GetBool();
+		}
+	}
 }
 
 void PlayerOutlines::ProcessEntity(IClientEntity* entity) {
