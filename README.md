@@ -8,6 +8,10 @@ a client plugin that aims to add many useful features for TF2 spectating
 Changelog
 ---------
 
+**0.14.1**
+* fix glitches with killstreaks on death
+* add command to help stop flickering issues with player outlines
+
 **0.14.0**
 * add killstreaks module
 
@@ -173,6 +177,7 @@ In addition, the following HUD animations are triggered by this plugin and may b
 
 #### Console Variables
 * `statusspec_playeroutlines_enabled` - enable player outlines
+* `statusspec_playeroutlines_frequent_override_enabled` - enable more frequent player outline overrides (helps stop flickering at cost of performance)
 * `statusspec_playeroutlines_team_colors` - override default health-based outline colors with team colors
 
 #### Console Commands

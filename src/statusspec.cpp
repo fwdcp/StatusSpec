@@ -200,6 +200,12 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 		}
 	}
 
+	if (g_PlayerOutlines) {
+		if (g_PlayerOutlines->IsEnabled() && g_PlayerOutlines->IsFrequentOverrideEnabled()) {
+			g_PlayerOutlines->Paint(vguiPanel);
+		}
+	}
+
 	if (g_StatusIcons) {
 		if (g_StatusIcons->IsEnabled()) {
 			g_StatusIcons->Paint(vguiPanel);
