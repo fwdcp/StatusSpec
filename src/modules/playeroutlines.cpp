@@ -56,6 +56,7 @@ PlayerOutlines::PlayerOutlines() {
 	enabled = new ConVar("statusspec_playeroutlines_enabled", "0", FCVAR_NONE, "enable player outlines", PlayerOutlines::ToggleEnabled);
 	force_refresh = new ConCommand("statusspec_playeroutlines_force_refresh", PlayerOutlines::ForceRefresh, "force the player outlines to refresh", FCVAR_NONE);
 	frequent_override_enabled = new ConVar("statusspec_playeroutlines_frequent_override_enabled", "0", FCVAR_NONE, "enable more frequent player outline overrides (helps stop flickering at cost of performance)");
+	health_adjusted_team_colors = new ConVar("statusspec_playeroutlines_health_adjusted_team_colors", "0", FCVAR_NONE, "adjusts team colors depending on health of players");
 	team_colors = new ConVar("statusspec_playeroutlines_team_colors", "0", FCVAR_NONE, "override default health-based outline colors with team colors");
 }
 
@@ -79,106 +80,124 @@ bool PlayerOutlines::GetGlowEffectColorOverride(C_TFPlayer *tfPlayer, float *r, 
 		C_BasePlayer *basePlayer = reinterpret_cast<C_BasePlayer *>(tfPlayer);
 
 		if (basePlayer) {
-			C_PlayerResource *playerResource = dynamic_cast<C_PlayerResource *>(Interfaces::GetGameResources());
-
-			if (playerResource) {
-				int health = *MAKE_PTR(int*, playerResource, Entities::pCTFPlayerResource__m_iHealth[basePlayer->entindex()]);
-				int maxHealth = *MAKE_PTR(int*, playerResource, Entities::pCTFPlayerResource__m_iMaxHealth[basePlayer->entindex()]);
-
-				// CTFPlayerResource isn't giving us proper values so let's calculate it manually
-				int maxBuffedHealth = floor((maxHealth / 5.0f) * 1.5f) * 5;
-
+			if (!health_adjusted_team_colors->GetBool()) {
 				if (team == TFTeam_Red) {
-					float red;
-					float green;
-					float blue;
-
-					if (health < 0) {
-						// this should never happen
-
-						 red = colors["red_low"].color.r();
-						 green = colors["red_low"].color.g();
-						 blue = colors["red_low"].color.b();
-					}
-					else if (health >= 0 && health < (maxHealth * 0.5f)) {
-						red = ChangeScale(health, 0, maxHealth * 0.5f, colors["red_low"].color.r(), colors["red_medium"].color.r());
-						green = ChangeScale(health, 0, maxHealth * 0.5f, colors["red_low"].color.g(), colors["red_medium"].color.g());
-						blue = ChangeScale(health, 0, maxHealth * 0.5f, colors["red_low"].color.b(), colors["red_medium"].color.b());
-					}
-					else if (health >= (maxHealth * 0.5f) && health < maxHealth) {
-						red = ChangeScale(health, maxHealth * 0.5f, maxHealth, colors["red_medium"].color.r(), colors["red_full"].color.r());
-						green = ChangeScale(health, maxHealth * 0.5f, maxHealth, colors["red_medium"].color.g(), colors["red_full"].color.g());
-						blue = ChangeScale(health, maxHealth * 0.5f, maxHealth, colors["red_medium"].color.b(), colors["red_full"].color.b());
-					}
-					else if (health >= maxHealth && health <= maxBuffedHealth) {
-						red = ChangeScale(health, maxHealth, maxBuffedHealth, colors["red_full"].color.r(), colors["red_buff"].color.r());
-						green = ChangeScale(health, maxHealth, maxBuffedHealth, colors["red_full"].color.g(), colors["red_buff"].color.g());
-						blue = ChangeScale(health, maxHealth, maxBuffedHealth, colors["red_full"].color.b(), colors["red_buff"].color.b());
-					}
-					else if (health >= maxBuffedHealth) {
-						// our max buffed health above does not take into account special cases so we have to compensate
-
-						red = colors["red_buff"].color.r();
-						green = colors["red_buff"].color.g();
-						blue = colors["red_buff"].color.b();
-					}
-					else {
-						// this DEFINITELY shouldn't ever happen
-
-						return false;
-					}
-
-					*r = red / 255.0f;
-					*g = green / 255.0f;
-					*b = blue / 255.0f;
+					*r = colors["red_full"].color.r() / 255.0f;
+					*g = colors["red_full"].color.g() / 255.0f;
+					*b = colors["red_full"].color.b() / 255.0f;
 
 					return true;
 				}
 				else if (team == TFTeam_Blue) {
-					int red;
-					int green;
-					int blue;
-
-					if (health < 0) {
-						// this should never happen
-
-						red = colors["blu_low"].color.r();
-						green = colors["blu_low"].color.g();
-						blue = colors["blu_low"].color.b();
-					}
-					else if (health >= 0 && health < (maxHealth * 0.5f)) {
-						red = ChangeScale(health, 0, maxHealth * 0.5f, colors["blu_low"].color.r(), colors["blu_medium"].color.r());
-						green = ChangeScale(health, 0, maxHealth * 0.5f, colors["blu_low"].color.g(), colors["blu_medium"].color.g());
-						blue = ChangeScale(health, 0, maxHealth * 0.5f, colors["blu_low"].color.b(), colors["blu_medium"].color.b());
-					}
-					else if (health >= (maxHealth * 0.5f) && health < maxHealth) {
-						red = ChangeScale(health, maxHealth * 0.5f, maxHealth, colors["blu_medium"].color.r(), colors["blu_full"].color.r());
-						green = ChangeScale(health, maxHealth * 0.5f, maxHealth, colors["blu_medium"].color.g(), colors["blu_full"].color.g());
-						blue = ChangeScale(health, maxHealth * 0.5f, maxHealth, colors["blu_medium"].color.b(), colors["blu_full"].color.b());
-					}
-					else if (health >= maxHealth && health <= maxBuffedHealth) {
-						red = ChangeScale(health, maxHealth, maxBuffedHealth, colors["blu_full"].color.r(), colors["blu_buff"].color.r());
-						green = ChangeScale(health, maxHealth, maxBuffedHealth, colors["blu_full"].color.g(), colors["blu_buff"].color.g());
-						blue = ChangeScale(health, maxHealth, maxBuffedHealth, colors["blu_full"].color.b(), colors["blu_buff"].color.b());
-					}
-					else if (health >= maxBuffedHealth) {
-						// our max buffed health above does not take into account special cases so we have to compensate
-
-						red = colors["blu_buff"].color.r();
-						green = colors["blu_buff"].color.g();
-						blue = colors["blu_buff"].color.b();
-					}
-					else {
-						// this DEFINITELY shouldn't ever happen
-
-						return false;
-					}
-
-					*r = red / 255.0f;
-					*g = green / 255.0f;
-					*b = blue / 255.0f;
+					*r = colors["blu_full"].color.r() / 255.0f;
+					*g = colors["blu_full"].color.g() / 255.0f;
+					*b = colors["blu_full"].color.b() / 255.0f;
 
 					return true;
+				}
+			}
+			else {
+				C_PlayerResource *playerResource = dynamic_cast<C_PlayerResource *>(Interfaces::GetGameResources());
+
+				if (playerResource) {
+					int health = *MAKE_PTR(int*, playerResource, Entities::pCTFPlayerResource__m_iHealth[basePlayer->entindex()]);
+					int maxHealth = *MAKE_PTR(int*, playerResource, Entities::pCTFPlayerResource__m_iMaxHealth[basePlayer->entindex()]);
+
+					// CTFPlayerResource isn't giving us proper values so let's calculate it manually
+					int maxBuffedHealth = floor((maxHealth / 5.0f) * 1.5f) * 5;
+
+					if (team == TFTeam_Red) {
+						float red;
+						float green;
+						float blue;
+
+						if (health < 0) {
+							// this should never happen
+
+							red = colors["red_low"].color.r();
+							green = colors["red_low"].color.g();
+							blue = colors["red_low"].color.b();
+						}
+						else if (health >= 0 && health < (maxHealth * 0.5f)) {
+							red = ChangeScale(health, 0, maxHealth * 0.5f, colors["red_low"].color.r(), colors["red_medium"].color.r());
+							green = ChangeScale(health, 0, maxHealth * 0.5f, colors["red_low"].color.g(), colors["red_medium"].color.g());
+							blue = ChangeScale(health, 0, maxHealth * 0.5f, colors["red_low"].color.b(), colors["red_medium"].color.b());
+						}
+						else if (health >= (maxHealth * 0.5f) && health < maxHealth) {
+							red = ChangeScale(health, maxHealth * 0.5f, maxHealth, colors["red_medium"].color.r(), colors["red_full"].color.r());
+							green = ChangeScale(health, maxHealth * 0.5f, maxHealth, colors["red_medium"].color.g(), colors["red_full"].color.g());
+							blue = ChangeScale(health, maxHealth * 0.5f, maxHealth, colors["red_medium"].color.b(), colors["red_full"].color.b());
+						}
+						else if (health >= maxHealth && health <= maxBuffedHealth) {
+							red = ChangeScale(health, maxHealth, maxBuffedHealth, colors["red_full"].color.r(), colors["red_buff"].color.r());
+							green = ChangeScale(health, maxHealth, maxBuffedHealth, colors["red_full"].color.g(), colors["red_buff"].color.g());
+							blue = ChangeScale(health, maxHealth, maxBuffedHealth, colors["red_full"].color.b(), colors["red_buff"].color.b());
+						}
+						else if (health >= maxBuffedHealth) {
+							// our max buffed health above does not take into account special cases so we have to compensate
+
+							red = colors["red_buff"].color.r();
+							green = colors["red_buff"].color.g();
+							blue = colors["red_buff"].color.b();
+						}
+						else {
+							// this DEFINITELY shouldn't ever happen
+
+							return false;
+						}
+
+						*r = red / 255.0f;
+						*g = green / 255.0f;
+						*b = blue / 255.0f;
+
+						return true;
+					}
+					else if (team == TFTeam_Blue) {
+						int red;
+						int green;
+						int blue;
+
+						if (health < 0) {
+							// this should never happen
+
+							red = colors["blu_low"].color.r();
+							green = colors["blu_low"].color.g();
+							blue = colors["blu_low"].color.b();
+						}
+						else if (health >= 0 && health < (maxHealth * 0.5f)) {
+							red = ChangeScale(health, 0, maxHealth * 0.5f, colors["blu_low"].color.r(), colors["blu_medium"].color.r());
+							green = ChangeScale(health, 0, maxHealth * 0.5f, colors["blu_low"].color.g(), colors["blu_medium"].color.g());
+							blue = ChangeScale(health, 0, maxHealth * 0.5f, colors["blu_low"].color.b(), colors["blu_medium"].color.b());
+						}
+						else if (health >= (maxHealth * 0.5f) && health < maxHealth) {
+							red = ChangeScale(health, maxHealth * 0.5f, maxHealth, colors["blu_medium"].color.r(), colors["blu_full"].color.r());
+							green = ChangeScale(health, maxHealth * 0.5f, maxHealth, colors["blu_medium"].color.g(), colors["blu_full"].color.g());
+							blue = ChangeScale(health, maxHealth * 0.5f, maxHealth, colors["blu_medium"].color.b(), colors["blu_full"].color.b());
+						}
+						else if (health >= maxHealth && health <= maxBuffedHealth) {
+							red = ChangeScale(health, maxHealth, maxBuffedHealth, colors["blu_full"].color.r(), colors["blu_buff"].color.r());
+							green = ChangeScale(health, maxHealth, maxBuffedHealth, colors["blu_full"].color.g(), colors["blu_buff"].color.g());
+							blue = ChangeScale(health, maxHealth, maxBuffedHealth, colors["blu_full"].color.b(), colors["blu_buff"].color.b());
+						}
+						else if (health >= maxBuffedHealth) {
+							// our max buffed health above does not take into account special cases so we have to compensate
+
+							red = colors["blu_buff"].color.r();
+							green = colors["blu_buff"].color.g();
+							blue = colors["blu_buff"].color.b();
+						}
+						else {
+							// this DEFINITELY shouldn't ever happen
+
+							return false;
+						}
+
+						*r = red / 255.0f;
+						*g = green / 255.0f;
+						*b = blue / 255.0f;
+
+						return true;
+					}
 				}
 			}
 		}
