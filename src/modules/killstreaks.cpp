@@ -135,7 +135,7 @@ void Killstreaks::PostEntityUpdate() {
 			continue;
 		}
 
-		if (IsEnabled() && playerResource) {
+		if (IsEnabled() && Interfaces::GetGameResources()->IsAlive(player) && playerResource) {
 			int *killstreak = MAKE_PTR(int *, playerResource, Entities::pCTFPlayerResource__m_iKillstreak[player]);
 			*killstreak = GetCurrentKillstreak(iterator->first);
 		}
