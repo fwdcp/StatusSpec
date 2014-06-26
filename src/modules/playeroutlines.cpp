@@ -104,7 +104,7 @@ bool PlayerOutlines::GetGlowEffectColorOverride(C_TFPlayer *tfPlayer, float *r, 
 					int maxHealth = *MAKE_PTR(int*, playerResource, Entities::pCTFPlayerResource__m_iMaxHealth[basePlayer->entindex()]);
 
 					// CTFPlayerResource isn't giving us proper values so let's calculate it manually
-					int maxBuffedHealth = floor((float(maxHealth) / 5.0f) * 1.5f) * 5;
+					int maxBuffedHealth = ((maxHealth / 5) * 3 / 2) * 5;
 
 					// calculate this once instead of several times
 					float halfHealth = float(maxHealth) / 2.0f;
