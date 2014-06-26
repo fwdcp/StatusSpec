@@ -107,7 +107,7 @@ bool PlayerOutlines::GetGlowEffectColorOverride(C_TFPlayer *tfPlayer, float *r, 
 					int maxBuffedHealth = ((maxHealth / 5) * 3 / 2) * 5;
 
 					// calculate this once instead of several times
-					float halfHealth = float(maxHealth) / 2.0f;
+					float halfHealth = maxHealth * 0.5f;
 
 					if (team == TFTeam_Red) {
 						float red;
