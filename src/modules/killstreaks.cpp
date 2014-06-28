@@ -110,14 +110,17 @@ void Killstreaks::ProcessEntity(IClientEntity* entity) {
 	}
 
 	if (IsEnabled()) {
+		int *killstreakPlayer = MAKE_PTR(int *, entity, Entities::pCTFPlayer__m_iKillStreak);
+		*killstreakPlayer = 0;
+
 		C_PlayerResource *playerResource = dynamic_cast<C_PlayerResource *>(Interfaces::GetGameResources());
 
 		if (playerResource) {
 			player_info_t playerInfo;
 
 			if (Interfaces::pEngineClient->GetPlayerInfo(entity->entindex(), &playerInfo)) {
-				int *killstreak = MAKE_PTR(int *, playerResource, Entities::pCTFPlayerResource__m_iKillstreak[entity->entindex()]);
-				*killstreak = 0;
+				int *killstreakGlobal = MAKE_PTR(int *, playerResource, Entities::pCTFPlayerResource__m_iKillstreak[entity->entindex()]);
+				*killstreakGlobal = 0;
 			}
 		}
 	}
@@ -135,9 +138,16 @@ void Killstreaks::PostEntityUpdate() {
 			continue;
 		}
 
-		if (IsEnabled() && Interfaces::GetGameResources()->IsAlive(player) && playerResource) {
-			int *killstreak = MAKE_PTR(int *, playerResource, Entities::pCTFPlayerResource__m_iKillstreak[player]);
-			*killstreak = GetCurrentKillstreak(iterator->first);
+		if (IsEnabled() && Interfaces::GetGameResources()->IsAlive(player)) {
+			int currentKillstreak = GetCurrentKillstreak(iterator->first);
+
+			int *killstreakPlayer = MAKE_PTR(int *, playerEntity, Entities::pCTFPlayer__m_iKillStreak);
+			*killstreakPlayer = currentKillstreak;
+
+			if (playerResource) {
+				int *killstreakGlobal = MAKE_PTR(int *, playerResource, Entities::pCTFPlayerResource__m_iKillstreak[player]);
+				*killstreakGlobal = currentKillstreak;
+			}
 		}
 	}
 }
