@@ -1,7 +1,7 @@
 StatusSpec
 ==========
 
-a client plugin that aims to add many useful features for TF2 spectating
+a Team Fortress 2 client plugin that augments game spectating
 
 ![screenshot](http://i.imgur.com/HliUKLk.png)
 
