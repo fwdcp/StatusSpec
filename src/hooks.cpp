@@ -30,35 +30,35 @@ SH_DECL_HOOK3_void(IPanel, SendMessage, SH_NOATTRIB, 0, VPANEL, KeyValues *, VPA
 SH_DECL_HOOK2(IVEngineClient, GetPlayerInfo, SH_NOATTRIB, 0, bool, int, player_info_t *);
 
 int Hooks::AddHook_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *instance, void(*hook)(float *, float *, float *)) {
-	return SH_ADD_MANUALVPHOOK(C_TFPlayer_GetGlowEffectColor, instance, hook, false);
+	return SH_ADD_MANUALVPHOOK(C_TFPlayer_GetGlowEffectColor, instance, SH_STATIC(hook), false);
 }
 
 int Hooks::AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, void(*hook)(ClientFrameStage_t)) {
-	return SH_ADD_HOOK(IBaseClientDLL, FrameStageNotify, instance, hook, false);
+	return SH_ADD_HOOK(IBaseClientDLL, FrameStageNotify, instance, SH_STATIC(hook), false);
 }
 
 int Hooks::AddHook_IGameEventManager2_FireEvent(IGameEventManager2 *instance, bool(*hook)(IGameEvent *, bool)) {
-	return SH_ADD_HOOK(IGameEventManager2, FireEvent, instance, hook, false);
+	return SH_ADD_HOOK(IGameEventManager2, FireEvent, instance, SH_STATIC(hook), false);
 }
 
 int Hooks::AddHook_IGameEventManager2_FireEventClientSide(IGameEventManager2 *instance, bool(*hook)(IGameEvent *)) {
-	return SH_ADD_HOOK(IGameEventManager2, FireEventClientSide, instance, hook, false);
+	return SH_ADD_HOOK(IGameEventManager2, FireEventClientSide, instance, SH_STATIC(hook), false);
 }
 
 int Hooks::AddHook_IGameResources_GetPlayerName(IGameResources *instance, const char *(*hook)(int)) {
-	return SH_ADD_HOOK(IGameResources, GetPlayerName, instance, hook, false);
+	return SH_ADD_HOOK(IGameResources, GetPlayerName, instance, SH_STATIC(hook), false);
 }
 
 int Hooks::AddHook_IPanel_PaintTraverse(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, bool, bool)) {
-	return SH_ADD_HOOK(IPanel, PaintTraverse, instance, hook, false);
+	return SH_ADD_HOOK(IPanel, PaintTraverse, instance, SH_STATIC(hook), false);
 }
 
 int Hooks::AddHook_IPanel_SendMessage(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, KeyValues *, vgui::VPANEL)) {
-	return SH_ADD_HOOK(IPanel, SendMessage, instance, hook, false);
+	return SH_ADD_HOOK(IPanel, SendMessage, instance, SH_STATIC(hook), false);
 }
 
 int Hooks::AddHook_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, bool(*hook)(int, player_info_t *)) {
-	return SH_ADD_HOOK(IVEngineClient, GetPlayerInfo, instance, hook, false);
+	return SH_ADD_HOOK(IVEngineClient, GetPlayerInfo, instance, SH_STATIC(hook), false);
 }
 
 void Hooks::CallFunc_C_TFPlayer_CalcView(C_TFPlayer *instance, Vector &eyeOrigin, QAngle &eyeAngles, float &zNear, float &zFar, float &fov) {
