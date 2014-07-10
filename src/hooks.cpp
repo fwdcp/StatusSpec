@@ -77,6 +77,14 @@ void Hooks::CallFunc_C_TFPlayer_UpdateGlowEffect(C_TFPlayer *instance) {
 	SH_MCALL(instance, C_TFPlayer_UpdateGlowEffect)();
 }
 
+const char *Hooks::CallFunc_IGameResources_GetPlayerName(IGameResources *instance, int client) {
+	return SH_CALL(instance, &IGameResources::GetPlayerName)(client);
+}
+
+bool Hooks::CallFunc_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, int ent_num, player_info_t *pinfo) {
+	return SH_CALL(instance, &IVEngineClient::GetPlayerInfo)(ent_num, pinfo);
+}
+
 void Hooks::Pause() {
 	g_SourceHook.PausePlugin(g_PLID);
 }

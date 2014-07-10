@@ -68,6 +68,8 @@ public:
 	static int CallFunc_C_TFPlayer_GetObserverMode(C_TFPlayer *instance);
 	static C_BaseEntity *CallFunc_C_TFPlayer_GetObserverTarget(C_TFPlayer *instance);
 	static void CallFunc_C_TFPlayer_UpdateGlowEffect(C_TFPlayer *instance);
+	static const char *CallFunc_IGameResources_GetPlayerName(IGameResources *instance, int client);
+	static bool CallFunc_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, int ent_num, player_info_t *pinfo);
 
 	static void Pause();
 
