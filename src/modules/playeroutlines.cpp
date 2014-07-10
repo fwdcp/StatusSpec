@@ -209,7 +209,7 @@ void PlayerOutlines::Paint(vgui::VPANEL vguiPanel) {
 			}
 
 			bool* glowEnabled = MAKE_PTR(bool*, entity, Entities::pCTFPlayer__m_bGlowEnabled);
-			*glowEnabled = g_PlayerOutlines->enabled->GetBool();
+			*glowEnabled = g_PlayerOutlines->IsEnabled();
 		}
 	}
 }
@@ -231,7 +231,7 @@ void PlayerOutlines::ProcessEntity(IClientEntity* entity) {
 
 	bool* glowEnabled = MAKE_PTR(bool*, baseCombatCharacter, Entities::pCTFPlayer__m_bGlowEnabled);
 
-	if (enabled->GetBool()) {
+	if (IsEnabled()) {
 		*glowEnabled = true;
 	}
 }
@@ -249,7 +249,7 @@ void PlayerOutlines::ForceRefresh() {
 		}
 
 		bool* glowEnabled = MAKE_PTR(bool*, entity, Entities::pCTFPlayer__m_bGlowEnabled);
-		*glowEnabled = g_PlayerOutlines->enabled->GetBool();
+		*glowEnabled = g_PlayerOutlines->IsEnabled();
 
 		Hooks::CallFunc_C_TFPlayer_UpdateGlowEffect((C_TFPlayer *)entity);
 	}
@@ -303,7 +303,7 @@ int PlayerOutlines::GetCurrentColor(const char *partial, char commands[COMMAND_C
 }
 
 void PlayerOutlines::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
-	if (!g_PlayerOutlines->enabled->GetBool()) {
+	if (!g_PlayerOutlines->IsEnabled()) {
 		for (int i = 0; i <= MAX_PLAYERS; i++) {
 			IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
 		

@@ -163,7 +163,7 @@ int Killstreaks::GetCurrentKillstreak(int userid) {
 }
 
 void Killstreaks::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
-	if (!g_Killstreaks->enabled->GetBool()) {
+	if (!g_Killstreaks->IsEnabled()) {
 		for (int i = 0; i <= MAX_PLAYERS; i++) {
 			IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
 
