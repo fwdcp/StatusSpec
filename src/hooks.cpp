@@ -16,8 +16,6 @@ SourceHook::Impl::CSourceHookImpl g_SourceHook;
 SourceHook::ISourceHook *g_SHPtr = &g_SourceHook;
 int g_PLID = 0;
 
-std::map<void *, void *> Hooks::hooks;
-
 SH_DECL_MANUALHOOK5_void(C_TFPlayer_CalcView, OFFSET_CALCVIEW, 0, 0, Vector &, QAngle &, float &, float &, float &);
 SH_DECL_MANUALHOOK3_void(C_TFPlayer_GetGlowEffectColor, OFFSET_GETGLOWEFFECTCOLOR, 0, 0, float *, float *, float *);
 SH_DECL_MANUALHOOK0(C_TFPlayer_GetObserverMode, OFFSET_GETOBSERVERMODE, 0, 0, int);
@@ -31,14 +29,10 @@ SH_DECL_HOOK3_void(IPanel, PaintTraverse, SH_NOATTRIB, 0, VPANEL, bool, bool);
 SH_DECL_HOOK3_void(IPanel, SendMessage, SH_NOATTRIB, 0, VPANEL, KeyValues *, VPANEL);
 SH_DECL_HOOK2(IVEngineClient, GetPlayerInfo, SH_NOATTRIB, 0, bool, int, player_info_t *);
 
-bool Hooks::AddDetour(void *target, void *detour) {
-	void *original;
+bool Hooks::AddDetour(void *target, void *detour, void *&original) {
 	MH_STATUS addHookResult = MH_CreateHook(target, detour, &original);
 
-	if (addHookResult == MH_OK) {
-		hooks[target] = original;
-	}
-	else if (addHookResult != MH_ERROR_ALREADY_CREATED) {
+	if (addHookResult != MH_OK && addHookResult != MH_ERROR_ALREADY_CREATED) {
 		return false;
 	}
 
@@ -77,15 +71,6 @@ int Hooks::AddHook_IPanel_SendMessage(vgui::IPanel *instance, void(*hook)(vgui::
 
 int Hooks::AddHook_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, bool(*hook)(int, player_info_t *)) {
 	return SH_ADD_HOOK(IVEngineClient, GetPlayerInfo, instance, SH_STATIC(hook), false);
-}
-
-void *Hooks::GetOriginal(void *target) {
-	if (hooks.find(target) != hooks.end()) {
-		return hooks[target];
-	}
-	else {
-		return nullptr;
-	}
 }
 
 void Hooks::CallFunc_C_TFPlayer_CalcView(C_TFPlayer *instance, Vector &eyeOrigin, QAngle &eyeAngles, float &zNear, float &zFar, float &fov) {
@@ -143,14 +128,14 @@ bool Hooks::Unload() {
 
 bool Hooks::Pause() {
 	g_SourceHook.PausePlugin(g_PLID);
-	MH_STATUS minHookResult = MH_QueueDisableHook(MH_ALL_HOOKS);
+	MH_STATUS minHookResult = MH_DisableHook(MH_ALL_HOOKS);
 
 	return (minHookResult == MH_OK || minHookResult == MH_ERROR_DISABLED);
 }
 
 bool Hooks::Unpause() {
 	g_SourceHook.UnpausePlugin(g_PLID);
-	MH_STATUS minHookResult = MH_QueueEnableHook(MH_ALL_HOOKS);
+	MH_STATUS minHookResult = MH_EnableHook(MH_ALL_HOOKS);
 
 	return (minHookResult == MH_OK || minHookResult == MH_ERROR_ENABLED);
 }
