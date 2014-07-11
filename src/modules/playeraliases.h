@@ -19,7 +19,6 @@
 #include <string>
 
 #include "convar.h"
-#include "sourcehook/sourcehook.h"
 
 #include "../hooks.h"
 #include "../ifaces.h"

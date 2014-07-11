@@ -113,15 +113,11 @@ void Killstreaks::ProcessEntity(IClientEntity* entity) {
 		int *killstreakPlayer = MAKE_PTR(int *, entity, Entities::pCTFPlayer__m_iKillStreak);
 		*killstreakPlayer = 0;
 
-		C_PlayerResource *playerResource = dynamic_cast<C_PlayerResource *>(Interfaces::GetGameResources());
+		player_info_t playerInfo;
 
-		if (playerResource) {
-			player_info_t playerInfo;
-
-			if (Interfaces::pEngineClient->GetPlayerInfo(entity->entindex(), &playerInfo)) {
-				int *killstreakGlobal = MAKE_PTR(int *, playerResource, Entities::pCTFPlayerResource__m_iKillstreak[entity->entindex()]);
-				*killstreakGlobal = 0;
-			}
+		if (Interfaces::pEngineClient->GetPlayerInfo(entity->entindex(), &playerInfo)) {
+			int *killstreakGlobal = MAKE_PTR(int *, Interfaces::GetGameResources(), Entities::pCTFPlayerResource__m_iKillstreak[entity->entindex()]);
+			*killstreakGlobal = 0;
 		}
 	}
 }
@@ -131,8 +127,6 @@ void Killstreaks::PostEntityUpdate() {
 		currentKillstreaks.clear();
 		return;
 	}
-
-	C_PlayerResource *playerResource = dynamic_cast<C_PlayerResource *>(Interfaces::GetGameResources());
 
 	for (auto iterator = currentKillstreaks.begin(); iterator != currentKillstreaks.end(); ++iterator) {
 		int player = Interfaces::pEngineClient->GetPlayerForUserID(iterator->first);
@@ -144,10 +138,8 @@ void Killstreaks::PostEntityUpdate() {
 			int *killstreakPlayer = MAKE_PTR(int *, playerEntity, Entities::pCTFPlayer__m_iKillStreak);
 			*killstreakPlayer = currentKillstreak;
 
-			if (playerResource) {
-				int *killstreakGlobal = MAKE_PTR(int *, playerResource, Entities::pCTFPlayerResource__m_iKillstreak[player]);
-				*killstreakGlobal = currentKillstreak;
-			}
+			int *killstreakGlobal = MAKE_PTR(int *, Interfaces::GetGameResources(), Entities::pCTFPlayerResource__m_iKillstreak[player]);
+			*killstreakGlobal = currentKillstreak;
 		}
 	}
 }
@@ -175,15 +167,11 @@ void Killstreaks::ToggleEnabled(IConVar *var, const char *pOldValue, float flOld
 				continue;
 			}
 
-			C_PlayerResource *playerResource = dynamic_cast<C_PlayerResource *>(Interfaces::GetGameResources());
+			player_info_t playerInfo;
 
-			if (playerResource) {
-				player_info_t playerInfo;
-
-				if (Interfaces::pEngineClient->GetPlayerInfo(entity->entindex(), &playerInfo)) {
-					int *killstreak = MAKE_PTR(int *, playerResource, Entities::pCTFPlayerResource__m_iKillstreak[entity->entindex()]);
-					*killstreak = 0;
-				}
+			if (Interfaces::pEngineClient->GetPlayerInfo(entity->entindex(), &playerInfo)) {
+				int *killstreak = MAKE_PTR(int *, Interfaces::GetGameResources(), Entities::pCTFPlayerResource__m_iKillstreak[entity->entindex()]);
+				*killstreak = 0;
 			}
 		}
 	}

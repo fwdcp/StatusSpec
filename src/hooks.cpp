@@ -16,6 +16,8 @@ SourceHook::Impl::CSourceHookImpl g_SourceHook;
 SourceHook::ISourceHook *g_SHPtr = &g_SourceHook;
 int g_PLID = 0;
 
+std::map<void *, void *> Hooks::hooks;
+
 SH_DECL_MANUALHOOK5_void(C_TFPlayer_CalcView, OFFSET_CALCVIEW, 0, 0, Vector &, QAngle &, float &, float &, float &);
 SH_DECL_MANUALHOOK3_void(C_TFPlayer_GetGlowEffectColor, OFFSET_GETGLOWEFFECTCOLOR, 0, 0, float *, float *, float *);
 SH_DECL_MANUALHOOK0(C_TFPlayer_GetObserverMode, OFFSET_GETOBSERVERMODE, 0, 0, int);
@@ -28,6 +30,22 @@ SH_DECL_HOOK1(IGameResources, GetPlayerName, SH_NOATTRIB, 0, const char *, int);
 SH_DECL_HOOK3_void(IPanel, PaintTraverse, SH_NOATTRIB, 0, VPANEL, bool, bool);
 SH_DECL_HOOK3_void(IPanel, SendMessage, SH_NOATTRIB, 0, VPANEL, KeyValues *, VPANEL);
 SH_DECL_HOOK2(IVEngineClient, GetPlayerInfo, SH_NOATTRIB, 0, bool, int, player_info_t *);
+
+bool Hooks::AddDetour(void *target, void *detour) {
+	void *original;
+	MH_STATUS addHookResult = MH_CreateHook(target, detour, &original);
+
+	if (addHookResult == MH_OK) {
+		hooks[target] = original;
+	}
+	else if (addHookResult != MH_ERROR_ALREADY_CREATED) {
+		return false;
+	}
+
+	MH_STATUS enableHookResult = MH_EnableHook(target);
+
+	return (enableHookResult == MH_OK || enableHookResult == MH_ERROR_ENABLED);
+}
 
 int Hooks::AddHook_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *instance, void(*hook)(float *, float *, float *)) {
 	return SH_ADD_MANUALVPHOOK(C_TFPlayer_GetGlowEffectColor, instance, SH_STATIC(hook), false);
@@ -61,6 +79,15 @@ int Hooks::AddHook_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, bool(*
 	return SH_ADD_HOOK(IVEngineClient, GetPlayerInfo, instance, SH_STATIC(hook), false);
 }
 
+void *Hooks::GetOriginal(void *target) {
+	if (hooks.find(target) != hooks.end()) {
+		return hooks[target];
+	}
+	else {
+		return nullptr;
+	}
+}
+
 void Hooks::CallFunc_C_TFPlayer_CalcView(C_TFPlayer *instance, Vector &eyeOrigin, QAngle &eyeAngles, float &zNear, float &zFar, float &fov) {
 	SH_MCALL(instance, C_TFPlayer_CalcView)(eyeOrigin, eyeAngles, zNear, zFar, fov);
 }
@@ -85,18 +112,45 @@ bool Hooks::CallFunc_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, int 
 	return SH_CALL(instance, &IVEngineClient::GetPlayerInfo)(ent_num, pinfo);
 }
 
-void Hooks::Pause() {
-	g_SourceHook.PausePlugin(g_PLID);
+bool Hooks::RemoveDetour(void *target) {
+	MH_STATUS disableHookResult = MH_DisableHook(target);
+
+	if (disableHookResult != MH_OK && disableHookResult != MH_ERROR_DISABLED) {
+		return false;
+	}
+
+	MH_STATUS removeHookResult = MH_RemoveHook(target);
+
+	return (removeHookResult == MH_OK || removeHookResult == MH_ERROR_NOT_CREATED);
 }
 
 bool Hooks::RemoveHook(int hookID) {
 	return SH_REMOVE_HOOK_ID(hookID);
 }
 
-void Hooks::Unload() {
-	g_SourceHook.UnloadPlugin(g_PLID, new StatusSpecUnloader());
+bool Hooks::Load() {
+	MH_STATUS minHookResult = MH_Initialize();
+
+	return (minHookResult == MH_OK || minHookResult == MH_ERROR_ALREADY_INITIALIZED);
 }
 
-void Hooks::Unpause() {
+bool Hooks::Unload() {
+	g_SourceHook.UnloadPlugin(g_PLID, new StatusSpecUnloader());
+	MH_STATUS minHookResult = MH_Uninitialize();
+
+	return (minHookResult == MH_OK || minHookResult == MH_ERROR_NOT_INITIALIZED);
+}
+
+bool Hooks::Pause() {
+	g_SourceHook.PausePlugin(g_PLID);
+	MH_STATUS minHookResult = MH_QueueDisableHook(MH_ALL_HOOKS);
+
+	return (minHookResult == MH_OK || minHookResult == MH_ERROR_DISABLED);
+}
+
+bool Hooks::Unpause() {
 	g_SourceHook.UnpausePlugin(g_PLID);
+	MH_STATUS minHookResult = MH_QueueEnableHook(MH_ALL_HOOKS);
+
+	return (minHookResult == MH_OK || minHookResult == MH_ERROR_ENABLED);
 }

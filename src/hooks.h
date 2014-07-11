@@ -18,18 +18,15 @@
 #define GLOWS_ENABLE
 
 #include "cdll_int.h"
-#include "KeyValues.h"
 #include "igameevents.h"
 #include "igameresources.h"
 #include "vgui/vgui.h"
 #include "vgui/IPanel.h"
 #include "cbase.h"
-#include "c_basecombatcharacter.h"
-#include "c_playerresource.h"
-#include "glow_outline_effect.h"
 
-#include <sourcehook/sourcehook_impl.h>
-#include <sourcehook/sourcehook.h>
+#include <sourcehook_impl.h>
+#include <sourcehook.h>
+#include <MinHook.h>
 
 using namespace vgui;
 
@@ -55,6 +52,8 @@ public:
 
 class Hooks {
 public:
+	static bool AddDetour(void *target, void *detour);
+
 	static int AddHook_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *instance, void(*hook)(float *, float *, float *));
 	static int AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, void(*hook)(ClientFrameStage_t));
 	static int AddHook_IGameEventManager2_FireEvent(IGameEventManager2 *instance, bool(*hook)(IGameEvent *, bool));
@@ -64,6 +63,8 @@ public:
 	static int AddHook_IPanel_SendMessage(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, KeyValues *, vgui::VPANEL));
 	static int AddHook_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, bool(*hook)(int, player_info_t *));
 
+	static void *GetOriginal(void *target);
+
 	static void CallFunc_C_TFPlayer_CalcView(C_TFPlayer *instance, Vector &eyeOrigin, QAngle &eyeAngles, float &zNear, float &zFar, float &fov);
 	static int CallFunc_C_TFPlayer_GetObserverMode(C_TFPlayer *instance);
 	static C_BaseEntity *CallFunc_C_TFPlayer_GetObserverTarget(C_TFPlayer *instance);
@@ -71,11 +72,17 @@ public:
 	static const char *CallFunc_IGameResources_GetPlayerName(IGameResources *instance, int client);
 	static bool CallFunc_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, int ent_num, player_info_t *pinfo);
 
-	static void Pause();
+	static bool RemoveDetour(void *target);
 
 	static bool RemoveHook(int hookID);
 
-	static void Unload();
+	static bool Load();
 
-	static void Unpause();
+	static bool Unload();
+
+	static bool Pause();
+
+	static bool Unpause();
+private:
+	static std::map<void *, void *> hooks;
 };

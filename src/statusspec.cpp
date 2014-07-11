@@ -267,6 +267,11 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 		Warning("[%s] Unable to determine proper offsets!\n", PLUGIN_DESC);
 		return false;
 	}
+
+	if (!Hooks::Load()) {
+		Warning("[%s] Unable to initialize hooking!", PLUGIN_DESC);
+		return false;
+	}
 	
 	Hooks::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, Hook_IBaseClientDLL_FrameStageNotify);
 	Hooks::AddHook_IGameEventManager2_FireEvent(Interfaces::pGameEventManager, Hook_IGameEventManager2_FireEvent);

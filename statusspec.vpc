@@ -7,6 +7,7 @@
 $Macro SRCDIR		"..\.."
 $Macro OUTBINDIR	".\addons"
 $Macro MMSOURCE_DEV	"..\..\..\..\..\metamod-source"
+$Macro MINHOOK		"..\..\..\..\..\minhook"
 
 $Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 
@@ -14,8 +15,9 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE,$SRCDIR\game\client,$SRCDIR\game\shared,$SRCDIR\public,$MMSOURCE_DEV\core"
+		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\game\client;$SRCDIR\game\shared;$SRCDIR\public;$MMSOURCE_DEV\core\sourcehook;$MINHOOK\include;$MINHOOK\src"
 		$PreprocessorDefinitions			"$BASE;statusspecONLY;_MBCS"
+		$TreatWarningsAsErrors				"No (/WX-)"
 	}
 
 	$Linker
@@ -47,6 +49,12 @@ $Project "StatusSpec"
 		$File	"$MMSOURCE_DEV\core\sourcehook\sourcehook_impl_chookmaninfo.cpp"
 		$File	"$MMSOURCE_DEV\core\sourcehook\sourcehook_impl_cproto.cpp"
 		$File	"$MMSOURCE_DEV\core\sourcehook\sourcehook_impl_cvfnptr.cpp"
+		$File	"$MINHOOK\src\HDE32\hde32.c"
+		$File	"$MINHOOK\src\buffer.cpp"
+		$File	"$MINHOOK\src\export.cpp"
+		$File	"$MINHOOK\src\hook.cpp"
+		$File	"$MINHOOK\src\thread.cpp"
+		$File	"$MINHOOK\src\trampoline.cpp"
 		$File	"$SRCDIR\public\vgui_controls\vgui_controls.cpp"
 		$File	"src\vgui_controls\ImageProgressBar.cpp"
 	}
