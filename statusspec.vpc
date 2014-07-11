@@ -4,9 +4,9 @@
 //	Project Script
 //-----------------------------------------------------------------------------
 
-$Macro SRCDIR		"../.."
-$Macro OUTBINDIR	"./addons"
-$Macro MMSOURCE_DEV	"../../../../../metamod-source"
+$Macro SRCDIR		"..\.."
+$Macro OUTBINDIR	".\addons"
+$Macro MMSOURCE_DEV	"..\..\..\..\..\metamod-source"
 
 $Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 
