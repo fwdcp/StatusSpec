@@ -127,16 +127,16 @@ void Killstreaks::ProcessEntity(IClientEntity* entity) {
 }
 
 void Killstreaks::PostEntityUpdate() {
+	if (!Interfaces::pEngineClient->IsInGame()) {
+		currentKillstreaks.clear();
+		return;
+	}
+
 	C_PlayerResource *playerResource = dynamic_cast<C_PlayerResource *>(Interfaces::GetGameResources());
 
 	for (auto iterator = currentKillstreaks.begin(); iterator != currentKillstreaks.end(); ++iterator) {
 		int player = Interfaces::pEngineClient->GetPlayerForUserID(iterator->first);
 		IClientEntity *playerEntity = Interfaces::pClientEntityList->GetClientEntity(player);
-
-		if (!playerEntity || !Entities::CheckClassBaseclass(playerEntity->GetClientClass(), "DT_TFPlayer")) {
-			currentKillstreaks.erase(iterator);
-			continue;
-		}
 
 		if (IsEnabled() && Interfaces::GetGameResources()->IsAlive(player)) {
 			int currentKillstreak = GetCurrentKillstreak(iterator->first);
