@@ -6,6 +6,7 @@
 
 $Macro SRCDIR		"../.."
 $Macro OUTBINDIR	"./addons"
+$Macro MMSOURCE_DEV	"../../../../../metamod-source"
 
 $Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 
@@ -13,7 +14,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE,$SRCDIR\game\client,$SRCDIR\game\shared,$SRCDIR\public,..\metamod-source\core"
+		$AdditionalIncludeDirectories		"$BASE,$SRCDIR\game\client,$SRCDIR\game\shared,$SRCDIR\public,$MMSOURCE_DEV\core"
 		$PreprocessorDefinitions			"$BASE;statusspecONLY;_MBCS"
 	}
 
@@ -40,13 +41,13 @@ $Project "StatusSpec"
 		$File	"src\ifaces.cpp"
 		$File	"src\itemschema.cpp"
 		$File	"src\paint.cpp"
-		$File	"..\metamod-source\core\sourcehook\sourcehook.cpp"
-		$File	"..\metamod-source\core\sourcehook\sourcehook_hookmangen.cpp"
-		$File	"..\metamod-source\core\sourcehook\sourcehook_impl_chookidman.cpp"
-		$File	"..\metamod-source\core\sourcehook\sourcehook_impl_chookmaninfo.cpp"
-		$File	"..\metamod-source\core\sourcehook\sourcehook_impl_cproto.cpp"
-		$File	"..\metamod-source\core\sourcehook\sourcehook_impl_cvfnptr.cpp"
-		$File	"..\..\public\vgui_controls\vgui_controls.cpp"
+		$File	"$MMSOURCE_DEV\core\sourcehook\sourcehook.cpp"
+		$File	"$MMSOURCE_DEV\core\sourcehook\sourcehook_hookmangen.cpp"
+		$File	"$MMSOURCE_DEV\core\sourcehook\sourcehook_impl_chookidman.cpp"
+		$File	"$MMSOURCE_DEV\core\sourcehook\sourcehook_impl_chookmaninfo.cpp"
+		$File	"$MMSOURCE_DEV\core\sourcehook\sourcehook_impl_cproto.cpp"
+		$File	"$MMSOURCE_DEV\core\sourcehook\sourcehook_impl_cvfnptr.cpp"
+		$File	"$SRCDIR\public\vgui_controls\vgui_controls.cpp"
 		$File	"src\vgui_controls\ImageProgressBar.cpp"
 	}
 	
