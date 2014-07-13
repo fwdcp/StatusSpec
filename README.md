@@ -80,7 +80,7 @@ Changelog
 
 Usage
 -----
-This plugin is not signed by Valve, and therefore will not load unless TF2 is loaded with the "-insecure" flag.
+To install, place the `StatusSpec` folder within the `custom` folder in the `tf` directory. Because this plugin is not signed by Valve, you must launch TF2 with the `-insecure` option in order for this plugin to be active and will not be able to use this plugin on VAC-secured servers.
 
 ### AntiFreeze
 *forces spectator GUI to refresh constantly, eliminating many HUD issues after game unpauses*
