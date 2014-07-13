@@ -22,6 +22,7 @@
 #include "modules/antifreeze.h"
 #include "modules/killstreaks.h"
 #include "modules/loadouticons.h"
+#include "modules/localplayer.h"
 #include "modules/mediguninfo.h"
 #include "modules/playeraliases.h"
 #include "modules/playeroutlines.h"
@@ -35,6 +36,8 @@ typedef struct ObserverInfo_s {
 } ObserverInfo_t;
 
 ObserverInfo_t GetLocalPlayerObserverInfo();
+
+int Detour_GetLocalPlayerIndex();
 
 void Hook_C_TFPlayer_GetGlowEffectColor(float *r, float *g, float *b);
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage);

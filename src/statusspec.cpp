@@ -13,6 +13,7 @@
 AntiFreeze *g_AntiFreeze = nullptr;
 Killstreaks *g_Killstreaks = nullptr;
 LoadoutIcons *g_LoadoutIcons = nullptr;
+LocalPlayer *g_LocalPlayer = nullptr;
 MedigunInfo *g_MedigunInfo = nullptr;
 PlayerAliases *g_PlayerAliases = nullptr;
 PlayerOutlines *g_PlayerOutlines = nullptr;
@@ -33,6 +34,16 @@ ObserverInfo_t GetLocalPlayerObserverInfo() {
 	}
 
 	return info;
+}
+
+int Detour_GetLocalPlayerIndex() {
+	if (g_LocalPlayer) {
+		if (g_LocalPlayer->IsEnabled()) {
+			return g_LocalPlayer->GetLocalPlayerIndexOverride();
+		}
+	}
+
+	return Hooks::CallFunc_GetLocalPlayerIndex();
 }
 
 void Hook_C_TFPlayer_GetGlowEffectColor(float *r, float *g, float *b) {
@@ -272,6 +283,8 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 		Warning("[%s] Unable to initialize hooking!", PLUGIN_DESC);
 		return false;
 	}
+
+	Hooks::AddDetour_GetLocalPlayerIndex(Detour_GetLocalPlayerIndex);
 	
 	Hooks::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, Hook_IBaseClientDLL_FrameStageNotify);
 	Hooks::AddHook_IGameEventManager2_FireEvent(Interfaces::pGameEventManager, Hook_IGameEventManager2_FireEvent);
@@ -285,6 +298,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_AntiFreeze = new AntiFreeze();
 	g_Killstreaks = new Killstreaks();
 	g_LoadoutIcons = new LoadoutIcons();
+	g_LocalPlayer = new LocalPlayer();
 	g_MedigunInfo = new MedigunInfo();
 	g_PlayerAliases = new PlayerAliases();
 	g_PlayerOutlines = new PlayerOutlines();
@@ -299,6 +313,7 @@ void StatusSpecPlugin::Unload(void)
 	delete g_AntiFreeze;
 	delete g_Killstreaks;
 	delete g_LoadoutIcons;
+	delete g_LocalPlayer;
 	delete g_MedigunInfo;
 	delete g_PlayerAliases;
 	delete g_PlayerOutlines;
