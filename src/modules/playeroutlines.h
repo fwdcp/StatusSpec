@@ -54,6 +54,7 @@ private:
 	ConVar *enabled;
 	ConCommand *force_refresh;
 	ConVar *frequent_override_enabled;
+	ConVar *health_adjusted_team_colors;
 	ConVar *team_colors;
 	static void ForceRefresh();
 	static void ColorCommand(const CCommand &command);
