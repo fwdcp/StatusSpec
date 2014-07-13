@@ -29,6 +29,41 @@ SH_DECL_HOOK3_void(IPanel, PaintTraverse, SH_NOATTRIB, 0, VPANEL, bool, bool);
 SH_DECL_HOOK3_void(IPanel, SendMessage, SH_NOATTRIB, 0, VPANEL, KeyValues *, VPANEL);
 SH_DECL_HOOK2(IVEngineClient, GetPlayerInfo, SH_NOATTRIB, 0, bool, int, player_info_t *);
 
+inline bool DataCompare(const BYTE* pData, const BYTE* bSig, const char* szMask)
+{
+	for (; *szMask; ++szMask, ++pData, ++bSig)
+	{
+		if (*szMask == 'x' && *pData != *bSig)
+			return false;
+	}
+
+	return (*szMask) == NULL;
+}
+
+inline DWORD FindPattern(DWORD dwAddress, DWORD dwSize, BYTE* pbSig, const char* szMask)
+{
+	for (DWORD i = NULL; i < dwSize; i++)
+	{
+		if (DataCompare((BYTE*)(dwAddress + i), pbSig, szMask))
+			return (DWORD)(dwAddress + i);
+	}
+
+	return 0;
+}
+
+inline GLPI_t GetGLPIFunc() {
+#if defined _WIN32
+	static DWORD pointer = NULL;
+	if (!pointer)
+		pointer = FindPattern((DWORD)GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE)GETLOCALPLAYERINDEX_SIG, GETLOCALPLAYERINDEX_MASK);
+	return (GLPI_t)(pointer);
+#else
+	return nullptr;
+#endif
+}
+
+GLPI_t Hooks::getLocalPlayerIndexOriginal = nullptr;
+
 bool Hooks::AddDetour(void *target, void *detour, void *&original) {
 	MH_STATUS addHookResult = MH_CreateHook(target, detour, &original);
 
@@ -39,6 +74,17 @@ bool Hooks::AddDetour(void *target, void *detour, void *&original) {
 	MH_STATUS enableHookResult = MH_EnableHook(target);
 
 	return (enableHookResult == MH_OK || enableHookResult == MH_ERROR_ENABLED);
+}
+
+bool Hooks::AddDetour_GetLocalPlayerIndex(GLPI_t detour) {
+	void *original;
+
+	if (AddDetour(GetGLPIFunc(), detour, original)) {
+		getLocalPlayerIndexOriginal = reinterpret_cast<GLPI_t>(original);
+		return true;
+	}
+
+	return false;
 }
 
 int Hooks::AddHook_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *instance, void(*hook)(float *, float *, float *)) {
@@ -73,6 +119,15 @@ int Hooks::AddHook_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, bool(*
 	return SH_ADD_HOOK(IVEngineClient, GetPlayerInfo, instance, SH_STATIC(hook), false);
 }
 
+int Hooks::CallFunc_GetLocalPlayerIndex() {
+	if (getLocalPlayerIndexOriginal) {
+		return getLocalPlayerIndexOriginal();
+	}
+	else {
+		return GetGLPIFunc()();
+	}
+}
+
 void Hooks::CallFunc_C_TFPlayer_CalcView(C_TFPlayer *instance, Vector &eyeOrigin, QAngle &eyeAngles, float &zNear, float &zFar, float &fov) {
 	SH_MCALL(instance, C_TFPlayer_CalcView)(eyeOrigin, eyeAngles, zNear, zFar, fov);
 }
@@ -95,6 +150,15 @@ const char *Hooks::CallFunc_IGameResources_GetPlayerName(IGameResources *instanc
 
 bool Hooks::CallFunc_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, int ent_num, player_info_t *pinfo) {
 	return SH_CALL(instance, &IVEngineClient::GetPlayerInfo)(ent_num, pinfo);
+}
+
+bool Hooks::RemoveDetour_GetLocalPlayerIndex() {
+	if (RemoveDetour(GetGLPIFunc())) {
+		getLocalPlayerIndexOriginal = nullptr;
+		return true;
+	}
+
+	return false;
 }
 
 bool Hooks::RemoveDetour(void *target) {

@@ -32,6 +32,16 @@ using namespace vgui;
 
 class C_TFPlayer;
 
+typedef int(*GLPI_t)(void);
+
+#if defined _WIN32
+#define GetFuncAddress(pAddress, szFunction) ::GetProcAddress((HMODULE)pAddress, szFunction)
+#define GetHandleOfModule(szModuleName) GetModuleHandleA(szModuleName".dll")
+#elif defined __linux__
+#define GetFuncAddress(pAddress, szFunction) dlsym(pAddress, szFunction)
+#define GetHandleOfModule(szModuleName) dlopen(szModuleName".so", RTLD_NOLOAD)
+#endif
+
 #if defined _WIN32
 #define OFFSET_GETGLOWEFFECTCOLOR 223
 #define OFFSET_UPDATEGLOWEFFECT 224
@@ -39,6 +49,9 @@ class C_TFPlayer;
 #define OFFSET_CALCVIEW 229
 #define OFFSET_GETOBSERVERMODE 240
 #define OFFSET_GETOBSERVERTARGET 241
+#define CLIENT_MODULE_SIZE 0xC74EC0
+#define GETLOCALPLAYERINDEX_SIG "\xE8\x00\x00\x00\x00\x85\xC0\x74\x08\x8D\x48\x08\x8B\x01\xFF\x60\x24\x33\xC0\xC3"
+#define GETLOCALPLAYERINDEX_MASK "x????xxxxxxxxxxxxxxx"
 #endif
 
 extern SourceHook::ISourceHook *g_SHPtr;
@@ -52,6 +65,7 @@ public:
 
 class Hooks {
 public:
+	static bool AddDetour_GetLocalPlayerIndex(GLPI_t detour);
 
 	static int AddHook_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *instance, void(*hook)(float *, float *, float *));
 	static int AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, void(*hook)(ClientFrameStage_t));
@@ -62,6 +76,7 @@ public:
 	static int AddHook_IPanel_SendMessage(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, KeyValues *, vgui::VPANEL));
 	static int AddHook_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, bool(*hook)(int, player_info_t *));
 
+	static int CallFunc_GetLocalPlayerIndex();
 
 	static void CallFunc_C_TFPlayer_CalcView(C_TFPlayer *instance, Vector &eyeOrigin, QAngle &eyeAngles, float &zNear, float &zFar, float &fov);
 	static int CallFunc_C_TFPlayer_GetObserverMode(C_TFPlayer *instance);
@@ -70,6 +85,7 @@ public:
 	static const char *CallFunc_IGameResources_GetPlayerName(IGameResources *instance, int client);
 	static bool CallFunc_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, int ent_num, player_info_t *pinfo);
 
+	static bool RemoveDetour_GetLocalPlayerIndex();
 
 	static bool RemoveHook(int hookID);
 
@@ -81,6 +97,8 @@ public:
 
 	static bool Unpause();
 private:
+	static GLPI_t getLocalPlayerIndexOriginal;
+
 	static bool AddDetour(void *target, void *detour, void *&original);
 
 	static bool RemoveDetour(void *target);
