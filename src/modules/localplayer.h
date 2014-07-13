@@ -13,7 +13,7 @@
 #include "../stdafx.h"
 
 #include "../entities.h"
-#include "../hooks.h"
+#include "../funcs.h"
 #include "../ifaces.h"
 
 class LocalPlayer {

@@ -1,5 +1,5 @@
 /*
- *  hooks.h
+ *  funcs.h
  *  StatusSpec project
  *  
  *  Copyright (c) 2014 thesupremecommander
@@ -63,7 +63,7 @@ public:
 	virtual void ReadyToUnload(SourceHook::Plugin plug);
 };
 
-class Hooks {
+class Funcs {
 public:
 	static bool AddDetour_GetLocalPlayerIndex(GLPI_t detour);
 

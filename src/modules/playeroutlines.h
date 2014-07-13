@@ -22,7 +22,7 @@
 #include "../statusspec.h"
 #include "../enums.h"
 #include "../entities.h"
-#include "../hooks.h"
+#include "../funcs.h"
 #include "../ifaces.h"
 
 #if defined _WIN32

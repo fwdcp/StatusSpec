@@ -30,7 +30,6 @@
 
 #include "../entities.h"
 #include "../enums.h"
-#include "../hooks.h"
 #include "../ifaces.h"
 
 #define VGUI_TEXTURE_NULL "replay/thumbnails/null"

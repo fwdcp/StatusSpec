@@ -20,7 +20,7 @@
 
 #include "convar.h"
 
-#include "../hooks.h"
+#include "../funcs.h"
 #include "../ifaces.h"
 
 #if defined _WIN32

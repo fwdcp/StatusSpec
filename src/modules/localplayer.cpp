@@ -27,7 +27,7 @@ int LocalPlayer::GetLocalPlayerIndexOverride() {
 		return player->GetInt();
 	}
 	else {
-		return Hooks::CallFunc_GetLocalPlayerIndex();
+		return Funcs::CallFunc_GetLocalPlayerIndex();
 	}
 }
 
@@ -36,7 +36,7 @@ void LocalPlayer::SetToCurrentTarget() {
 	IClientEntity *localPlayerEntity = Interfaces::pClientEntityList->GetClientEntity(localPlayer);
 
 	if (Entities::CheckClassBaseclass(localPlayerEntity->GetClientClass(), "DT_TFPlayer")) {
-		C_BaseEntity *targetEntity = Hooks::CallFunc_C_TFPlayer_GetObserverTarget((C_TFPlayer *)localPlayerEntity);
+		C_BaseEntity *targetEntity = Funcs::CallFunc_C_TFPlayer_GetObserverTarget((C_TFPlayer *)localPlayerEntity);
 
 		if (Entities::CheckClassBaseclass(targetEntity->GetClientClass(), "DT_TFPlayer")) {
 			g_LocalPlayer->player->SetValue(targetEntity->entindex());
