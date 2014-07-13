@@ -26,6 +26,9 @@ public:
 private:
 	ConVar *enabled;
 	ConVar *player;
+	ConCommand *set_current_target;
+
+	static void SetToCurrentTarget();
 };
 
 extern LocalPlayer *g_LocalPlayer;
