@@ -17,9 +17,9 @@ AntiFreeze::AntiFreeze() {
 	specguiPanel = vgui::INVALID_PANEL;
 	topPanel = vgui::INVALID_PANEL;
 
-	display = new ConVar("statusspec_antifreeze_display", "0", FCVAR_NONE, "displays an info panel when a freeze is detected");
+	display = new ConVar("statusspec_antifreeze_display", "0", FCVAR_NONE, "enables display of an info panel when a freeze is detected");
 	display_reload_settings = new ConCommand("statusspec_antifreeze_display_reload_settings", AntiFreeze::ReloadSettings, "reload settings for the freeze info panel from the resource file", FCVAR_NONE);
-	display_threshold = new ConVar("statusspec_antifreeze_display_threshold", "5", FCVAR_NONE, "the threshold (in seconds) before the info panel is displayed");
+	display_threshold = new ConVar("statusspec_antifreeze_display_threshold", "1", FCVAR_NONE, "the time of a freeze (in seconds) before the info panel is displayed");
 	enabled = new ConVar("statusspec_antifreeze_enabled", "0", FCVAR_NONE, "enable antifreeze (forces the spectator GUI to refresh)");
 }
 
