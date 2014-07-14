@@ -49,7 +49,7 @@
 	
 	"MedigunInfoRedNameLabel"
 	{
-		"ControlName"	"Label"
+		"ControlName"	"VariableLabel"
 		"fieldName"		"MedigunInfoRedNameLabel"
 		"xpos"			"165"
 		"ypos"			"21"
@@ -59,6 +59,7 @@
 		"autoResize"	"1"
 		"visible"		"0"
 		"enabled"		"0"
+		"labelText"		"%redname%"
 		"tabPosition"	"0"
 		"textAlignment"	"left"
 		"dulltext"		"0"
@@ -69,7 +70,7 @@
 	
 	"MedigunInfoRedChargeLabel"
 	{
-		"ControlName"	"Label"
+		"ControlName"	"VariableLabel"
 		"fieldName"		"MedigunInfoRedChargeLabel"
 		"xpos"			"147"
 		"ypos"			"21"
@@ -79,6 +80,7 @@
 		"autoResize"	"1"
 		"visible"		"1"
 		"enabled"		"1"
+		"labelText"		"%redcharge%%"
 		"tabPosition"	"0"
 		"textAlignment"	"center"
 		"dulltext"		"0"
@@ -89,7 +91,7 @@
 
 	"MedigunInfoRedIndividualChargesLabel"
 	{
-		"ControlName"	"Label"
+		"ControlName"	"VariableLabel"
 		"fieldName"		"MedigunInfoRedIndividualChargesLabel"
 		"xpos"			"147"
 		"ypos"			"21"
@@ -99,6 +101,7 @@
 		"autoResize"	"1"
 		"visible"		"1"
 		"enabled"		"1"
+		"labelText"		"%redcharges%"
 		"tabPosition"	"0"
 		"textAlignment"	"center"
 		"dulltext"		"0"
@@ -109,7 +112,7 @@
 	
 	"MedigunInfoRedChargeAdvantageLabel"
 	{
-		"ControlName"	"Label"
+		"ControlName"	"VariableLabel"
 		"fieldName"		"MedigunInfoRedChargeAdvantageLabel"
 		"xpos"			"165"
 		"ypos"			"21"
@@ -119,6 +122,7 @@
 		"autoResize"	"1"
 		"visible"		"1"
 		"enabled"		"1"
+		"labelText"		"+%redadvantage%%"
 		"tabPosition"	"0"
 		"textAlignment"	"center"
 		"dulltext"		"0"
@@ -269,7 +273,7 @@
 	
 	"MedigunInfoBluNameLabel"
 	{
-		"ControlName"	"Label"
+		"ControlName"	"VariableLabel"
 		"fieldName"		"MedigunInfoBluNameLabel"
 		"xpos"			"165"
 		"ypos"			"3"
@@ -279,6 +283,7 @@
 		"autoResize"	"1"
 		"visible"		"0"
 		"enabled"		"0"
+		"labelText"		"%bluname%"
 		"tabPosition"	"0"
 		"textAlignment"	"left"
 		"dulltext"		"0"
@@ -289,7 +294,7 @@
 	
 	"MedigunInfoBluChargeLabel"
 	{
-		"ControlName"	"Label"
+		"ControlName"	"VariableLabel"
 		"fieldName"		"MedigunInfoBluChargeLabel"
 		"xpos"			"147"
 		"ypos"			"3"
@@ -299,6 +304,7 @@
 		"autoResize"	"1"
 		"visible"		"1"
 		"enabled"		"1"
+		"labelText"		"%blucharge%%"
 		"tabPosition"	"0"
 		"textAlignment"	"center"
 		"dulltext"		"0"
@@ -309,7 +315,7 @@
 
 	"MedigunInfoBluIndividualChargesLabel"
 	{
-		"ControlName"	"Label"
+		"ControlName"	"VariableLabel"
 		"fieldName"		"MedigunInfoBluIndividualChargesLabel"
 		"xpos"			"147"
 		"ypos"			"3"
@@ -319,6 +325,7 @@
 		"autoResize"	"1"
 		"visible"		"1"
 		"enabled"		"1"
+		"labelText"		"%blucharges%"
 		"tabPosition"	"0"
 		"textAlignment"	"center"
 		"dulltext"		"0"
@@ -329,7 +336,7 @@
 	
 	"MedigunInfoBluChargeAdvantageLabel"
 	{
-		"ControlName"	"Label"
+		"ControlName"	"VariableLabel"
 		"fieldName"		"MedigunInfoBluChargeAdvantageLabel"
 		"xpos"			"165"
 		"ypos"			"3"
@@ -339,6 +346,7 @@
 		"autoResize"	"1"
 		"visible"		"1"
 		"enabled"		"1"
+		"labelText"		"+%bluadvantage%%"
 		"tabPosition"	"0"
 		"textAlignment"	"center"
 		"dulltext"		"0"
