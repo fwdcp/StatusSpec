@@ -58,12 +58,10 @@ public:
 
 	bool IsEnabled();
 	
-	void NoPaint(vgui::VPANEL vguiPanel);
 	void Paint(vgui::VPANEL vguiPanel);
 	
 	void PreEntityUpdate();
 	void ProcessEntity(IClientEntity* entity);
-	void PostEntityUpdate();
 private:
 	vgui::HPanel mainPanel;
 	std::map<TFTeam, Medigun_t> medigunInfo;
@@ -75,6 +73,7 @@ private:
 	ConVar *individual_charge_meters;
 	ConCommand* reload_settings;
 	static void ReloadSettings();
+	static void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
 
 extern MedigunInfo *g_MedigunInfo;

@@ -142,12 +142,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 				g_LoadoutIcons->PostEntityUpdate();
 			}
 		}
-
-		if (g_MedigunInfo) {
-			if (g_MedigunInfo->IsEnabled()) {
-				g_MedigunInfo->PostEntityUpdate();
-			}
-		}
 	}
 
 	RETURN_META(MRES_IGNORED);
@@ -213,9 +207,6 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 	if (g_MedigunInfo) {
 		if (g_MedigunInfo->IsEnabled()) {
 			g_MedigunInfo->Paint(vguiPanel);
-		}
-		else {
-			g_MedigunInfo->NoPaint(vguiPanel);
 		}
 	}
 

@@ -17,7 +17,7 @@ AntiFreeze::AntiFreeze() {
 	specguiPanel = vgui::INVALID_PANEL;
 	topPanel = vgui::INVALID_PANEL;
 
-	display = new ConVar("statusspec_antifreeze_display", "0", FCVAR_NONE, "enables display of an info panel when a freeze is detected");
+	display = new ConVar("statusspec_antifreeze_display", "0", FCVAR_NONE, "enables display of an info panel when a freeze is detected", AntiFreeze::ToggleDisplay);
 	display_reload_settings = new ConCommand("statusspec_antifreeze_display_reload_settings", AntiFreeze::ReloadSettings, "reload settings for the freeze info panel from the resource file", FCVAR_NONE);
 	display_threshold = new ConVar("statusspec_antifreeze_display_threshold", "1", FCVAR_NONE, "the time of a freeze (in seconds) before the info panel is displayed");
 	enabled = new ConVar("statusspec_antifreeze_enabled", "0", FCVAR_NONE, "enable antifreeze (forces the spectator GUI to refresh)");
@@ -64,21 +64,12 @@ void AntiFreeze::ProcessEntity(IClientEntity *entity) {
 }
 
 void AntiFreeze::PostEntityUpdate() {
-	if (!freezeInfoPanel) {
-		vgui::Panel *viewport = Interfaces::GetClientMode()->GetViewport();
-
-		freezeInfoPanel = new vgui::EditablePanel(viewport, "FreezeInfo");
-		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), freezeInfoPanel);
-
-		freezeInfoPanel->LoadControlSettings("Resource/UI/FreezeInfo.res");
-
-		freezeInfoPanel->SetVisible(false);
-	}
-
 	if (entitiesUpdated) {
 		lastEntityUpdate = Plat_FloatTime();
 
-		freezeInfoPanel->SetVisible(false);
+		if (freezeInfoPanel) {
+			freezeInfoPanel->SetVisible(false);
+		}
 	}
 	else if (Interfaces::pEngineClient->IsInGame()) {
 		float freezeTime = Plat_FloatTime() - lastEntityUpdate;
@@ -90,16 +81,46 @@ void AntiFreeze::PostEntityUpdate() {
 			char *formattedTime = new char[16];
 			V_snprintf(formattedTime, 15, "%i:%02i", minutes, seconds);
 
-			freezeInfoPanel->SetDialogVariable("time", formattedTime);
-			freezeInfoPanel->SetVisible(true);
+			if (freezeInfoPanel) {
+				freezeInfoPanel->SetDialogVariable("time", formattedTime);
+				freezeInfoPanel->SetVisible(true);
+			}
 		}
 	}
 
 	entitiesUpdated = false;
 }
 
+void AntiFreeze::InitHud() {
+	if (!freezeInfoPanel) {
+		vgui::Panel *viewport = Interfaces::GetClientMode()->GetViewport();
+
+		if (viewport) {
+			freezeInfoPanel = new vgui::EditablePanel(viewport, "FreezeInfo");
+			g_pVGuiPanel->Init(g_pVGui->AllocPanel(), freezeInfoPanel);
+
+			freezeInfoPanel->LoadControlSettings("Resource/UI/FreezeInfo.res");
+
+			freezeInfoPanel->SetVisible(false);
+		}
+	}
+}
+
 void AntiFreeze::ReloadSettings() {
 	if (g_AntiFreeze->freezeInfoPanel) {
 		g_AntiFreeze->freezeInfoPanel->LoadControlSettings("Resource/UI/FreezeInfo.res");
+	}
+}
+
+void AntiFreeze::ToggleDisplay(IConVar *var, const char *pOldValue, float flOldValue) {
+	bool enabled = g_AntiFreeze->display->GetBool();
+
+	if (enabled) {
+		g_AntiFreeze->InitHud();
+	}
+
+	if (g_AntiFreeze->freezeInfoPanel) {
+		g_AntiFreeze->freezeInfoPanel->SetEnabled(enabled);
+		g_AntiFreeze->freezeInfoPanel->SetVisible(enabled);
 	}
 }

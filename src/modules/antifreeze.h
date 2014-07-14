@@ -51,11 +51,14 @@ private:
 	vgui::HPanel specguiPanel;
 	vgui::HPanel topPanel;
 
+	void InitHud();
+
 	ConVar *display;
 	ConCommand *display_reload_settings;
 	ConVar *display_threshold;
 	ConVar *enabled;
 	static void ReloadSettings();
+	static void ToggleDisplay(IConVar *var, const char *pOldValue, float flOldValue);
 };
 
 extern AntiFreeze *g_AntiFreeze;

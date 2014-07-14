@@ -29,104 +29,13 @@ inline void StartAnimationSequence(const char *sequenceName) {
 MedigunInfo::MedigunInfo() {
 	mainPanel = vgui::INVALID_PANEL;
 
-	enabled = new ConVar("statusspec_mediguninfo_enabled", "0", FCVAR_NONE, "enable medigun info");
+	enabled = new ConVar("statusspec_mediguninfo_enabled", "0", FCVAR_NONE, "enable medigun info", MedigunInfo::ToggleEnabled);
 	individual_charge_meters = new ConVar("statusspec_mediguninfo_individual_charge_meters", "1", FCVAR_NONE, "enable individual charge meters (for Vaccinator)");
 	reload_settings = new ConCommand("statusspec_mediguninfo_reload_settings", MedigunInfo::ReloadSettings, "reload settings for the medigun info HUD from the resource file", FCVAR_NONE);
 }
 
 bool MedigunInfo::IsEnabled() {
 	return enabled->GetBool();
-}
-
-void MedigunInfo::InitHud() {
-	if (mainPanel == vgui::INVALID_PANEL) {
-		vgui::Panel *viewport = Interfaces::GetClientMode()->GetViewport();
-		
-		vgui::EditablePanel *medigunInfoPanel = new vgui::EditablePanel(viewport, "MedigunInfo");
-		panels["MedigunInfo"] = medigunInfoPanel;
-		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), medigunInfoPanel);
-		
-		panels["MedigunInfoBackground"] = new vgui::ImagePanel(medigunInfoPanel, "MedigunInfoBackground");
-		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBackground"]);
-		
-		panels["MedigunInfoRedBackground"] = new vgui::ScalableImagePanel(medigunInfoPanel, "MedigunInfoRedBackground");
-		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedBackground"]);
-		
-		panels["MedigunInfoRedNameLabel"] = new vgui::VariableLabel(medigunInfoPanel, "MedigunInfoRedNameLabel", "");
-		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedNameLabel"]);
-		
-		panels["MedigunInfoRedChargeMeter"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter");
-		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeMeter"]);
-		
-		panels["MedigunInfoRedChargeMeter1"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter1");
-		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeMeter1"]);
-		
-		panels["MedigunInfoRedChargeMeter2"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter2");
-		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeMeter2"]);
-		
-		panels["MedigunInfoRedChargeMeter3"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter3");
-		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeMeter3"]);
-		
-		panels["MedigunInfoRedChargeMeter4"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter4");
-		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeMeter4"]);
-		
-		panels["MedigunInfoRedChargeLabel"] = new vgui::VariableLabel(medigunInfoPanel, "MedigunInfoRedChargeLabel", "");
-		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeLabel"]);
-		
-		panels["MedigunInfoRedIndividualChargesLabel"] = new vgui::VariableLabel(medigunInfoPanel, "MedigunInfoRedIndividualChargesLabel", "");
-		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedIndividualChargesLabel"]);
-
-		panels["MedigunInfoRedChargeAdvantageLabel"] = new vgui::VariableLabel(medigunInfoPanel, "MedigunInfoRedChargeAdvantageLabel", "");
-		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeAdvantageLabel"]);
-		
-		panels["MedigunInfoRedChargeTypeIcon"] = new vgui::ImagePanel(medigunInfoPanel, "MedigunInfoRedChargeTypeIcon");
-		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeTypeIcon"]);
-		
-		panels["MedigunInfoBluBackground"] = new vgui::ScalableImagePanel(medigunInfoPanel, "MedigunInfoBluBackground");
-		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluBackground"]);
-		
-		panels["MedigunInfoBluNameLabel"] = new vgui::VariableLabel(medigunInfoPanel, "MedigunInfoBluNameLabel", "");
-		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluNameLabel"]);
-		
-		panels["MedigunInfoBluChargeMeter"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter");
-		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeMeter"]);
-		
-		panels["MedigunInfoBluChargeMeter1"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter1");
-		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeMeter1"]);
-		
-		panels["MedigunInfoBluChargeMeter2"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter2");
-		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeMeter2"]);
-		
-		panels["MedigunInfoBluChargeMeter3"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter3");
-		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeMeter3"]);
-		
-		panels["MedigunInfoBluChargeMeter4"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter4");
-		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeMeter4"]);
-		
-		panels["MedigunInfoBluChargeLabel"] = new vgui::VariableLabel(medigunInfoPanel, "MedigunInfoBluChargeLabel", "");
-		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeLabel"]);
-		
-		panels["MedigunInfoBluIndividualChargesLabel"] = new vgui::VariableLabel(medigunInfoPanel, "MedigunInfoBluIndividualChargesLabel", "");
-		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluIndividualChargesLabel"]);
-
-		panels["MedigunInfoBluChargeAdvantageLabel"] = new vgui::VariableLabel(medigunInfoPanel, "MedigunInfoBluChargeAdvantageLabel", "");
-		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeAdvantageLabel"]);
-		
-		panels["MedigunInfoBluChargeTypeIcon"] = new vgui::ImagePanel(medigunInfoPanel, "MedigunInfoBluChargeTypeIcon");
-		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeTypeIcon"]);
-
-		medigunInfoPanel->LoadControlSettings("Resource/UI/MedigunInfo.res");
-	
-		mainPanel = g_pVGui->PanelToHandle(medigunInfoPanel->GetVPanel());
-	}
-	
-	panels["MedigunInfo"]->SetVisible(true);
-}
-
-void MedigunInfo::NoPaint(vgui::VPANEL vguiPanel) {
-	if (g_pVGui->HandleToPanel(mainPanel) == vguiPanel) {
-		panels["MedigunInfo"]->SetVisible(false);
-	}
 }
 
 void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
@@ -813,12 +722,106 @@ void MedigunInfo::ProcessEntity(IClientEntity* entity) {
 	}
 }
 
-void MedigunInfo::PostEntityUpdate() {
-	InitHud();
+void MedigunInfo::InitHud() {
+	if (mainPanel == vgui::INVALID_PANEL) {
+		vgui::Panel *viewport = Interfaces::GetClientMode()->GetViewport();
+
+		if (viewport) {
+			vgui::EditablePanel *medigunInfoPanel = new vgui::EditablePanel(viewport, "MedigunInfo");
+			panels["MedigunInfo"] = medigunInfoPanel;
+			g_pVGuiPanel->Init(g_pVGui->AllocPanel(), medigunInfoPanel);
+
+			panels["MedigunInfoBackground"] = new vgui::ImagePanel(medigunInfoPanel, "MedigunInfoBackground");
+			g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBackground"]);
+
+			panels["MedigunInfoRedBackground"] = new vgui::ScalableImagePanel(medigunInfoPanel, "MedigunInfoRedBackground");
+			g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedBackground"]);
+
+			panels["MedigunInfoRedNameLabel"] = new vgui::VariableLabel(medigunInfoPanel, "MedigunInfoRedNameLabel", "");
+			g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedNameLabel"]);
+
+			panels["MedigunInfoRedChargeMeter"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter");
+			g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeMeter"]);
+
+			panels["MedigunInfoRedChargeMeter1"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter1");
+			g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeMeter1"]);
+
+			panels["MedigunInfoRedChargeMeter2"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter2");
+			g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeMeter2"]);
+
+			panels["MedigunInfoRedChargeMeter3"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter3");
+			g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeMeter3"]);
+
+			panels["MedigunInfoRedChargeMeter4"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoRedChargeMeter4");
+			g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeMeter4"]);
+
+			panels["MedigunInfoRedChargeLabel"] = new vgui::VariableLabel(medigunInfoPanel, "MedigunInfoRedChargeLabel", "");
+			g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeLabel"]);
+
+			panels["MedigunInfoRedIndividualChargesLabel"] = new vgui::VariableLabel(medigunInfoPanel, "MedigunInfoRedIndividualChargesLabel", "");
+			g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedIndividualChargesLabel"]);
+
+			panels["MedigunInfoRedChargeAdvantageLabel"] = new vgui::VariableLabel(medigunInfoPanel, "MedigunInfoRedChargeAdvantageLabel", "");
+			g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeAdvantageLabel"]);
+
+			panels["MedigunInfoRedChargeTypeIcon"] = new vgui::ImagePanel(medigunInfoPanel, "MedigunInfoRedChargeTypeIcon");
+			g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoRedChargeTypeIcon"]);
+
+			panels["MedigunInfoBluBackground"] = new vgui::ScalableImagePanel(medigunInfoPanel, "MedigunInfoBluBackground");
+			g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluBackground"]);
+
+			panels["MedigunInfoBluNameLabel"] = new vgui::VariableLabel(medigunInfoPanel, "MedigunInfoBluNameLabel", "");
+			g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluNameLabel"]);
+
+			panels["MedigunInfoBluChargeMeter"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter");
+			g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeMeter"]);
+
+			panels["MedigunInfoBluChargeMeter1"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter1");
+			g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeMeter1"]);
+
+			panels["MedigunInfoBluChargeMeter2"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter2");
+			g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeMeter2"]);
+
+			panels["MedigunInfoBluChargeMeter3"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter3");
+			g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeMeter3"]);
+
+			panels["MedigunInfoBluChargeMeter4"] = new vgui::ImageProgressBar(medigunInfoPanel, "MedigunInfoBluChargeMeter4");
+			g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeMeter4"]);
+
+			panels["MedigunInfoBluChargeLabel"] = new vgui::VariableLabel(medigunInfoPanel, "MedigunInfoBluChargeLabel", "");
+			g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeLabel"]);
+
+			panels["MedigunInfoBluIndividualChargesLabel"] = new vgui::VariableLabel(medigunInfoPanel, "MedigunInfoBluIndividualChargesLabel", "");
+			g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluIndividualChargesLabel"]);
+
+			panels["MedigunInfoBluChargeAdvantageLabel"] = new vgui::VariableLabel(medigunInfoPanel, "MedigunInfoBluChargeAdvantageLabel", "");
+			g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeAdvantageLabel"]);
+
+			panels["MedigunInfoBluChargeTypeIcon"] = new vgui::ImagePanel(medigunInfoPanel, "MedigunInfoBluChargeTypeIcon");
+			g_pVGuiPanel->Init(g_pVGui->AllocPanel(), panels["MedigunInfoBluChargeTypeIcon"]);
+
+			medigunInfoPanel->LoadControlSettings("Resource/UI/MedigunInfo.res");
+
+			mainPanel = g_pVGui->PanelToHandle(medigunInfoPanel->GetVPanel());
+		}
+	}
 }
 
 void MedigunInfo::ReloadSettings() {
 	if (g_MedigunInfo->panels.find("MedigunInfo") != g_MedigunInfo->panels.end()) {
 		((vgui::EditablePanel *) g_MedigunInfo->panels["MedigunInfo"])->LoadControlSettings("Resource/UI/MedigunInfo.res");
+	}
+}
+
+void MedigunInfo::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
+	bool enabled = g_MedigunInfo->IsEnabled();
+
+	if (enabled) {
+		g_MedigunInfo->InitHud();
+	}
+
+	if (g_MedigunInfo->panels.find("MedigunInfo") != g_MedigunInfo->panels.end()) {
+		g_MedigunInfo->panels["MedigunInfo"]->SetEnabled(enabled);
+		g_MedigunInfo->panels["MedigunInfo"]->SetVisible(enabled);
 	}
 }
