@@ -40,19 +40,8 @@ bool MedigunInfo::IsEnabled() {
 
 void MedigunInfo::InitHud() {
 	if (mainPanel == vgui::INVALID_PANEL) {
-		for (auto panel = panels.begin(); panel != panels.end(); ++panel) {
-			vgui::VPANEL vPanel = panel->second->GetVPanel();
-			panel->second->SetVisible(false);
-			panel->second->SetEnabled(false);
-			g_pVGui->FreePanel(vPanel);
-			delete panel->second;
-			panels.erase(panel);
-		}
-
-		mainPanel = vgui::INVALID_PANEL;
-
 		vgui::Panel *viewport = Interfaces::GetClientMode()->GetViewport();
-
+		
 		vgui::EditablePanel *medigunInfoPanel = new vgui::EditablePanel(viewport, "MedigunInfo");
 		panels["MedigunInfo"] = medigunInfoPanel;
 		g_pVGuiPanel->Init(g_pVGui->AllocPanel(), medigunInfoPanel);
