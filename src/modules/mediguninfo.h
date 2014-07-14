@@ -27,6 +27,7 @@
 #include "../vgui_controls/ImageProgressBar.h"
 #include "vgui_controls/ProgressBar.h"
 #include "vgui_controls/ScalableImagePanel.h"
+#include "../vgui_controls/VariableLabel.h"
 
 #include "../entities.h"
 #include "../enums.h"
@@ -70,11 +71,8 @@ private:
 
 	void InitHud();
 	
-	ConVar *charge_advantage_label_text;
-	ConVar *charge_label_text;
 	ConVar *enabled;
 	ConVar *individual_charge_meters;
-	ConVar *individual_charges_label_text;
 	ConCommand* reload_settings;
 	static void ReloadSettings();
 };
