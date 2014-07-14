@@ -37,17 +37,6 @@ MedigunInfo::MedigunInfo() {
 	reload_settings = new ConCommand("statusspec_mediguninfo_reload_settings", MedigunInfo::ReloadSettings, "reload settings for the medigun info HUD from the resource file", FCVAR_NONE);
 }
 
-MedigunInfo::~MedigunInfo() {
-	for (auto panel = panels.begin(); panel != panels.end(); ++panel) {
-		vgui::VPANEL vPanel = panel->second->GetVPanel();
-		panel->second->SetVisible(false);
-		panel->second->SetEnabled(false);
-		g_pVGui->FreePanel(vPanel);
-		delete panel->second;
-		panels.erase(panel);
-	}
-}
-
 bool MedigunInfo::IsEnabled() {
 	return enabled->GetBool();
 }

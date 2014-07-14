@@ -54,7 +54,6 @@ typedef struct Medigun_s {
 class MedigunInfo {
 public:
 	MedigunInfo();
-	~MedigunInfo();
 
 	bool IsEnabled();
 	
