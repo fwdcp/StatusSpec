@@ -4,6 +4,7 @@
 //	Project Script
 //-----------------------------------------------------------------------------
 
+$Macro PROJECTDIR	"."
 $Macro SRCDIR		"..\.."
 $Macro OUTBINDIR	".\addons"
 $Macro MMSOURCE_DEV	"..\..\..\..\..\metamod-source"
@@ -58,6 +59,7 @@ $Project "StatusSpec"
 		$File	"$MINHOOK\src\trampoline.cpp"
 		$File	"$SRCDIR\public\vgui_controls\vgui_controls.cpp"
 		$File	"src\vgui_controls\ImageProgressBar.cpp"
+		$File	"src\vgui_controls\VariableLabel.cpp"
 	}
 	
 	$Folder	"Header Files"
@@ -78,6 +80,7 @@ $Project "StatusSpec"
 		$File	"src\itemschema.h"
 		$File	"src\paint.h"
 		$File	"src\vgui_controls\ImageProgressBar.h"
+		$File	"src\vgui_controls\VariableLabel.h"
 	}
 	
 	$Folder	"Link Libraries"
