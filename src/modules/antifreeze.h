@@ -12,18 +12,26 @@
 
 #include "../stdafx.h"
 
+#include <map>
 #include <string>
 
 #include "convar.h"
+#include "icliententity.h"
 #include "vgui/IPanel.h"
 #include "vgui/IVGui.h"
 #include "KeyValues.h"
 
+#include "../entities.h"
 #include "../ifaces.h"
 
 #define PERFORM_LAYOUT_COMMAND new KeyValues("Command", "Command", "performlayout")
 #define SPEC_GUI_NAME "specgui"
 #define TOP_PANEL_NAME "MatSystemTopPanel"
+
+typedef struct EntityInfo_s {
+	Vector origin;
+	QAngle angles;
+} EntityInfo_t;
 
 class AntiFreeze {
 public:
@@ -32,7 +40,12 @@ public:
 	bool IsEnabled();
 
 	void Paint(vgui::VPANEL vguiPanel);
+	void ProcessEntity(IClientEntity* entity);
+	void PostEntityUpdate();
 private:
+	bool entitiesUpdated;
+	std::map<int, EntityInfo_t> entityInfo;
+	double lastEntityUpdate;
 	vgui::HPanel specguiPanel;
 	vgui::HPanel topPanel;
 

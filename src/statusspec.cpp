@@ -102,6 +102,10 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 				continue;
 			}
 
+			if (g_AntiFreeze) {
+				g_AntiFreeze->ProcessEntity(entity);
+			}
+
 			if (g_LoadoutIcons) {
 				if (g_LoadoutIcons->IsEnabled()) {
 					g_LoadoutIcons->ProcessEntity(entity);
@@ -123,6 +127,10 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 					g_StatusIcons->ProcessEntity(entity);
 				}
 			}
+		}
+
+		if (g_AntiFreeze) {
+			g_AntiFreeze->PostEntityUpdate();
 		}
 
 		if (g_Killstreaks) {
