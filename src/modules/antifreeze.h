@@ -17,9 +17,10 @@
 
 #include "convar.h"
 #include "icliententity.h"
+#include "KeyValues.h"
 #include "vgui/IPanel.h"
 #include "vgui/IVGui.h"
-#include "KeyValues.h"
+#include "vgui_controls/EditablePanel.h"
 
 #include "../entities.h"
 #include "../ifaces.h"
@@ -45,11 +46,16 @@ public:
 private:
 	bool entitiesUpdated;
 	std::map<int, EntityInfo_t> entityInfo;
+	vgui::EditablePanel *freezeInfoPanel;
 	double lastEntityUpdate;
 	vgui::HPanel specguiPanel;
 	vgui::HPanel topPanel;
 
-	ConVar* enabled;
+	ConVar *display;
+	ConCommand *display_reload_settings;
+	ConVar *display_threshold;
+	ConVar *enabled;
+	static void ReloadSettings();
 };
 
 extern AntiFreeze *g_AntiFreeze;
