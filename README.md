@@ -8,6 +8,20 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**0.15.0**
+* antifreeze
+  * now supports displaying a message when a freeze is occurring
+* killstreaks
+  * expand killstreak display to the scoreboard
+  * fix killstreaks causing post-game crashes
+* local player
+  * new module - allows a certain player's actions to be highlighted by the killfeed
+* multipanel
+  * new module - allows the console and scoreboard to be opened on top of the game
+* player outlines
+  * make player outline calculations more efficient
+  * add option to disable health-based calculations
+
 **0.14.1**
 * fix glitches with killstreaks on death
 * add command to help stop flickering issues with player outlines
@@ -86,7 +100,15 @@ To install, place the `StatusSpec` folder within the `custom` folder in the `tf`
 *forces spectator GUI to refresh constantly, eliminating many HUD issues after game unpauses*
 
 #### Console Variables
+* `statusspec_antifreeze_display` - enables display of an info panel when a freeze is detected
+* `statusspec_antifreeze_display_threshold` - the time of a freeze (in seconds) before the info panel is displayed
 * `statusspec_antifreeze_enabled` - enable antifreeze (forces the spectator GUI to refresh)
+
+#### Console Commands
+* `statusspec_antifreeze_display_reload_settings` - reload settings for the freeze info panel from the resource file
+
+#### UI Resource Files
+An example file for the medigun info box is included under `Resource/UI/FreezeInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_antifreeze_display_reload_settings` is provided as a replacement.
 
 ### Killstreaks
 *enables killstreak tracking for all weapons, all players*
@@ -137,21 +159,28 @@ To properly support loadout icons, adjust `Resource/UI/SpectatorTournament.res` 
 }
 ```
 
+### Local Player
+*changes the local player locally to affect certain HUD elements like the killfeed*
+
+#### Console Variables
+* `statusspec_localplayer_enabled` - enable local player override
+* `statusspec_localplayer_player` - player to set as the local player
+
+#### Console Commands
+* `statusspec_localplayer_set_current_target` - set the local player to the current spectator target
+
 ### Medigun Info
 *displays info about mediguns for both teams*
 
 #### Console Variables
-* `statusspec_mediguninfo_charge_advantage_label_text` - text for charge advantage label in medigun info ('%advantage%' is replaced with the current charge advantage percentage number)
-* `statusspec_mediguninfo_charge_label_text` - text for charge label in medigun info ('%charge%' is replaced with the current charge percentage number)
 * `statusspec_mediguninfo_enabled` - enable medigun info
 * `statusspec_mediguninfo_individual_charge_meters` - enable individual charge meters (for Vaccinator)
-* `statusspec_mediguninfo_individual_charges_label_text` - text for individual charges label (for Vaccinator) in medigun info ('%charges%' is replaced with the current number of charges)
 
 #### Console Commands
 * `statusspec_mediguninfo_reload_settings` - reload settings for the medigun info HUD from the resource file
 
 #### UI Resource Files
-An example file for the medigun info box is included under `Resource/UI/MedigunInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_medigun_info_reload_settings` is provided as a replacement.
+An example file for the medigun info box is included under `Resource/UI/MedigunInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_mediguninfo_reload_settings` is provided as a replacement.
 
 In addition, the following HUD animations are triggered by this plugin and may be used to show events on the HUD:
 * `MedigunInfoBluChargeReady` - triggered when a BLU medigun charge is ready for use
@@ -160,6 +189,13 @@ In addition, the following HUD animations are triggered by this plugin and may b
 * `MedigunInfoRedChargeReady` - triggered when a RED medigun charge is ready for use
 * `MedigunInfoRedChargeReleased` - triggered when a RED medigun charge has been released/popped
 * `MedigunInfoRedChargeStop` - triggered when the RED medigun charge is no longer ready/released (after a charge is completed/dropped)
+
+### Multipanel
+*displays panels on top of the main game*
+
+#### Console Variables
+* `statusspec_multipanel_console` - displays a console in the HUD
+* `statusspec_multipanel_scoreboard` - displays the scoreboard
 
 ### Player Aliases
 *substitutes in user-defined aliases for player names*
@@ -178,6 +214,7 @@ In addition, the following HUD animations are triggered by this plugin and may b
 #### Console Variables
 * `statusspec_playeroutlines_enabled` - enable player outlines
 * `statusspec_playeroutlines_frequent_override_enabled` - enable more frequent player outline overrides (helps stop flickering at cost of performance)
+* `statusspec_playeroutlines_health_adjusted_team_colors` - adjusts team colors depending on health of players
 * `statusspec_playeroutlines_team_colors` - override default health-based outline colors with team colors
 
 #### Console Commands
@@ -234,4 +271,6 @@ Thanks
 ------
 **bluee** - for the inspiration to do this project and for a lot of code reused from his [AdvSpec project](https://github.com/MattMcNam/advspec)
 
-**AlliedModders** - for in-depth information about the internals of the Source Engine and for SourceHook
+**AlliedModders** - for in-depth information about the internals of the Source Engine and for [SourceHook](https://github.com/alliedmodders/metamod-source/tree/master/core/sourcehook)
+
+**Tsuda Kageyu, RaMMicHaeL, et al.** - for [MinHook](https://github.com/RaMMicHaeL/minhook)
