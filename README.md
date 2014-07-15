@@ -271,4 +271,6 @@ Thanks
 ------
 **bluee** - for the inspiration to do this project and for a lot of code reused from his [AdvSpec project](https://github.com/MattMcNam/advspec)
 
-**AlliedModders** - for in-depth information about the internals of the Source Engine and for SourceHook
+**AlliedModders** - for in-depth information about the internals of the Source Engine and for [SourceHook](https://github.com/alliedmodders/metamod-source/tree/master/core/sourcehook)
+
+**Tsuda Kageyu, RaMMicHaeL, et al.** - for [MinHook](https://github.com/RaMMicHaeL/minhook)
