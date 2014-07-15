@@ -15,6 +15,7 @@ Killstreaks *g_Killstreaks = nullptr;
 LoadoutIcons *g_LoadoutIcons = nullptr;
 LocalPlayer *g_LocalPlayer = nullptr;
 MedigunInfo *g_MedigunInfo = nullptr;
+MultiPanel *g_MultiPanel = nullptr;
 PlayerAliases *g_PlayerAliases = nullptr;
 PlayerOutlines *g_PlayerOutlines = nullptr;
 StatusIcons *g_StatusIcons = nullptr;
@@ -299,6 +300,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_LoadoutIcons = new LoadoutIcons();
 	g_LocalPlayer = new LocalPlayer();
 	g_MedigunInfo = new MedigunInfo();
+	g_MultiPanel = new MultiPanel();
 	g_PlayerAliases = new PlayerAliases();
 	g_PlayerOutlines = new PlayerOutlines();
 	g_StatusIcons = new StatusIcons();
@@ -314,6 +316,7 @@ void StatusSpecPlugin::Unload(void)
 	delete g_LoadoutIcons;
 	delete g_LocalPlayer;
 	delete g_MedigunInfo;
+	delete g_MultiPanel;
 	delete g_PlayerAliases;
 	delete g_PlayerOutlines;
 	delete g_StatusIcons;
