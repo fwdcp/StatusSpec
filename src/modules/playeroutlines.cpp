@@ -56,6 +56,7 @@ PlayerOutlines::PlayerOutlines() {
 	enabled = new ConVar("statusspec_playeroutlines_enabled", "0", FCVAR_NONE, "enable player outlines", PlayerOutlines::ToggleEnabled);
 	force_refresh = new ConCommand("statusspec_playeroutlines_force_refresh", PlayerOutlines::ForceRefresh, "force the player outlines to refresh", FCVAR_NONE);
 	frequent_override_enabled = new ConVar("statusspec_playeroutlines_frequent_override_enabled", "0", FCVAR_NONE, "enable more frequent player outline overrides (helps stop flickering at cost of performance)");
+	health_adjusted_team_colors = new ConVar("statusspec_playeroutlines_health_adjusted_team_colors", "0", FCVAR_NONE, "adjusts team colors depending on health of players");
 	team_colors = new ConVar("statusspec_playeroutlines_team_colors", "0", FCVAR_NONE, "override default health-based outline colors with team colors");
 }
 
@@ -79,14 +80,31 @@ bool PlayerOutlines::GetGlowEffectColorOverride(C_TFPlayer *tfPlayer, float *r, 
 		C_BasePlayer *basePlayer = reinterpret_cast<C_BasePlayer *>(tfPlayer);
 
 		if (basePlayer) {
-			C_PlayerResource *playerResource = dynamic_cast<C_PlayerResource *>(Interfaces::GetGameResources());
+			if (!health_adjusted_team_colors->GetBool()) {
+				if (team == TFTeam_Red) {
+					*r = colors["red_full"].color.r() / 255.0f;
+					*g = colors["red_full"].color.g() / 255.0f;
+					*b = colors["red_full"].color.b() / 255.0f;
 
-			if (playerResource) {
-				int health = *MAKE_PTR(int*, playerResource, Entities::pCTFPlayerResource__m_iHealth[basePlayer->entindex()]);
-				int maxHealth = *MAKE_PTR(int*, playerResource, Entities::pCTFPlayerResource__m_iMaxHealth[basePlayer->entindex()]);
+					return true;
+				}
+				else if (team == TFTeam_Blue) {
+					*r = colors["blu_full"].color.r() / 255.0f;
+					*g = colors["blu_full"].color.g() / 255.0f;
+					*b = colors["blu_full"].color.b() / 255.0f;
+
+					return true;
+				}
+			}
+			else {
+				int health = *MAKE_PTR(int*, Interfaces::GetGameResources(), Entities::pCTFPlayerResource__m_iHealth[basePlayer->entindex()]);
+				int maxHealth = *MAKE_PTR(int*, Interfaces::GetGameResources(), Entities::pCTFPlayerResource__m_iMaxHealth[basePlayer->entindex()]);
 
 				// CTFPlayerResource isn't giving us proper values so let's calculate it manually
-				int maxBuffedHealth = floor((maxHealth / 5.0f) * 1.5f) * 5;
+				int maxBuffedHealth = ((maxHealth / 5) * 3 / 2) * 5;
+
+				// calculate this once instead of several times
+				float halfHealth = maxHealth * 0.5f;
 
 				if (team == TFTeam_Red) {
 					float red;
@@ -96,19 +114,19 @@ bool PlayerOutlines::GetGlowEffectColorOverride(C_TFPlayer *tfPlayer, float *r, 
 					if (health < 0) {
 						// this should never happen
 
-						 red = colors["red_low"].color.r();
-						 green = colors["red_low"].color.g();
-						 blue = colors["red_low"].color.b();
+						red = colors["red_low"].color.r();
+						green = colors["red_low"].color.g();
+						blue = colors["red_low"].color.b();
 					}
-					else if (health >= 0 && health < (maxHealth * 0.5f)) {
-						red = ChangeScale(health, 0, maxHealth * 0.5f, colors["red_low"].color.r(), colors["red_medium"].color.r());
-						green = ChangeScale(health, 0, maxHealth * 0.5f, colors["red_low"].color.g(), colors["red_medium"].color.g());
-						blue = ChangeScale(health, 0, maxHealth * 0.5f, colors["red_low"].color.b(), colors["red_medium"].color.b());
+					else if (health >= 0 && health < halfHealth) {
+						red = ChangeScale(health, 0, halfHealth, colors["red_low"].color.r(), colors["red_medium"].color.r());
+						green = ChangeScale(health, 0, halfHealth, colors["red_low"].color.g(), colors["red_medium"].color.g());
+						blue = ChangeScale(health, 0, halfHealth, colors["red_low"].color.b(), colors["red_medium"].color.b());
 					}
-					else if (health >= (maxHealth * 0.5f) && health < maxHealth) {
-						red = ChangeScale(health, maxHealth * 0.5f, maxHealth, colors["red_medium"].color.r(), colors["red_full"].color.r());
-						green = ChangeScale(health, maxHealth * 0.5f, maxHealth, colors["red_medium"].color.g(), colors["red_full"].color.g());
-						blue = ChangeScale(health, maxHealth * 0.5f, maxHealth, colors["red_medium"].color.b(), colors["red_full"].color.b());
+					else if (health >= halfHealth && health < maxHealth) {
+						red = ChangeScale(health, halfHealth, maxHealth, colors["red_medium"].color.r(), colors["red_full"].color.r());
+						green = ChangeScale(health, halfHealth, maxHealth, colors["red_medium"].color.g(), colors["red_full"].color.g());
+						blue = ChangeScale(health, halfHealth, maxHealth, colors["red_medium"].color.b(), colors["red_full"].color.b());
 					}
 					else if (health >= maxHealth && health <= maxBuffedHealth) {
 						red = ChangeScale(health, maxHealth, maxBuffedHealth, colors["red_full"].color.r(), colors["red_buff"].color.r());
@@ -209,7 +227,7 @@ void PlayerOutlines::Paint(vgui::VPANEL vguiPanel) {
 			}
 
 			bool* glowEnabled = MAKE_PTR(bool*, entity, Entities::pCTFPlayer__m_bGlowEnabled);
-			*glowEnabled = g_PlayerOutlines->enabled->GetBool();
+			*glowEnabled = g_PlayerOutlines->IsEnabled();
 		}
 	}
 }
@@ -225,13 +243,13 @@ void PlayerOutlines::ProcessEntity(IClientEntity* entity) {
 	EHANDLE entityHandle = entity->GetBaseEntity();
 
 	if (!getGlowEffectColorHooked) {
-		Hooks::AddHook_C_TFPlayer_GetGlowEffectColor((C_TFPlayer *)baseCombatCharacter, Hook_C_TFPlayer_GetGlowEffectColor);
+		Funcs::AddHook_C_TFPlayer_GetGlowEffectColor((C_TFPlayer *)baseCombatCharacter, Hook_C_TFPlayer_GetGlowEffectColor);
 		getGlowEffectColorHooked = true;
 	}
 
 	bool* glowEnabled = MAKE_PTR(bool*, baseCombatCharacter, Entities::pCTFPlayer__m_bGlowEnabled);
 
-	if (enabled->GetBool()) {
+	if (IsEnabled()) {
 		*glowEnabled = true;
 	}
 }
@@ -249,9 +267,9 @@ void PlayerOutlines::ForceRefresh() {
 		}
 
 		bool* glowEnabled = MAKE_PTR(bool*, entity, Entities::pCTFPlayer__m_bGlowEnabled);
-		*glowEnabled = g_PlayerOutlines->enabled->GetBool();
+		*glowEnabled = g_PlayerOutlines->IsEnabled();
 
-		Hooks::CallFunc_C_TFPlayer_UpdateGlowEffect((C_TFPlayer *)entity);
+		Funcs::CallFunc_C_TFPlayer_UpdateGlowEffect((C_TFPlayer *)entity);
 	}
 }
 
@@ -303,7 +321,7 @@ int PlayerOutlines::GetCurrentColor(const char *partial, char commands[COMMAND_C
 }
 
 void PlayerOutlines::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
-	if (!g_PlayerOutlines->enabled->GetBool()) {
+	if (!g_PlayerOutlines->IsEnabled()) {
 		for (int i = 0; i <= MAX_PLAYERS; i++) {
 			IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
 		

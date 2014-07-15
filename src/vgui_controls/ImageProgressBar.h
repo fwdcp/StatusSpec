@@ -1,7 +1,6 @@
 /*
  *  ImageProgressBar.h
  *  StatusSpec project
- *  
  *  Based on https://developer.valvesoftware.com/wiki/VGUI_Image_Progress_Bar
  *
  */

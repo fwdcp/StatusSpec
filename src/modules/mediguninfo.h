@@ -27,10 +27,10 @@
 #include "../vgui_controls/ImageProgressBar.h"
 #include "vgui_controls/ProgressBar.h"
 #include "vgui_controls/ScalableImagePanel.h"
+#include "../vgui_controls/VariableLabel.h"
 
 #include "../entities.h"
 #include "../enums.h"
-#include "../hooks.h"
 #include "../ifaces.h"
 
 #define VGUI_TEXTURE_NULL "replay/thumbnails/null"
@@ -55,16 +55,13 @@ typedef struct Medigun_s {
 class MedigunInfo {
 public:
 	MedigunInfo();
-	~MedigunInfo();
 
 	bool IsEnabled();
 	
-	void NoPaint(vgui::VPANEL vguiPanel);
 	void Paint(vgui::VPANEL vguiPanel);
 	
 	void PreEntityUpdate();
 	void ProcessEntity(IClientEntity* entity);
-	void PostEntityUpdate();
 private:
 	vgui::HPanel mainPanel;
 	std::map<TFTeam, Medigun_t> medigunInfo;
@@ -72,13 +69,11 @@ private:
 
 	void InitHud();
 	
-	ConVar *charge_advantage_label_text;
-	ConVar *charge_label_text;
 	ConVar *enabled;
 	ConVar *individual_charge_meters;
-	ConVar *individual_charges_label_text;
 	ConCommand* reload_settings;
 	static void ReloadSettings();
+	static void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
 
 extern MedigunInfo *g_MedigunInfo;

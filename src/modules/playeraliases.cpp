@@ -55,7 +55,7 @@ inline CSteamID ConvertTextToSteamID(std::string textID) {
 inline CSteamID GetClientSteamID(int client) {
 	player_info_t playerInfo;
 
-	if (SH_CALL(Interfaces::pEngineClient, &IVEngineClient::GetPlayerInfo)(client, &playerInfo)) {
+	if (Funcs::CallFunc_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, client, &playerInfo)) {
 		if (playerInfo.friendsID) {
 			static EUniverse universe = k_EUniverseInvalid;
 
@@ -84,7 +84,7 @@ bool PlayerAliases::IsEnabled() {
 }
 
 bool PlayerAliases::GetPlayerInfoOverride(int ent_num, player_info_t *pinfo) {
-	bool result = SH_CALL(Interfaces::pEngineClient, &IVEngineClient::GetPlayerInfo)(ent_num, pinfo);
+	bool result = Funcs::CallFunc_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, ent_num, pinfo);
 
 	CSteamID playerSteamID = GetClientSteamID(ent_num);
 
@@ -102,7 +102,7 @@ const char * PlayerAliases::GetPlayerNameOverride(int client) {
 		return playerAliases[playerSteamID].c_str();
 	}
 	else {
-		return SH_CALL(Interfaces::GetGameResources(), &IGameResources::GetPlayerName)(client);
+		return Funcs::CallFunc_IGameResources_GetPlayerName(Interfaces::GetGameResources(), client);
 	}
 }
 

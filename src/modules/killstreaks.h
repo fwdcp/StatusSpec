@@ -17,7 +17,6 @@
 
 #include "../entities.h"
 #include "../enums.h"
-#include "../hooks.h"
 #include "../ifaces.h"
 
 class Killstreaks {

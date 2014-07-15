@@ -49,6 +49,7 @@ public:
 	static int pCTFPlayerResource__m_iKillstreak[MAX_PLAYERS + 1];
 	static int pCWeaponMedigun__m_bHealing;
 	static int pCWeaponMedigun__m_hHealingTarget;
+	static int pCTFPlayer__m_iKillStreak;
 
 	static bool PrepareOffsets();
 	static bool GetClassPropOffset(const char *className, int &offset, int depth, ...);

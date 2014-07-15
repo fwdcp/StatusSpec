@@ -14,7 +14,7 @@
 
 #include "entities.h"
 #include "enums.h"
-#include "hooks.h"
+#include "funcs.h"
 #include "ifaces.h"
 #include "itemschema.h"
 #include "paint.h"
@@ -22,12 +22,14 @@
 #include "modules/antifreeze.h"
 #include "modules/killstreaks.h"
 #include "modules/loadouticons.h"
+#include "modules/localplayer.h"
 #include "modules/mediguninfo.h"
+#include "modules/multipanel.h"
 #include "modules/playeraliases.h"
 #include "modules/playeroutlines.h"
 #include "modules/statusicons.h"
 
-#define PLUGIN_DESC "StatusSpec v0.14.1"
+#define PLUGIN_DESC "StatusSpec v0.15.0"
 
 typedef struct ObserverInfo_s {
 	int mode;
@@ -35,6 +37,8 @@ typedef struct ObserverInfo_s {
 } ObserverInfo_t;
 
 ObserverInfo_t GetLocalPlayerObserverInfo();
+
+int Detour_GetLocalPlayerIndex();
 
 void Hook_C_TFPlayer_GetGlowEffectColor(float *r, float *g, float *b);
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage);

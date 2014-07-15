@@ -13,7 +13,9 @@
 AntiFreeze *g_AntiFreeze = nullptr;
 Killstreaks *g_Killstreaks = nullptr;
 LoadoutIcons *g_LoadoutIcons = nullptr;
+LocalPlayer *g_LocalPlayer = nullptr;
 MedigunInfo *g_MedigunInfo = nullptr;
+MultiPanel *g_MultiPanel = nullptr;
 PlayerAliases *g_PlayerAliases = nullptr;
 PlayerOutlines *g_PlayerOutlines = nullptr;
 StatusIcons *g_StatusIcons = nullptr;
@@ -28,11 +30,21 @@ ObserverInfo_t GetLocalPlayerObserverInfo() {
 	ObserverInfo_t info;
 
 	if (dynamic_cast<C_BasePlayer *>(playerEntity->GetBaseEntity())) {
-		info.mode = Hooks::CallFunc_C_TFPlayer_GetObserverMode((C_TFPlayer *)playerEntity);
-		info.target = Hooks::CallFunc_C_TFPlayer_GetObserverTarget((C_TFPlayer *)playerEntity);
+		info.mode = Funcs::CallFunc_C_TFPlayer_GetObserverMode((C_TFPlayer *)playerEntity);
+		info.target = Funcs::CallFunc_C_TFPlayer_GetObserverTarget((C_TFPlayer *)playerEntity);
 	}
 
 	return info;
+}
+
+int Detour_GetLocalPlayerIndex() {
+	if (g_LocalPlayer) {
+		if (g_LocalPlayer->IsEnabled()) {
+			return g_LocalPlayer->GetLocalPlayerIndexOverride();
+		}
+	}
+
+	return Funcs::CallFunc_GetLocalPlayerIndex();
 }
 
 void Hook_C_TFPlayer_GetGlowEffectColor(float *r, float *g, float *b) {
@@ -52,14 +64,14 @@ void Hook_C_TFPlayer_GetGlowEffectColor(float *r, float *g, float *b) {
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 	if (gameResources != Interfaces::GetGameResources()) {
 		if (getPlayerNameHook) {
-			Hooks::RemoveHook(getPlayerNameHook);
+			Funcs::RemoveHook(getPlayerNameHook);
 			getPlayerNameHook = 0;
 		}
 
 		gameResources = Interfaces::GetGameResources();
 		
 		if (gameResources) {
-			getPlayerNameHook = Hooks::AddHook_IGameResources_GetPlayerName(gameResources, Hook_IGameResources_GetPlayerName);
+			getPlayerNameHook = Funcs::AddHook_IGameResources_GetPlayerName(gameResources, Hook_IGameResources_GetPlayerName);
 		}
 	}
 
@@ -91,6 +103,10 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 				continue;
 			}
 
+			if (g_AntiFreeze) {
+				g_AntiFreeze->ProcessEntity(entity);
+			}
+
 			if (g_LoadoutIcons) {
 				if (g_LoadoutIcons->IsEnabled()) {
 					g_LoadoutIcons->ProcessEntity(entity);
@@ -114,6 +130,10 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 			}
 		}
 
+		if (g_AntiFreeze) {
+			g_AntiFreeze->PostEntityUpdate();
+		}
+
 		if (g_Killstreaks) {
 			g_Killstreaks->PostEntityUpdate();
 		}
@@ -121,12 +141,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 		if (g_LoadoutIcons) {
 			if (g_LoadoutIcons->IsEnabled()) {
 				g_LoadoutIcons->PostEntityUpdate();
-			}
-		}
-
-		if (g_MedigunInfo) {
-			if (g_MedigunInfo->IsEnabled()) {
-				g_MedigunInfo->PostEntityUpdate();
 			}
 		}
 	}
@@ -194,9 +208,6 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 	if (g_MedigunInfo) {
 		if (g_MedigunInfo->IsEnabled()) {
 			g_MedigunInfo->Paint(vguiPanel);
-		}
-		else {
-			g_MedigunInfo->NoPaint(vguiPanel);
 		}
 	}
 
@@ -267,20 +278,29 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 		Warning("[%s] Unable to determine proper offsets!\n", PLUGIN_DESC);
 		return false;
 	}
+
+	if (!Funcs::Load()) {
+		Warning("[%s] Unable to initialize hooking!", PLUGIN_DESC);
+		return false;
+	}
+
+	Funcs::AddDetour_GetLocalPlayerIndex(Detour_GetLocalPlayerIndex);
 	
-	Hooks::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, Hook_IBaseClientDLL_FrameStageNotify);
-	Hooks::AddHook_IGameEventManager2_FireEvent(Interfaces::pGameEventManager, Hook_IGameEventManager2_FireEvent);
-	Hooks::AddHook_IGameEventManager2_FireEventClientSide(Interfaces::pGameEventManager, Hook_IGameEventManager2_FireEventClientSide);
-	Hooks::AddHook_IPanel_PaintTraverse(g_pVGuiPanel, Hook_IPanel_PaintTraverse);
-	Hooks::AddHook_IPanel_SendMessage(g_pVGuiPanel, Hook_IPanel_SendMessage);
-	Hooks::AddHook_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, Hook_IVEngineClient_GetPlayerInfo);
+	Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, Hook_IBaseClientDLL_FrameStageNotify);
+	Funcs::AddHook_IGameEventManager2_FireEvent(Interfaces::pGameEventManager, Hook_IGameEventManager2_FireEvent);
+	Funcs::AddHook_IGameEventManager2_FireEventClientSide(Interfaces::pGameEventManager, Hook_IGameEventManager2_FireEventClientSide);
+	Funcs::AddHook_IPanel_PaintTraverse(g_pVGuiPanel, Hook_IPanel_PaintTraverse);
+	Funcs::AddHook_IPanel_SendMessage(g_pVGuiPanel, Hook_IPanel_SendMessage);
+	Funcs::AddHook_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, Hook_IVEngineClient_GetPlayerInfo);
 	
 	ConVar_Register();
 
 	g_AntiFreeze = new AntiFreeze();
 	g_Killstreaks = new Killstreaks();
 	g_LoadoutIcons = new LoadoutIcons();
+	g_LocalPlayer = new LocalPlayer();
 	g_MedigunInfo = new MedigunInfo();
+	g_MultiPanel = new MultiPanel();
 	g_PlayerAliases = new PlayerAliases();
 	g_PlayerOutlines = new PlayerOutlines();
 	g_StatusIcons = new StatusIcons();
@@ -294,23 +314,25 @@ void StatusSpecPlugin::Unload(void)
 	delete g_AntiFreeze;
 	delete g_Killstreaks;
 	delete g_LoadoutIcons;
+	delete g_LocalPlayer;
 	delete g_MedigunInfo;
+	delete g_MultiPanel;
 	delete g_PlayerAliases;
 	delete g_PlayerOutlines;
 	delete g_StatusIcons;
 
-	Hooks::Unload();
+	Funcs::Unload();
 
 	ConVar_Unregister();
 	Interfaces::Unload();
 }
 
 void StatusSpecPlugin::Pause(void) {
-	Hooks::Pause();
+	Funcs::Pause();
 }
 
 void StatusSpecPlugin::UnPause(void) {
-	Hooks::Unpause();
+	Funcs::Unpause();
 }
 
 const char *StatusSpecPlugin::GetPluginDescription(void) {

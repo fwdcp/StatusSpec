@@ -19,9 +19,8 @@
 #include <string>
 
 #include "convar.h"
-#include "sourcehook/sourcehook.h"
 
-#include "../hooks.h"
+#include "../funcs.h"
 #include "../ifaces.h"
 
 #if defined _WIN32
