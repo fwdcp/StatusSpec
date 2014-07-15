@@ -24,6 +24,7 @@
 #include "modules/loadouticons.h"
 #include "modules/localplayer.h"
 #include "modules/mediguninfo.h"
+#include "modules/multipanel.h"
 #include "modules/playeraliases.h"
 #include "modules/playeroutlines.h"
 #include "modules/statusicons.h"
