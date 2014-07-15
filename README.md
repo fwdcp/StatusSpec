@@ -8,6 +8,20 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**0.15.0**
+* antifreeze
+  * now supports displaying a message when a freeze is occurring
+* killstreaks
+  * expand killstreak display to the scoreboard
+  * fix killstreaks causing post-game crashes
+* local player
+  * new module - allows a certain player's actions to be highlighted by the killfeed
+* multipanel
+  * new module - allows the console and scoreboard to be opened on top of the game
+* player outlines
+  * make player outline calculations more efficient
+  * add option to disable health-based calculations
+
 **0.14.1**
 * fix glitches with killstreaks on death
 * add command to help stop flickering issues with player outlines
