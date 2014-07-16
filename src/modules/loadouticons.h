@@ -43,8 +43,8 @@ typedef struct Loadout_s {
 		pda = -1;
 		pda2 = -1;
 		building = -1;
-		std::fill(cosmetic[0], cosmetic[MAX_COSMETIC_SLOTS], -1);
-		std::fill(taunt[0], taunt[MAX_TAUNT_SLOTS], -1);
+		std::fill(&cosmetic[0], &cosmetic[MAX_COSMETIC_SLOTS], -1);
+		std::fill(&taunt[0], &taunt[MAX_TAUNT_SLOTS], -1);
 		action = -1;
 		activeWeaponSlot = -1;
 	};
