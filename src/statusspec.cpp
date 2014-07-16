@@ -143,6 +143,12 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 				g_LoadoutIcons->PostEntityUpdate();
 			}
 		}
+
+		if (g_LocalPlayer) {
+			if (g_LocalPlayer->IsEnabled()) {
+				g_LocalPlayer->PostEntityUpdate();
+			}
+		}
 	}
 
 	RETURN_META(MRES_IGNORED);

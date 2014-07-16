@@ -12,7 +12,7 @@
 
 ItemSchema::ItemSchema() {
 	itemSchema = new KeyValues("items_game");
-	itemSchema->LoadFromFile(g_pFullFileSystem, "tf/scripts/items/items_game.txt");
+	itemSchema->LoadFromFile(Interfaces::pFileSystem, "scripts/items/items_game.txt", "mod");
 	
 	itemInfo = itemSchema->FindKey("items");
 	prefabInfo = itemSchema->FindKey("prefabs");

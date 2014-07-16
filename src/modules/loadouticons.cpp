@@ -10,17 +10,7 @@
 
 #include "loadouticons.h"
 
-#define SHOW_SLOT_ICON(slot) \
-	if (loadoutInfo[i].slot != -1) { \
-		if (loadoutInfo[i].activeWeaponSlot.compare(#slot) == 0) { \
-			Paint::DrawTexture(itemIconTextures[loadoutInfo[i].slot], iconsWide, 0, iconSize, iconSize, filter_active_color); \
-		} \
-		else { \
-			Paint::DrawTexture(itemIconTextures[loadoutInfo[i].slot], iconsWide, 0, iconSize, iconSize, filter_nonactive_color); \
-		} \
-	} \
-	 \
-	iconsWide += iconSize;
+#define SHOW_SLOT_ICON(slot) DrawSlotIcon(i, loadoutInfo[i].slot, iconsWide, iconSize);
 
 inline int ColorRangeRestrict(int color) {
 	if (color < 0) return 0;
@@ -46,6 +36,7 @@ LoadoutIcons::LoadoutIcons() {
 	filter_active = new ConCommand("statusspec_loadouticons_filter_active", LoadoutIcons::SetFilter, "the RGBA filter applied to the icon for an active item", FCVAR_NONE, LoadoutIcons::GetCurrentFilter);
 	filter_nonactive = new ConCommand("statusspec_loadouticons_filter_nonactive", LoadoutIcons::SetFilter, "the RGBA filter applied to the icon for a nonactive item", FCVAR_NONE, LoadoutIcons::GetCurrentFilter);
 	nonloadout = new ConVar("statusspec_loadouticons_nonloadout", "0", FCVAR_NONE, "enable loadout icons for nonloadout items");
+	only_active = new ConVar("statusspec_loadouticons_only_active", "0", FCVAR_NONE, "only display loadout icons for the active weapon");
 }
 
 LoadoutIcons::~LoadoutIcons() {
@@ -158,7 +149,7 @@ void LoadoutIcons::ProcessEntity(IClientEntity* entity) {
 	}
 
 	if (activeWeapon == entity->entindex()) {
-		loadoutInfo[player].activeWeaponSlot = itemSlot;
+		loadoutInfo[player].activeWeaponSlot = itemDefinitionIndex;
 	}
 			
 	if (strcmp(itemSlot, "primary") == 0) {
@@ -180,9 +171,17 @@ void LoadoutIcons::ProcessEntity(IClientEntity* entity) {
 		loadoutInfo[player].building = itemDefinitionIndex;
 	}
 	else if (strcmp(itemSlot, "head") == 0 || strcmp(itemSlot, "misc") == 0) {
-		for (int slot = 0; slot < 3; slot++) {
+		for (int slot = 0; slot < MAX_COSMETIC_SLOTS; slot++) {
 			if (loadoutInfo[player].cosmetic[slot] == -1) {
 				loadoutInfo[player].cosmetic[slot] = itemDefinitionIndex;
+				break;
+			}
+		}
+	}
+	else if (strcmp(itemSlot, "taunt") == 0) {
+		for (int slot = 0; slot < MAX_TAUNT_SLOTS; slot++) {
+			if (loadoutInfo[player].taunt[slot] == -1) {
+				loadoutInfo[player].taunt[slot] = itemDefinitionIndex;
 				break;
 			}
 		}
@@ -232,7 +231,7 @@ void LoadoutIcons::PostEntityUpdate() {
 			}
 
 			if (activeWeapon == i) {
-				loadoutInfo[player].activeWeaponSlot = itemSlot;
+				loadoutInfo[player].activeWeaponSlot = itemDefinitionIndex;
 			}
 				
 			if (strcmp(itemSlot, "primary") == 0) {
@@ -254,9 +253,17 @@ void LoadoutIcons::PostEntityUpdate() {
 				loadoutInfo[player].building = itemDefinitionIndex;
 			}
 			else if (strcmp(itemSlot, "head") == 0 || strcmp(itemSlot, "misc") == 0) {
-				for (int slot = 0; slot < 3; slot++) {
+				for (int slot = 0; slot < MAX_COSMETIC_SLOTS; slot++) {
 					if (loadoutInfo[player].cosmetic[slot] == -1) {
 						loadoutInfo[player].cosmetic[slot] = itemDefinitionIndex;
+						break;
+					}
+				}
+			}
+			else if (strcmp(itemSlot, "taunt") == 0) {
+				for (int slot = 0; slot < MAX_TAUNT_SLOTS; slot++) {
+					if (loadoutInfo[player].taunt[slot] == -1) {
+						loadoutInfo[player].taunt[slot] = itemDefinitionIndex;
 						break;
 					}
 				}
@@ -265,6 +272,27 @@ void LoadoutIcons::PostEntityUpdate() {
 				loadoutInfo[player].action = itemDefinitionIndex;
 			}
 		}
+	}
+}
+
+void LoadoutIcons::DrawSlotIcon(int player, int weapon, int &width, int size) {
+	if (only_active->GetBool()) {
+		if (weapon != -1 && loadoutInfo[player].activeWeaponSlot == weapon) {
+			Paint::DrawTexture(itemIconTextures[weapon], width, 0, size, size, filter_active_color);
+			width += size;
+		}
+	}
+	else {
+		if (weapon != -1) {
+			if (loadoutInfo[player].activeWeaponSlot == weapon) {
+				Paint::DrawTexture(itemIconTextures[weapon], width, 0, size, size, filter_active_color);
+			}
+			else {
+				Paint::DrawTexture(itemIconTextures[weapon], width, 0, size, size, filter_nonactive_color);
+			}
+		}
+
+		width += size;
 	}
 }
 

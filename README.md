@@ -8,6 +8,16 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**0.16.0**
+* loadout icons
+  * add ability to only show the active weapon
+* local player
+  * add command to track spectator target
+  * fix warning being emitted on successful changes
+* medigun info
+  * change how progress bars are set (requires changes to MedigunInfo.res)
+  * add ability to have custom meter settings based on medigun type
+
 **0.15.0**
 * antifreeze
   * now supports displaying a message when a freeze is occurring
@@ -108,7 +118,7 @@ To install, place the `StatusSpec` folder within the `custom` folder in the `tf`
 * `statusspec_antifreeze_display_reload_settings` - reload settings for the freeze info panel from the resource file
 
 #### UI Resource Files
-An example file for the medigun info box is included under `Resource/UI/FreezeInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_antifreeze_display_reload_settings` is provided as a replacement.
+An example file for the freeze info box is included under `Resource/UI/FreezeInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_antifreeze_display_reload_settings` is provided as a replacement.
 
 ### Killstreaks
 *enables killstreak tracking for all weapons, all players*
@@ -122,6 +132,7 @@ An example file for the medigun info box is included under `Resource/UI/FreezeIn
 #### Console Variables
 * `statusspec_loadouticons_enabled` - enable loadout icons
 * `statusspec_loadouticons_nonloadout` - enable loadout icons for nonloadout items
+* `statusspec_loadouticons_only_active` - only display loadout icons for the active weapon
 
 #### Console Commands
 * `statusspec_loadouticons_filter_active <red> <green> <blue> <alpha>` - the RGBA filter applied to the icon for an active item
@@ -173,6 +184,7 @@ To properly support loadout icons, adjust `Resource/UI/SpectatorTournament.res` 
 *displays info about mediguns for both teams*
 
 #### Console Variables
+* `statusspec_mediguninfo_dynamic_meters` - enable charge meters to change based on medigun
 * `statusspec_mediguninfo_enabled` - enable medigun info
 * `statusspec_mediguninfo_individual_charge_meters` - enable individual charge meters (for Vaccinator)
 
@@ -180,7 +192,7 @@ To properly support loadout icons, adjust `Resource/UI/SpectatorTournament.res` 
 * `statusspec_mediguninfo_reload_settings` - reload settings for the medigun info HUD from the resource file
 
 #### UI Resource Files
-An example file for the medigun info box is included under `Resource/UI/MedigunInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_mediguninfo_reload_settings` is provided as a replacement.
+An example file for the medigun info box is included under `Resource/UI/MedigunInfo.res`. In addition, the `Resource/UI/MedigunInfoDynamicMeters.res` file is used for the dynamic meters feature, and contains empty sections for each medigun within which you can add progress bar options that will be applied when the specified medigun is being used. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_mediguninfo_reload_settings` is provided as a replacement.
 
 In addition, the following HUD animations are triggered by this plugin and may be used to show events on the HUD:
 * `MedigunInfoBluChargeReady` - triggered when a BLU medigun charge is ready for use

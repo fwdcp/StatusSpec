@@ -22,10 +22,13 @@ public:
 
 	bool IsEnabled();
 
+	void PostEntityUpdate();
+
 	int GetLocalPlayerIndexOverride();
 private:
 	ConVar *enabled;
 	ConVar *player;
+	ConVar *track_spec_target;
 	ConCommand *set_current_target;
 
 	static void SetToCurrentTarget();

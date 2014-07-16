@@ -13,11 +13,18 @@
 LocalPlayer::LocalPlayer() {
 	enabled = new ConVar("statusspec_localplayer_enabled", "0", FCVAR_NONE, "enable local player override");
 	player = new ConVar("statusspec_localplayer_player", "0", FCVAR_NONE, "player to set as the local player");
+	track_spec_target = new ConVar("statusspec_localplayer_track_spec_target", "0", FCVAR_NONE, "have the local player value track the spectator target");
 	set_current_target = new ConCommand("statusspec_localplayer_set_current_target", LocalPlayer::SetToCurrentTarget, "set the local player to the current spectator target", FCVAR_NONE);
 }
 
 bool LocalPlayer::IsEnabled() {
 	return enabled->GetBool();
+}
+
+void LocalPlayer::PostEntityUpdate() {
+	if (track_spec_target->GetBool()) {
+		SetToCurrentTarget();
+	}
 }
 
 int LocalPlayer::GetLocalPlayerIndexOverride() {
@@ -40,8 +47,9 @@ void LocalPlayer::SetToCurrentTarget() {
 
 		if (Entities::CheckClassBaseclass(targetEntity->GetClientClass(), "DT_TFPlayer")) {
 			g_LocalPlayer->player->SetValue(targetEntity->entindex());
+			return;
 		}
 	}
 
-	Warning("Unable to set local player to current spectator target.");
+	Warning("Unable to set local player to current spectator target.\n");
 }
