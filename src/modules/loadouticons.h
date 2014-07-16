@@ -35,6 +35,19 @@
 #define MAX_TAUNT_SLOTS 8
 
 typedef struct Loadout_s {
+	Loadout_s() {
+		tfclass = TFClass_Unknown;
+		primary = -1;
+		secondary = -1;
+		melee = -1;
+		pda = -1;
+		pda2 = -1;
+		building = -1;
+		std::fill(cosmetic[0], cosmetic[MAX_COSMETIC_SLOTS], -1);
+		std::fill(taunt[0], taunt[MAX_TAUNT_SLOTS], -1);
+		action = -1;
+	};
+
 	TFClassType tfclass;
 	int primary;
 	int secondary;
