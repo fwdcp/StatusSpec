@@ -12,6 +12,8 @@ Changelog
 * local player
   * add command to track spectator target
   * fix warning being emitted on successful changes
+* medigun info
+  * change how progress bars are set (requires changes to MedigunInfo.res)
 
 **0.15.0**
 * antifreeze
