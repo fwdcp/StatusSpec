@@ -10,17 +10,7 @@
 
 #include "loadouticons.h"
 
-#define SHOW_SLOT_ICON(slot) \
-	if (loadoutInfo[i].slot != -1) { \
-		if (loadoutInfo[i].activeWeaponSlot.compare(#slot) == 0) { \
-			Paint::DrawTexture(itemIconTextures[loadoutInfo[i].slot], iconsWide, 0, iconSize, iconSize, filter_active_color); \
-		} \
-		else { \
-			Paint::DrawTexture(itemIconTextures[loadoutInfo[i].slot], iconsWide, 0, iconSize, iconSize, filter_nonactive_color); \
-		} \
-	} \
-	 \
-	iconsWide += iconSize;
+#define SHOW_SLOT_ICON(slot) DrawSlotIcon(i, loadoutInfo[i].slot, iconsWide, iconSize);
 
 inline int ColorRangeRestrict(int color) {
 	if (color < 0) return 0;
@@ -158,7 +148,7 @@ void LoadoutIcons::ProcessEntity(IClientEntity* entity) {
 	}
 
 	if (activeWeapon == entity->entindex()) {
-		loadoutInfo[player].activeWeaponSlot = itemSlot;
+		loadoutInfo[player].activeWeaponSlot = itemDefinitionIndex;
 	}
 			
 	if (strcmp(itemSlot, "primary") == 0) {
@@ -240,7 +230,7 @@ void LoadoutIcons::PostEntityUpdate() {
 			}
 
 			if (activeWeapon == i) {
-				loadoutInfo[player].activeWeaponSlot = itemSlot;
+				loadoutInfo[player].activeWeaponSlot = itemDefinitionIndex;
 			}
 				
 			if (strcmp(itemSlot, "primary") == 0) {
@@ -282,6 +272,19 @@ void LoadoutIcons::PostEntityUpdate() {
 			}
 		}
 	}
+}
+
+void LoadoutIcons::DrawSlotIcon(int player, int weapon, int &width, int size) {
+	if (weapon != -1) {
+		if (loadoutInfo[player].activeWeaponSlot == weapon) {
+			Paint::DrawTexture(itemIconTextures[weapon], width, 0, size, size, filter_active_color);
+		}
+		else {
+			Paint::DrawTexture(itemIconTextures[weapon], width, 0, size, size, filter_nonactive_color);
+		}
+	}
+
+	width += size;
 }
 
 int LoadoutIcons::GetCurrentFilter(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]) {

@@ -46,6 +46,7 @@ typedef struct Loadout_s {
 		std::fill(cosmetic[0], cosmetic[MAX_COSMETIC_SLOTS], -1);
 		std::fill(taunt[0], taunt[MAX_TAUNT_SLOTS], -1);
 		action = -1;
+		activeWeaponSlot = -1;
 	};
 
 	TFClassType tfclass;
@@ -58,7 +59,7 @@ typedef struct Loadout_s {
 	int cosmetic[MAX_COSMETIC_SLOTS];
 	int taunt[MAX_TAUNT_SLOTS];
 	int action;
-	std::string activeWeaponSlot;
+	int activeWeaponSlot;
 } Loadout_t;
 
 class LoadoutIcons {
@@ -82,6 +83,8 @@ private:
 	ItemSchema* itemSchema;
 	std::map<int, Loadout_t> loadoutInfo;
 	std::map<std::string, int> playerPanels;
+
+	void DrawSlotIcon(int player, int weapon, int &width, int size);
 
 	ConVar* enabled;
 	ConCommand* filter_active;
