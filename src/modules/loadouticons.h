@@ -32,8 +32,23 @@
 #endif
 
 #define MAX_COSMETIC_SLOTS 3
+#define MAX_TAUNT_SLOTS 8
 
 typedef struct Loadout_s {
+	Loadout_s() {
+		tfclass = TFClass_Unknown;
+		primary = -1;
+		secondary = -1;
+		melee = -1;
+		pda = -1;
+		pda2 = -1;
+		building = -1;
+		std::fill(&cosmetic[0], &cosmetic[MAX_COSMETIC_SLOTS], -1);
+		std::fill(&taunt[0], &taunt[MAX_TAUNT_SLOTS], -1);
+		action = -1;
+		activeWeaponSlot = -1;
+	};
+
 	TFClassType tfclass;
 	int primary;
 	int secondary;
@@ -42,8 +57,9 @@ typedef struct Loadout_s {
 	int pda2;
 	int building;
 	int cosmetic[MAX_COSMETIC_SLOTS];
+	int taunt[MAX_TAUNT_SLOTS];
 	int action;
-	std::string activeWeaponSlot;
+	int activeWeaponSlot;
 } Loadout_t;
 
 class LoadoutIcons {
@@ -68,10 +84,13 @@ private:
 	std::map<int, Loadout_t> loadoutInfo;
 	std::map<std::string, int> playerPanels;
 
+	void DrawSlotIcon(int player, int weapon, int &width, int size);
+
 	ConVar* enabled;
 	ConCommand* filter_active;
 	ConCommand* filter_nonactive;
 	ConVar* nonloadout;
+	ConVar *only_active;
 	static int GetCurrentFilter(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]);
 	static void SetFilter(const CCommand &command);
 };

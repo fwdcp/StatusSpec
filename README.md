@@ -9,6 +9,8 @@ Changelog
 ---------
 
 **WIP**
+* loadout icons
+  * add ability to only show the active weapon
 * local player
   * add command to track spectator target
   * fix warning being emitted on successful changes
@@ -130,6 +132,7 @@ An example file for the freeze info box is included under `Resource/UI/FreezeInf
 #### Console Variables
 * `statusspec_loadouticons_enabled` - enable loadout icons
 * `statusspec_loadouticons_nonloadout` - enable loadout icons for nonloadout items
+* `statusspec_loadouticons_only_active` - only display loadout icons for the active weapon
 
 #### Console Commands
 * `statusspec_loadouticons_filter_active <red> <green> <blue> <alpha>` - the RGBA filter applied to the icon for an active item
