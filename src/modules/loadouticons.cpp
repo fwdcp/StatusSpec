@@ -187,6 +187,14 @@ void LoadoutIcons::ProcessEntity(IClientEntity* entity) {
 			}
 		}
 	}
+	else if (strcmp(itemSlot, "taunt") == 0) {
+		for (int slot = 0; slot < MAX_TAUNT_SLOTS; slot++) {
+			if (loadoutInfo[player].taunt[slot] == -1) {
+				loadoutInfo[player].taunt[slot] = itemDefinitionIndex;
+				break;
+			}
+		}
+	}
 	else if (strcmp(itemSlot, "action") == 0) {
 		loadoutInfo[player].action = itemDefinitionIndex;
 	}
@@ -257,6 +265,14 @@ void LoadoutIcons::PostEntityUpdate() {
 				for (int slot = 0; slot < 3; slot++) {
 					if (loadoutInfo[player].cosmetic[slot] == -1) {
 						loadoutInfo[player].cosmetic[slot] = itemDefinitionIndex;
+						break;
+					}
+				}
+			}
+			else if (strcmp(itemSlot, "taunt") == 0) {
+				for (int slot = 0; slot < MAX_TAUNT_SLOTS; slot++) {
+					if (loadoutInfo[player].taunt[slot] == -1) {
+						loadoutInfo[player].taunt[slot] = itemDefinitionIndex;
 						break;
 					}
 				}

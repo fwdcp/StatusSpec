@@ -32,6 +32,7 @@
 #endif
 
 #define MAX_COSMETIC_SLOTS 3
+#define MAX_TAUNT_SLOTS 8
 
 typedef struct Loadout_s {
 	TFClassType tfclass;
@@ -42,6 +43,7 @@ typedef struct Loadout_s {
 	int pda2;
 	int building;
 	int cosmetic[MAX_COSMETIC_SLOTS];
+	int taunt[MAX_TAUNT_SLOTS];
 	int action;
 	std::string activeWeaponSlot;
 } Loadout_t;
