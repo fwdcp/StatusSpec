@@ -16,7 +16,7 @@ inline void StartAnimationSequence(const char *sequenceName) {
 
 MedigunInfo::MedigunInfo() {
 	dynamicMeterSettings = new KeyValues("MedigunInfoDynamicMeters");
-	dynamicMeterSettings->LoadFromFile(g_pFullFileSystem, "tf/resource/ui/mediguninfodynamicmeters.res");
+	dynamicMeterSettings->LoadFromFile(Interfaces::pFileSystem, "resource/ui/mediguninfodynamicmeters.res", "mod");
 	mainPanel = vgui::INVALID_PANEL;
 
 	dynamic_meters = new ConVar("statusspec_mediguninfo_dynamic_meters", "0", FCVAR_NONE, "enable charge meters to change based on medigun");
@@ -804,7 +804,7 @@ void MedigunInfo::ReloadSettings() {
 	}
 
 	g_MedigunInfo->dynamicMeterSettings = new KeyValues("MedigunInfoDynamicMeters");
-	g_MedigunInfo->dynamicMeterSettings->LoadFromFile(g_pFullFileSystem, "tf/resource/ui/mediguninfodynamicmeters.res");
+	g_MedigunInfo->dynamicMeterSettings->LoadFromFile(Interfaces::pFileSystem, "resource/ui/mediguninfodynamicmeters.res", "mod");
 }
 
 void MedigunInfo::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {

@@ -24,6 +24,7 @@
 #include "igameresources.h"
 #include "steam/steam_api.h"
 #include "tier3/tier3.h"
+#include "filesystem_init.h"
 #include "vgui_controls/Controls.h"
 
 #if defined __linux__
@@ -56,7 +57,8 @@ class Interfaces {
 		static IClientEntityList* pClientEntityList;
 		static IGameEventManager2 *pGameEventManager;
 		static IVEngineClient* pEngineClient;
-		static CSteamAPIContext* pSteamAPIContext; 
+		static CSteamAPIContext* pSteamAPIContext;
+		static IFileSystem *pFileSystem;
 		static IGameResources* GetGameResources();
 		static IClientMode* GetClientMode();
 	private:
