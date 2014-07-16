@@ -113,7 +113,7 @@ To install, place the `StatusSpec` folder within the `custom` folder in the `tf`
 * `statusspec_antifreeze_display_reload_settings` - reload settings for the freeze info panel from the resource file
 
 #### UI Resource Files
-An example file for the medigun info box is included under `Resource/UI/FreezeInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_antifreeze_display_reload_settings` is provided as a replacement.
+An example file for the freeze info box is included under `Resource/UI/FreezeInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_antifreeze_display_reload_settings` is provided as a replacement.
 
 ### Killstreaks
 *enables killstreak tracking for all weapons, all players*
