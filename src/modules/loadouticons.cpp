@@ -180,7 +180,7 @@ void LoadoutIcons::ProcessEntity(IClientEntity* entity) {
 		loadoutInfo[player].building = itemDefinitionIndex;
 	}
 	else if (strcmp(itemSlot, "head") == 0 || strcmp(itemSlot, "misc") == 0) {
-		for (int slot = 0; slot < 3; slot++) {
+		for (int slot = 0; slot < MAX_COSMETIC_SLOTS; slot++) {
 			if (loadoutInfo[player].cosmetic[slot] == -1) {
 				loadoutInfo[player].cosmetic[slot] = itemDefinitionIndex;
 				break;
@@ -262,7 +262,7 @@ void LoadoutIcons::PostEntityUpdate() {
 				loadoutInfo[player].building = itemDefinitionIndex;
 			}
 			else if (strcmp(itemSlot, "head") == 0 || strcmp(itemSlot, "misc") == 0) {
-				for (int slot = 0; slot < 3; slot++) {
+				for (int slot = 0; slot < MAX_COSMETIC_SLOTS; slot++) {
 					if (loadoutInfo[player].cosmetic[slot] == -1) {
 						loadoutInfo[player].cosmetic[slot] = itemDefinitionIndex;
 						break;
