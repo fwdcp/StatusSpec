@@ -36,6 +36,7 @@ LoadoutIcons::LoadoutIcons() {
 	filter_active = new ConCommand("statusspec_loadouticons_filter_active", LoadoutIcons::SetFilter, "the RGBA filter applied to the icon for an active item", FCVAR_NONE, LoadoutIcons::GetCurrentFilter);
 	filter_nonactive = new ConCommand("statusspec_loadouticons_filter_nonactive", LoadoutIcons::SetFilter, "the RGBA filter applied to the icon for a nonactive item", FCVAR_NONE, LoadoutIcons::GetCurrentFilter);
 	nonloadout = new ConVar("statusspec_loadouticons_nonloadout", "0", FCVAR_NONE, "enable loadout icons for nonloadout items");
+	only_active = new ConVar("statusspec_loadouticons_only_active", "0", FCVAR_NONE, "only display loadout icons for the active weapon");
 }
 
 LoadoutIcons::~LoadoutIcons() {
@@ -275,16 +276,24 @@ void LoadoutIcons::PostEntityUpdate() {
 }
 
 void LoadoutIcons::DrawSlotIcon(int player, int weapon, int &width, int size) {
-	if (weapon != -1) {
-		if (loadoutInfo[player].activeWeaponSlot == weapon) {
+	if (only_active->GetBool()) {
+		if (weapon != -1 && loadoutInfo[player].activeWeaponSlot == weapon) {
 			Paint::DrawTexture(itemIconTextures[weapon], width, 0, size, size, filter_active_color);
-		}
-		else {
-			Paint::DrawTexture(itemIconTextures[weapon], width, 0, size, size, filter_nonactive_color);
+			width += size;
 		}
 	}
+	else {
+		if (weapon != -1) {
+			if (loadoutInfo[player].activeWeaponSlot == weapon) {
+				Paint::DrawTexture(itemIconTextures[weapon], width, 0, size, size, filter_active_color);
+			}
+			else {
+				Paint::DrawTexture(itemIconTextures[weapon], width, 0, size, size, filter_nonactive_color);
+			}
+		}
 
-	width += size;
+		width += size;
+	}
 }
 
 int LoadoutIcons::GetCurrentFilter(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]) {
