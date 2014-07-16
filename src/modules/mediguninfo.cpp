@@ -48,6 +48,8 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 		if (medigunInfo.find(TFTeam_Red) != medigunInfo.end()) {
 			panels["MedigunInfoRedBackground"]->SetVisible(true);
 
+			const char *redname;
+
 			switch(medigunInfo[TFTeam_Red].itemDefinitionIndex) {
 				case 29:	// Medi Gun
 				case 211:
@@ -61,34 +63,31 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 				case 961:
 				case 970:
 				{
-					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redname", "Medi Gun");
-
+					redname = "Medi Gun";
 					break;
 				}
 				case 35:	// Kritzkrieg
 				{
-					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redname", "Kritzkrieg");
-
+					redname = "Kritzkrieg";
 					break;
 				}
 				case 411:	// Quick-Fix
 				{
-					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redname", "Quick-Fix");
-
+					redname = "Quick-Fix";
 					break;
 				}
 				case 998:	// Vaccinator
 				{
-					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redname", "Vaccinator");
-
+					redname = "Vaccinator";
 					break;
 				}
 				default:
 				{
-					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redname", "Unknown");
+					redname = "Unknown";
 					break;
 				}
 			}
+			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redname", redname);
 			panels["MedigunInfoRedNameLabel"]->SetVisible(true);
 			
 			switch(medigunInfo[TFTeam_Red].itemDefinitionIndex) {
@@ -367,6 +366,8 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 		if (medigunInfo.find(TFTeam_Blue) != medigunInfo.end()) {
 			panels["MedigunInfoBluBackground"]->SetVisible(true);
 			
+			const char *bluname;
+
 			switch(medigunInfo[TFTeam_Blue].itemDefinitionIndex) {
 				case 29:	// Medi Gun
 				case 211:
@@ -380,34 +381,31 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 				case 961:
 				case 970:
 				{
-					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("bluname", "Medi Gun");
-
+					bluname = "Medi Gun";
 					break;
 				}
 				case 35:	// Kritzkrieg
 				{
-					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("bluname", "Kritzkrieg");
-
+					bluname = "Kritzkrieg";
 					break;
 				}
 				case 411:	// Quick-Fix
 				{
-					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("bluname", "Quick-Fix");
-
+					bluname = "Quick-Fix";
 					break;
 				}
 				case 998:	// Vaccinator
 				{
-					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("bluname", "Vaccinator");
-
+					bluname = "Vaccinator";
 					break;
 				}
 				default:
 				{
-					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("bluname", "Unknown");
+					bluname = "Unknown";
 					break;
 				}
 			}
+			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("bluname", bluname);
 			panels["MedigunInfoBluNameLabel"]->SetVisible(true);
 			
 			switch(medigunInfo[TFTeam_Blue].itemDefinitionIndex) {
