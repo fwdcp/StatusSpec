@@ -21,6 +21,7 @@ IClientEntityList* Interfaces::pClientEntityList = nullptr;
 IVEngineClient* Interfaces::pEngineClient = nullptr;
 IGameEventManager2 *Interfaces::pGameEventManager = nullptr;
 CSteamAPIContext* Interfaces::pSteamAPIContext = nullptr;
+IFileSystem *Interfaces::pFileSystem = nullptr;
 CDllDemandLoader *Interfaces::pClientModule = nullptr;
 
 CBaseEntityList *g_pEntityList;
@@ -108,8 +109,47 @@ bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 	CheckPointerAndWarn(g_pFullFileSystem, IFileSystem);
 
 	g_pEntityList = dynamic_cast<CBaseEntityList *>(Interfaces::pClientEntityList);
-	
-	return true;
+
+	char dll[MAX_PATH];
+	bool steam;
+	if (FileSystem_GetFileSystemDLLName(dll, sizeof(dll), steam) == FS_OK) {
+		CFSLoadModuleInfo fsLoadModuleInfo;
+		fsLoadModuleInfo.m_bSteam = steam;
+		fsLoadModuleInfo.m_pFileSystemDLLName = dll;
+		fsLoadModuleInfo.m_ConnectFactory = interfaceFactory;
+
+		if (FileSystem_LoadFileSystemModule(fsLoadModuleInfo) == FS_OK) {
+			CFSMountContentInfo fsMountContentInfo;
+			fsMountContentInfo.m_bToolsMode = fsLoadModuleInfo.m_bToolsMode;
+			fsMountContentInfo.m_pDirectoryName = fsLoadModuleInfo.m_GameInfoPath;
+			fsMountContentInfo.m_pFileSystem = fsLoadModuleInfo.m_pFileSystem;
+
+			if (FileSystem_MountContent(fsMountContentInfo) == FS_OK) {
+				CFSSearchPathsInit fsSearchPathsInit;
+				fsSearchPathsInit.m_pDirectoryName = fsLoadModuleInfo.m_GameInfoPath;
+				fsSearchPathsInit.m_pFileSystem = fsLoadModuleInfo.m_pFileSystem;
+
+				if (FileSystem_LoadSearchPaths(fsSearchPathsInit) == FS_OK) {
+					Interfaces::pFileSystem = fsLoadModuleInfo.m_pFileSystem;
+
+					CheckPointerAndWarn(Interfaces::pFileSystem, IFileSystem);
+
+					return true;
+				}
+			}
+			else {
+				return false;
+			}
+		}
+		else {
+			return false;
+		}
+	}
+	else {
+		return false;
+	}
+
+	return false;
 }
 
 void Interfaces::Unload() {

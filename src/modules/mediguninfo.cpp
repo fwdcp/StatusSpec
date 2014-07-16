@@ -10,25 +10,16 @@
 
 #include "mediguninfo.h"
 
-inline void FindAndReplaceInString(std::string &str, const std::string &find, const std::string &replace) {
-	if (find.empty())
-        return;
-
-    size_t start_pos = 0;
-
-    while((start_pos = str.find(find, start_pos)) != std::string::npos) {
-        str.replace(start_pos, find.length(), replace);
-        start_pos += replace.length();
-    }
-}
-
 inline void StartAnimationSequence(const char *sequenceName) {
 	Interfaces::GetClientMode()->GetViewportAnimationController()->StartAnimationSequence(sequenceName);
 }
 
 MedigunInfo::MedigunInfo() {
+	dynamicMeterSettings = new KeyValues("MedigunInfoDynamicMeters");
+	dynamicMeterSettings->LoadFromFile(Interfaces::pFileSystem, "resource/ui/mediguninfodynamicmeters.res", "mod");
 	mainPanel = vgui::INVALID_PANEL;
 
+	dynamic_meters = new ConVar("statusspec_mediguninfo_dynamic_meters", "0", FCVAR_NONE, "enable charge meters to change based on medigun");
 	enabled = new ConVar("statusspec_mediguninfo_enabled", "0", FCVAR_NONE, "enable medigun info", MedigunInfo::ToggleEnabled);
 	individual_charge_meters = new ConVar("statusspec_mediguninfo_individual_charge_meters", "1", FCVAR_NONE, "enable individual charge meters (for Vaccinator)");
 	reload_settings = new ConCommand("statusspec_mediguninfo_reload_settings", MedigunInfo::ReloadSettings, "reload settings for the medigun info HUD from the resource file", FCVAR_NONE);
@@ -48,6 +39,8 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 		if (medigunInfo.find(TFTeam_Red) != medigunInfo.end()) {
 			panels["MedigunInfoRedBackground"]->SetVisible(true);
 
+			const char *redname;
+
 			switch(medigunInfo[TFTeam_Red].itemDefinitionIndex) {
 				case 29:	// Medi Gun
 				case 211:
@@ -61,72 +54,81 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 				case 961:
 				case 970:
 				{
-					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redname", "Medi Gun");
-
+					redname = "Medi Gun";
 					break;
 				}
 				case 35:	// Kritzkrieg
 				{
-					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redname", "Kritzkrieg");
-
+					redname = "Kritzkrieg";
 					break;
 				}
 				case 411:	// Quick-Fix
 				{
-					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redname", "Quick-Fix");
-
+					redname = "Quick-Fix";
 					break;
 				}
 				case 998:	// Vaccinator
 				{
-					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redname", "Vaccinator");
-
+					redname = "Vaccinator";
 					break;
 				}
 				default:
 				{
-					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redname", "Unknown");
+					redname = "Unknown";
 					break;
 				}
 			}
+			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redname", redname);
+
+			if (dynamic_meters->GetBool()) {
+				KeyValues *medigunSettings = dynamicMeterSettings->FindKey(redname);
+
+				if (medigunSettings) {
+					panels["MedigunInfoRedChargeMeter"]->ApplySettings(medigunSettings);
+					panels["MedigunInfoRedChargeMeter1"]->ApplySettings(medigunSettings);
+					panels["MedigunInfoRedChargeMeter2"]->ApplySettings(medigunSettings);
+					panels["MedigunInfoRedChargeMeter3"]->ApplySettings(medigunSettings);
+					panels["MedigunInfoRedChargeMeter4"]->ApplySettings(medigunSettings);
+				}
+			}
+
 			panels["MedigunInfoRedNameLabel"]->SetVisible(true);
 			
+			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redcharge", int(floor(medigunInfo[TFTeam_Red].chargeLevel * 100.0f)));
+
+			float redChargeAdvantage;
+
+			if (medigunInfo.find(TFTeam_Blue) != medigunInfo.end()) {
+				redChargeAdvantage = medigunInfo[TFTeam_Red].chargeLevel - medigunInfo[TFTeam_Blue].chargeLevel;
+			}
+			else {
+				redChargeAdvantage = medigunInfo[TFTeam_Red].chargeLevel;
+			}
+
+			if (floor(redChargeAdvantage * 100) > 0.0f) {
+				((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redadvantage", int(floor(redChargeAdvantage * 100.0f)));
+
+				panels["MedigunInfoRedChargeAdvantageLabel"]->SetVisible(true);
+			}
+			else {
+				((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redadvantage", 0);
+
+				panels["MedigunInfoRedChargeAdvantageLabel"]->SetVisible(false);
+			}
+
 			switch(medigunInfo[TFTeam_Red].itemDefinitionIndex) {
 				case 998:	// Vaccinator
 				{
-					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redcharge", "");
 					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redcharges", int(floor(medigunInfo[TFTeam_Red].chargeLevel * 4.0f)));
+					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redcharge1", int(floor(medigunInfo[TFTeam_Red].chargeLevel * 400.0f) - 0.0f) < 0 ? 0 : int(floor(medigunInfo[TFTeam_Red].chargeLevel * 400.0f) - 0.0f));
+					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redcharge2", int(floor(medigunInfo[TFTeam_Red].chargeLevel * 400.0f) - 100.0f) < 0 ? 0 : int(floor(medigunInfo[TFTeam_Red].chargeLevel * 400.0f) - 100.0f));
+					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redcharge3", int(floor(medigunInfo[TFTeam_Red].chargeLevel * 400.0f) - 200.0f) < 0 ? 0 : int(floor(medigunInfo[TFTeam_Red].chargeLevel * 400.0f) - 200.0f));
+					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redcharge4", int(floor(medigunInfo[TFTeam_Red].chargeLevel * 400.0f) - 300.0f) < 0 ? 0 : int(floor(medigunInfo[TFTeam_Red].chargeLevel * 400.0f) - 300.0f));
 
 					panels["MedigunInfoRedChargeLabel"]->SetVisible(false);
 					panels["MedigunInfoRedIndividualChargesLabel"]->SetVisible(true);
 
-					float redChargeAdvantage;
-
-					if (medigunInfo.find(TFTeam_Blue) != medigunInfo.end()) {
-						redChargeAdvantage = medigunInfo[TFTeam_Red].chargeLevel - medigunInfo[TFTeam_Blue].chargeLevel;
-					}
-					else {
-						redChargeAdvantage = medigunInfo[TFTeam_Red].chargeLevel;
-					}
-
-					if (floor(redChargeAdvantage * 100) > 0.0f) {
-						((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redadvantage", int(floor(redChargeAdvantage * 100)));
-
-						panels["MedigunInfoRedChargeAdvantageLabel"]->SetVisible(true);
-					}
-					else {
-						((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redadvantage", "");
-
-						panels["MedigunInfoRedChargeAdvantageLabel"]->SetVisible(false);
-					}
-
 					if (individual_charge_meters->GetBool()) {
-						((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter"])->SetProgress(0.0f);
-						((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter1"])->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 0.0f);
-						((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter2"])->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 1.0f);
-						((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter3"])->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 2.0f);
-						((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter4"])->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 3.0f);
-
 						panels["MedigunInfoRedChargeMeter"]->SetVisible(false);
 						panels["MedigunInfoRedChargeMeter1"]->SetVisible(true);
 						panels["MedigunInfoRedChargeMeter2"]->SetVisible(true);
@@ -134,12 +136,6 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 						panels["MedigunInfoRedChargeMeter4"]->SetVisible(true);
 					}
 					else {
-						((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter"])->SetProgress(medigunInfo[TFTeam_Red].chargeLevel);
-						((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter1"])->SetProgress(0.0f);
-						((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter2"])->SetProgress(0.0f);
-						((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter3"])->SetProgress(0.0f);
-						((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter4"])->SetProgress(0.0f);
-
 						panels["MedigunInfoRedChargeMeter"]->SetVisible(true);
 						panels["MedigunInfoRedChargeMeter1"]->SetVisible(false);
 						panels["MedigunInfoRedChargeMeter2"]->SetVisible(false);
@@ -189,33 +185,29 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 				case 411:	// Quick-Fix
 				default:
 				{
-					float redChargeAdvantage;
+					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redcharges", int(floor(medigunInfo[TFTeam_Red].chargeLevel)));
+					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redcharge1", 0);
+					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redcharge2", 0);
+					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redcharge3", 0);
+					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redcharge4", 0);
 
-					if (medigunInfo.find(TFTeam_Blue) != medigunInfo.end()) {
-						redChargeAdvantage = medigunInfo[TFTeam_Red].chargeLevel - medigunInfo[TFTeam_Blue].chargeLevel;
+					panels["MedigunInfoRedChargeLabel"]->SetVisible(false);
+					panels["MedigunInfoRedIndividualChargesLabel"]->SetVisible(true);
+
+					if (individual_charge_meters->GetBool()) {
+						panels["MedigunInfoRedChargeMeter"]->SetVisible(false);
+						panels["MedigunInfoRedChargeMeter1"]->SetVisible(true);
+						panels["MedigunInfoRedChargeMeter2"]->SetVisible(true);
+						panels["MedigunInfoRedChargeMeter3"]->SetVisible(true);
+						panels["MedigunInfoRedChargeMeter4"]->SetVisible(true);
 					}
 					else {
-						redChargeAdvantage = medigunInfo[TFTeam_Red].chargeLevel;
+						panels["MedigunInfoRedChargeMeter"]->SetVisible(true);
+						panels["MedigunInfoRedChargeMeter1"]->SetVisible(false);
+						panels["MedigunInfoRedChargeMeter2"]->SetVisible(false);
+						panels["MedigunInfoRedChargeMeter3"]->SetVisible(false);
+						panels["MedigunInfoRedChargeMeter4"]->SetVisible(false);
 					}
-
-					if (floor(redChargeAdvantage * 100) > 0.0f) {
-						((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redadvantage", int(floor(redChargeAdvantage * 100)));
-
-						panels["MedigunInfoRedChargeAdvantageLabel"]->SetVisible(true);
-					}
-					else {
-						((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redadvantage", "");
-
-						panels["MedigunInfoRedChargeAdvantageLabel"]->SetVisible(false);
-					}
-				
-					((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter"])->SetProgress(medigunInfo[TFTeam_Red].chargeLevel);
-					((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter1"])->SetProgress(0.0f);
-					((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter2"])->SetProgress(0.0f);
-					((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter3"])->SetProgress(0.0f);
-					((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter4"])->SetProgress(0.0f);
-					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redcharge", int(floor(medigunInfo[TFTeam_Red].chargeLevel * 100)));
-					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redcharges", "");
 				
 					panels["MedigunInfoRedChargeMeter"]->SetVisible(true);
 					panels["MedigunInfoRedChargeMeter1"]->SetVisible(false);
@@ -331,15 +323,14 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 			}
 		}
 		else {
-			((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter"])->SetProgress(0.0f);
-			((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter1"])->SetProgress(0.0f);
-			((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter2"])->SetProgress(0.0f);
-			((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter3"])->SetProgress(0.0f);
-			((vgui::ContinuousProgressBar *) panels["MedigunInfoRedChargeMeter4"])->SetProgress(0.0f);
 			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redname", "");
-			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redcharge", "");
-			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redcharges", "");
-			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redadvantage", "");
+			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redcharge", 0);
+			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redcharges", 0);
+			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redcharge1", 0);
+			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redcharge2", 0);
+			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redcharge3", 0);
+			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redcharge4", 0);
+			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redadvantage", 0);
 			((vgui::ImagePanel *) panels["MedigunInfoRedChargeTypeIcon"])->SetImage(VGUI_TEXTURE_NULL);
 		
 			panels["MedigunInfoRedNameLabel"]->SetVisible(false);
@@ -367,6 +358,8 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 		if (medigunInfo.find(TFTeam_Blue) != medigunInfo.end()) {
 			panels["MedigunInfoBluBackground"]->SetVisible(true);
 			
+			const char *bluname;
+
 			switch(medigunInfo[TFTeam_Blue].itemDefinitionIndex) {
 				case 29:	// Medi Gun
 				case 211:
@@ -380,72 +373,81 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 				case 961:
 				case 970:
 				{
-					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("bluname", "Medi Gun");
-
+					bluname = "Medi Gun";
 					break;
 				}
 				case 35:	// Kritzkrieg
 				{
-					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("bluname", "Kritzkrieg");
-
+					bluname = "Kritzkrieg";
 					break;
 				}
 				case 411:	// Quick-Fix
 				{
-					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("bluname", "Quick-Fix");
-
+					bluname = "Quick-Fix";
 					break;
 				}
 				case 998:	// Vaccinator
 				{
-					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("bluname", "Vaccinator");
-
+					bluname = "Vaccinator";
 					break;
 				}
 				default:
 				{
-					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("bluname", "Unknown");
+					bluname = "Unknown";
 					break;
 				}
 			}
+			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("bluname", bluname);
+
+			if (dynamic_meters->GetBool()) {
+				KeyValues *medigunSettings = dynamicMeterSettings->FindKey(bluname);
+
+				if (medigunSettings) {
+					panels["MedigunInfoBluChargeMeter"]->ApplySettings(medigunSettings);
+					panels["MedigunInfoBluChargeMeter1"]->ApplySettings(medigunSettings);
+					panels["MedigunInfoBluChargeMeter2"]->ApplySettings(medigunSettings);
+					panels["MedigunInfoBluChargeMeter3"]->ApplySettings(medigunSettings);
+					panels["MedigunInfoBluChargeMeter4"]->ApplySettings(medigunSettings);
+				}
+			}
+
 			panels["MedigunInfoBluNameLabel"]->SetVisible(true);
 			
+			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("blucharge", int(floor(medigunInfo[TFTeam_Blue].chargeLevel * 100.0f)));
+
+			float bluChargeAdvantage;
+
+			if (medigunInfo.find(TFTeam_Blue) != medigunInfo.end()) {
+				bluChargeAdvantage = medigunInfo[TFTeam_Blue].chargeLevel - medigunInfo[TFTeam_Blue].chargeLevel;
+			}
+			else {
+				bluChargeAdvantage = medigunInfo[TFTeam_Blue].chargeLevel;
+			}
+
+			if (floor(bluChargeAdvantage * 100) > 0.0f) {
+				((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("bluadvantage", int(floor(bluChargeAdvantage * 100.0f)));
+
+				panels["MedigunInfoBluChargeAdvantageLabel"]->SetVisible(true);
+			}
+			else {
+				((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("bluadvantage", 0);
+
+				panels["MedigunInfoBluChargeAdvantageLabel"]->SetVisible(false);
+			}
+
 			switch(medigunInfo[TFTeam_Blue].itemDefinitionIndex) {
 				case 998:	// Vaccinator
 				{
-					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("blucharge", "");
 					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("blucharges", int(floor(medigunInfo[TFTeam_Blue].chargeLevel * 4.0f)));
+					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("blucharge1", int(floor(medigunInfo[TFTeam_Blue].chargeLevel * 400.0f) - 0.0f) < 0 ? 0 : int(floor(medigunInfo[TFTeam_Blue].chargeLevel * 400.0f) - 0.0f));
+					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("blucharge2", int(floor(medigunInfo[TFTeam_Blue].chargeLevel * 400.0f) - 100.0f) < 0 ? 0 : int(floor(medigunInfo[TFTeam_Blue].chargeLevel * 400.0f) - 100.0f));
+					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("blucharge3", int(floor(medigunInfo[TFTeam_Blue].chargeLevel * 400.0f) - 200.0f) < 0 ? 0 : int(floor(medigunInfo[TFTeam_Blue].chargeLevel * 400.0f) - 200.0f));
+					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("blucharge4", int(floor(medigunInfo[TFTeam_Blue].chargeLevel * 400.0f) - 300.0f) < 0 ? 0 : int(floor(medigunInfo[TFTeam_Blue].chargeLevel * 400.0f) - 300.0f));
 
 					panels["MedigunInfoBluChargeLabel"]->SetVisible(false);
 					panels["MedigunInfoBluIndividualChargesLabel"]->SetVisible(true);
 
-					float bluChargeAdvantage;
-
-					if (medigunInfo.find(TFTeam_Red) != medigunInfo.end()) {
-						bluChargeAdvantage = medigunInfo[TFTeam_Blue].chargeLevel - medigunInfo[TFTeam_Red].chargeLevel;
-					}
-					else {
-						bluChargeAdvantage = medigunInfo[TFTeam_Blue].chargeLevel;
-					}
-
-					if (floor(bluChargeAdvantage * 100) > 0.0f) {
-						((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("bluadvantage", int(floor(bluChargeAdvantage * 100)));
-
-						panels["MedigunInfoBluChargeAdvantageLabel"]->SetVisible(true);
-					}
-					else {
-						((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("bluadvantage", "");
-
-						panels["MedigunInfoBluChargeAdvantageLabel"]->SetVisible(false);
-					}
-
 					if (individual_charge_meters->GetBool()) {
-						((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter"])->SetProgress(0.0f);
-						((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter1"])->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 0.0f);
-						((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter2"])->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 1.0f);
-						((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter3"])->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 2.0f);
-						((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter4"])->SetProgress((medigunInfo[TFTeam_Red].chargeLevel * 4.0f) - 3.0f);
-
 						panels["MedigunInfoBluChargeMeter"]->SetVisible(false);
 						panels["MedigunInfoBluChargeMeter1"]->SetVisible(true);
 						panels["MedigunInfoBluChargeMeter2"]->SetVisible(true);
@@ -453,12 +455,6 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 						panels["MedigunInfoBluChargeMeter4"]->SetVisible(true);
 					}
 					else {
-						((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter"])->SetProgress(medigunInfo[TFTeam_Red].chargeLevel);
-						((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter1"])->SetProgress(0.0f);
-						((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter2"])->SetProgress(0.0f);
-						((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter3"])->SetProgress(0.0f);
-						((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter4"])->SetProgress(0.0f);
-
 						panels["MedigunInfoBluChargeMeter"]->SetVisible(true);
 						panels["MedigunInfoBluChargeMeter1"]->SetVisible(false);
 						panels["MedigunInfoBluChargeMeter2"]->SetVisible(false);
@@ -508,33 +504,29 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 				case 411:	// Quick-Fix
 				default:
 				{
-					float bluChargeAdvantage;
+					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("blucharges", int(floor(medigunInfo[TFTeam_Blue].chargeLevel)));
+					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("blucharge1", 0);
+					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("blucharge2", 0);
+					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("blucharge3", 0);
+					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("blucharge4", 0);
 
-					if (medigunInfo.find(TFTeam_Red) != medigunInfo.end()) {
-						bluChargeAdvantage = medigunInfo[TFTeam_Blue].chargeLevel - medigunInfo[TFTeam_Red].chargeLevel;
+					panels["MedigunInfoBluChargeLabel"]->SetVisible(false);
+					panels["MedigunInfoBluIndividualChargesLabel"]->SetVisible(true);
+
+					if (individual_charge_meters->GetBool()) {
+						panels["MedigunInfoBluChargeMeter"]->SetVisible(false);
+						panels["MedigunInfoBluChargeMeter1"]->SetVisible(true);
+						panels["MedigunInfoBluChargeMeter2"]->SetVisible(true);
+						panels["MedigunInfoBluChargeMeter3"]->SetVisible(true);
+						panels["MedigunInfoBluChargeMeter4"]->SetVisible(true);
 					}
 					else {
-						bluChargeAdvantage = medigunInfo[TFTeam_Blue].chargeLevel;
+						panels["MedigunInfoBluChargeMeter"]->SetVisible(true);
+						panels["MedigunInfoBluChargeMeter1"]->SetVisible(false);
+						panels["MedigunInfoBluChargeMeter2"]->SetVisible(false);
+						panels["MedigunInfoBluChargeMeter3"]->SetVisible(false);
+						panels["MedigunInfoBluChargeMeter4"]->SetVisible(false);
 					}
-
-					if (floor(bluChargeAdvantage * 100) > 0.0f) {
-						((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("bluadvantage", int(floor(bluChargeAdvantage * 100)));
-
-						panels["MedigunInfoBluChargeAdvantageLabel"]->SetVisible(true);
-					}
-					else {
-						((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("bluadvantage", "");
-
-						panels["MedigunInfoBluChargeAdvantageLabel"]->SetVisible(false);
-					}
-				
-					((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter"])->SetProgress(medigunInfo[TFTeam_Blue].chargeLevel);
-					((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter1"])->SetProgress(0.0f);
-					((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter2"])->SetProgress(0.0f);
-					((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter3"])->SetProgress(0.0f);
-					((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter4"])->SetProgress(0.0f);
-					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("blucharge", int(floor(medigunInfo[TFTeam_Blue].chargeLevel * 100)));
-					((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("blucharges", "");
 				
 					panels["MedigunInfoBluChargeMeter"]->SetVisible(true);
 					panels["MedigunInfoBluChargeMeter1"]->SetVisible(false);
@@ -650,15 +642,14 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 			}
 		}
 		else {
-			((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter"])->SetProgress(0.0f);
-			((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter1"])->SetProgress(0.0f);
-			((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter2"])->SetProgress(0.0f);
-			((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter3"])->SetProgress(0.0f);
-			((vgui::ContinuousProgressBar *) panels["MedigunInfoBluChargeMeter4"])->SetProgress(0.0f);
 			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("bluname", "");
-			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("blucharge", "");
-			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("blucharges", "");
-			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("bluadvantage", "");
+			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("blucharge", 0);
+			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("blucharges", 0);
+			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("blucharge1", 0);
+			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("blucharge2", 0);
+			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("blucharge3", 0);
+			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("blucharge4", 0);
+			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("bluadvantage", 0);
 			((vgui::ImagePanel *) panels["MedigunInfoBluChargeTypeIcon"])->SetImage(VGUI_TEXTURE_NULL);
 		
 			panels["MedigunInfoBluNameLabel"]->SetVisible(false);
@@ -811,6 +802,9 @@ void MedigunInfo::ReloadSettings() {
 	if (g_MedigunInfo->panels.find("MedigunInfo") != g_MedigunInfo->panels.end()) {
 		((vgui::EditablePanel *) g_MedigunInfo->panels["MedigunInfo"])->LoadControlSettings("Resource/UI/MedigunInfo.res");
 	}
+
+	g_MedigunInfo->dynamicMeterSettings = new KeyValues("MedigunInfoDynamicMeters");
+	g_MedigunInfo->dynamicMeterSettings->LoadFromFile(Interfaces::pFileSystem, "resource/ui/mediguninfodynamicmeters.res", "mod");
 }
 
 void MedigunInfo::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {

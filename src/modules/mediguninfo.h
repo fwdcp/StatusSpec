@@ -63,12 +63,14 @@ public:
 	void PreEntityUpdate();
 	void ProcessEntity(IClientEntity* entity);
 private:
+	KeyValues *dynamicMeterSettings;
 	vgui::HPanel mainPanel;
 	std::map<TFTeam, Medigun_t> medigunInfo;
 	std::map<std::string, vgui::Panel *> panels;
 
 	void InitHud();
 	
+	ConVar *dynamic_meters;
 	ConVar *enabled;
 	ConVar *individual_charge_meters;
 	ConCommand* reload_settings;
