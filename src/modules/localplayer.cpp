@@ -40,8 +40,9 @@ void LocalPlayer::SetToCurrentTarget() {
 
 		if (Entities::CheckClassBaseclass(targetEntity->GetClientClass(), "DT_TFPlayer")) {
 			g_LocalPlayer->player->SetValue(targetEntity->entindex());
+			return;
 		}
 	}
 
-	Warning("Unable to set local player to current spectator target.");
+	Warning("Unable to set local player to current spectator target.\n");
 }
