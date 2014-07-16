@@ -8,6 +8,11 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**WIP**
+* local player
+  * add command to track spectator target
+  * fix warning being emitted on successful changes
+
 **0.15.0**
 * antifreeze
   * now supports displaying a message when a freeze is occurring
