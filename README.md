@@ -192,7 +192,7 @@ To properly support loadout icons, adjust `Resource/UI/SpectatorTournament.res` 
 * `statusspec_mediguninfo_reload_settings` - reload settings for the medigun info HUD from the resource file
 
 #### UI Resource Files
-An example file for the medigun info box is included under `Resource/UI/MedigunInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_mediguninfo_reload_settings` is provided as a replacement.
+An example file for the medigun info box is included under `Resource/UI/MedigunInfo.res`. In addition, the `Resource/UI/MedigunInfoDynamicMeters.res` file is used for the dynamic meters feature, and contains empty sections for each medigun within which you can add progress bar options that will be applied when the specified medigun is being used. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_mediguninfo_reload_settings` is provided as a replacement.
 
 In addition, the following HUD animations are triggered by this plugin and may be used to show events on the HUD:
 * `MedigunInfoBluChargeReady` - triggered when a BLU medigun charge is ready for use
