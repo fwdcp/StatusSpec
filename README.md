@@ -181,6 +181,7 @@ To properly support loadout icons, adjust `Resource/UI/SpectatorTournament.res` 
 *displays info about mediguns for both teams*
 
 #### Console Variables
+* `statusspec_mediguninfo_dynamic_meters` - enable charge meters to change based on medigun
 * `statusspec_mediguninfo_enabled` - enable medigun info
 * `statusspec_mediguninfo_individual_charge_meters` - enable individual charge meters (for Vaccinator)
 
