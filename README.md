@@ -8,7 +8,7 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
-**WIP**
+**0.16.0**
 * loadout icons
   * add ability to only show the active weapon
 * local player
