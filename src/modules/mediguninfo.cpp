@@ -27,8 +27,11 @@ inline void StartAnimationSequence(const char *sequenceName) {
 }
 
 MedigunInfo::MedigunInfo() {
+	dynamicMeterSettings = new KeyValues("MedigunInfoDynamicMeters");
+	dynamicMeterSettings->LoadFromFile(g_pFullFileSystem, "tf/resource/ui/mediguninfodynamicmeters.res");
 	mainPanel = vgui::INVALID_PANEL;
 
+	dynamic_meters = new ConVar("statusspec_mediguninfo_dynamic_meters", "0", FCVAR_NONE, "enable charge meters to change based on medigun");
 	enabled = new ConVar("statusspec_mediguninfo_enabled", "0", FCVAR_NONE, "enable medigun info", MedigunInfo::ToggleEnabled);
 	individual_charge_meters = new ConVar("statusspec_mediguninfo_individual_charge_meters", "1", FCVAR_NONE, "enable individual charge meters (for Vaccinator)");
 	reload_settings = new ConCommand("statusspec_mediguninfo_reload_settings", MedigunInfo::ReloadSettings, "reload settings for the medigun info HUD from the resource file", FCVAR_NONE);
@@ -88,6 +91,19 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 				}
 			}
 			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redname", redname);
+
+			if (dynamic_meters->GetBool()) {
+				KeyValues *medigunSettings = dynamicMeterSettings->FindKey(redname);
+
+				if (medigunSettings) {
+					panels["MedigunInfoRedChargeMeter"]->ApplySettings(medigunSettings);
+					panels["MedigunInfoRedChargeMeter1"]->ApplySettings(medigunSettings);
+					panels["MedigunInfoRedChargeMeter2"]->ApplySettings(medigunSettings);
+					panels["MedigunInfoRedChargeMeter3"]->ApplySettings(medigunSettings);
+					panels["MedigunInfoRedChargeMeter4"]->ApplySettings(medigunSettings);
+				}
+			}
+
 			panels["MedigunInfoRedNameLabel"]->SetVisible(true);
 			
 			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redcharge", int(floor(medigunInfo[TFTeam_Red].chargeLevel * 100.0f)));
@@ -394,6 +410,19 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 				}
 			}
 			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("bluname", bluname);
+
+			if (dynamic_meters->GetBool()) {
+				KeyValues *medigunSettings = dynamicMeterSettings->FindKey(bluname);
+
+				if (medigunSettings) {
+					panels["MedigunInfoBluChargeMeter"]->ApplySettings(medigunSettings);
+					panels["MedigunInfoBluChargeMeter1"]->ApplySettings(medigunSettings);
+					panels["MedigunInfoBluChargeMeter2"]->ApplySettings(medigunSettings);
+					panels["MedigunInfoBluChargeMeter3"]->ApplySettings(medigunSettings);
+					panels["MedigunInfoBluChargeMeter4"]->ApplySettings(medigunSettings);
+				}
+			}
+
 			panels["MedigunInfoBluNameLabel"]->SetVisible(true);
 			
 			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("blucharge", int(floor(medigunInfo[TFTeam_Blue].chargeLevel * 100.0f)));
@@ -785,6 +814,9 @@ void MedigunInfo::ReloadSettings() {
 	if (g_MedigunInfo->panels.find("MedigunInfo") != g_MedigunInfo->panels.end()) {
 		((vgui::EditablePanel *) g_MedigunInfo->panels["MedigunInfo"])->LoadControlSettings("Resource/UI/MedigunInfo.res");
 	}
+
+	g_MedigunInfo->dynamicMeterSettings = new KeyValues("MedigunInfoDynamicMeters");
+	g_MedigunInfo->dynamicMeterSettings->LoadFromFile(g_pFullFileSystem, "tf/resource/ui/mediguninfodynamicmeters.res");
 }
 
 void MedigunInfo::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {

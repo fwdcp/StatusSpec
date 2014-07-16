@@ -14,6 +14,7 @@ Changelog
   * fix warning being emitted on successful changes
 * medigun info
   * change how progress bars are set (requires changes to MedigunInfo.res)
+  * add ability to have custom meter settings based on medigun type
 
 **0.15.0**
 * antifreeze

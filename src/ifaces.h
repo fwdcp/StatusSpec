@@ -17,6 +17,7 @@
 
 #include "cdll_int.h"
 #include "entitylist_base.h"
+#include "filesystem.h"
 #include "icliententitylist.h"
 #include "iclientmode.h"
 #include "igameevents.h"
