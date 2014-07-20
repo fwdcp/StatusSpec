@@ -74,9 +74,9 @@ PlayerAliases::PlayerAliases() {
 	std::map<CSteamID, std::string> customAliases;
 
 	enabled = new ConVar("statusspec_playeraliases_enabled", "0", FCVAR_NONE, "enable player aliases");
-	get = new ConCommand("statusspec_playeraliases_get", PlayerAliases::GetPlayerAlias, "get a player alias", FCVAR_NONE, PlayerAliases::GetCurrentAliasedPlayers);
-	remove = new ConCommand("statusspec_playeraliases_remove", PlayerAliases::RemovePlayerAlias, "remove a player alias", FCVAR_NONE, PlayerAliases::GetCurrentAliasedPlayers);
-	set = new ConCommand("statusspec_playeraliases_set", PlayerAliases::SetPlayerAlias, "set a player alias", FCVAR_NONE, PlayerAliases::GetCurrentGamePlayers);
+	get = new ConCommand("statusspec_playeraliases_get", PlayerAliases::GetCustomPlayerAlias, "get a custom player alias", FCVAR_NONE, PlayerAliases::GetCurrentAliasedPlayers);
+	remove = new ConCommand("statusspec_playeraliases_remove", PlayerAliases::RemoveCustomPlayerAlias, "remove a custom player alias", FCVAR_NONE, PlayerAliases::GetCurrentAliasedPlayers);
+	set = new ConCommand("statusspec_playeraliases_set", PlayerAliases::SetCustomPlayerAlias, "set a custom player alias", FCVAR_NONE, PlayerAliases::GetCurrentGamePlayers);
 }
 
 bool PlayerAliases::IsEnabled() {
@@ -144,7 +144,7 @@ int PlayerAliases::GetCurrentGamePlayers(const char *partial, char commands[COMM
 
 }
 
-void PlayerAliases::GetPlayerAlias(const CCommand &command) {
+void PlayerAliases::GetCustomPlayerAlias(const CCommand &command) {
 	if (command.ArgC() < 1)
 	{
 		Warning("Usage: statusspec_player_alias_get <steamid>\n");
@@ -166,7 +166,7 @@ void PlayerAliases::GetPlayerAlias(const CCommand &command) {
 	}
 }
 
-void PlayerAliases::RemovePlayerAlias(const CCommand &command) {
+void PlayerAliases::RemoveCustomPlayerAlias(const CCommand &command) {
 	if (command.ArgC() < 1)
 	{
 		Warning("Usage: statusspec_player_alias_remove <steamid>\n");
@@ -184,7 +184,7 @@ void PlayerAliases::RemovePlayerAlias(const CCommand &command) {
 	Msg("Alias associated with Steam ID %llu erased.\n", playerSteamID.ConvertToUint64());
 }
 
-void PlayerAliases::SetPlayerAlias(const CCommand &command) {
+void PlayerAliases::SetCustomPlayerAlias(const CCommand &command) {
 	if (command.ArgC() < 2)
 	{
 		Warning("Usage: statusspec_player_alias_set <steamid> <alias>\n");

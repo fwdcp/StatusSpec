@@ -44,9 +44,9 @@ private:
 	ConCommand* set;
 	static int GetCurrentAliasedPlayers(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]);
 	static int GetCurrentGamePlayers(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]);
-	static void GetPlayerAlias(const CCommand &command);
-	static void RemovePlayerAlias(const CCommand &command);
-	static void SetPlayerAlias(const CCommand &command);
+	static void GetCustomPlayerAlias(const CCommand &command);
+	static void RemoveCustomPlayerAlias(const CCommand &command);
+	static void SetCustomPlayerAlias(const CCommand &command);
 };
 
 extern PlayerAliases *g_PlayerAliases;
