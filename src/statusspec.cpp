@@ -21,6 +21,7 @@ PlayerOutlines *g_PlayerOutlines = nullptr;
 StatusIcons *g_StatusIcons = nullptr;
 
 static IGameResources* gameResources = nullptr;
+static int getGlowEffectColorHook;
 static int getPlayerNameHook;
 
 ObserverInfo_t GetLocalPlayerObserverInfo() {
@@ -101,6 +102,10 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 		
 			if (!entity) {
 				continue;
+			}
+
+			if (!getGlowEffectColorHook && Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFPlayer")) {
+				getGlowEffectColorHook = Funcs::AddHook_C_TFPlayer_GetGlowEffectColor((C_TFPlayer *)entity, Hook_C_TFPlayer_GetGlowEffectColor);
 			}
 
 			if (g_AntiFreeze) {
