@@ -74,6 +74,7 @@ PlayerAliases::PlayerAliases() {
 	std::map<CSteamID, std::string> customAliases;
 
 	enabled = new ConVar("statusspec_playeraliases_enabled", "0", FCVAR_NONE, "enable player aliases");
+	etf2l = new ConVar("statusspec_playeraliases_etf2l", "0", FCVAR_NONE, "enable player aliases from the ETF2L API");
 	get = new ConCommand("statusspec_playeraliases_get", PlayerAliases::GetCustomPlayerAlias, "get a custom player alias", FCVAR_NONE, PlayerAliases::GetCurrentAliasedPlayers);
 	remove = new ConCommand("statusspec_playeraliases_remove", PlayerAliases::RemoveCustomPlayerAlias, "remove a custom player alias", FCVAR_NONE, PlayerAliases::GetCurrentAliasedPlayers);
 	set = new ConCommand("statusspec_playeraliases_set", PlayerAliases::SetCustomPlayerAlias, "set a custom player alias", FCVAR_NONE, PlayerAliases::GetCurrentGamePlayers);
@@ -113,8 +114,75 @@ bool PlayerAliases::GetAlias(CSteamID player, std::string &alias) {
 		alias = customAliases[player];
 		return true;
 	}
+
+	if (etf2l->GetBool()) {
+		if (etf2lAliases[player].status == API_UNKNOWN) {
+			RequestETF2LPlayerInfo(player);
+		}
+		else if (etf2lAliases[player].status == API_SUCCESSFUL) {
+			alias = etf2lAliases[player].name;
+			return true;
+		}
+	}
 	
 	return false;
+}
+
+void PlayerAliases::GetETF2LPlayerInfo(HTTPRequestCompleted_t *requestCompletionInfo, bool bIOFailure) {
+	CSteamID player = CSteamID(requestCompletionInfo->m_ulContextValue);
+
+	if (!requestCompletionInfo->m_bRequestSuccessful) {
+		etf2lAliases[player].status = API_UNKNOWN;
+	}
+	else if (requestCompletionInfo->m_eStatusCode != k_EHTTPStatusCode200OK) {
+		etf2lAliases[player].status = API_FAILED;
+	}
+	else {
+		ISteamHTTP *httpClient = Interfaces::pSteamAPIContext->SteamHTTP();
+		
+		uint32 bodySize;
+		httpClient->GetHTTPResponseBodySize(requestCompletionInfo->m_hRequest, &bodySize);
+
+		uint8 *body = new uint8[bodySize];
+		httpClient->GetHTTPResponseBodyData(requestCompletionInfo->m_hRequest, (uint8 *)body, bodySize);
+
+		std::string json = (char *)body;
+		
+		Json::Reader reader;
+		Json::Value root;
+
+		if (reader.parse(json, root)) {
+			if (root["status"]["code"].asInt() == 200) {
+				if (root["player"]["steam"]["id64"].asString() == std::to_string(player.ConvertToUint64())) {
+					etf2lAliases[player].name = root["player"]["name"].asString();
+					etf2lAliases[player].status = API_SUCCESSFUL;
+					httpClient->ReleaseHTTPRequest(requestCompletionInfo->m_hRequest);
+
+					return;
+				}
+			}
+		}
+
+		etf2lAliases[player].status = API_FAILED;
+	}
+
+	Interfaces::pSteamAPIContext->SteamHTTP()->ReleaseHTTPRequest(requestCompletionInfo->m_hRequest);
+}
+
+void PlayerAliases::RequestETF2LPlayerInfo(CSteamID player) {
+	ISteamHTTP *httpClient = Interfaces::pSteamAPIContext->SteamHTTP();
+
+	char url[MAX_URL_LENGTH];
+	V_snprintf(url, sizeof(url), ETF2L_PLAYER_API_URL, player.ConvertToUint64());
+
+	HTTPRequestHandle request = httpClient->CreateHTTPRequest(k_EHTTPMethodGET, url);
+	httpClient->SetHTTPRequestContextValue(request, player.ConvertToUint64());
+
+	SteamAPICall_t apiCall;
+	if (httpClient->SendHTTPRequest(request, &apiCall)) {
+		etf2lAliases[player].status = API_REQUESTED;
+		etf2lAliases[player].call.Set(apiCall, this, &PlayerAliases::GetETF2LPlayerInfo);
+	}
 }
 
 int PlayerAliases::GetCurrentAliasedPlayers(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]) {
