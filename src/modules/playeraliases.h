@@ -36,7 +36,7 @@ public:
 	bool GetPlayerInfoOverride(int ent_num, player_info_t *pinfo);
 	const char * GetPlayerNameOverride(int client);
 private:
-	std::map<CSteamID, std::string> playerAliases;
+	std::map<CSteamID, std::string> customAliases;
 
 	ConVar* enabled;
 	ConCommand* get;
