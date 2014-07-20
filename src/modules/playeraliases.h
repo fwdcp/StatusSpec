@@ -38,6 +38,8 @@ public:
 private:
 	std::map<CSteamID, std::string> customAliases;
 
+	bool GetAlias(CSteamID player, std::string &alias);
+
 	ConVar* enabled;
 	ConCommand* get;
 	ConCommand* remove;

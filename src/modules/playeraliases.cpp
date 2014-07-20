@@ -88,8 +88,9 @@ bool PlayerAliases::GetPlayerInfoOverride(int ent_num, player_info_t *pinfo) {
 
 	CSteamID playerSteamID = GetClientSteamID(ent_num);
 
-	if (customAliases.find(playerSteamID) != customAliases.end()) {
-		V_strcpy_safe(pinfo->name, customAliases[playerSteamID].c_str());
+	std::string playerAlias;
+	if (GetAlias(playerSteamID, playerAlias)) {
+		V_strcpy_safe(pinfo->name, playerAlias.c_str());
 	}
 
 	return result;
@@ -98,12 +99,22 @@ bool PlayerAliases::GetPlayerInfoOverride(int ent_num, player_info_t *pinfo) {
 const char * PlayerAliases::GetPlayerNameOverride(int client) {
 	CSteamID playerSteamID = GetClientSteamID(client);
 
-	if (customAliases.find(playerSteamID) != customAliases.end()) {
-		return customAliases[playerSteamID].c_str();
+	std::string playerAlias;
+	if (GetAlias(playerSteamID, playerAlias)) {
+		return playerAlias.c_str();
 	}
 	else {
 		return Funcs::CallFunc_IGameResources_GetPlayerName(Interfaces::GetGameResources(), client);
 	}
+}
+
+bool PlayerAliases::GetAlias(CSteamID player, std::string &alias) {
+	if (customAliases.find(player) != customAliases.end()) {
+		alias = customAliases[player];
+		return true;
+	}
+	
+	return false;
 }
 
 int PlayerAliases::GetCurrentAliasedPlayers(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]) {
