@@ -45,7 +45,7 @@ class PlayerAliases;
 
 typedef struct APIAlias_s {
 	std::string name;
-	APIStatus_t status;
+	APIStatus_t status = API_UNKNOWN;
 	CCallResult<PlayerAliases, HTTPRequestCompleted_t> call;
 } APIAlias_t;
 
