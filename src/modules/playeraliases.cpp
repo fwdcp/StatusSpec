@@ -115,7 +115,7 @@ bool PlayerAliases::GetAlias(CSteamID player, std::string &alias) {
 	}
 
 	if (customAliases.find(player) != customAliases.end()) {
-		alias = customAliases[player];
+		alias.assign(customAliases[player]);
 		return true;
 	}
 
@@ -124,7 +124,7 @@ bool PlayerAliases::GetAlias(CSteamID player, std::string &alias) {
 			RequestETF2LPlayerInfo(player);
 		}
 		else if (etf2lAliases[player].status == API_SUCCESSFUL) {
-			alias = etf2lAliases[player].name;
+			alias.assign(etf2lAliases[player].name);
 			return true;
 		}
 	}
