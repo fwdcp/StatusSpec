@@ -110,6 +110,10 @@ const char * PlayerAliases::GetPlayerNameOverride(int client) {
 }
 
 bool PlayerAliases::GetAlias(CSteamID player, std::string &alias) {
+	if (!player.IsValid()) {
+		return false;
+	}
+
 	if (customAliases.find(player) != customAliases.end()) {
 		alias = customAliases[player];
 		return true;
@@ -213,8 +217,10 @@ int PlayerAliases::GetCurrentGamePlayers(const char *partial, char commands[COMM
 		if (Interfaces::GetGameResources()->IsConnected(i)) {
 			CSteamID playerSteamID = GetClientSteamID(i);
 			
-			V_snprintf(commands[playerCount], COMMAND_COMPLETION_ITEM_LENGTH, "%s %llu", command.c_str(), playerSteamID.ConvertToUint64());
-			playerCount++;
+			if (playerSteamID.IsValid()) {
+				V_snprintf(commands[playerCount], COMMAND_COMPLETION_ITEM_LENGTH, "%s %llu", command.c_str(), playerSteamID.ConvertToUint64());
+				playerCount++;
+			}
 		}
 	}
 
