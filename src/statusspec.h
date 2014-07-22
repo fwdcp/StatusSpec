@@ -29,7 +29,7 @@
 #include "modules/playeroutlines.h"
 #include "modules/statusicons.h"
 
-#define PLUGIN_DESC "StatusSpec v0.16.0"
+#define PLUGIN_DESC "StatusSpec v0.17.0"
 
 typedef struct ObserverInfo_s {
 	int mode;
