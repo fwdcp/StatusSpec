@@ -71,12 +71,13 @@ inline CSteamID GetClientSteamID(int client) {
 }
 
 PlayerAliases::PlayerAliases() {
-	std::map<CSteamID, std::string> playerAliases;
+	std::map<CSteamID, std::string> customAliases;
 
 	enabled = new ConVar("statusspec_playeraliases_enabled", "0", FCVAR_NONE, "enable player aliases");
-	get = new ConCommand("statusspec_playeraliases_get", PlayerAliases::GetPlayerAlias, "get a player alias", FCVAR_NONE, PlayerAliases::GetCurrentAliasedPlayers);
-	remove = new ConCommand("statusspec_playeraliases_remove", PlayerAliases::RemovePlayerAlias, "remove a player alias", FCVAR_NONE, PlayerAliases::GetCurrentAliasedPlayers);
-	set = new ConCommand("statusspec_playeraliases_set", PlayerAliases::SetPlayerAlias, "set a player alias", FCVAR_NONE, PlayerAliases::GetCurrentGamePlayers);
+	etf2l = new ConVar("statusspec_playeraliases_etf2l", "0", FCVAR_NONE, "enable player aliases from the ETF2L API");
+	get = new ConCommand("statusspec_playeraliases_get", PlayerAliases::GetCustomPlayerAlias, "get a custom player alias", FCVAR_NONE, PlayerAliases::GetCurrentAliasedPlayers);
+	remove = new ConCommand("statusspec_playeraliases_remove", PlayerAliases::RemoveCustomPlayerAlias, "remove a custom player alias", FCVAR_NONE, PlayerAliases::GetCurrentAliasedPlayers);
+	set = new ConCommand("statusspec_playeraliases_set", PlayerAliases::SetCustomPlayerAlias, "set a custom player alias", FCVAR_NONE, PlayerAliases::GetCurrentGamePlayers);
 }
 
 bool PlayerAliases::IsEnabled() {
@@ -88,21 +89,91 @@ bool PlayerAliases::GetPlayerInfoOverride(int ent_num, player_info_t *pinfo) {
 
 	CSteamID playerSteamID = GetClientSteamID(ent_num);
 
-	if (playerAliases.find(playerSteamID) != playerAliases.end()) {
-		V_strcpy_safe(pinfo->name, playerAliases[playerSteamID].c_str());
+	std::string playerAlias;
+	if (GetAlias(playerSteamID, playerAlias)) {
+		V_strcpy_safe(pinfo->name, playerAlias.c_str());
 	}
 
 	return result;
 }
 
-const char * PlayerAliases::GetPlayerNameOverride(int client) {
-	CSteamID playerSteamID = GetClientSteamID(client);
+bool PlayerAliases::GetAlias(CSteamID player, std::string &alias) {
+	if (!player.IsValid()) {
+		return false;
+	}
 
-	if (playerAliases.find(playerSteamID) != playerAliases.end()) {
-		return playerAliases[playerSteamID].c_str();
+	if (customAliases.find(player) != customAliases.end()) {
+		alias.assign(customAliases[player]);
+		return true;
+	}
+
+	if (etf2l->GetBool()) {
+		if (etf2lAliases[player].status == API_UNKNOWN) {
+			RequestETF2LPlayerInfo(player);
+		}
+		else if (etf2lAliases[player].status == API_SUCCESSFUL) {
+			alias.assign(etf2lAliases[player].name);
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+void PlayerAliases::GetETF2LPlayerInfo(HTTPRequestCompleted_t *requestCompletionInfo, bool bIOFailure) {
+	CSteamID player = CSteamID(requestCompletionInfo->m_ulContextValue);
+
+	if (!requestCompletionInfo->m_bRequestSuccessful) {
+		etf2lAliases[player].status = API_UNKNOWN;
+	}
+	else if (requestCompletionInfo->m_eStatusCode != k_EHTTPStatusCode200OK) {
+		etf2lAliases[player].status = API_FAILED;
 	}
 	else {
-		return Funcs::CallFunc_IGameResources_GetPlayerName(Interfaces::GetGameResources(), client);
+		ISteamHTTP *httpClient = Interfaces::pSteamAPIContext->SteamHTTP();
+		
+		uint32 bodySize;
+		httpClient->GetHTTPResponseBodySize(requestCompletionInfo->m_hRequest, &bodySize);
+
+		uint8 *body = new uint8[bodySize];
+		httpClient->GetHTTPResponseBodyData(requestCompletionInfo->m_hRequest, (uint8 *)body, bodySize);
+
+		std::string json = (char *)body;
+		
+		Json::Reader reader;
+		Json::Value root;
+
+		if (reader.parse(json, root)) {
+			if (root["status"]["code"].asInt() == 200) {
+				if (root["player"]["steam"]["id64"].asString() == std::to_string(player.ConvertToUint64())) {
+					etf2lAliases[player].name = root["player"]["name"].asString();
+					etf2lAliases[player].status = API_SUCCESSFUL;
+					httpClient->ReleaseHTTPRequest(requestCompletionInfo->m_hRequest);
+
+					return;
+				}
+			}
+		}
+
+		etf2lAliases[player].status = API_FAILED;
+	}
+
+	Interfaces::pSteamAPIContext->SteamHTTP()->ReleaseHTTPRequest(requestCompletionInfo->m_hRequest);
+}
+
+void PlayerAliases::RequestETF2LPlayerInfo(CSteamID player) {
+	ISteamHTTP *httpClient = Interfaces::pSteamAPIContext->SteamHTTP();
+
+	char url[MAX_URL_LENGTH];
+	V_snprintf(url, sizeof(url), ETF2L_PLAYER_API_URL, player.ConvertToUint64());
+
+	HTTPRequestHandle request = httpClient->CreateHTTPRequest(k_EHTTPMethodGET, url);
+	httpClient->SetHTTPRequestContextValue(request, player.ConvertToUint64());
+
+	SteamAPICall_t apiCall;
+	if (httpClient->SendHTTPRequest(request, &apiCall)) {
+		etf2lAliases[player].status = API_REQUESTED;
+		etf2lAliases[player].call.Set(apiCall, this, &PlayerAliases::GetETF2LPlayerInfo);
 	}
 }
 
@@ -113,7 +184,7 @@ int PlayerAliases::GetCurrentAliasedPlayers(const char *partial, char commands[C
 	std::string command;
 	std::getline(ss, command, ' ');
 
-	for (auto playerAlias = g_PlayerAliases->playerAliases.begin(); playerAlias != g_PlayerAliases->playerAliases.end() && playerCount < COMMAND_COMPLETION_MAXITEMS; ++playerAlias) {
+	for (auto playerAlias = g_PlayerAliases->customAliases.begin(); playerAlias != g_PlayerAliases->customAliases.end() && playerCount < COMMAND_COMPLETION_MAXITEMS; ++playerAlias) {
 		CSteamID playerSteamID = playerAlias->first;
 
 		V_snprintf(commands[playerCount], COMMAND_COMPLETION_ITEM_LENGTH, "%s %llu", command.c_str(), playerSteamID.ConvertToUint64());
@@ -134,8 +205,10 @@ int PlayerAliases::GetCurrentGamePlayers(const char *partial, char commands[COMM
 		if (Interfaces::GetGameResources()->IsConnected(i)) {
 			CSteamID playerSteamID = GetClientSteamID(i);
 			
-			V_snprintf(commands[playerCount], COMMAND_COMPLETION_ITEM_LENGTH, "%s %llu", command.c_str(), playerSteamID.ConvertToUint64());
-			playerCount++;
+			if (playerSteamID.IsValid()) {
+				V_snprintf(commands[playerCount], COMMAND_COMPLETION_ITEM_LENGTH, "%s %llu", command.c_str(), playerSteamID.ConvertToUint64());
+				playerCount++;
+			}
 		}
 	}
 
@@ -144,7 +217,7 @@ int PlayerAliases::GetCurrentGamePlayers(const char *partial, char commands[COMM
 
 }
 
-void PlayerAliases::GetPlayerAlias(const CCommand &command) {
+void PlayerAliases::GetCustomPlayerAlias(const CCommand &command) {
 	if (command.ArgC() < 1)
 	{
 		Warning("Usage: statusspec_player_alias_get <steamid>\n");
@@ -158,15 +231,15 @@ void PlayerAliases::GetPlayerAlias(const CCommand &command) {
 		return;
 	}
 
-	if (g_PlayerAliases->playerAliases.find(playerSteamID) != g_PlayerAliases->playerAliases.end()) {
-		Msg("Steam ID %llu has an associated alias '%s'.\n", playerSteamID.ConvertToUint64(), g_PlayerAliases->playerAliases[playerSteamID].c_str());
+	if (g_PlayerAliases->customAliases.find(playerSteamID) != g_PlayerAliases->customAliases.end()) {
+		Msg("Steam ID %llu has an associated alias '%s'.\n", playerSteamID.ConvertToUint64(), g_PlayerAliases->customAliases[playerSteamID].c_str());
 	}
 	else {
 		Msg("Steam ID %llu does not have an associated alias.\n", playerSteamID.ConvertToUint64());
 	}
 }
 
-void PlayerAliases::RemovePlayerAlias(const CCommand &command) {
+void PlayerAliases::RemoveCustomPlayerAlias(const CCommand &command) {
 	if (command.ArgC() < 1)
 	{
 		Warning("Usage: statusspec_player_alias_remove <steamid>\n");
@@ -180,11 +253,11 @@ void PlayerAliases::RemovePlayerAlias(const CCommand &command) {
 		return;
 	}
 
-	g_PlayerAliases->playerAliases.erase(playerSteamID);
+	g_PlayerAliases->customAliases.erase(playerSteamID);
 	Msg("Alias associated with Steam ID %llu erased.\n", playerSteamID.ConvertToUint64());
 }
 
-void PlayerAliases::SetPlayerAlias(const CCommand &command) {
+void PlayerAliases::SetCustomPlayerAlias(const CCommand &command) {
 	if (command.ArgC() < 2)
 	{
 		Warning("Usage: statusspec_player_alias_set <steamid> <alias>\n");
@@ -198,6 +271,6 @@ void PlayerAliases::SetPlayerAlias(const CCommand &command) {
 		return;
 	}
 
-	g_PlayerAliases->playerAliases[playerSteamID] = command.Arg(2);
-	Msg("Steam ID %llu has been associated with alias '%s'.\n", playerSteamID.ConvertToUint64(), g_PlayerAliases->playerAliases[playerSteamID].c_str());
+	g_PlayerAliases->customAliases[playerSteamID] = command.Arg(2);
+	Msg("Steam ID %llu has been associated with alias '%s'.\n", playerSteamID.ConvertToUint64(), g_PlayerAliases->customAliases[playerSteamID].c_str());
 }

@@ -9,6 +9,7 @@ $Macro SRCDIR		"..\.."
 $Macro OUTBINDIR	".\addons"
 $Macro MMSOURCE_DEV	"..\..\..\..\..\metamod-source"
 $Macro MINHOOK		"..\..\..\..\..\minhook"
+$Macro JSONCPP		"..\..\..\..\..\jsoncpp\dist"
 
 $Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 
@@ -16,7 +17,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\game\client;$SRCDIR\game\shared;$SRCDIR\public;$MMSOURCE_DEV\core\sourcehook;$MINHOOK\include;$MINHOOK\src"
+		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\game\client;$SRCDIR\game\shared;$SRCDIR\public;$MMSOURCE_DEV\core\sourcehook;$MINHOOK\include;$MINHOOK\src;$JSONCPP"
 		$PreprocessorDefinitions			"$BASE;statusspecONLY;_MBCS"
 		$TreatWarningsAsErrors				"No (/WX-)"
 	}
@@ -58,6 +59,7 @@ $Project "StatusSpec"
 		$File	"$MINHOOK\src\hook.cpp"
 		$File	"$MINHOOK\src\thread.cpp"
 		$File	"$MINHOOK\src\trampoline.cpp"
+		$File	"$JSONCPP\jsoncpp.cpp"
 		$File	"$SRCDIR\public\filesystem_init.cpp"
 		$File	"$SRCDIR\public\vgui_controls\vgui_controls.cpp"
 		$File	"src\vgui_controls\gameconsoledialog.cpp"

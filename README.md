@@ -8,6 +8,10 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**0.17.0**
+* player aliases
+  * add ETF2L API support
+
 **0.16.0**
 * loadout icons
   * add ability to only show the active weapon
@@ -214,6 +218,7 @@ In addition, the following HUD animations are triggered by this plugin and may b
 
 #### Console Variables
 * `statusspec_playeraliases_enabled` - enable player aliases
+* `statusspec_playeraliases_etf2l` - enable player aliases from the ETF2L API
 
 #### Console Commands
 * `statusspec_playeraliases_get <steamid>` - get an alias for a player

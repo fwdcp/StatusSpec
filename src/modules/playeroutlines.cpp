@@ -233,21 +233,11 @@ void PlayerOutlines::Paint(vgui::VPANEL vguiPanel) {
 }
 
 void PlayerOutlines::ProcessEntity(IClientEntity* entity) {
-	static bool getGlowEffectColorHooked = false;
-
 	if (!Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFPlayer")) {
 		return;
 	}
 
-	C_BaseCombatCharacter *baseCombatCharacter = dynamic_cast<C_BaseCombatCharacter *>(entity->GetBaseEntity());
-	EHANDLE entityHandle = entity->GetBaseEntity();
-
-	if (!getGlowEffectColorHooked) {
-		Funcs::AddHook_C_TFPlayer_GetGlowEffectColor((C_TFPlayer *)baseCombatCharacter, Hook_C_TFPlayer_GetGlowEffectColor);
-		getGlowEffectColorHooked = true;
-	}
-
-	bool* glowEnabled = MAKE_PTR(bool*, baseCombatCharacter, Entities::pCTFPlayer__m_bGlowEnabled);
+	bool* glowEnabled = MAKE_PTR(bool*, entity, Entities::pCTFPlayer__m_bGlowEnabled);
 
 	if (IsEnabled()) {
 		*glowEnabled = true;

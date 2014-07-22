@@ -18,8 +18,8 @@
 
 #include "convar.h"
 #include "ehandle.h"
+#include "vgui/IVGui.h"
 
-#include "../statusspec.h"
 #include "../enums.h"
 #include "../entities.h"
 #include "../funcs.h"
@@ -28,6 +28,8 @@
 #if defined _WIN32
 #define strtoull _strtoui64
 #endif
+
+#define TOP_PANEL_NAME "MatSystemTopPanel"
 
 typedef struct ColorConCommand_s {
 	Color color;
