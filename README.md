@@ -8,6 +8,10 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**0.17.0**
+* player aliases
+  * add ETF2L API support
+
 **0.16.0**
 * loadout icons
   * add ability to only show the active weapon
