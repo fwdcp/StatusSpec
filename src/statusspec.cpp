@@ -22,7 +22,6 @@ StatusIcons *g_StatusIcons = nullptr;
 
 static IGameResources* gameResources = nullptr;
 static int getGlowEffectColorHook;
-static int getPlayerNameHook;
 
 ObserverInfo_t GetLocalPlayerObserverInfo() {
 	int player = Interfaces::pEngineClient->GetLocalPlayer();
@@ -63,19 +62,6 @@ void Hook_C_TFPlayer_GetGlowEffectColor(float *r, float *g, float *b) {
 }
 
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
-	if (gameResources != Interfaces::GetGameResources()) {
-		if (getPlayerNameHook) {
-			Funcs::RemoveHook(getPlayerNameHook);
-			getPlayerNameHook = 0;
-		}
-
-		gameResources = Interfaces::GetGameResources();
-		
-		if (gameResources) {
-			getPlayerNameHook = Funcs::AddHook_IGameResources_GetPlayerName(gameResources, Hook_IGameResources_GetPlayerName);
-		}
-	}
-
 	if (curStage == FRAME_RENDER_START) {
 		if (g_LoadoutIcons) {
 			if (g_LoadoutIcons->IsEnabled()) {
@@ -187,16 +173,6 @@ bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event) {
 
 		RETURN_META_VALUE(MRES_IGNORED, false);
 	}
-}
-
-const char * Hook_IGameResources_GetPlayerName(int client) {
-	if (g_PlayerAliases) {
-		if (g_PlayerAliases->IsEnabled()) {
-			RETURN_META_VALUE(MRES_SUPERCEDE, g_PlayerAliases->GetPlayerNameOverride(client));
-		}
-	}
-
-	RETURN_META_VALUE(MRES_IGNORED, "");
 }
 	
 void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {

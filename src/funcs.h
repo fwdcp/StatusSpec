@@ -71,7 +71,6 @@ public:
 	static int AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, void(*hook)(ClientFrameStage_t));
 	static int AddHook_IGameEventManager2_FireEvent(IGameEventManager2 *instance, bool(*hook)(IGameEvent *, bool));
 	static int AddHook_IGameEventManager2_FireEventClientSide(IGameEventManager2 *instance, bool(*hook)(IGameEvent *));
-	static int AddHook_IGameResources_GetPlayerName(IGameResources *instance, const char *(*hook)(int));
 	static int AddHook_IPanel_PaintTraverse(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, bool, bool));
 	static int AddHook_IPanel_SendMessage(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, KeyValues *, vgui::VPANEL));
 	static int AddHook_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, bool(*hook)(int, player_info_t *));
@@ -82,7 +81,6 @@ public:
 	static int CallFunc_C_TFPlayer_GetObserverMode(C_TFPlayer *instance);
 	static C_BaseEntity *CallFunc_C_TFPlayer_GetObserverTarget(C_TFPlayer *instance);
 	static void CallFunc_C_TFPlayer_UpdateGlowEffect(C_TFPlayer *instance);
-	static const char *CallFunc_IGameResources_GetPlayerName(IGameResources *instance, int client);
 	static bool CallFunc_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, int ent_num, player_info_t *pinfo);
 
 	static bool RemoveDetour_GetLocalPlayerIndex();

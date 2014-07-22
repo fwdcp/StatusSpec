@@ -24,7 +24,6 @@ SH_DECL_MANUALHOOK0_void(C_TFPlayer_UpdateGlowEffect, OFFSET_UPDATEGLOWEFFECT, 0
 SH_DECL_HOOK1_void(IBaseClientDLL, FrameStageNotify, SH_NOATTRIB, 0, ClientFrameStage_t);
 SH_DECL_HOOK2(IGameEventManager2, FireEvent, SH_NOATTRIB, 0, bool, IGameEvent *, bool);
 SH_DECL_HOOK1(IGameEventManager2, FireEventClientSide, SH_NOATTRIB, 0, bool, IGameEvent *);
-SH_DECL_HOOK1(IGameResources, GetPlayerName, SH_NOATTRIB, 0, const char *, int);
 SH_DECL_HOOK3_void(IPanel, PaintTraverse, SH_NOATTRIB, 0, VPANEL, bool, bool);
 SH_DECL_HOOK3_void(IPanel, SendMessage, SH_NOATTRIB, 0, VPANEL, KeyValues *, VPANEL);
 SH_DECL_HOOK2(IVEngineClient, GetPlayerInfo, SH_NOATTRIB, 0, bool, int, player_info_t *);
@@ -103,10 +102,6 @@ int Funcs::AddHook_IGameEventManager2_FireEventClientSide(IGameEventManager2 *in
 	return SH_ADD_HOOK(IGameEventManager2, FireEventClientSide, instance, SH_STATIC(hook), false);
 }
 
-int Funcs::AddHook_IGameResources_GetPlayerName(IGameResources *instance, const char *(*hook)(int)) {
-	return SH_ADD_HOOK(IGameResources, GetPlayerName, instance, SH_STATIC(hook), false);
-}
-
 int Funcs::AddHook_IPanel_PaintTraverse(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, bool, bool)) {
 	return SH_ADD_HOOK(IPanel, PaintTraverse, instance, SH_STATIC(hook), false);
 }
@@ -142,10 +137,6 @@ C_BaseEntity *Funcs::CallFunc_C_TFPlayer_GetObserverTarget(C_TFPlayer *instance)
 
 void Funcs::CallFunc_C_TFPlayer_UpdateGlowEffect(C_TFPlayer *instance) {
 	SH_MCALL(instance, C_TFPlayer_UpdateGlowEffect)();
-}
-
-const char *Funcs::CallFunc_IGameResources_GetPlayerName(IGameResources *instance, int client) {
-	return SH_CALL(instance, &IGameResources::GetPlayerName)(client);
 }
 
 bool Funcs::CallFunc_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, int ent_num, player_info_t *pinfo) {

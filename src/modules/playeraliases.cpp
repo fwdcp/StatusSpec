@@ -97,18 +97,6 @@ bool PlayerAliases::GetPlayerInfoOverride(int ent_num, player_info_t *pinfo) {
 	return result;
 }
 
-const char * PlayerAliases::GetPlayerNameOverride(int client) {
-	CSteamID playerSteamID = GetClientSteamID(client);
-
-	std::string playerAlias;
-	if (GetAlias(playerSteamID, playerAlias)) {
-		return playerAlias.c_str();
-	}
-	else {
-		return Funcs::CallFunc_IGameResources_GetPlayerName(Interfaces::GetGameResources(), client);
-	}
-}
-
 bool PlayerAliases::GetAlias(CSteamID player, std::string &alias) {
 	if (!player.IsValid()) {
 		return false;

@@ -44,7 +44,6 @@ void Hook_C_TFPlayer_GetGlowEffectColor(float *r, float *g, float *b);
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage);
 bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast = false);
 bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event);
-const char *Hook_IGameResources_GetPlayerName(int client);
 void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce);
 void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel);
 bool Hook_IVEngineClient_GetPlayerInfo(int ent_num, player_info_t *pinfo);

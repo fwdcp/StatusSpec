@@ -56,7 +56,6 @@ public:
 	bool IsEnabled();
 
 	bool GetPlayerInfoOverride(int ent_num, player_info_t *pinfo);
-	const char * GetPlayerNameOverride(int client);
 
 	bool GetAlias(CSteamID player, std::string &alias);
 	void GetETF2LPlayerInfo(HTTPRequestCompleted_t *requestCompletionInfo, bool bIOFailure);
