@@ -10,7 +10,7 @@ Requirements
 * **[Windows]** Visual Studio or Visual Express C++
 * Source SDK 2013 - https://github.com/ValveSoftware/source-sdk-2013
 * Metamod:Source - https://github.com/alliedmodders/metamod-source
-* MinHook - https://github.com/alliedmodders/metamod-source
+* MinHook - https://github.com/RaMMicHaeL/minhook
 * JsonCpp - https://github.com/open-source-parsers/jsoncpp
 
 Building
