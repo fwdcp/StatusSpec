@@ -78,6 +78,7 @@ PlayerAliases::PlayerAliases() {
 	get = new ConCommand("statusspec_playeraliases_get", PlayerAliases::GetCustomPlayerAlias, "get a custom player alias", FCVAR_NONE, PlayerAliases::GetCurrentAliasedPlayers);
 	remove = new ConCommand("statusspec_playeraliases_remove", PlayerAliases::RemoveCustomPlayerAlias, "remove a custom player alias", FCVAR_NONE, PlayerAliases::GetCurrentAliasedPlayers);
 	set = new ConCommand("statusspec_playeraliases_set", PlayerAliases::SetCustomPlayerAlias, "set a custom player alias", FCVAR_NONE, PlayerAliases::GetCurrentGamePlayers);
+	twitch = new ConVar("statusspec_playeraliases_twitch", "0", FCVAR_NONE, "enable player aliases from the Twitch API");
 }
 
 bool PlayerAliases::IsEnabled() {
@@ -113,6 +114,16 @@ bool PlayerAliases::GetAlias(CSteamID player, std::string &alias) {
 		}
 		else if (etf2lAliases[player].status == API_SUCCESSFUL) {
 			alias.assign(etf2lAliases[player].name);
+			return true;
+		}
+	}
+
+	if (twitch->GetBool()) {
+		if (twitchAliases[player].status == API_UNKNOWN) {
+			RequestTwitchUserInfo(player);
+		}
+		else if (twitchAliases[player].status == API_SUCCESSFUL) {
+			alias.assign(twitchAliases[player].name);
 			return true;
 		}
 	}
@@ -161,6 +172,45 @@ void PlayerAliases::GetETF2LPlayerInfo(HTTPRequestCompleted_t *requestCompletion
 	Interfaces::pSteamAPIContext->SteamHTTP()->ReleaseHTTPRequest(requestCompletionInfo->m_hRequest);
 }
 
+void PlayerAliases::GetTwitchUserInfo(HTTPRequestCompleted_t *requestCompletionInfo, bool bIOFailure) {
+	CSteamID player = CSteamID(requestCompletionInfo->m_ulContextValue);
+
+	if (!requestCompletionInfo->m_bRequestSuccessful) {
+		twitchAliases[player].status = API_UNKNOWN;
+	}
+	else if (requestCompletionInfo->m_eStatusCode != k_EHTTPStatusCode200OK) {
+		twitchAliases[player].status = API_FAILED;
+	}
+	else {
+		ISteamHTTP *httpClient = Interfaces::pSteamAPIContext->SteamHTTP();
+
+		uint32 bodySize;
+		httpClient->GetHTTPResponseBodySize(requestCompletionInfo->m_hRequest, &bodySize);
+
+		uint8 *body = new uint8[bodySize];
+		httpClient->GetHTTPResponseBodyData(requestCompletionInfo->m_hRequest, body, bodySize);
+
+		std::string json = (char *)body;
+
+		Json::Reader reader;
+		Json::Value root;
+
+		if (reader.parse(json, root)) {
+			if (!root.isMember("status") || root["status"] == 200) {
+				twitchAliases[player].name = root["name"].asString();
+				twitchAliases[player].status = API_SUCCESSFUL;
+				httpClient->ReleaseHTTPRequest(requestCompletionInfo->m_hRequest);
+
+				return;
+			}
+		}
+
+		twitchAliases[player].status = API_FAILED;
+	}
+
+	Interfaces::pSteamAPIContext->SteamHTTP()->ReleaseHTTPRequest(requestCompletionInfo->m_hRequest);
+}
+
 void PlayerAliases::RequestETF2LPlayerInfo(CSteamID player) {
 	ISteamHTTP *httpClient = Interfaces::pSteamAPIContext->SteamHTTP();
 
@@ -174,6 +224,22 @@ void PlayerAliases::RequestETF2LPlayerInfo(CSteamID player) {
 	if (httpClient->SendHTTPRequest(request, &apiCall)) {
 		etf2lAliases[player].status = API_REQUESTED;
 		etf2lAliases[player].call.Set(apiCall, this, &PlayerAliases::GetETF2LPlayerInfo);
+	}
+}
+
+void PlayerAliases::RequestTwitchUserInfo(CSteamID player) {
+	ISteamHTTP *httpClient = Interfaces::pSteamAPIContext->SteamHTTP();
+
+	char url[MAX_URL_LENGTH];
+	V_snprintf(url, sizeof(url), TWITCH_USER_API_URL, player.ConvertToUint64());
+
+	HTTPRequestHandle request = httpClient->CreateHTTPRequest(k_EHTTPMethodGET, url);
+	httpClient->SetHTTPRequestContextValue(request, player.ConvertToUint64());
+
+	SteamAPICall_t apiCall;
+	if (httpClient->SendHTTPRequest(request, &apiCall)) {
+		twitchAliases[player].status = API_REQUESTED;
+		twitchAliases[player].call.Set(apiCall, this, &PlayerAliases::GetTwitchUserInfo);
 	}
 }
 
