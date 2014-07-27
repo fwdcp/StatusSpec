@@ -132,7 +132,7 @@ bool PlayerAliases::GetAlias(CSteamID player, std::string &alias) {
 void PlayerAliases::GetETF2LPlayerInfo(HTTPRequestCompleted_t *requestCompletionInfo, bool bIOFailure) {
 	CSteamID player = CSteamID(requestCompletionInfo->m_ulContextValue);
 
-	if (!requestCompletionInfo->m_bRequestSuccessful) {
+	if (bIOFailure || !requestCompletionInfo->m_bRequestSuccessful) {
 		etf2lAliases[player].status = API_UNKNOWN;
 	}
 	else if (requestCompletionInfo->m_eStatusCode != k_EHTTPStatusCode200OK) {
@@ -173,7 +173,7 @@ void PlayerAliases::GetETF2LPlayerInfo(HTTPRequestCompleted_t *requestCompletion
 void PlayerAliases::GetTwitchUserInfo(HTTPRequestCompleted_t *requestCompletionInfo, bool bIOFailure) {
 	CSteamID player = CSteamID(requestCompletionInfo->m_ulContextValue);
 
-	if (!requestCompletionInfo->m_bRequestSuccessful) {
+	if (bIOFailure || !requestCompletionInfo->m_bRequestSuccessful) {
 		twitchAliases[player].status = API_UNKNOWN;
 	}
 	else if (requestCompletionInfo->m_eStatusCode != k_EHTTPStatusCode200OK) {
