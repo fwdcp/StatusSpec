@@ -145,7 +145,7 @@ void PlayerAliases::GetETF2LPlayerInfo(HTTPRequestCompleted_t *requestCompletion
 		httpClient->GetHTTPResponseBodySize(requestCompletionInfo->m_hRequest, &bodySize);
 
 		uint8 *body = new uint8[bodySize];
-		httpClient->GetHTTPResponseBodyData(requestCompletionInfo->m_hRequest, (uint8 *)body, bodySize);
+		httpClient->GetHTTPResponseBodyData(requestCompletionInfo->m_hRequest, body, bodySize);
 
 		std::string json = (char *)body;
 		
