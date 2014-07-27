@@ -71,8 +71,6 @@ inline CSteamID GetClientSteamID(int client) {
 }
 
 PlayerAliases::PlayerAliases() {
-	std::map<CSteamID, std::string> customAliases;
-
 	enabled = new ConVar("statusspec_playeraliases_enabled", "0", FCVAR_NONE, "enable player aliases");
 	etf2l = new ConVar("statusspec_playeraliases_etf2l", "0", FCVAR_NONE, "enable player aliases from the ETF2L API");
 	get = new ConCommand("statusspec_playeraliases_get", PlayerAliases::GetCustomPlayerAlias, "get a custom player alias", FCVAR_NONE, PlayerAliases::GetCurrentAliasedPlayers);
