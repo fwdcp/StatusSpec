@@ -418,7 +418,7 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 			float bluChargeAdvantage;
 
 			if (medigunInfo.find(TFTeam_Blue) != medigunInfo.end()) {
-				bluChargeAdvantage = medigunInfo[TFTeam_Blue].chargeLevel - medigunInfo[TFTeam_Blue].chargeLevel;
+				bluChargeAdvantage = medigunInfo[TFTeam_Blue].chargeLevel - medigunInfo[TFTeam_Red].chargeLevel;
 			}
 			else {
 				bluChargeAdvantage = medigunInfo[TFTeam_Blue].chargeLevel;
