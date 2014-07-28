@@ -8,6 +8,12 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**0.17.1**
+* medigun info
+  * fix issues with charge advantage info (thanks Bluee/MattMcNam)
+* player aliases
+  * add Twitch API support
+
 **0.17.0**
 * player aliases
   * add ETF2L API support

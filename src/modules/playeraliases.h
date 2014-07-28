@@ -32,6 +32,7 @@
 
 #define ETF2L_PLAYER_API_URL "http://api.etf2l.org/player/%llu.json"
 #define MAX_URL_LENGTH 2048
+#define TWITCH_USER_API_URL "http://api.twitch.tv/api/steam/%llu"
 
 typedef enum APIStatus_s {
 	API_UNKNOWN,
@@ -59,16 +60,20 @@ public:
 
 	bool GetAlias(CSteamID player, std::string &alias);
 	void GetETF2LPlayerInfo(HTTPRequestCompleted_t *requestCompletionInfo, bool bIOFailure);
+	void GetTwitchUserInfo(HTTPRequestCompleted_t *requestCompletionInfo, bool bIOFailure);
 	void RequestETF2LPlayerInfo(CSteamID player);
+	void RequestTwitchUserInfo(CSteamID player);
 private:
 	std::map<CSteamID, std::string> customAliases;
 	std::map<CSteamID, APIAlias_t> etf2lAliases;
+	std::map<CSteamID, APIAlias_t> twitchAliases;
 
 	ConVar *enabled;
 	ConVar *etf2l;
 	ConCommand *get;
 	ConCommand *remove;
 	ConCommand *set;
+	ConVar *twitch;
 	static int GetCurrentAliasedPlayers(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]);
 	static int GetCurrentGamePlayers(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]);
 	static void GetCustomPlayerAlias(const CCommand &command);

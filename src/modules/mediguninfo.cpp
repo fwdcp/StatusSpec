@@ -96,17 +96,17 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 			
 			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redcharge", int(floor(medigunInfo[TFTeam_Red].chargeLevel * 100.0f)));
 
-			float redChargeAdvantage;
+			int redChargeAdvantage;
 
 			if (medigunInfo.find(TFTeam_Blue) != medigunInfo.end()) {
-				redChargeAdvantage = medigunInfo[TFTeam_Red].chargeLevel - medigunInfo[TFTeam_Blue].chargeLevel;
+				redChargeAdvantage = int(floor(medigunInfo[TFTeam_Red].chargeLevel * 100.0f)) - int(floor(medigunInfo[TFTeam_Blue].chargeLevel * 100.0f));
 			}
 			else {
-				redChargeAdvantage = medigunInfo[TFTeam_Red].chargeLevel;
+				redChargeAdvantage = int(floor(medigunInfo[TFTeam_Red].chargeLevel * 100.0f));
 			}
 
-			if (floor(redChargeAdvantage * 100) > 0.0f) {
-				((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redadvantage", int(floor(redChargeAdvantage * 100.0f)));
+			if (redChargeAdvantage > 0) {
+				((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redadvantage", redChargeAdvantage);
 
 				panels["MedigunInfoRedChargeAdvantageLabel"]->SetVisible(true);
 			}
@@ -415,17 +415,17 @@ void MedigunInfo::Paint(vgui::VPANEL vguiPanel) {
 			
 			((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("blucharge", int(floor(medigunInfo[TFTeam_Blue].chargeLevel * 100.0f)));
 
-			float bluChargeAdvantage;
+			int bluChargeAdvantage;
 
 			if (medigunInfo.find(TFTeam_Blue) != medigunInfo.end()) {
-				bluChargeAdvantage = medigunInfo[TFTeam_Blue].chargeLevel - medigunInfo[TFTeam_Red].chargeLevel;
+				bluChargeAdvantage = int(floor(medigunInfo[TFTeam_Blue].chargeLevel * 100.0f)) - int(floor(medigunInfo[TFTeam_Red].chargeLevel * 100.0f));
 			}
 			else {
-				bluChargeAdvantage = medigunInfo[TFTeam_Blue].chargeLevel;
+				bluChargeAdvantage = int(floor(medigunInfo[TFTeam_Blue].chargeLevel * 100.0f));
 			}
 
-			if (floor(bluChargeAdvantage * 100) > 0.0f) {
-				((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("bluadvantage", int(floor(bluChargeAdvantage * 100.0f)));
+			if (bluChargeAdvantage > 0) {
+				((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("bluadvantage", bluChargeAdvantage);
 
 				panels["MedigunInfoBluChargeAdvantageLabel"]->SetVisible(true);
 			}
