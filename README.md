@@ -8,6 +8,10 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**0.17.2**
+* general
+  * updated version of MinHook and changed build procedures
+
 **0.17.1**
 * medigun info
   * fix issues with charge advantage info (thanks Bluee/MattMcNam)
@@ -292,8 +296,8 @@ To properly support status icons, adjust `Resource/UI/SpectatorTournament.res` s
 
 Thanks
 ------
-**bluee** - for the inspiration to do this project and for a lot of code reused from his [AdvSpec project](https://github.com/MattMcNam/advspec)
+**bluee (MattMcNam)** - for the inspiration to do this project and for a lot of code reused from his [AdvSpec project](https://github.com/MattMcNam/advspec)
 
 **AlliedModders** - for in-depth information about the internals of the Source Engine and for [SourceHook](https://github.com/alliedmodders/metamod-source/tree/master/core/sourcehook)
 
-**Tsuda Kageyu, RaMMicHaeL, et al.** - for [MinHook](https://github.com/RaMMicHaeL/minhook)
+**Tsuda Kageyu and other contributors** - for [MinHook](https://github.com/TsudaKageyu/minhook)

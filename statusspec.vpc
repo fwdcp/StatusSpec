@@ -4,12 +4,13 @@
 //	Project Script
 //-----------------------------------------------------------------------------
 
-$Macro PROJECTDIR	"."
-$Macro SRCDIR		"..\.."
-$Macro OUTBINDIR	".\addons"
-$Macro MMSOURCE_DEV	"..\..\..\..\..\metamod-source"
-$Macro MINHOOK		"..\..\..\..\..\minhook"
-$Macro JSONCPP		"..\..\..\..\..\jsoncpp\dist"
+$Macro PROJECTDIR		"."
+$Macro SRCDIR			"..\.."
+$Macro OUTBINDIR		".\addons"
+$Macro MMSOURCE_DEV		"..\..\..\..\..\metamod-source"
+$Macro MINHOOK			"..\..\..\..\..\minhook"
+$Macro MINHOOK_BUILD	"$MINHOOK\build\VC12"
+$Macro JSONCPP			"..\..\..\..\..\jsoncpp\dist"
 
 $Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 
@@ -17,14 +18,30 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\game\client;$SRCDIR\game\shared;$SRCDIR\public;$MMSOURCE_DEV\core\sourcehook;$MINHOOK\include;$MINHOOK\src;$JSONCPP"
+		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\game\client;$SRCDIR\game\shared;$SRCDIR\public;$MMSOURCE_DEV\core\sourcehook;$MINHOOK\include;$JSONCPP"
 		$PreprocessorDefinitions			"$BASE;statusspecONLY;_MBCS"
 		$TreatWarningsAsErrors				"No (/WX-)"
 	}
 
 	$Linker
 	{
-		$AdditionalDependencies				"$BASE odbc32.lib odbccp32.lib"
+		$AdditionalDependencies				"$BASE odbc32.lib odbccp32.lib libMinHook.x86.lib"
+	}
+}
+
+$Configuration "Debug"
+{
+	$Linker
+	{
+		$AdditionalLibraryDirectories		"$BASE;$MINHOOK_BUILD\lib\Debug"
+	}
+}
+
+$Configuration "Release"
+{
+	$Linker
+	{
+		$AdditionalLibraryDirectories		"$BASE;$MINHOOK_BUILD\lib\Release"
 	}
 }
 
@@ -53,12 +70,6 @@ $Project "StatusSpec"
 		$File	"$MMSOURCE_DEV\core\sourcehook\sourcehook_impl_chookmaninfo.cpp"
 		$File	"$MMSOURCE_DEV\core\sourcehook\sourcehook_impl_cproto.cpp"
 		$File	"$MMSOURCE_DEV\core\sourcehook\sourcehook_impl_cvfnptr.cpp"
-		$File	"$MINHOOK\src\HDE32\hde32.c"
-		$File	"$MINHOOK\src\buffer.cpp"
-		$File	"$MINHOOK\src\export.cpp"
-		$File	"$MINHOOK\src\hook.cpp"
-		$File	"$MINHOOK\src\thread.cpp"
-		$File	"$MINHOOK\src\trampoline.cpp"
 		$File	"$JSONCPP\jsoncpp.cpp"
 		$File	"$SRCDIR\public\filesystem_init.cpp"
 		$File	"$SRCDIR\public\vgui_controls\vgui_controls.cpp"
@@ -85,9 +96,6 @@ $Project "StatusSpec"
 		$File	"src\ifaces.h"
 		$File	"src\itemschema.h"
 		$File	"src\paint.h"
-		$File	"src\vgui_controls\gameconsoledialog.h"
-		$File	"src\vgui_controls\ImageProgressBar.h"
-		$File	"src\vgui_controls\VariableLabel.h"
 	}
 	
 	$Folder	"Link Libraries"
