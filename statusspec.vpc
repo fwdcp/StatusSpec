@@ -96,9 +96,6 @@ $Project "StatusSpec"
 		$File	"src\ifaces.h"
 		$File	"src\itemschema.h"
 		$File	"src\paint.h"
-		$File	"src\vgui_controls\gameconsoledialog.h"
-		$File	"src\vgui_controls\ImageProgressBar.h"
-		$File	"src\vgui_controls\VariableLabel.h"
 	}
 	
 	$Folder	"Link Libraries"
