@@ -8,6 +8,10 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**0.17.2**
+* general
+  * updated version of MinHook and changed build procedures
+
 **0.17.1**
 * medigun info
   * fix issues with charge advantage info (thanks Bluee/MattMcNam)
