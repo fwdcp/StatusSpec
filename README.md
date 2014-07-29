@@ -296,4 +296,4 @@ Thanks
 
 **AlliedModders** - for in-depth information about the internals of the Source Engine and for [SourceHook](https://github.com/alliedmodders/metamod-source/tree/master/core/sourcehook)
 
-**Tsuda Kageyu, RaMMicHaeL, et al.** - for [MinHook](https://github.com/RaMMicHaeL/minhook)
+**Tsuda Kageyu and other contributors** - for [MinHook](https://github.com/TsudaKageyu/minhook)
