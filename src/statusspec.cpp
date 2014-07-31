@@ -177,7 +177,7 @@ bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event) {
 	
 void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
 	if (Interfaces::pEngineClient->IsDrawingLoadingImage() || !Interfaces::pEngineClient->IsInGame() || !Interfaces::pEngineClient->IsConnected() || Interfaces::pEngineClient->Con_IsVisible()) {
-		return;
+		RETURN_META(MRES_IGNORED);
 	}
 
 	if (g_AntiFreeze) {
