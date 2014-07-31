@@ -148,36 +148,38 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast) {
 	IGameEvent *newEvent = Interfaces::pGameEventManager->DuplicateEvent(event);
 
-	if (g_Killstreaks->FireEvent(newEvent)) {
-		Interfaces::pGameEventManager->FreeEvent(event);
+	if (g_Killstreaks) {
+		if (g_Killstreaks->FireEvent(newEvent)) {
+			Interfaces::pGameEventManager->FreeEvent(event);
 
-		RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEvent, (newEvent, bDontBroadcast));
+			RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEvent, (newEvent, bDontBroadcast));
+		}
 	}
-	else {
-		Interfaces::pGameEventManager->FreeEvent(newEvent);
+	
+	Interfaces::pGameEventManager->FreeEvent(newEvent);
 
-		RETURN_META_VALUE(MRES_IGNORED, false);
-	}
+	RETURN_META_VALUE(MRES_IGNORED, false);
 }
 
 bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event) {
 	IGameEvent *newEvent = Interfaces::pGameEventManager->DuplicateEvent(event);
 
-	if (g_Killstreaks->FireEvent(newEvent)) {
-		Interfaces::pGameEventManager->FreeEvent(event);
+	if (g_Killstreaks) {
+		if (g_Killstreaks->FireEvent(newEvent)) {
+			Interfaces::pGameEventManager->FreeEvent(event);
 
-		RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEventClientSide, (newEvent));
+			RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEventClientSide, (newEvent));
+		}
 	}
-	else {
-		Interfaces::pGameEventManager->FreeEvent(newEvent);
+	
+	Interfaces::pGameEventManager->FreeEvent(newEvent);
 
-		RETURN_META_VALUE(MRES_IGNORED, false);
-	}
+	RETURN_META_VALUE(MRES_IGNORED, false);
 }
 	
 void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
 	if (Interfaces::pEngineClient->IsDrawingLoadingImage() || !Interfaces::pEngineClient->IsInGame() || !Interfaces::pEngineClient->IsConnected() || Interfaces::pEngineClient->Con_IsVisible()) {
-		return;
+		RETURN_META(MRES_IGNORED);
 	}
 
 	if (g_AntiFreeze) {
