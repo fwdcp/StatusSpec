@@ -8,6 +8,10 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**0.17.3**
+* general
+  * update offsets for 2014-07-31 update
+
 **0.17.2**
 * general
   * updated version of MinHook and changed build procedures
