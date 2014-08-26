@@ -176,8 +176,8 @@ bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event) {
 
 	RETURN_META_VALUE(MRES_IGNORED, false);
 }
-	
-void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
+
+void Hook_IPanel_PaintTraverse_Pre(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
 	if (Interfaces::pEngineClient->IsDrawingLoadingImage() || !Interfaces::pEngineClient->IsInGame() || !Interfaces::pEngineClient->IsConnected() || Interfaces::pEngineClient->Con_IsVisible()) {
 		RETURN_META(MRES_IGNORED);
 	}
@@ -185,12 +185,6 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 	if (g_AntiFreeze) {
 		if (g_AntiFreeze->IsEnabled()) {
 			g_AntiFreeze->Paint(vguiPanel);
-		}
-	}
-
-	if (g_LoadoutIcons) {
-		if (g_LoadoutIcons->IsEnabled()) {
-			g_LoadoutIcons->Paint(vguiPanel);
 		}
 	}
 
@@ -203,6 +197,16 @@ void Hook_IPanel_PaintTraverse(vgui::VPANEL vguiPanel, bool forceRepaint, bool a
 	if (g_PlayerOutlines) {
 		if (g_PlayerOutlines->IsEnabled() && g_PlayerOutlines->IsFrequentOverrideEnabled()) {
 			g_PlayerOutlines->Paint(vguiPanel);
+		}
+	}
+
+	RETURN_META(MRES_IGNORED);
+}
+
+void Hook_IPanel_PaintTraverse_Post(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
+	if (g_LoadoutIcons) {
+		if (g_LoadoutIcons->IsEnabled()) {
+			g_LoadoutIcons->Paint(vguiPanel);
 		}
 	}
 
@@ -278,7 +282,8 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, Hook_IBaseClientDLL_FrameStageNotify);
 	Funcs::AddHook_IGameEventManager2_FireEvent(Interfaces::pGameEventManager, Hook_IGameEventManager2_FireEvent);
 	Funcs::AddHook_IGameEventManager2_FireEventClientSide(Interfaces::pGameEventManager, Hook_IGameEventManager2_FireEventClientSide);
-	Funcs::AddHook_IPanel_PaintTraverse(g_pVGuiPanel, Hook_IPanel_PaintTraverse);
+	Funcs::AddHook_IPanel_PaintTraverse_Pre(g_pVGuiPanel, Hook_IPanel_PaintTraverse_Pre);
+	Funcs::AddHook_IPanel_PaintTraverse_Post(g_pVGuiPanel, Hook_IPanel_PaintTraverse_Post);
 	Funcs::AddHook_IPanel_SendMessage(g_pVGuiPanel, Hook_IPanel_SendMessage);
 	Funcs::AddHook_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, Hook_IVEngineClient_GetPlayerInfo);
 	
