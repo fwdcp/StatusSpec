@@ -8,6 +8,10 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**0.17.4**
+* general
+  * adjust paint method hooking so that we can draw at the correct location
+
 **0.17.3**
 * general
   * update offsets for 2014-07-31 update
