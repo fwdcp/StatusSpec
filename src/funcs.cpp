@@ -102,8 +102,12 @@ int Funcs::AddHook_IGameEventManager2_FireEventClientSide(IGameEventManager2 *in
 	return SH_ADD_HOOK(IGameEventManager2, FireEventClientSide, instance, SH_STATIC(hook), false);
 }
 
-int Funcs::AddHook_IPanel_PaintTraverse(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, bool, bool)) {
+int Funcs::AddHook_IPanel_PaintTraverse_Pre(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, bool, bool)) {
 	return SH_ADD_HOOK(IPanel, PaintTraverse, instance, SH_STATIC(hook), false);
+}
+
+int Funcs::AddHook_IPanel_PaintTraverse_Post(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, bool, bool)) {
+	return SH_ADD_HOOK(IPanel, PaintTraverse, instance, SH_STATIC(hook), true);
 }
 
 int Funcs::AddHook_IPanel_SendMessage(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, KeyValues *, vgui::VPANEL)) {
