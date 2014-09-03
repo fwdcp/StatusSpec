@@ -28,7 +28,7 @@
 		"pinCorner"		"0"
 		"visible" 		"1"
 		"enabled" 		"1"
-		"fillcolor" 	"NotoDark"
+		"fillcolor" 	"32 32 32 255"
 	}
 	
 	"FreezeInfoIcon"
@@ -62,6 +62,6 @@
 		"dulltext"		"0"
 		"brighttext"	"0"
 		"font"			"Noto16"
-		"fgcolor"		"NotoWhite"
+		"fgcolor"		"220 220 220 255"
 	}
 }
