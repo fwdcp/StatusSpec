@@ -28,7 +28,7 @@
 		"pinCorner"		"0"
 		"visible" 		"1"
 		"enabled" 		"1"
-		"fillcolor" 	"NotoDark"
+		"fillcolor" 	"32 32 32 255"
 	}
 	
 	"MedigunInfoRedBackground"
@@ -44,7 +44,7 @@
 		"pinCorner"		"0"
 		"visible" 		"1"
 		"enabled" 		"1"
-		"drawcolor" 	"HUDRedTeam"
+		"drawcolor" 	"180 92 77 127"
 	}
 	
 	"MedigunInfoRedNameLabel"
@@ -65,7 +65,7 @@
 		"dulltext"		"0"
 		"brighttext"	"0"
 		"font"			"Noto8"
-		"fgcolor"		"NotoWhite"
+		"fgcolor"		"220 220 220 255"
 	}
 	
 	"MedigunInfoRedChargeLabel"
@@ -86,7 +86,7 @@
 		"dulltext"		"0"
 		"brighttext"	"0"
 		"font"			"Noto8"
-		"fgcolor"		"NotoWhite"
+		"fgcolor"		"220 220 220 255"
 	}
 
 	"MedigunInfoRedIndividualChargesLabel"
@@ -107,7 +107,7 @@
 		"dulltext"		"0"
 		"brighttext"	"0"
 		"font"			"Noto8"
-		"fgcolor"		"NotoWhite"
+		"fgcolor"		"220 220 220 255"
 	}
 	
 	"MedigunInfoRedChargeAdvantageLabel"
@@ -128,7 +128,7 @@
 		"dulltext"		"0"
 		"brighttext"	"0"
 		"font"			"Noto8"
-		"fgcolor"		"NotoWhite"
+		"fgcolor"		"220 220 220 255"
 	}
 	
 	"MedigunInfoRedChargeMeter"
@@ -148,8 +148,8 @@
 		"textAlignment"		"Left"
 		"dulltext"			"0"
 		"brighttext"		"0"
-		"bgcolor_override"	"NotoMedicBarBG"
-		"fgcolor_override" 	"NotoMedicBarNormal"
+		"bgcolor_override"	"0 0 0 75"
+		"fgcolor_override" 	"220 220 220 255"
 		"direction"			"east"
 		"variable"			"redcharge"
 	}
@@ -171,8 +171,8 @@
 		"textAlignment"		"Left"
 		"dulltext"			"0"
 		"brighttext"		"0"
-		"bgcolor_override"	"NotoMedicBarBG"
-		"fgcolor_override" 	"NotoMedicBarNormal"
+		"bgcolor_override"	"0 0 0 75"
+		"fgcolor_override" 	"220 220 220 255"
 		"direction"			"east"
 		"variable"			"redcharge1"
 	}
@@ -194,8 +194,8 @@
 		"textAlignment"		"Left"
 		"dulltext"			"0"
 		"brighttext"		"0"
-		"bgcolor_override"	"NotoMedicBarBG"
-		"fgcolor_override" 	"NotoMedicBarNormal"
+		"bgcolor_override"	"0 0 0 75"
+		"fgcolor_override" 	"220 220 220 255"
 		"direction"			"east"
 		"variable"			"redcharge2"
 	}
@@ -217,8 +217,8 @@
 		"textAlignment"		"Left"
 		"dulltext"			"0"
 		"brighttext"		"0"
-		"bgcolor_override"	"NotoMedicBarBG"
-		"fgcolor_override" 	"NotoMedicBarNormal"
+		"bgcolor_override"	"0 0 0 75"
+		"fgcolor_override" 	"220 220 220 255"
 		"direction"			"east"
 		"variable"			"redcharge3"
 	}
@@ -240,8 +240,8 @@
 		"textAlignment"		"Left"
 		"dulltext"			"0"
 		"brighttext"		"0"
-		"bgcolor_override"	"NotoMedicBarBG"
-		"fgcolor_override" 	"NotoMedicBarNormal"
+		"bgcolor_override"	"0 0 0 75"
+		"fgcolor_override" 	"220 220 220 255"
 		"direction"			"east"
 		"variable"			"redcharge4"
 	}
@@ -273,7 +273,7 @@
 		"pinCorner"		"0"
 		"visible" 		"1"
 		"enabled" 		"1"
-		"drawcolor" 	"HUDBlueTeam"
+		"drawcolor" 	"104 124 155 127"
 	}
 	
 	"MedigunInfoBluNameLabel"
@@ -294,7 +294,7 @@
 		"dulltext"		"0"
 		"brighttext"	"0"
 		"font"			"Noto8"
-		"fgcolor"		"NotoWhite"
+		"fgcolor"		"220 220 220 255"
 	}
 	
 	"MedigunInfoBluChargeLabel"
@@ -315,7 +315,7 @@
 		"dulltext"		"0"
 		"brighttext"	"0"
 		"font"			"Noto8"
-		"fgcolor"		"NotoWhite"
+		"fgcolor"		"220 220 220 255"
 	}
 
 	"MedigunInfoBluIndividualChargesLabel"
@@ -336,7 +336,7 @@
 		"dulltext"		"0"
 		"brighttext"	"0"
 		"font"			"Noto8"
-		"fgcolor"		"NotoWhite"
+		"fgcolor"		"220 220 220 255"
 	}
 	
 	"MedigunInfoBluChargeAdvantageLabel"
@@ -357,7 +357,7 @@
 		"dulltext"		"0"
 		"brighttext"	"0"
 		"font"			"Noto8"
-		"fgcolor"		"NotoWhite"
+		"fgcolor"		"220 220 220 255"
 	}
 	
 	"MedigunInfoBluChargeMeter"
@@ -377,8 +377,8 @@
 		"textAlignment"		"Left"
 		"dulltext"			"0"
 		"brighttext"		"0"
-		"bgcolor_override"	"NotoMedicBarBG"
-		"fgcolor_override" 	"NotoMedicBarNormal"
+		"bgcolor_override"	"0 0 0 75"
+		"fgcolor_override" 	"220 220 220 255"
 		"direction"			"east"
 		"variable"			"blucharge"
 	}
@@ -400,8 +400,8 @@
 		"textAlignment"		"Left"
 		"dulltext"			"0"
 		"brighttext"		"0"
-		"bgcolor_override"	"NotoMedicBarBG"
-		"fgcolor_override" 	"NotoMedicBarNormal"
+		"bgcolor_override"	"0 0 0 75"
+		"fgcolor_override" 	"220 220 220 255"
 		"direction"			"east"
 		"variable"			"blucharge1"
 	}
@@ -423,8 +423,8 @@
 		"textAlignment"		"Left"
 		"dulltext"			"0"
 		"brighttext"		"0"
-		"bgcolor_override"	"NotoMedicBarBG"
-		"fgcolor_override" 	"NotoMedicBarNormal"
+		"bgcolor_override"	"0 0 0 75"
+		"fgcolor_override" 	"220 220 220 255"
 		"direction"			"east"
 		"variable"			"blucharge2"
 	}
@@ -446,8 +446,8 @@
 		"textAlignment"		"Left"
 		"dulltext"			"0"
 		"brighttext"		"0"
-		"bgcolor_override"	"NotoMedicBarBG"
-		"fgcolor_override" 	"NotoMedicBarNormal"
+		"bgcolor_override"	"0 0 0 75"
+		"fgcolor_override" 	"220 220 220 255"
 		"direction"			"east"
 		"variable"			"blucharge3"
 	}
@@ -469,8 +469,8 @@
 		"textAlignment"		"Left"
 		"dulltext"			"0"
 		"brighttext"		"0"
-		"bgcolor_override"	"NotoMedicBarBG"
-		"fgcolor_override" 	"NotoMedicBarNormal"
+		"bgcolor_override"	"0 0 0 75"
+		"fgcolor_override" 	"220 220 220 255"
 		"direction"			"east"
 		"variable"			"blucharge4"
 	}
