@@ -105,6 +105,9 @@ bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 	CheckPointerAndWarn(pEngineClient, IVEngineClient);
 	CheckPointerAndWarn(pGameEventManager, IGameEventManager2);
 	CheckPointerAndWarn(pRenderView, IVRenderView);
+	CheckPointerAndWarn(g_pMaterialSystem, IMaterialSystem);
+	CheckPointerAndWarn(g_pMaterialSystemHardwareConfig, IMaterialSystemHardwareConfig);
+	CheckPointerAndWarn(g_pStudioRender, IStudioRender);
 	CheckPointerAndWarn(g_pVGuiSurface, vgui::ISurface);
 	CheckPointerAndWarn(g_pVGui, vgui::IVGui);
 	CheckPointerAndWarn(g_pVGuiPanel, vgui::IPanel);
