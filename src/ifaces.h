@@ -22,6 +22,7 @@
 #include "iclientmode.h"
 #include "igameevents.h"
 #include "igameresources.h"
+#include "ivrenderview.h"
 #include "steam/steam_api.h"
 #include "tier3/tier3.h"
 #include "filesystem_init.h"
@@ -58,6 +59,7 @@ class Interfaces {
 		static IVEngineClient *pEngineClient;
 		static IFileSystem *pFileSystem;
 		static IGameEventManager2 *pGameEventManager;
+		static IVRenderView *pRenderView;
 		static CSteamAPIContext *pSteamAPIContext;
 		static IClientMode *GetClientMode();
 		static IGameResources *GetGameResources();
