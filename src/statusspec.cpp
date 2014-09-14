@@ -21,6 +21,7 @@ PlayerOutlines *g_PlayerOutlines = nullptr;
 StatusIcons *g_StatusIcons = nullptr;
 
 static IGameResources* gameResources = nullptr;
+static int doPostScreenSpaceEffectsHook;
 static int getGlowEffectColorHook;
 
 ObserverInfo_t GetLocalPlayerObserverInfo() {
@@ -62,6 +63,10 @@ void Hook_C_TFPlayer_GetGlowEffectColor(float *r, float *g, float *b) {
 }
 
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
+	if (!doPostScreenSpaceEffectsHook && Interfaces::GetClientMode()) {
+		Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), Hook_IClientMode_DoPostScreenSpaceEffects);
+	}
+
 	if (curStage == FRAME_RENDER_START) {
 		if (g_LoadoutIcons) {
 			if (g_LoadoutIcons->IsEnabled()) {
@@ -143,6 +148,10 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 	}
 
 	RETURN_META(MRES_IGNORED);
+}
+
+bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup) {
+	RETURN_META_VALUE(MRES_IGNORED, false);
 }
 
 bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast) {
