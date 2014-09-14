@@ -105,6 +105,7 @@ bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 	CheckPointerAndWarn(pEngineClient, IVEngineClient);
 	CheckPointerAndWarn(pGameEventManager, IGameEventManager2);
 	CheckPointerAndWarn(pRenderView, IVRenderView);
+	CheckPointerAndWarn(g_pFullFileSystem, IFileSystem);
 	CheckPointerAndWarn(g_pMaterialSystem, IMaterialSystem);
 	CheckPointerAndWarn(g_pMaterialSystemHardwareConfig, IMaterialSystemHardwareConfig);
 	CheckPointerAndWarn(g_pStudioRender, IStudioRender);
@@ -112,7 +113,6 @@ bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 	CheckPointerAndWarn(g_pVGui, vgui::IVGui);
 	CheckPointerAndWarn(g_pVGuiPanel, vgui::IPanel);
 	CheckPointerAndWarn(g_pVGuiSchemeManager, vgui::ISchemeManager);
-	CheckPointerAndWarn(g_pFullFileSystem, IFileSystem);
 
 	g_pEntityList = dynamic_cast<CBaseEntityList *>(Interfaces::pClientEntityList);
 
