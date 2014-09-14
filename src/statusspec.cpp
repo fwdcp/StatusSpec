@@ -22,7 +22,6 @@ StatusIcons *g_StatusIcons = nullptr;
 
 static IGameResources* gameResources = nullptr;
 static int doPostScreenSpaceEffectsHook;
-static int getGlowEffectColorHook;
 
 ObserverInfo_t GetLocalPlayerObserverInfo() {
 	int player = Interfaces::pEngineClient->GetLocalPlayer();
@@ -46,10 +45,6 @@ int Detour_GetLocalPlayerIndex() {
 	}
 
 	return Funcs::CallFunc_GetLocalPlayerIndex();
-}
-
-void Hook_C_TFPlayer_GetGlowEffectColor(float *r, float *g, float *b) {
-	RETURN_META(MRES_IGNORED);
 }
 
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
@@ -83,10 +78,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 		
 			if (!entity) {
 				continue;
-			}
-
-			if (!getGlowEffectColorHook && Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFPlayer")) {
-				getGlowEffectColorHook = Funcs::AddHook_C_TFPlayer_GetGlowEffectColor((C_TFPlayer *)entity, Hook_C_TFPlayer_GetGlowEffectColor);
 			}
 
 			if (g_AntiFreeze) {

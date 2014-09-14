@@ -15,7 +15,6 @@
 #include <map>
 
 #define CLIENT_DLL
-#define GLOWS_ENABLE
 
 #include "cdll_int.h"
 #include "iclientmode.h"
@@ -68,7 +67,6 @@ class Funcs {
 public:
 	static bool AddDetour_GetLocalPlayerIndex(GLPI_t detour);
 
-	static int AddHook_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *instance, void(*hook)(float *, float *, float *));
 	static int AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, void(*hook)(ClientFrameStage_t));
 	static int AddHook_IClientMode_DoPostScreenSpaceEffects(IClientMode *instance, bool(*hook)(const CViewSetup *));
 	static int AddHook_IGameEventManager2_FireEvent(IGameEventManager2 *instance, bool(*hook)(IGameEvent *, bool));
@@ -81,9 +79,9 @@ public:
 	static int CallFunc_GetLocalPlayerIndex();
 
 	static void CallFunc_C_TFPlayer_CalcView(C_TFPlayer *instance, Vector &eyeOrigin, QAngle &eyeAngles, float &zNear, float &zFar, float &fov);
+	static void CallFunc_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *instance, float *r, float *g, float *b);
 	static int CallFunc_C_TFPlayer_GetObserverMode(C_TFPlayer *instance);
 	static C_BaseEntity *CallFunc_C_TFPlayer_GetObserverTarget(C_TFPlayer *instance);
-	static void CallFunc_C_TFPlayer_UpdateGlowEffect(C_TFPlayer *instance);
 	static bool CallFunc_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, int ent_num, player_info_t *pinfo);
 
 	static bool RemoveDetour_GetLocalPlayerIndex();
