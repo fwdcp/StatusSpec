@@ -14,7 +14,7 @@ Changelog
 
 **0.17.3**
 * general
-  * update offsets for 2014-07-31 update
+  * update offsets for 2014-07-30 update
 
 **0.17.2**
 * general
