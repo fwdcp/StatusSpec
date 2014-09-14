@@ -53,14 +53,14 @@ class Interfaces {
 	public:
 		static bool Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory);
 		static void Unload();
-		static IBaseClientDLL* pClientDLL;
-		static IClientEntityList* pClientEntityList;
-		static IGameEventManager2 *pGameEventManager;
-		static IVEngineClient* pEngineClient;
-		static CSteamAPIContext* pSteamAPIContext;
+		static IBaseClientDLL *pClientDLL;
+		static IClientEntityList *pClientEntityList;
+		static IVEngineClient *pEngineClient;
 		static IFileSystem *pFileSystem;
-		static IGameResources* GetGameResources();
-		static IClientMode* GetClientMode();
+		static IGameEventManager2 *pGameEventManager;
+		static CSteamAPIContext *pSteamAPIContext;
+		static IClientMode *GetClientMode();
+		static IGameResources *GetGameResources();
 	private:
 		static CDllDemandLoader *pClientModule;
 };

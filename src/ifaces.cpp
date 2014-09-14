@@ -16,13 +16,13 @@
 		return false; \
 	}
 
-IBaseClientDLL* Interfaces::pClientDLL = nullptr;
-IClientEntityList* Interfaces::pClientEntityList = nullptr;
-IVEngineClient* Interfaces::pEngineClient = nullptr;
-IGameEventManager2 *Interfaces::pGameEventManager = nullptr;
-CSteamAPIContext* Interfaces::pSteamAPIContext = nullptr;
-IFileSystem *Interfaces::pFileSystem = nullptr;
+IBaseClientDLL *Interfaces::pClientDLL = nullptr;
+IClientEntityList *Interfaces::pClientEntityList = nullptr;
 CDllDemandLoader *Interfaces::pClientModule = nullptr;
+IVEngineClient *Interfaces::pEngineClient = nullptr;
+IFileSystem *Interfaces::pFileSystem = nullptr;
+IGameEventManager2 *Interfaces::pGameEventManager = nullptr;
+CSteamAPIContext *Interfaces::pSteamAPIContext = nullptr;
 
 CBaseEntityList *g_pEntityList;
 
@@ -48,6 +48,17 @@ inline DWORD FindPattern(DWORD dwAddress, DWORD dwSize, BYTE* pbSig, const char*
 	return 0;
 }
 
+IClientMode* Interfaces::GetClientMode() {
+#if defined _WIN32
+	static DWORD pointer = NULL;
+	if (!pointer)
+		pointer = FindPattern((DWORD)GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE)CLIENTMODE_SIG, CLIENTMODE_MASK) + CLIENTMODE_OFFSET;
+	return **(IClientMode***)(pointer);
+#else
+	return nullptr;
+#endif
+}
+
 IGameResources* Interfaces::GetGameResources() {
 #if defined _WIN32
 	static DWORD pointer = NULL;
@@ -56,17 +67,6 @@ IGameResources* Interfaces::GetGameResources() {
 	typedef IGameResources* (*GGR_t) (void);
 	GGR_t GGR = (GGR_t) pointer;
 	return GGR();
-#else
-	return nullptr;
-#endif
-}
-
-IClientMode* Interfaces::GetClientMode() {
-#if defined _WIN32
-	static DWORD pointer = NULL;
-	if (!pointer)
-		pointer = FindPattern((DWORD) GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE) CLIENTMODE_SIG, CLIENTMODE_MASK) + CLIENTMODE_OFFSET;
-	return **(IClientMode***)(pointer);
 #else
 	return nullptr;
 #endif
@@ -82,15 +82,15 @@ bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 		return false;
 	}
 	
-	pEngineClient = (IVEngineClient*) interfaceFactory(VENGINE_CLIENT_INTERFACE_VERSION, nullptr);
+	pEngineClient = (IVEngineClient *)interfaceFactory(VENGINE_CLIENT_INTERFACE_VERSION, nullptr);
 	pGameEventManager = (IGameEventManager2 *)interfaceFactory(INTERFACEVERSION_GAMEEVENTSMANAGER2, nullptr);
 	
 	pClientModule = new CDllDemandLoader(CLIENT_MODULE_FILE);
 
 	CreateInterfaceFn gameClientFactory = pClientModule->GetFactory();
 	
-	pClientDLL = (IBaseClientDLL*) gameClientFactory(CLIENT_DLL_INTERFACE_VERSION, nullptr);
-	pClientEntityList = (IClientEntityList*) gameClientFactory(VCLIENTENTITYLIST_INTERFACE_VERSION, nullptr);
+	pClientDLL = (IBaseClientDLL*)gameClientFactory(CLIENT_DLL_INTERFACE_VERSION, nullptr);
+	pClientEntityList = (IClientEntityList*)gameClientFactory(VCLIENTENTITYLIST_INTERFACE_VERSION, nullptr);
 
 	pSteamAPIContext = new CSteamAPIContext();
 	if (!SteamAPI_InitSafe() || !pSteamAPIContext->Init()) {
@@ -137,16 +137,7 @@ bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 					return true;
 				}
 			}
-			else {
-				return false;
-			}
 		}
-		else {
-			return false;
-		}
-	}
-	else {
-		return false;
 	}
 
 	return false;
@@ -165,4 +156,6 @@ void Interfaces::Unload() {
 	pClientDLL = nullptr;
 	pClientEntityList = nullptr;
 	pEngineClient = nullptr;
+	pFileSystem = nullptr;
+	pGameEventManager = nullptr;
 }
