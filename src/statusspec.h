@@ -31,13 +31,6 @@
 
 #define PLUGIN_DESC "StatusSpec v0.17.4"
 
-typedef struct ObserverInfo_s {
-	int mode;
-	EHANDLE target;
-} ObserverInfo_t;
-
-ObserverInfo_t GetLocalPlayerObserverInfo();
-
 int Detour_GetLocalPlayerIndex();
 
 void Hook_C_TFPlayer_GetGlowEffectColor(float *r, float *g, float *b);

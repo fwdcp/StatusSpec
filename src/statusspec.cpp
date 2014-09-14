@@ -20,22 +20,7 @@ PlayerAliases *g_PlayerAliases = nullptr;
 PlayerOutlines *g_PlayerOutlines = nullptr;
 StatusIcons *g_StatusIcons = nullptr;
 
-static IGameResources* gameResources = nullptr;
 static int getGlowEffectColorHook;
-
-ObserverInfo_t GetLocalPlayerObserverInfo() {
-	int player = Interfaces::pEngineClient->GetLocalPlayer();
-	IClientEntity *playerEntity = Interfaces::pClientEntityList->GetClientEntity(player);
-
-	ObserverInfo_t info;
-
-	if (dynamic_cast<C_BasePlayer *>(playerEntity->GetBaseEntity())) {
-		info.mode = Funcs::CallFunc_C_TFPlayer_GetObserverMode((C_TFPlayer *)playerEntity);
-		info.target = Funcs::CallFunc_C_TFPlayer_GetObserverTarget((C_TFPlayer *)playerEntity);
-	}
-
-	return info;
-}
 
 int Detour_GetLocalPlayerIndex() {
 	if (g_LocalPlayer) {

@@ -127,18 +127,6 @@ int Funcs::CallFunc_GetLocalPlayerIndex() {
 	}
 }
 
-void Funcs::CallFunc_C_TFPlayer_CalcView(C_TFPlayer *instance, Vector &eyeOrigin, QAngle &eyeAngles, float &zNear, float &zFar, float &fov) {
-	SH_MCALL(instance, C_TFPlayer_CalcView)(eyeOrigin, eyeAngles, zNear, zFar, fov);
-}
-
-int Funcs::CallFunc_C_TFPlayer_GetObserverMode(C_TFPlayer *instance) {
-	return SH_MCALL(instance, C_TFPlayer_GetObserverMode)();
-}
-
-C_BaseEntity *Funcs::CallFunc_C_TFPlayer_GetObserverTarget(C_TFPlayer *instance) {
-	return SH_MCALL(instance, C_TFPlayer_GetObserverTarget)();
-}
-
 void Funcs::CallFunc_C_TFPlayer_UpdateGlowEffect(C_TFPlayer *instance) {
 	SH_MCALL(instance, C_TFPlayer_UpdateGlowEffect)();
 }
