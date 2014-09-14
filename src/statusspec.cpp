@@ -49,16 +49,6 @@ int Detour_GetLocalPlayerIndex() {
 }
 
 void Hook_C_TFPlayer_GetGlowEffectColor(float *r, float *g, float *b) {
-	if (g_PlayerOutlines) {
-		if (g_PlayerOutlines->IsEnabled()) {
-			C_TFPlayer *tfPlayer = META_IFACEPTR(C_TFPlayer);
-
-			if (g_PlayerOutlines->GetGlowEffectColorOverride(tfPlayer, r, g, b)) {
-				RETURN_META(MRES_SUPERCEDE);
-			}
-		}
-	}
-
 	RETURN_META(MRES_IGNORED);
 }
 
@@ -202,12 +192,6 @@ void Hook_IPanel_PaintTraverse_Pre(vgui::VPANEL vguiPanel, bool forceRepaint, bo
 	if (g_MedigunInfo) {
 		if (g_MedigunInfo->IsEnabled()) {
 			g_MedigunInfo->Paint(vguiPanel);
-		}
-	}
-
-	if (g_PlayerOutlines) {
-		if (g_PlayerOutlines->IsEnabled() && g_PlayerOutlines->IsFrequentOverrideEnabled()) {
-			g_PlayerOutlines->Paint(vguiPanel);
 		}
 	}
 
