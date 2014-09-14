@@ -151,7 +151,9 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 }
 
 bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup) {
-	RETURN_META_VALUE(MRES_IGNORED, false);
+	g_GlowObjectManager.RenderGlowEffects(pSetup);
+
+	RETURN_META_VALUE(MRES_OVERRIDE, true);
 }
 
 bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast) {

@@ -15,6 +15,7 @@
 #include "entities.h"
 #include "enums.h"
 #include "funcs.h"
+#include "glows.h"
 #include "ifaces.h"
 #include "itemschema.h"
 #include "paint.h"
