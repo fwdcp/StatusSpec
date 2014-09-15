@@ -31,7 +31,7 @@
 #include "modules/projectileoutlines.h"
 #include "modules/statusicons.h"
 
-#define PLUGIN_DESC "StatusSpec v0.17.4"
+#define PLUGIN_DESC "StatusSpec v0.18.0"
 
 int Detour_GetLocalPlayerIndex();
 
