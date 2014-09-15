@@ -28,6 +28,7 @@
 #include "modules/multipanel.h"
 #include "modules/playeraliases.h"
 #include "modules/playeroutlines.h"
+#include "modules/projectileoutlines.h"
 #include "modules/statusicons.h"
 
 #define PLUGIN_DESC "StatusSpec v0.17.4"

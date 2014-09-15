@@ -18,6 +18,7 @@ MedigunInfo *g_MedigunInfo = nullptr;
 MultiPanel *g_MultiPanel = nullptr;
 PlayerAliases *g_PlayerAliases = nullptr;
 PlayerOutlines *g_PlayerOutlines = nullptr;
+ProjectileOutlines *g_ProjectileOutlines = nullptr;
 StatusIcons *g_StatusIcons = nullptr;
 
 static int doPostScreenSpaceEffectsHook;
@@ -83,6 +84,10 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 
 			if (g_PlayerOutlines) {
 				g_PlayerOutlines->ProcessEntity(entity);
+			}
+
+			if (g_ProjectileOutlines) {
+				g_ProjectileOutlines->ProcessEntity(entity);
 			}
 
 			if (g_StatusIcons) {
@@ -268,6 +273,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_MultiPanel = new MultiPanel();
 	g_PlayerAliases = new PlayerAliases();
 	g_PlayerOutlines = new PlayerOutlines();
+	g_ProjectileOutlines = new ProjectileOutlines();
 	g_StatusIcons = new StatusIcons();
 	
 	Msg("%s loaded!\n", PLUGIN_DESC);
@@ -284,6 +290,7 @@ void StatusSpecPlugin::Unload(void)
 	delete g_MultiPanel;
 	delete g_PlayerAliases;
 	delete g_PlayerOutlines;
+	delete g_ProjectileOutlines;
 	delete g_StatusIcons;
 
 	Funcs::Unload();
