@@ -276,7 +276,7 @@ int PlayerOutlines::GetCurrentColor(const char *partial, char commands[COMMAND_C
 		std::string colorType = command.substr(32);
 
 		if (g_PlayerOutlines->colors.find(colorType) != g_PlayerOutlines->colors.end()) {
-			V_snprintf(commands[0], sizeof(commands[0]), "%s %i %i %i", command.c_str(), g_PlayerOutlines->colors[colorType].color.r(), g_PlayerOutlines->colors[colorType].color.g(), g_PlayerOutlines->colors[colorType].color.b());
+			V_snprintf(commands[0], sizeof(commands[0]), "%s %i %i %i %i", command.c_str(), g_PlayerOutlines->colors[colorType].color.r(), g_PlayerOutlines->colors[colorType].color.g(), g_PlayerOutlines->colors[colorType].color.b(), g_PlayerOutlines->colors[colorType].color.a());
 
 			return 1;
 		}
