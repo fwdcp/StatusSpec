@@ -225,8 +225,10 @@ void PlayerOutlines::SetGlowEffect(IClientEntity *entity, bool enabled, Vector c
 		}
 	}
 	else {
-		delete glows[entityHandle];
-		glows.erase(entityHandle);
+		if (glows.find(entityHandle) != glows.end()) {
+			delete glows[entityHandle];
+			glows.erase(entityHandle);
+		}
 	}
 }
 
