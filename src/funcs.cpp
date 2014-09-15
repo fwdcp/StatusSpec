@@ -127,6 +127,14 @@ int Funcs::CallFunc_GetLocalPlayerIndex() {
 	}
 }
 
+int Funcs::CallFunc_C_TFPlayer_GetObserverMode(C_TFPlayer *instance) {
+	return SH_MCALL(instance, C_TFPlayer_GetObserverMode)();
+}
+
+C_BaseEntity *Funcs::CallFunc_C_TFPlayer_GetObserverTarget(C_TFPlayer *instance) {
+	return SH_MCALL(instance, C_TFPlayer_GetObserverTarget)();
+}
+
 void Funcs::CallFunc_C_TFPlayer_UpdateGlowEffect(C_TFPlayer *instance) {
 	SH_MCALL(instance, C_TFPlayer_UpdateGlowEffect)();
 }
