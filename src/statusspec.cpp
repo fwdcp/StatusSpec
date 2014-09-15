@@ -18,24 +18,10 @@ MedigunInfo *g_MedigunInfo = nullptr;
 MultiPanel *g_MultiPanel = nullptr;
 PlayerAliases *g_PlayerAliases = nullptr;
 PlayerOutlines *g_PlayerOutlines = nullptr;
+ProjectileOutlines *g_ProjectileOutlines = nullptr;
 StatusIcons *g_StatusIcons = nullptr;
 
-static IGameResources* gameResources = nullptr;
-static int getGlowEffectColorHook;
-
-ObserverInfo_t GetLocalPlayerObserverInfo() {
-	int player = Interfaces::pEngineClient->GetLocalPlayer();
-	IClientEntity *playerEntity = Interfaces::pClientEntityList->GetClientEntity(player);
-
-	ObserverInfo_t info;
-
-	if (dynamic_cast<C_BasePlayer *>(playerEntity->GetBaseEntity())) {
-		info.mode = Funcs::CallFunc_C_TFPlayer_GetObserverMode((C_TFPlayer *)playerEntity);
-		info.target = Funcs::CallFunc_C_TFPlayer_GetObserverTarget((C_TFPlayer *)playerEntity);
-	}
-
-	return info;
-}
+static int doPostScreenSpaceEffectsHook;
 
 int Detour_GetLocalPlayerIndex() {
 	if (g_LocalPlayer) {
@@ -47,21 +33,11 @@ int Detour_GetLocalPlayerIndex() {
 	return Funcs::CallFunc_GetLocalPlayerIndex();
 }
 
-void Hook_C_TFPlayer_GetGlowEffectColor(float *r, float *g, float *b) {
-	if (g_PlayerOutlines) {
-		if (g_PlayerOutlines->IsEnabled()) {
-			C_TFPlayer *tfPlayer = META_IFACEPTR(C_TFPlayer);
-
-			if (g_PlayerOutlines->GetGlowEffectColorOverride(tfPlayer, r, g, b)) {
-				RETURN_META(MRES_SUPERCEDE);
-			}
-		}
+void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
+	if (!doPostScreenSpaceEffectsHook && Interfaces::GetClientMode()) {
+		doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), Hook_IClientMode_DoPostScreenSpaceEffects);
 	}
 
-	RETURN_META(MRES_IGNORED);
-}
-
-void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 	if (curStage == FRAME_RENDER_START) {
 		if (g_LoadoutIcons) {
 			if (g_LoadoutIcons->IsEnabled()) {
@@ -90,10 +66,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 				continue;
 			}
 
-			if (!getGlowEffectColorHook && Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFPlayer")) {
-				getGlowEffectColorHook = Funcs::AddHook_C_TFPlayer_GetGlowEffectColor((C_TFPlayer *)entity, Hook_C_TFPlayer_GetGlowEffectColor);
-			}
-
 			if (g_AntiFreeze) {
 				g_AntiFreeze->ProcessEntity(entity);
 			}
@@ -112,6 +84,10 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 
 			if (g_PlayerOutlines) {
 				g_PlayerOutlines->ProcessEntity(entity);
+			}
+
+			if (g_ProjectileOutlines) {
+				g_ProjectileOutlines->ProcessEntity(entity);
 			}
 
 			if (g_StatusIcons) {
@@ -143,6 +119,12 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 	}
 
 	RETURN_META(MRES_IGNORED);
+}
+
+bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup) {
+	g_GlowObjectManager.RenderGlowEffects(pSetup);
+
+	RETURN_META_VALUE(MRES_OVERRIDE, true);
 }
 
 bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast) {
@@ -191,12 +173,6 @@ void Hook_IPanel_PaintTraverse_Pre(vgui::VPANEL vguiPanel, bool forceRepaint, bo
 	if (g_MedigunInfo) {
 		if (g_MedigunInfo->IsEnabled()) {
 			g_MedigunInfo->Paint(vguiPanel);
-		}
-	}
-
-	if (g_PlayerOutlines) {
-		if (g_PlayerOutlines->IsEnabled() && g_PlayerOutlines->IsFrequentOverrideEnabled()) {
-			g_PlayerOutlines->Paint(vguiPanel);
 		}
 	}
 
@@ -297,6 +273,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_MultiPanel = new MultiPanel();
 	g_PlayerAliases = new PlayerAliases();
 	g_PlayerOutlines = new PlayerOutlines();
+	g_ProjectileOutlines = new ProjectileOutlines();
 	g_StatusIcons = new StatusIcons();
 	
 	Msg("%s loaded!\n", PLUGIN_DESC);
@@ -313,6 +290,7 @@ void StatusSpecPlugin::Unload(void)
 	delete g_MultiPanel;
 	delete g_PlayerAliases;
 	delete g_PlayerOutlines;
+	delete g_ProjectileOutlines;
 	delete g_StatusIcons;
 
 	Funcs::Unload();

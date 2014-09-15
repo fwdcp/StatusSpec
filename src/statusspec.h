@@ -15,6 +15,7 @@
 #include "entities.h"
 #include "enums.h"
 #include "funcs.h"
+#include "glows.h"
 #include "ifaces.h"
 #include "itemschema.h"
 #include "paint.h"
@@ -27,21 +28,15 @@
 #include "modules/multipanel.h"
 #include "modules/playeraliases.h"
 #include "modules/playeroutlines.h"
+#include "modules/projectileoutlines.h"
 #include "modules/statusicons.h"
 
-#define PLUGIN_DESC "StatusSpec v0.17.4"
-
-typedef struct ObserverInfo_s {
-	int mode;
-	EHANDLE target;
-} ObserverInfo_t;
-
-ObserverInfo_t GetLocalPlayerObserverInfo();
+#define PLUGIN_DESC "StatusSpec v0.18.0"
 
 int Detour_GetLocalPlayerIndex();
 
-void Hook_C_TFPlayer_GetGlowEffectColor(float *r, float *g, float *b);
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage);
+bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup);
 bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast = false);
 bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event);
 void Hook_IPanel_PaintTraverse_Pre(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce);

@@ -29,7 +29,6 @@
 
 class Entities {
 public:
-	static int pCTFPlayer__m_bGlowEnabled;
 	static int pCTFPlayer__m_iClass;
 	static int pCTFPlayer__m_iTeamNum;
 	static int pCTFPlayer__m_nPlayerCond;
@@ -50,6 +49,7 @@ public:
 	static int pCWeaponMedigun__m_bHealing;
 	static int pCWeaponMedigun__m_hHealingTarget;
 	static int pCTFPlayer__m_iKillStreak;
+	static int pCTFGrenadePipebombProjectile__m_iType;
 
 	static bool PrepareOffsets();
 	static bool GetClassPropOffset(const char *className, int &offset, int depth, ...);
