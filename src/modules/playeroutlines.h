@@ -23,13 +23,12 @@
 #include "../enums.h"
 #include "../entities.h"
 #include "../funcs.h"
+#include "../glows.h"
 #include "../ifaces.h"
 
 #if defined _WIN32
 #define strtoull _strtoui64
 #endif
-
-#define TOP_PANEL_NAME "MatSystemTopPanel"
 
 typedef struct ColorConCommand_s {
 	Color color;
@@ -39,29 +38,22 @@ typedef struct ColorConCommand_s {
 class PlayerOutlines {
 public:
 	PlayerOutlines();
-	~PlayerOutlines();
 
 	bool IsEnabled();
-	bool IsFrequentOverrideEnabled();
 
-	bool GetGlowEffectColorOverride(C_TFPlayer *tfPlayer, float *r, float *g, float *b);
-
-	void Paint(vgui::VPANEL vguiPanel);
-
-	void ProcessEntity(IClientEntity* entity);
+	void ProcessEntity(IClientEntity *entity);
 private:
 	std::map<std::string, ColorConCommand_t> colors;
-	vgui::HPanel topPanel;
+	std::map<EHANDLE, CGlowObject *> glows;
+
+	Color GetGlowColor(IClientEntity *entity);
+	void SetGlowEffect(IClientEntity *entity, bool enabled, Vector color = Vector(1.0f, 1.0f, 1.0f), float alpha = 1.0f);
 	
 	ConVar *enabled;
-	ConCommand *force_refresh;
-	ConVar *frequent_override_enabled;
 	ConVar *health_adjusted_team_colors;
 	ConVar *team_colors;
-	static void ForceRefresh();
 	static void ColorCommand(const CCommand &command);
 	static int GetCurrentColor(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]);
-	static void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
 
 extern PlayerOutlines *g_PlayerOutlines;

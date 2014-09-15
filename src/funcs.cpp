@@ -20,8 +20,8 @@ SH_DECL_MANUALHOOK5_void(C_TFPlayer_CalcView, OFFSET_CALCVIEW, 0, 0, Vector &, Q
 SH_DECL_MANUALHOOK3_void(C_TFPlayer_GetGlowEffectColor, OFFSET_GETGLOWEFFECTCOLOR, 0, 0, float *, float *, float *);
 SH_DECL_MANUALHOOK0(C_TFPlayer_GetObserverMode, OFFSET_GETOBSERVERMODE, 0, 0, int);
 SH_DECL_MANUALHOOK0(C_TFPlayer_GetObserverTarget, OFFSET_GETOBSERVERTARGET, 0, 0, C_BaseEntity *);
-SH_DECL_MANUALHOOK0_void(C_TFPlayer_UpdateGlowEffect, OFFSET_UPDATEGLOWEFFECT, 0, 0);
 SH_DECL_HOOK1_void(IBaseClientDLL, FrameStageNotify, SH_NOATTRIB, 0, ClientFrameStage_t);
+SH_DECL_HOOK1(IClientMode, DoPostScreenSpaceEffects, SH_NOATTRIB, 0, bool, const CViewSetup *);
 SH_DECL_HOOK2(IGameEventManager2, FireEvent, SH_NOATTRIB, 0, bool, IGameEvent *, bool);
 SH_DECL_HOOK1(IGameEventManager2, FireEventClientSide, SH_NOATTRIB, 0, bool, IGameEvent *);
 SH_DECL_HOOK3_void(IPanel, PaintTraverse, SH_NOATTRIB, 0, VPANEL, bool, bool);
@@ -86,12 +86,12 @@ bool Funcs::AddDetour_GetLocalPlayerIndex(GLPI_t detour) {
 	return false;
 }
 
-int Funcs::AddHook_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *instance, void(*hook)(float *, float *, float *)) {
-	return SH_ADD_MANUALVPHOOK(C_TFPlayer_GetGlowEffectColor, instance, SH_STATIC(hook), false);
-}
-
 int Funcs::AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, void(*hook)(ClientFrameStage_t)) {
 	return SH_ADD_HOOK(IBaseClientDLL, FrameStageNotify, instance, SH_STATIC(hook), false);
+}
+
+int Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(IClientMode *instance, bool(*hook)(const CViewSetup *)) {
+	return SH_ADD_HOOK(IClientMode, DoPostScreenSpaceEffects, instance, SH_STATIC(hook), false);
 }
 
 int Funcs::AddHook_IGameEventManager2_FireEvent(IGameEventManager2 *instance, bool(*hook)(IGameEvent *, bool)) {
@@ -135,8 +135,8 @@ C_BaseEntity *Funcs::CallFunc_C_TFPlayer_GetObserverTarget(C_TFPlayer *instance)
 	return SH_MCALL(instance, C_TFPlayer_GetObserverTarget)();
 }
 
-void Funcs::CallFunc_C_TFPlayer_UpdateGlowEffect(C_TFPlayer *instance) {
-	SH_MCALL(instance, C_TFPlayer_UpdateGlowEffect)();
+void Funcs::CallFunc_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *instance, float *r, float *g, float *b) {
+	SH_MCALL(instance, C_TFPlayer_GetGlowEffectColor)(r, g, b);
 }
 
 bool Funcs::CallFunc_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, int ent_num, player_info_t *pinfo) {

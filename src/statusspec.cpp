@@ -20,7 +20,7 @@ PlayerAliases *g_PlayerAliases = nullptr;
 PlayerOutlines *g_PlayerOutlines = nullptr;
 StatusIcons *g_StatusIcons = nullptr;
 
-static int getGlowEffectColorHook;
+static int doPostScreenSpaceEffectsHook;
 
 int Detour_GetLocalPlayerIndex() {
 	if (g_LocalPlayer) {
@@ -32,21 +32,11 @@ int Detour_GetLocalPlayerIndex() {
 	return Funcs::CallFunc_GetLocalPlayerIndex();
 }
 
-void Hook_C_TFPlayer_GetGlowEffectColor(float *r, float *g, float *b) {
-	if (g_PlayerOutlines) {
-		if (g_PlayerOutlines->IsEnabled()) {
-			C_TFPlayer *tfPlayer = META_IFACEPTR(C_TFPlayer);
-
-			if (g_PlayerOutlines->GetGlowEffectColorOverride(tfPlayer, r, g, b)) {
-				RETURN_META(MRES_SUPERCEDE);
-			}
-		}
+void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
+	if (!doPostScreenSpaceEffectsHook && Interfaces::GetClientMode()) {
+		doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), Hook_IClientMode_DoPostScreenSpaceEffects);
 	}
 
-	RETURN_META(MRES_IGNORED);
-}
-
-void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 	if (curStage == FRAME_RENDER_START) {
 		if (g_LoadoutIcons) {
 			if (g_LoadoutIcons->IsEnabled()) {
@@ -73,10 +63,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 		
 			if (!entity) {
 				continue;
-			}
-
-			if (!getGlowEffectColorHook && Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFPlayer")) {
-				getGlowEffectColorHook = Funcs::AddHook_C_TFPlayer_GetGlowEffectColor((C_TFPlayer *)entity, Hook_C_TFPlayer_GetGlowEffectColor);
 			}
 
 			if (g_AntiFreeze) {
@@ -130,6 +116,12 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 	RETURN_META(MRES_IGNORED);
 }
 
+bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup) {
+	g_GlowObjectManager.RenderGlowEffects(pSetup);
+
+	RETURN_META_VALUE(MRES_OVERRIDE, true);
+}
+
 bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast) {
 	IGameEvent *newEvent = Interfaces::pGameEventManager->DuplicateEvent(event);
 
@@ -176,12 +168,6 @@ void Hook_IPanel_PaintTraverse_Pre(vgui::VPANEL vguiPanel, bool forceRepaint, bo
 	if (g_MedigunInfo) {
 		if (g_MedigunInfo->IsEnabled()) {
 			g_MedigunInfo->Paint(vguiPanel);
-		}
-	}
-
-	if (g_PlayerOutlines) {
-		if (g_PlayerOutlines->IsEnabled() && g_PlayerOutlines->IsFrequentOverrideEnabled()) {
-			g_PlayerOutlines->Paint(vguiPanel);
 		}
 	}
 
