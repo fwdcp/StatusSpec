@@ -34,21 +34,21 @@ inline bool IsInteger(const std::string &s) {
 }
 
 PlayerOutlines::PlayerOutlines() {
-	colors["blu_low"].color = Color(88, 133, 162);
+	colors["blu_low"].color = Color(88, 133, 162, 255);
 	colors["blu_low"].command = new ConCommand("statusspec_playeroutlines_color_blu_low", PlayerOutlines::ColorCommand, "the color used for outlines for BLU team players at low health", FCVAR_NONE, PlayerOutlines::GetCurrentColor);
-	colors["blu_medium"].color = Color(88, 133, 162);
+	colors["blu_medium"].color = Color(88, 133, 162, 255);
 	colors["blu_medium"].command = new ConCommand("statusspec_playeroutlines_color_blu_medium", PlayerOutlines::ColorCommand, "the color used for outlines for BLU team players at medium health", FCVAR_NONE, PlayerOutlines::GetCurrentColor);
-	colors["blu_full"].color = Color(88, 133, 162);
+	colors["blu_full"].color = Color(88, 133, 162, 255);
 	colors["blu_full"].command = new ConCommand("statusspec_playeroutlines_color_blu_full", PlayerOutlines::ColorCommand, "the color used for outlines for BLU team players at full health", FCVAR_NONE, PlayerOutlines::GetCurrentColor);
-	colors["blu_buff"].color = Color(88, 133, 162);
+	colors["blu_buff"].color = Color(88, 133, 162, 255);
 	colors["blu_buff"].command = new ConCommand("statusspec_playeroutlines_color_blu_buff", PlayerOutlines::ColorCommand, "the color used for outlines for BLU team players at max buffed health", FCVAR_NONE, PlayerOutlines::GetCurrentColor);
-	colors["red_low"].color = Color(184, 56, 59);
+	colors["red_low"].color = Color(184, 56, 59, 255);
 	colors["red_low"].command = new ConCommand("statusspec_playeroutlines_color_red_low", PlayerOutlines::ColorCommand, "the color used for outlines for RED team players at low health", FCVAR_NONE, PlayerOutlines::GetCurrentColor);
-	colors["red_medium"].color = Color(184, 56, 59);
+	colors["red_medium"].color = Color(184, 56, 59, 255);
 	colors["red_medium"].command = new ConCommand("statusspec_playeroutlines_color_red_medium", PlayerOutlines::ColorCommand, "the color used for outlines for RED team players at medium health", FCVAR_NONE, PlayerOutlines::GetCurrentColor);
-	colors["red_full"].color = Color(184, 56, 59);
+	colors["red_full"].color = Color(184, 56, 59, 255);
 	colors["red_full"].command = new ConCommand("statusspec_playeroutlines_color_red_full", PlayerOutlines::ColorCommand, "the color used for outlines for RED team players at full health", FCVAR_NONE, PlayerOutlines::GetCurrentColor);
-	colors["red_buff"].color = Color(184, 56, 59);
+	colors["red_buff"].color = Color(184, 56, 59, 255);
 	colors["red_buff"].command = new ConCommand("statusspec_playeroutlines_color_red_buff", PlayerOutlines::ColorCommand, "the color used for outlines for RED team players at max buffed health", FCVAR_NONE, PlayerOutlines::GetCurrentColor);
 	
 	enabled = new ConVar("statusspec_playeroutlines_enabled", "0", FCVAR_NONE, "enable player outlines");
