@@ -16,13 +16,13 @@
 
 #define CLIENT_DLL
 
+#include "cbase.h"
 #include "cdll_int.h"
 #include "iclientmode.h"
 #include "igameevents.h"
 #include "igameresources.h"
 #include "vgui/vgui.h"
 #include "vgui/IPanel.h"
-#include "cbase.h"
 
 #include <sourcehook_impl.h>
 #include <sourcehook.h>
