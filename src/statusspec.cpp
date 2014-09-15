@@ -49,7 +49,7 @@ int Detour_GetLocalPlayerIndex() {
 
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 	if (!doPostScreenSpaceEffectsHook && Interfaces::GetClientMode()) {
-		Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), Hook_IClientMode_DoPostScreenSpaceEffects);
+		doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), Hook_IClientMode_DoPostScreenSpaceEffects);
 	}
 
 	if (curStage == FRAME_RENDER_START) {
