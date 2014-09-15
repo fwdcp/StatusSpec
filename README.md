@@ -8,6 +8,16 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**0.18.0**
+* general
+  * added plugin glow system
+  * fix issues caused by the 2014-09-10 update
+* player outlines
+  * migrated to plugin glow system
+  * removed useless commands
+* projectile outlines
+  * new module
+
 **0.17.4**
 * general
   * adjust paint method hooking so that we can draw at the correct location
@@ -248,20 +258,31 @@ In addition, the following HUD animations are triggered by this plugin and may b
 
 #### Console Variables
 * `statusspec_playeroutlines_enabled` - enable player outlines
-* `statusspec_playeroutlines_frequent_override_enabled` - enable more frequent player outline overrides (helps stop flickering at cost of performance)
 * `statusspec_playeroutlines_health_adjusted_team_colors` - adjusts team colors depending on health of players
 * `statusspec_playeroutlines_team_colors` - override default health-based outline colors with team colors
 
 #### Console Commands
-* `statusspec_playeroutlines_color_blu_buff <red> <green> <blue>` - the color used for outlines for BLU team players at max buffed health
-* `statusspec_playeroutlines_color_blu_full <red> <green> <blue>` - the color used for outlines for BLU team players at full health
-* `statusspec_playeroutlines_color_blu_low <red> <green> <blue>` - the color used for outlines for BLU team players at low health
-* `statusspec_playeroutlines_color_blu_medium <red> <green> <blue>` - the color used for outlines for BLU team players at medium health
-* `statusspec_playeroutlines_color_red_buff <red> <green> <blue>` - the color used for outlines for RED team players at max buffed health
-* `statusspec_playeroutlines_color_red_full <red> <green> <blue>` - the color used for outlines for RED team players at full health
-* `statusspec_playeroutlines_color_red_low <red> <green> <blue>` - the color used for outlines for RED team players at low health
-* `statusspec_playeroutlines_color_red_medium <red> <green> <blue>` - the color used for outlines for RED team players at medium health
-* `statusspec_playeroutlines_force_refresh` - force the player outlines to refresh
+* `statusspec_playeroutlines_color_blu_buff <red> <green> <blue> [alpha]` - the color used for outlines for BLU team players at max buffed health
+* `statusspec_playeroutlines_color_blu_full <red> <green> <blue> [alpha]` - the color used for outlines for BLU team players at full health
+* `statusspec_playeroutlines_color_blu_low <red> <green> <blue> [alpha]` - the color used for outlines for BLU team players at low health
+* `statusspec_playeroutlines_color_blu_medium <red> <green> <blue> [alpha]` - the color used for outlines for BLU team players at medium health
+* `statusspec_playeroutlines_color_red_buff <red> <green> <blue> [alpha]` - the color used for outlines for RED team players at max buffed health
+* `statusspec_playeroutlines_color_red_full <red> <green> <blue> [alpha]` - the color used for outlines for RED team players at full health
+* `statusspec_playeroutlines_color_red_low <red> <green> <blue> [alpha]` - the color used for outlines for RED team players at low health
+* `statusspec_playeroutlines_color_red_medium <red> <green> <blue> [alpha]` - the color used for outlines for RED team players at medium health
+
+### Projectile Outlines
+*displays bright outlines around projectiles that can be seen through walls*
+
+#### Console Variables
+* `statusspec_projectileoutlines_enabled` - enable projectile outlines
+* `statusspec_projectileoutlines_grenades` - enable outlines for grenades
+* `statusspec_projectileoutlines_rockets` - enable outlines for rockets
+* `statusspec_projectileoutlines_stickybombs` - enable outlines for stickybombs
+
+#### Console Commands
+* `statusspec_projectileoutlines_color_blu <red> <green> <blue> [alpha]` - the color used for outlines for BLU projectiles
+* `statusspec_projectileoutlines_color_red <red> <green> <blue> [alpha]` - the color used for outlines for RED projectiles
 
 ### Status Icons
 *displays icons representing special statuses of a player*
