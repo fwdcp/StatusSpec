@@ -15,6 +15,8 @@
 #include <array>
 #include <string>
 
+#include "Color.h"
+
 // taken from SourceMod
 
 enum TFClassType
@@ -227,3 +229,15 @@ static std::array<std::string, 10> tfclassNames = {"", "scout", "sniper", "soldi
 // taken from the item schema
 
 static std::array<std::string, 9> itemSlots = {"primary", "secondary", "melee", "pda", "pda2", "building", "head", "misc", "action"};
+
+// self-generated
+
+enum TFGrenadePipebombType {
+	TFGrenadePipebombType_Grenade,
+	TFGrenadePipebombType_Stickybomb,
+};
+
+typedef struct ColorConCommand_s {
+	Color color;
+	ConCommand *command;
+} ColorConCommand_t;
