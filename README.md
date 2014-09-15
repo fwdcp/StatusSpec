@@ -8,6 +8,16 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**0.18.0**
+* general
+  * added plugin glow system
+  * fix issues caused by the 2014-09-10 update
+* player outlines
+  * migrated to plugin glow system
+  * removed useless commands
+* projectile outlines
+  * new module
+
 **0.17.4**
 * general
   * adjust paint method hooking so that we can draw at the correct location
