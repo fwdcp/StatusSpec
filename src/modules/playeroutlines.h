@@ -30,11 +30,6 @@
 #define strtoull _strtoui64
 #endif
 
-typedef struct ColorConCommand_s {
-	Color color;
-	ConCommand *command;
-} ColorConCommand_t;
-
 class PlayerOutlines {
 public:
 	PlayerOutlines();
