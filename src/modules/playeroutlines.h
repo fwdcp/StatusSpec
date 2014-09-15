@@ -30,8 +30,6 @@
 #define strtoull _strtoui64
 #endif
 
-#define TOP_PANEL_NAME "MatSystemTopPanel"
-
 typedef struct ColorConCommand_s {
 	Color color;
 	ConCommand *command;
