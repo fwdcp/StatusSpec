@@ -20,30 +20,7 @@ inline bool IsInteger(const std::string &s) {
 }
 
 inline CSteamID ConvertTextToSteamID(std::string textID) {
-	if (textID.substr(0, 6).compare("STEAM_") == 0 && std::count(textID.begin(), textID.end(), ':') == 2) {
-		std::stringstream ss(textID);
-		std::string universe;
-		std::string server;
-		std::string authID;
-		std::getline(ss, universe, ':');
-		std::getline(ss, server, ':');
-		std::getline(ss, authID, ':');
-
-		if (IsInteger(server) && IsInteger(authID)) {
-			uint32_t accountID = (2 * strtoul(authID.c_str(), nullptr, 10)) + strtoul(server.c_str(), nullptr, 10);
-
-			static EUniverse universe = k_EUniverseInvalid;
-
-			if (universe == k_EUniverseInvalid) {
-				universe = Interfaces::pSteamAPIContext->SteamUtils()->GetConnectedUniverse();
-			}
-
-			return CSteamID(accountID, universe, k_EAccountTypeIndividual);
-		}
-
-		return CSteamID();
-	}
-	else if (IsInteger(textID)) {
+	if (IsInteger(textID)) {
 		uint64_t steamID = strtoull(textID.c_str(), nullptr, 10);
 
 		return CSteamID(steamID);
