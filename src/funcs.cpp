@@ -22,6 +22,7 @@ SH_DECL_MANUALHOOK0(C_TFPlayer_GetObserverMode, OFFSET_GETOBSERVERMODE, 0, 0, in
 SH_DECL_MANUALHOOK0(C_TFPlayer_GetObserverTarget, OFFSET_GETOBSERVERTARGET, 0, 0, C_BaseEntity *);
 SH_DECL_HOOK1_void(IBaseClientDLL, FrameStageNotify, SH_NOATTRIB, 0, ClientFrameStage_t);
 SH_DECL_HOOK1(IClientMode, DoPostScreenSpaceEffects, SH_NOATTRIB, 0, bool, const CViewSetup *);
+SH_DECL_HOOK0(IClientRenderable, GetModel, const, 0, const model_t *);
 SH_DECL_HOOK2(IGameEventManager2, FireEvent, SH_NOATTRIB, 0, bool, IGameEvent *, bool);
 SH_DECL_HOOK1(IGameEventManager2, FireEventClientSide, SH_NOATTRIB, 0, bool, IGameEvent *);
 SH_DECL_HOOK3_void(IPanel, PaintTraverse, SH_NOATTRIB, 0, VPANEL, bool, bool);
@@ -94,6 +95,10 @@ int Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(IClientMode *instance, b
 	return SH_ADD_HOOK(IClientMode, DoPostScreenSpaceEffects, instance, SH_STATIC(hook), false);
 }
 
+int Funcs::AddHook_IClientRenderable_GetModel(IClientRenderable *instance, const model_t *(*hook)()) {
+	return SH_ADD_HOOK(IClientRenderable, GetModel, instance, SH_STATIC(hook), false);
+}
+
 int Funcs::AddHook_IGameEventManager2_FireEvent(IGameEventManager2 *instance, bool(*hook)(IGameEvent *, bool)) {
 	return SH_ADD_HOOK(IGameEventManager2, FireEvent, instance, SH_STATIC(hook), false);
 }
@@ -137,6 +142,10 @@ C_BaseEntity *Funcs::CallFunc_C_TFPlayer_GetObserverTarget(C_TFPlayer *instance)
 
 void Funcs::CallFunc_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *instance, float *r, float *g, float *b) {
 	SH_MCALL(instance, C_TFPlayer_GetGlowEffectColor)(r, g, b);
+}
+
+const model_t *Funcs::CallFunc_IClientRenderable_GetModel(IClientRenderable *instance) {
+	return SH_CALL(instance, &IClientRenderable::GetModel)();
 }
 
 bool Funcs::CallFunc_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, int ent_num, player_info_t *pinfo) {

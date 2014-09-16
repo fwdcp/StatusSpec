@@ -69,6 +69,7 @@ public:
 
 	static int AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, void(*hook)(ClientFrameStage_t));
 	static int AddHook_IClientMode_DoPostScreenSpaceEffects(IClientMode *instance, bool(*hook)(const CViewSetup *));
+	static int AddHook_IClientRenderable_GetModel(IClientRenderable *instance, const model_t *(*hook)());
 	static int AddHook_IGameEventManager2_FireEvent(IGameEventManager2 *instance, bool(*hook)(IGameEvent *, bool));
 	static int AddHook_IGameEventManager2_FireEventClientSide(IGameEventManager2 *instance, bool(*hook)(IGameEvent *));
 	static int AddHook_IPanel_PaintTraverse_Pre(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, bool, bool));
@@ -81,6 +82,7 @@ public:
 	static void CallFunc_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *instance, float *r, float *g, float *b);
 	static int CallFunc_C_TFPlayer_GetObserverMode(C_TFPlayer *instance);
 	static C_BaseEntity *CallFunc_C_TFPlayer_GetObserverTarget(C_TFPlayer *instance);
+	static const model_t *CallFunc_IClientRenderable_GetModel(IClientRenderable *instance);
 	static bool CallFunc_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, int ent_num, player_info_t *pinfo);
 
 	static bool RemoveDetour_GetLocalPlayerIndex();
