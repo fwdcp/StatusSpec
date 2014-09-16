@@ -246,6 +246,7 @@ In addition, the following HUD animations are triggered by this plugin and may b
 
 #### Console Variables
 * `statusspec_playeraliases_enabled` - enable player aliases
+* `statusspec_playeraliases_esea` - enable player aliases from the ESEA API
 * `statusspec_playeraliases_etf2l` - enable player aliases from the ETF2L API
 
 #### Console Commands

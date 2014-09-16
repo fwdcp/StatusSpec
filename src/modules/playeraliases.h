@@ -30,9 +30,12 @@
 #define strtoull _strtoui64
 #endif
 
-#define ETF2L_PLAYER_API_URL "http://api.etf2l.org/player/%llu.json"
 #define MAX_URL_LENGTH 2048
+
+#define ESEA_PLAYER_API_URL "http://play.esea.net/index.php"
+#define ETF2L_PLAYER_API_URL "http://api.etf2l.org/player/%llu.json"
 #define TWITCH_USER_API_URL "http://api.twitch.tv/api/steam/%llu"
+#define STEAM_USER_ID_FORMAT "[U:%i:%lu]"
 
 typedef enum APIStatus_s {
 	API_UNKNOWN,
@@ -59,16 +62,20 @@ public:
 	bool GetPlayerInfoOverride(int ent_num, player_info_t *pinfo);
 
 	bool GetAlias(CSteamID player, std::string &alias);
+	void GetESEAPlayerInfo(HTTPRequestCompleted_t *requestCompletionInfo, bool bIOFailure);
 	void GetETF2LPlayerInfo(HTTPRequestCompleted_t *requestCompletionInfo, bool bIOFailure);
 	void GetTwitchUserInfo(HTTPRequestCompleted_t *requestCompletionInfo, bool bIOFailure);
+	void RequestESEAPlayerInfo(CSteamID player);
 	void RequestETF2LPlayerInfo(CSteamID player);
 	void RequestTwitchUserInfo(CSteamID player);
 private:
 	std::map<CSteamID, std::string> customAliases;
+	std::map<CSteamID, APIAlias_t> eseaAliases;
 	std::map<CSteamID, APIAlias_t> etf2lAliases;
 	std::map<CSteamID, APIAlias_t> twitchAliases;
 
 	ConVar *enabled;
+	ConVar *esea;
 	ConVar *etf2l;
 	ConCommand *get;
 	ConCommand *remove;
