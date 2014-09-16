@@ -8,6 +8,10 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**WIP**
+* player aliases
+  * add support for ESEA aliases
+
 **0.18.0**
 * general
   * added plugin glow system
