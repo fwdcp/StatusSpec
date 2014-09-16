@@ -16,6 +16,7 @@
 #define VERSION_SAFE_STEAM_API_INTERFACES
 
 #include "cdll_int.h"
+#include "engine/ivmodelinfo.h"
 #include "entitylist_base.h"
 #include "filesystem.h"
 #include "icliententitylist.h"
@@ -59,6 +60,7 @@ class Interfaces {
 		static IVEngineClient *pEngineClient;
 		static IFileSystem *pFileSystem;
 		static IGameEventManager2 *pGameEventManager;
+		static IVModelInfoClient *pModelInfoClient;
 		static IVRenderView *pRenderView;
 		static CSteamAPIContext *pSteamAPIContext;
 		static IClientMode *GetClientMode();
