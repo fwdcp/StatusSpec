@@ -72,6 +72,7 @@ inline CSteamID GetClientSteamID(int client) {
 
 PlayerAliases::PlayerAliases() {
 	enabled = new ConVar("statusspec_playeraliases_enabled", "0", FCVAR_NONE, "enable player aliases");
+	esea = new ConVar("statusspec_playeraliases_esea", "0", FCVAR_NONE, "enable player aliases from the ESEA API");
 	etf2l = new ConVar("statusspec_playeraliases_etf2l", "0", FCVAR_NONE, "enable player aliases from the ETF2L API");
 	get = new ConCommand("statusspec_playeraliases_get", PlayerAliases::GetCustomPlayerAlias, "get a custom player alias", FCVAR_NONE, PlayerAliases::GetCurrentAliasedPlayers);
 	remove = new ConCommand("statusspec_playeraliases_remove", PlayerAliases::RemoveCustomPlayerAlias, "remove a custom player alias", FCVAR_NONE, PlayerAliases::GetCurrentAliasedPlayers);
@@ -116,6 +117,16 @@ bool PlayerAliases::GetAlias(CSteamID player, std::string &alias) {
 		}
 	}
 
+	if (esea->GetBool()) {
+		if (eseaAliases[player].status == API_UNKNOWN) {
+			RequestESEAPlayerInfo(player);
+		}
+		else if (eseaAliases[player].status == API_SUCCESSFUL) {
+			alias.assign(eseaAliases[player].name);
+			return true;
+		}
+	}
+
 	if (twitch->GetBool()) {
 		if (twitchAliases[player].status == API_UNKNOWN) {
 			RequestTwitchUserInfo(player);
@@ -127,6 +138,47 @@ bool PlayerAliases::GetAlias(CSteamID player, std::string &alias) {
 	}
 	
 	return false;
+}
+
+void PlayerAliases::GetESEAPlayerInfo(HTTPRequestCompleted_t *requestCompletionInfo, bool bIOFailure) {
+	CSteamID player = CSteamID(requestCompletionInfo->m_ulContextValue);
+
+	if (bIOFailure || !requestCompletionInfo->m_bRequestSuccessful) {
+		eseaAliases[player].status = API_UNKNOWN;
+	}
+	else if (requestCompletionInfo->m_eStatusCode != k_EHTTPStatusCode200OK) {
+		eseaAliases[player].status = API_FAILED;
+	}
+	else {
+		ISteamHTTP *httpClient = Interfaces::pSteamAPIContext->SteamHTTP();
+
+		uint32 bodySize;
+		httpClient->GetHTTPResponseBodySize(requestCompletionInfo->m_hRequest, &bodySize);
+
+		uint8 *body = new uint8[bodySize];
+		httpClient->GetHTTPResponseBodyData(requestCompletionInfo->m_hRequest, body, bodySize);
+
+		std::string json = (char *)body;
+
+		Json::Reader reader;
+		Json::Value root;
+
+		if (reader.parse(json, root)) {
+			if (root.isMember("results") && root["results"].size() > 0) {
+				if (root["results"][0].isMember("alias")) {
+					eseaAliases[player].name = root["results"][0]["alias"].asString();
+					eseaAliases[player].status = API_SUCCESSFUL;
+					httpClient->ReleaseHTTPRequest(requestCompletionInfo->m_hRequest);
+
+					return;
+				}
+			}
+		}
+
+		eseaAliases[player].status = API_FAILED;
+	}
+
+	Interfaces::pSteamAPIContext->SteamHTTP()->ReleaseHTTPRequest(requestCompletionInfo->m_hRequest);
 }
 
 void PlayerAliases::GetETF2LPlayerInfo(HTTPRequestCompleted_t *requestCompletionInfo, bool bIOFailure) {
@@ -207,6 +259,28 @@ void PlayerAliases::GetTwitchUserInfo(HTTPRequestCompleted_t *requestCompletionI
 	}
 
 	Interfaces::pSteamAPIContext->SteamHTTP()->ReleaseHTTPRequest(requestCompletionInfo->m_hRequest);
+}
+
+void PlayerAliases::RequestESEAPlayerInfo(CSteamID player) {
+	ISteamHTTP *httpClient = Interfaces::pSteamAPIContext->SteamHTTP();
+
+	char id[MAX_URL_LENGTH];
+	V_snprintf(id, sizeof(id), STEAM_USER_ID_FORMAT, Interfaces::pSteamAPIContext->SteamUtils()->GetConnectedUniverse(), player.GetAccountID());
+
+	HTTPRequestHandle request = httpClient->CreateHTTPRequest(k_EHTTPMethodGET, ESEA_PLAYER_API_URL);
+	httpClient->SetHTTPRequestGetOrPostParameter(request, "s", "search");
+	httpClient->SetHTTPRequestGetOrPostParameter(request, "query", id);
+	httpClient->SetHTTPRequestGetOrPostParameter(request, "source", "users");
+	httpClient->SetHTTPRequestGetOrPostParameter(request, "fields%5Bunique_ids%5D", "1");
+	httpClient->SetHTTPRequestGetOrPostParameter(request, "format", "json");
+	httpClient->SetHTTPRequestHeaderValue(request, "Cookie", "viewed_welcome_page=1");
+	httpClient->SetHTTPRequestContextValue(request, player.ConvertToUint64());
+
+	SteamAPICall_t apiCall;
+	if (httpClient->SendHTTPRequest(request, &apiCall)) {
+		eseaAliases[player].status = API_REQUESTED;
+		eseaAliases[player].call.Set(apiCall, this, &PlayerAliases::GetESEAPlayerInfo);
+	}
 }
 
 void PlayerAliases::RequestETF2LPlayerInfo(CSteamID player) {
