@@ -127,6 +127,10 @@ bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup) {
 	RETURN_META_VALUE(MRES_OVERRIDE, true);
 }
 
+const model_t *Hook_IClientRenderable_GetModel() {
+	RETURN_META_VALUE(MRES_IGNORED, nullptr);
+}
+
 bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast) {
 	IGameEvent *newEvent = Interfaces::pGameEventManager->DuplicateEvent(event);
 
