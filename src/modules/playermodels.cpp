@@ -85,7 +85,7 @@ void PlayerModels::ProcessEntity(IClientEntity* entity) {
 		return;
 	}
 
-	CHandle<IClientRenderable> entityHandle = entity->GetClientRenderable();
+	EHANDLE entityHandle = entity->GetBaseEntity();
 
 	if (hooks.find(entityHandle) == hooks.end()) {
 		Funcs::AddHook_IClientRenderable_GetModel(entity->GetClientRenderable(), Hook_IClientRenderable_GetModel);
