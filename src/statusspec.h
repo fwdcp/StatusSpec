@@ -27,6 +27,7 @@
 #include "modules/mediguninfo.h"
 #include "modules/multipanel.h"
 #include "modules/playeraliases.h"
+#include "modules/playermodels.h"
 #include "modules/playeroutlines.h"
 #include "modules/projectileoutlines.h"
 #include "modules/statusicons.h"

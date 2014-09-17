@@ -17,6 +17,7 @@ LocalPlayer *g_LocalPlayer = nullptr;
 MedigunInfo *g_MedigunInfo = nullptr;
 MultiPanel *g_MultiPanel = nullptr;
 PlayerAliases *g_PlayerAliases = nullptr;
+PlayerModels *g_PlayerModels = nullptr;
 PlayerOutlines *g_PlayerOutlines = nullptr;
 ProjectileOutlines *g_ProjectileOutlines = nullptr;
 StatusIcons *g_StatusIcons = nullptr;
@@ -128,6 +129,12 @@ bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup) {
 }
 
 const model_t *Hook_IClientRenderable_GetModel() {
+	if (g_PlayerModels) {
+		if (g_PlayerModels->IsEnabled()) {
+			RETURN_META_VALUE(MRES_SUPERCEDE, g_PlayerModels->GetModelOverride(META_IFACEPTR(IClientRenderable)));
+		}
+	}
+
 	RETURN_META_VALUE(MRES_IGNORED, nullptr);
 }
 
@@ -276,6 +283,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_MedigunInfo = new MedigunInfo();
 	g_MultiPanel = new MultiPanel();
 	g_PlayerAliases = new PlayerAliases();
+	g_PlayerModels = new PlayerModels();
 	g_PlayerOutlines = new PlayerOutlines();
 	g_ProjectileOutlines = new ProjectileOutlines();
 	g_StatusIcons = new StatusIcons();
@@ -293,6 +301,7 @@ void StatusSpecPlugin::Unload(void)
 	delete g_MedigunInfo;
 	delete g_MultiPanel;
 	delete g_PlayerAliases;
+	delete g_PlayerModels;
 	delete g_PlayerOutlines;
 	delete g_ProjectileOutlines;
 	delete g_StatusIcons;
