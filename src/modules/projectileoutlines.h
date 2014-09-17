@@ -18,7 +18,6 @@
 
 #include "convar.h"
 #include "ehandle.h"
-#include "vgui/IVGui.h"
 
 #include "../enums.h"
 #include "../entities.h"

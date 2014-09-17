@@ -12,7 +12,6 @@
 
 #include "../stdafx.h"
 
-#include <algorithm>
 #include <cstdint>
 #include <map>
 #include <sstream>
