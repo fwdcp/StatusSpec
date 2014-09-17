@@ -83,6 +83,10 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 				}
 			}
 
+			if (g_PlayerModels) {
+				g_PlayerModels->ProcessEntity(entity);
+			}
+
 			if (g_PlayerOutlines) {
 				g_PlayerOutlines->ProcessEntity(entity);
 			}
