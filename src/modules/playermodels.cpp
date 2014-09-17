@@ -71,8 +71,6 @@ const model_t *PlayerModels::GetModelOverride(IClientRenderable *entity) {
 		return model;
 	}
 
-	const model_t *replacementModel;
-
 	if (models.find(replacementModelName) == models.end()) {
 		models[replacementModelName] = Interfaces::pModelInfoClient->FindOrLoadModel(replacementModelName);
 	}
