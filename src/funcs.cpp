@@ -62,17 +62,6 @@ inline GLPI_t GetGLPIFunc() {
 #endif
 }
 
-inline SM_t GetSMFunc() {
-#if defined _WIN32
-	static DWORD pointer = NULL;
-	if (!pointer)
-		pointer = FindPattern((DWORD)GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE)SETMODEL_SIG, SETMODEL_MASK);
-	return (SM_t)(pointer);
-#else
-	return nullptr;
-#endif
-}
-
 inline SMI_t GetSMIFunc() {
 #if defined _WIN32
 	static DWORD pointer = NULL;
@@ -96,7 +85,6 @@ inline SMP_t GetSMPFunc() {
 }
 
 GLPI_t Funcs::getLocalPlayerIndexOriginal = nullptr;
-SM_t Funcs::setModelOriginal = nullptr;
 SMI_t Funcs::setModelIndexOriginal = nullptr;
 SMP_t Funcs::setModelPointerOriginal = nullptr;
 
@@ -117,17 +105,6 @@ bool Funcs::AddDetour_GetLocalPlayerIndex(GLPI_t detour) {
 
 	if (AddDetour(GetGLPIFunc(), detour, original)) {
 		getLocalPlayerIndexOriginal = reinterpret_cast<GLPI_t>(original);
-		return true;
-	}
-
-	return false;
-}
-
-bool Funcs::AddDetour_C_BaseEntity_SetModel(SM_t detour) {
-	void *original;
-
-	if (AddDetour(GetSMFunc(), detour, original)) {
-		setModelOriginal = reinterpret_cast<SM_t>(original);
 		return true;
 	}
 
@@ -201,15 +178,6 @@ int Funcs::CallFunc_GetLocalPlayerIndex() {
 	}
 }
 
-void Funcs::CallFunc_C_BaseEntity_SetModel(C_BaseEntity *instance, const char *pModelName) {
-	if (setModelOriginal) {
-		setModelOriginal(instance, pModelName);
-	}
-	else {
-		GetSMFunc()(instance, pModelName);
-	}
-}
-
 void Funcs::CallFunc_C_BaseEntity_SetModelIndex(C_BaseEntity *instance, int index) {
 	if (setModelIndexOriginal) {
 		setModelIndexOriginal(instance, index);
@@ -251,15 +219,6 @@ bool Funcs::CallFunc_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, int 
 bool Funcs::RemoveDetour_GetLocalPlayerIndex() {
 	if (RemoveDetour(GetGLPIFunc())) {
 		getLocalPlayerIndexOriginal = nullptr;
-		return true;
-	}
-
-	return false;
-}
-
-bool Funcs::RemoveDetour_C_BaseEntity_SetModel() {
-	if (RemoveDetour(GetSMFunc())) {
-		setModelOriginal = nullptr;
 		return true;
 	}
 

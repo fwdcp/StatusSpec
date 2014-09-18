@@ -33,7 +33,6 @@ using namespace vgui;
 class C_TFPlayer;
 
 typedef int(*GLPI_t)(void);
-typedef void(__thiscall *SM_t)(C_BaseEntity *, const char *);
 typedef void(__thiscall *SMI_t)(C_BaseEntity *, int);
 typedef void(__thiscall *SMP_t)(C_BaseEntity *, const model_t *);
 
@@ -75,7 +74,6 @@ public:
 class Funcs {
 public:
 	static bool AddDetour_GetLocalPlayerIndex(GLPI_t detour);
-	static bool AddDetour_C_BaseEntity_SetModel(SM_t detour);
 	static bool AddDetour_C_BaseEntity_SetModelIndex(SMI_t detour);
 	static bool AddDetour_C_BaseEntity_SetModelPointer(SMP_t detour);
 
@@ -90,7 +88,6 @@ public:
 	static int AddHook_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, bool(*hook)(int, player_info_t *));
 
 	static int CallFunc_GetLocalPlayerIndex();
-	static void CallFunc_C_BaseEntity_SetModel(C_BaseEntity *instance, const char *pModelName);
 	static void CallFunc_C_BaseEntity_SetModelIndex(C_BaseEntity *instance, int index);
 	static void CallFunc_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, const model_t *pModel);
 
@@ -101,7 +98,6 @@ public:
 	static bool CallFunc_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, int ent_num, player_info_t *pinfo);
 
 	static bool RemoveDetour_GetLocalPlayerIndex();
-	static bool RemoveDetour_C_BaseEntity_SetModel();
 	static bool RemoveDetour_C_BaseEntity_SetModelIndex();
 	static bool RemoveDetour_C_BaseEntity_SetModelPointer();
 
@@ -116,7 +112,6 @@ public:
 	static bool Unpause();
 private:
 	static GLPI_t getLocalPlayerIndexOriginal;
-	static SM_t setModelOriginal;
 	static SMI_t setModelIndexOriginal;
 	static SMP_t setModelPointerOriginal;
 
