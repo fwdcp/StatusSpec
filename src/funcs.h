@@ -33,6 +33,9 @@ using namespace vgui;
 class C_TFPlayer;
 
 typedef int(*GLPI_t)(void);
+typedef void(__thiscall *SM_t)(C_BaseEntity *, const char *);
+typedef void(__thiscall *SMI_t)(C_BaseEntity *, int);
+typedef void(__thiscall *SMP_t)(C_BaseEntity *, const model_t *);
 
 #if defined _WIN32
 #define GetFuncAddress(pAddress, szFunction) ::GetProcAddress((HMODULE)pAddress, szFunction)
@@ -52,6 +55,12 @@ typedef int(*GLPI_t)(void);
 #define CLIENT_MODULE_SIZE 0xC74EC0
 #define GETLOCALPLAYERINDEX_SIG "\xE8\x00\x00\x00\x00\x85\xC0\x74\x08\x8D\x48\x08\x8B\x01\xFF\x60\x24\x33\xC0\xC3"
 #define GETLOCALPLAYERINDEX_MASK "x????xxxxxxxxxxxxxxx"
+#define SETMODEL_SIG "\x55\x8B\xEC\x8B\x55\x08\x56\x57\x8B\xF9\x85\xD2"
+#define SETMODEL_MASK "xxxxxxxxxxxx"
+#define SETMODELINDEX_SIG "\x55\x8B\xEC\x8B\x45\x08\x56\x8B\xF1\x57\x66\x89\x86\x00\x00\x00\x00"
+#define SETMODELINDEX_MASK "xxxxxxxxxxxxx????"
+#define SETMODELPOINTER_SIG "\x55\x8B\xEC\x56\x8B\xF1\x57\x8B\x7D\x08\x3B\x7E\x00\x74\x00"
+#define SETMODELPOINTER_MASK "xxxxxxxxxxxx?x?"
 #endif
 
 extern SourceHook::ISourceHook *g_SHPtr;
@@ -66,6 +75,9 @@ public:
 class Funcs {
 public:
 	static bool AddDetour_GetLocalPlayerIndex(GLPI_t detour);
+	static bool AddDetour_C_BaseEntity_SetModel(SM_t detour);
+	static bool AddDetour_C_BaseEntity_SetModelIndex(SMI_t detour);
+	static bool AddDetour_C_BaseEntity_SetModelPointer(SMP_t detour);
 
 	static int AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, void(*hook)(ClientFrameStage_t));
 	static int AddHook_IClientMode_DoPostScreenSpaceEffects(IClientMode *instance, bool(*hook)(const CViewSetup *));
@@ -78,6 +90,9 @@ public:
 	static int AddHook_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, bool(*hook)(int, player_info_t *));
 
 	static int CallFunc_GetLocalPlayerIndex();
+	static void CallFunc_C_BaseEntity_SetModel(C_BaseEntity *instance, const char *pModelName);
+	static void CallFunc_C_BaseEntity_SetModelIndex(C_BaseEntity *instance, int index);
+	static void CallFunc_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, const model_t *pModel);
 
 	static void CallFunc_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *instance, float *r, float *g, float *b);
 	static int CallFunc_C_TFPlayer_GetObserverMode(C_TFPlayer *instance);
@@ -86,6 +101,9 @@ public:
 	static bool CallFunc_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, int ent_num, player_info_t *pinfo);
 
 	static bool RemoveDetour_GetLocalPlayerIndex();
+	static bool RemoveDetour_C_BaseEntity_SetModel();
+	static bool RemoveDetour_C_BaseEntity_SetModelIndex();
+	static bool RemoveDetour_C_BaseEntity_SetModelPointer();
 
 	static bool RemoveHook(int hookID);
 
@@ -98,6 +116,9 @@ public:
 	static bool Unpause();
 private:
 	static GLPI_t getLocalPlayerIndexOriginal;
+	static SM_t setModelOriginal;
+	static SMI_t setModelIndexOriginal;
+	static SMP_t setModelPointerOriginal;
 
 	static bool AddDetour(void *target, void *detour, void *&original);
 
