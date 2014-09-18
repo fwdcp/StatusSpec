@@ -39,20 +39,19 @@ bool PlayerModels::IsEnabled() {
 	return enabled->GetBool();
 }
 
-const model_t *PlayerModels::GetModelOverride(IClientRenderable *entity) {
-	const model_t *model = Funcs::CallFunc_IClientRenderable_GetModel(entity);
-
-	if (!Entities::CheckClassBaseclass(entity->GetIClientUnknown()->GetIClientEntity()->GetClientClass(), "DT_TFPlayer")) {
+const model_t *PlayerModels::SetModelOverride(C_BaseEntity *entity, const model_t *model) {
+	if (!Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFPlayer")) {
 		return model;
 	}
 
-	const char *modelName = Interfaces::pModelInfoClient->GetModelName(model);
-	CSteamID playerSteamID = GetClientSteamID(entity->GetIClientUnknown()->GetIClientEntity()->entindex());
-	char *playerSteamID64 = new char[32];
-	V_snprintf(playerSteamID64, sizeof(playerSteamID64), "%llu", playerSteamID.ConvertToUint64());
+	CSteamID playerSteamID = GetClientSteamID(entity->entindex());
+	std::stringstream stringstream;
+	std::string playerSteamID64;
+	stringstream << playerSteamID.ConvertToUint64();
+	stringstream >> playerSteamID64;
 
 	KeyValues *playersConfig = modelConfig->FindKey("players");
-	const char *playerGroup = playersConfig->GetString(playerSteamID64);
+	const char *playerGroup = playersConfig->GetString(playerSteamID64.c_str());
 
 	if (strcmp(playerGroup, "") == 0) {
 		return model;
@@ -65,27 +64,13 @@ const model_t *PlayerModels::GetModelOverride(IClientRenderable *entity) {
 		return model;
 	}
 
-	const char *replacementModelName = groupConfig->GetString(modelName);
+	const char *modelName = Interfaces::pModelInfoClient->GetModelName(model);
 
-	if (strcmp(replacementModelName, "") == 0) {
-		return model;
+	FOR_EACH_VALUE(groupConfig, replacementModelConfig) {
+		if (strcmp(replacementModelConfig->GetName(), modelName) == 0) {
+			return Interfaces::pModelInfoClient->GetModel(Interfaces::pModelInfoClient->RegisterDynamicModel(replacementModelConfig->GetString(), true));
+		}
 	}
 
-	if (models.find(replacementModelName) == models.end()) {
-		models[replacementModelName] = Interfaces::pModelInfoClient->FindOrLoadModel(replacementModelName);
-	}
-
-	return models[replacementModelName];
-}
-
-void PlayerModels::ProcessEntity(IClientEntity* entity) {
-	if (!Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFPlayer")) {
-		return;
-	}
-
-	EHANDLE entityHandle = entity->GetBaseEntity();
-
-	if (hooks.find(entityHandle) == hooks.end()) {
-		Funcs::AddHook_IClientRenderable_GetModel(entity->GetClientRenderable(), Hook_IClientRenderable_GetModel);
-	}
+	return model;
 }

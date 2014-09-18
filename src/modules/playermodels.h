@@ -13,17 +13,15 @@
 #include "../stdafx.h"
 
 #include <map>
+#include <sstream>
 #include <string>
 
 #include "convar.h"
 #include "ehandle.h"
-#include "iclientrenderable.h"
 
 #include "../entities.h"
 #include "../funcs.h"
 #include "../ifaces.h"
-
-#include "../statusspec.h"
 
 #if defined _WIN32
 #define strtoull _strtoui64
@@ -35,12 +33,8 @@ public:
 
 	bool IsEnabled();
 
-	const model_t *GetModelOverride(IClientRenderable *entity);
-
-	void ProcessEntity(IClientEntity *entity);
+	const model_t *SetModelOverride(C_BaseEntity *entity, const model_t *model);
 private:
-	std::map<EHANDLE, int> hooks;
-	std::map<std::string, const model_t *> models;
 	KeyValues *modelConfig;
 
 	ConVar *enabled;
