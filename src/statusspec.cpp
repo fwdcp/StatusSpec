@@ -34,6 +34,30 @@ int Detour_GetLocalPlayerIndex() {
 	return Funcs::CallFunc_GetLocalPlayerIndex();
 }
 
+void __fastcall Detour_C_BaseEntity_SetModelIndex(C_BaseEntity *instance, void *, int index) {
+	if (g_PlayerModels) {
+		if (g_PlayerModels->IsEnabled()) {
+			const model_t *oldModel = Interfaces::pModelInfoClient->GetModel(index);
+			const model_t *newModel = g_PlayerModels->SetModelOverride(instance, oldModel);
+			index = Interfaces::pModelInfoClient->GetModelIndex(Interfaces::pModelInfoClient->GetModelName(newModel));
+		}
+	}
+
+	Funcs::CallFunc_C_BaseEntity_SetModelIndex(instance, index);
+}
+
+void __fastcall Detour_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, void *, const model_t *pModel) {
+	if (g_PlayerModels) {
+		if (g_PlayerModels->IsEnabled()) {
+			const model_t *oldModel = pModel;
+			const model_t *newModel = g_PlayerModels->SetModelOverride(instance, oldModel);
+			pModel = newModel;
+		}
+	}
+
+	Funcs::CallFunc_C_BaseEntity_SetModelPointer(instance, pModel);
+}
+
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 	if (!doPostScreenSpaceEffectsHook && Interfaces::GetClientMode()) {
 		doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), Hook_IClientMode_DoPostScreenSpaceEffects);
@@ -255,6 +279,8 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	}
 
 	Funcs::AddDetour_GetLocalPlayerIndex(Detour_GetLocalPlayerIndex);
+	Funcs::AddDetour_C_BaseEntity_SetModelIndex(Detour_C_BaseEntity_SetModelIndex);
+	Funcs::AddDetour_C_BaseEntity_SetModelPointer(Detour_C_BaseEntity_SetModelPointer);
 	
 	Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, Hook_IBaseClientDLL_FrameStageNotify);
 	Funcs::AddHook_IGameEventManager2_FireEvent(Interfaces::pGameEventManager, Hook_IGameEventManager2_FireEvent);
