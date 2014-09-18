@@ -83,10 +83,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 				}
 			}
 
-			if (g_PlayerModels) {
-				g_PlayerModels->ProcessEntity(entity);
-			}
-
 			if (g_PlayerOutlines) {
 				g_PlayerOutlines->ProcessEntity(entity);
 			}
@@ -130,16 +126,6 @@ bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup) {
 	g_GlowObjectManager.RenderGlowEffects(pSetup);
 
 	RETURN_META_VALUE(MRES_OVERRIDE, true);
-}
-
-const model_t *Hook_IClientRenderable_GetModel() {
-	if (g_PlayerModels) {
-		if (g_PlayerModels->IsEnabled()) {
-			RETURN_META_VALUE(MRES_SUPERCEDE, g_PlayerModels->GetModelOverride(META_IFACEPTR(IClientRenderable)));
-		}
-	}
-
-	RETURN_META_VALUE(MRES_IGNORED, nullptr);
 }
 
 bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast) {

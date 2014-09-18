@@ -38,7 +38,6 @@ int Detour_GetLocalPlayerIndex();
 
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage);
 bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup);
-const model_t *Hook_IClientRenderable_GetModel();
 bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast = false);
 bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event);
 void Hook_IPanel_PaintTraverse_Pre(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce);
