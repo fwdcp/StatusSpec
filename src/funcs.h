@@ -35,6 +35,8 @@ class C_TFPlayer;
 typedef int(*GLPI_t)(void);
 typedef void(__thiscall *SMI_t)(C_BaseEntity *, int);
 typedef void(__thiscall *SMP_t)(C_BaseEntity *, const model_t *);
+typedef void(__fastcall *SMIH_t)(C_BaseEntity *, void *, int);
+typedef void(__fastcall *SMPH_t)(C_BaseEntity *, void *, const model_t *);
 
 #if defined _WIN32
 #define GetFuncAddress(pAddress, szFunction) ::GetProcAddress((HMODULE)pAddress, szFunction)
@@ -74,8 +76,8 @@ public:
 class Funcs {
 public:
 	static bool AddDetour_GetLocalPlayerIndex(GLPI_t detour);
-	static bool AddDetour_C_BaseEntity_SetModelIndex(SMI_t detour);
-	static bool AddDetour_C_BaseEntity_SetModelPointer(SMP_t detour);
+	static bool AddDetour_C_BaseEntity_SetModelIndex(SMIH_t detour);
+	static bool AddDetour_C_BaseEntity_SetModelPointer(SMPH_t detour);
 
 	static int AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, void(*hook)(ClientFrameStage_t));
 	static int AddHook_IClientMode_DoPostScreenSpaceEffects(IClientMode *instance, bool(*hook)(const CViewSetup *));

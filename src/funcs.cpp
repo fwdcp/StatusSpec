@@ -111,7 +111,7 @@ bool Funcs::AddDetour_GetLocalPlayerIndex(GLPI_t detour) {
 	return false;
 }
 
-bool Funcs::AddDetour_C_BaseEntity_SetModelIndex(SMI_t detour) {
+bool Funcs::AddDetour_C_BaseEntity_SetModelIndex(SMIH_t detour) {
 	void *original;
 
 	if (AddDetour(GetSMIFunc(), detour, original)) {
@@ -122,7 +122,7 @@ bool Funcs::AddDetour_C_BaseEntity_SetModelIndex(SMI_t detour) {
 	return false;
 }
 
-bool Funcs::AddDetour_C_BaseEntity_SetModelPointer(SMP_t detour) {
+bool Funcs::AddDetour_C_BaseEntity_SetModelPointer(SMPH_t detour) {
 	void *original;
 
 	if (AddDetour(GetSMPFunc(), detour, original)) {
