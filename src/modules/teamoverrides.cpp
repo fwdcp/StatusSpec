@@ -38,11 +38,11 @@ void TeamOverrides::InterceptMessage(vgui::VPANEL vguiPanel, KeyValues *params, 
 
 		if (scores->GetBool()) {
 			if (strcmp(params->GetString("blueteamscore"), "") != 0) {
-				params->SetString("blueteamscore", score_blu->GetString());
+				params->SetInt("blueteamscore", score_blu->GetInt());
 			}
 
 			if (strcmp(params->GetString("redteamscore"), "") != 0) {
-				params->SetString("redteamscore", score_red->GetString());
+				params->SetInt("redteamscore", score_red->GetInt());
 			}
 		}
 	}
