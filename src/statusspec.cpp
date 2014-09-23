@@ -129,34 +129,24 @@ bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup) {
 
 bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast) {
 	IGameEvent *newEvent = Interfaces::pGameEventManager->DuplicateEvent(event);
+	Interfaces::pGameEventManager->FreeEvent(event);
 
 	if (g_Killstreaks) {
-		if (g_Killstreaks->FireEvent(newEvent)) {
-			Interfaces::pGameEventManager->FreeEvent(event);
-
-			RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEvent, (newEvent, bDontBroadcast));
-		}
+		g_Killstreaks->FireEvent(newEvent);
 	}
-	
-	Interfaces::pGameEventManager->FreeEvent(newEvent);
 
-	RETURN_META_VALUE(MRES_IGNORED, false);
+	RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEvent, (newEvent, bDontBroadcast));
 }
 
 bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event) {
 	IGameEvent *newEvent = Interfaces::pGameEventManager->DuplicateEvent(event);
+	Interfaces::pGameEventManager->FreeEvent(event);
 
 	if (g_Killstreaks) {
-		if (g_Killstreaks->FireEvent(newEvent)) {
-			Interfaces::pGameEventManager->FreeEvent(event);
-
-			RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEventClientSide, (newEvent));
-		}
+		g_Killstreaks->FireEvent(newEvent);
 	}
-	
-	Interfaces::pGameEventManager->FreeEvent(newEvent);
 
-	RETURN_META_VALUE(MRES_IGNORED, false);
+	RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEventClientSide, (newEvent));
 }
 
 void Hook_IPanel_PaintTraverse_Pre(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
