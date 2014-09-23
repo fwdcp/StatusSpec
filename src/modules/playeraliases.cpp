@@ -84,22 +84,22 @@ bool PlayerAliases::GetAlias(CSteamID player, std::string &alias) {
 		return true;
 	}
 
-	if (etf2l->GetBool()) {
-		if (etf2lAliases[player].status == API_UNKNOWN) {
-			RequestETF2LPlayerInfo(player);
-		}
-		else if (etf2lAliases[player].status == API_SUCCESSFUL) {
-			alias.assign(etf2lAliases[player].name);
-			return true;
-		}
-	}
-
 	if (esea->GetBool()) {
 		if (eseaAliases[player].status == API_UNKNOWN) {
 			RequestESEAPlayerInfo(player);
 		}
 		else if (eseaAliases[player].status == API_SUCCESSFUL) {
 			alias.assign(eseaAliases[player].name);
+			return true;
+		}
+	}
+
+	if (etf2l->GetBool()) {
+		if (etf2lAliases[player].status == API_UNKNOWN) {
+			RequestETF2LPlayerInfo(player);
+		}
+		else if (etf2lAliases[player].status == API_SUCCESSFUL) {
+			alias.assign(etf2lAliases[player].name);
 			return true;
 		}
 	}
