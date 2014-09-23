@@ -32,6 +32,8 @@ private:
 	ConVar *score_blu;
 	ConVar *score_red;
 	ConVar *scores;
+	ConCommand *switch_teams;
+	static void SwitchTeams();
 };
 
 extern TeamOverrides *g_TeamOverrides;

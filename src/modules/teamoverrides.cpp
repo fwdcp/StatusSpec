@@ -18,6 +18,7 @@ TeamOverrides::TeamOverrides() {
 	score_blu = new ConVar("statusspec_teamoverrides_score_blu", "0", FCVAR_NONE, "BLU team score");
 	score_red = new ConVar("statusspec_teamoverrides_score_red", "0", FCVAR_NONE, "RED team score");
 	scores = new ConVar("statusspec_teamoverrides_scores", "0", FCVAR_NONE, "enable overrides for team scores");
+	switch_teams = new ConCommand("statusspec_teamoverrides_switch_teams", TeamOverrides::SwitchTeams, "switch names and scores for both teams", FCVAR_NONE);
 }
 
 bool TeamOverrides::IsEnabled() {
@@ -46,4 +47,16 @@ void TeamOverrides::InterceptMessage(vgui::VPANEL vguiPanel, KeyValues *params, 
 			}
 		}
 	}
+}
+
+void TeamOverrides::SwitchTeams() {
+	const char *newBluName = g_TeamOverrides->name_red->GetString();
+	const char *newRedName = g_TeamOverrides->name_blu->GetString();
+	int newBluScore = g_TeamOverrides->score_red->GetInt();
+	int newRedScore = g_TeamOverrides->score_blu->GetInt();
+
+	g_TeamOverrides->name_blu->SetValue(newBluName);
+	g_TeamOverrides->name_red->SetValue(newRedName);
+	g_TeamOverrides->score_blu->SetValue(newBluScore);
+	g_TeamOverrides->score_red->SetValue(newRedScore);
 }
