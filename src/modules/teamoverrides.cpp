@@ -18,30 +18,10 @@ TeamOverrides::TeamOverrides() {
 	score_blu = new ConVar("statusspec_teamoverrides_score_blu", "0", FCVAR_NONE, "BLU team score");
 	score_red = new ConVar("statusspec_teamoverrides_score_red", "0", FCVAR_NONE, "RED team score");
 	scores = new ConVar("statusspec_teamoverrides_scores", "0", FCVAR_NONE, "enable overrides for team scores");
-	scores_winpanel = new ConVar("statusspec_teamoverrides_scores_winpanel", "0", FCVAR_NONE, "apply score overrides to winpanel");
 }
 
 bool TeamOverrides::IsEnabled() {
 	return enabled->GetBool();
-}
-
-bool TeamOverrides::FireEvent(IGameEvent *event) {
-	if (scores_winpanel->GetBool()) {
-		if (strcmp(event->GetName(), "arena_win_panel") == 0 || strcmp(event->GetName(), "teamplay_win_panel") == 0) {
-			int bluScoreDiff = event->GetInt("blue_score") - event->GetInt("blue_score_prev");
-			int redScoreDiff = event->GetInt("red_score") - event->GetInt("red_score_prev");
-
-			event->SetInt("blue_score", score_blu->GetInt() + bluScoreDiff);
-			event->SetInt("red_score", score_red->GetInt() + redScoreDiff);
-
-			event->SetInt("blue_score_prev", score_blu->GetInt());
-			event->SetInt("red_score_prev", score_red->GetInt());
-
-			return true;
-		}
-	}
-
-	return false;
 }
 
 void TeamOverrides::InterceptMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel) {

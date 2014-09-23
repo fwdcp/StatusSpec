@@ -23,8 +23,6 @@ public:
 
 	bool IsEnabled();
 
-	bool FireEvent(IGameEvent *event);
-
 	void InterceptMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel);
 private:
 	ConVar *enabled;
@@ -34,7 +32,6 @@ private:
 	ConVar *score_blu;
 	ConVar *score_red;
 	ConVar *scores;
-	ConVar *scores_winpanel;
 };
 
 extern TeamOverrides *g_TeamOverrides;

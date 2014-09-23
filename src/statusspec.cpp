@@ -136,10 +136,6 @@ bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast) {
 		g_Killstreaks->FireEvent(newEvent);
 	}
 
-	if (g_TeamOverrides) {
-		g_TeamOverrides->FireEvent(newEvent);
-	}
-
 	RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEvent, (newEvent, bDontBroadcast));
 }
 
@@ -149,10 +145,6 @@ bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event) {
 
 	if (g_Killstreaks) {
 		g_Killstreaks->FireEvent(newEvent);
-	}
-
-	if (g_TeamOverrides) {
-		g_TeamOverrides->FireEvent(newEvent);
 	}
 
 	RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEventClientSide, (newEvent));
