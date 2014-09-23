@@ -30,6 +30,7 @@
 #include "modules/playeroutlines.h"
 #include "modules/projectileoutlines.h"
 #include "modules/statusicons.h"
+#include "modules/teamoverrides.h"
 
 #define PLUGIN_DESC "StatusSpec v0.18.0"
 

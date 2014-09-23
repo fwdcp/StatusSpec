@@ -20,6 +20,7 @@ PlayerAliases *g_PlayerAliases = nullptr;
 PlayerOutlines *g_PlayerOutlines = nullptr;
 ProjectileOutlines *g_ProjectileOutlines = nullptr;
 StatusIcons *g_StatusIcons = nullptr;
+TeamOverrides *g_TeamOverrides = nullptr;
 
 static int doPostScreenSpaceEffectsHook;
 
@@ -129,34 +130,24 @@ bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup) {
 
 bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast) {
 	IGameEvent *newEvent = Interfaces::pGameEventManager->DuplicateEvent(event);
+	Interfaces::pGameEventManager->FreeEvent(event);
 
 	if (g_Killstreaks) {
-		if (g_Killstreaks->FireEvent(newEvent)) {
-			Interfaces::pGameEventManager->FreeEvent(event);
-
-			RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEvent, (newEvent, bDontBroadcast));
-		}
+		g_Killstreaks->FireEvent(newEvent);
 	}
-	
-	Interfaces::pGameEventManager->FreeEvent(newEvent);
 
-	RETURN_META_VALUE(MRES_IGNORED, false);
+	RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEvent, (newEvent, bDontBroadcast));
 }
 
 bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event) {
 	IGameEvent *newEvent = Interfaces::pGameEventManager->DuplicateEvent(event);
+	Interfaces::pGameEventManager->FreeEvent(event);
 
 	if (g_Killstreaks) {
-		if (g_Killstreaks->FireEvent(newEvent)) {
-			Interfaces::pGameEventManager->FreeEvent(event);
-
-			RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEventClientSide, (newEvent));
-		}
+		g_Killstreaks->FireEvent(newEvent);
 	}
-	
-	Interfaces::pGameEventManager->FreeEvent(newEvent);
 
-	RETURN_META_VALUE(MRES_IGNORED, false);
+	RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEventClientSide, (newEvent));
 }
 
 void Hook_IPanel_PaintTraverse_Pre(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
@@ -208,6 +199,12 @@ void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VP
 	if (g_StatusIcons) {
 		if (g_StatusIcons->IsEnabled()) {
 			g_StatusIcons->InterceptMessage(vguiPanel, params, ifromPanel);
+		}
+	}
+
+	if (g_TeamOverrides) {
+		if (g_TeamOverrides->IsEnabled()) {
+			g_TeamOverrides->InterceptMessage(vguiPanel, params, ifromPanel);
 		}
 	}
 
@@ -275,6 +272,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_PlayerOutlines = new PlayerOutlines();
 	g_ProjectileOutlines = new ProjectileOutlines();
 	g_StatusIcons = new StatusIcons();
+	g_TeamOverrides = new TeamOverrides();
 	
 	Msg("%s loaded!\n", PLUGIN_DESC);
 	return true;
@@ -292,6 +290,7 @@ void StatusSpecPlugin::Unload(void)
 	delete g_PlayerOutlines;
 	delete g_ProjectileOutlines;
 	delete g_StatusIcons;
+	delete g_TeamOverrides;
 
 	Funcs::Unload();
 
