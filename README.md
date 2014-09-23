@@ -11,6 +11,7 @@ Changelog
 **WIP**
 * player aliases
   * add support for ESEA aliases
+  * add support for formatting names with prefixes and suffixes
   * remove support for STEAM_ format (only 64-bit IDs accepted now)
 * team overrides
   * new module
@@ -255,12 +256,15 @@ In addition, the following HUD animations are triggered by this plugin and may b
 * `statusspec_playeraliases_enabled` - enable player aliases
 * `statusspec_playeraliases_esea` - enable player aliases from the ESEA API
 * `statusspec_playeraliases_etf2l` - enable player aliases from the ETF2L API
+* `statusspec_playeraliases_format_blu` - the name format for BLU players
+* `statusspec_playeraliases_format_red` - the name format for RED players
 * `statusspec_playeraliases_twitch` - enable player aliases from the Twitch API
 
 #### Console Commands
 * `statusspec_playeraliases_get <steamid>` - get an alias for a player
 * `statusspec_playeraliases_remove <steamid>` - remove an alias for a player
 * `statusspec_playeraliases_set <steamid> <alias>` - set an alias for a player
+* `statusspec_playeraliases_switch_teams` - switch name formats for both teams
 
 ### Player Outlines
 *displays bright outlines around players that can be seen through walls*
