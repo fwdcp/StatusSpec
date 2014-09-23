@@ -50,13 +50,13 @@ void TeamOverrides::InterceptMessage(vgui::VPANEL vguiPanel, KeyValues *params, 
 }
 
 void TeamOverrides::SwitchTeams() {
-	const char *newBluName = g_TeamOverrides->name_red->GetString();
-	const char *newRedName = g_TeamOverrides->name_blu->GetString();
+	std::string newBluName = g_TeamOverrides->name_red->GetString();
+	std::string newRedName = g_TeamOverrides->name_blu->GetString();
 	int newBluScore = g_TeamOverrides->score_red->GetInt();
 	int newRedScore = g_TeamOverrides->score_blu->GetInt();
 
-	g_TeamOverrides->name_blu->SetValue(newBluName);
-	g_TeamOverrides->name_red->SetValue(newRedName);
+	g_TeamOverrides->name_blu->SetValue(newBluName.c_str());
+	g_TeamOverrides->name_red->SetValue(newRedName.c_str());
 	g_TeamOverrides->score_blu->SetValue(newBluScore);
 	g_TeamOverrides->score_red->SetValue(newRedScore);
 }

@@ -12,6 +12,8 @@
 
 #include "../stdafx.h"
 
+#include <string>
+
 #include "convar.h"
 #include "igameevents.h"
 #include "KeyValues.h"
