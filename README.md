@@ -12,6 +12,8 @@ Changelog
 * player aliases
   * add support for ESEA aliases
   * remove support for STEAM_ format (only 64-bit IDs accepted now)
+* team overrides
+  * new module
 
 **0.18.0**
 * general
