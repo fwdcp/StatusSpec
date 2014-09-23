@@ -10,6 +10,30 @@
 
 #include "playeraliases.h"
 
+inline TFTeam GetPlayerTeam(int entityIndex) {
+	IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(entityIndex);
+
+	if (!entity || !Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFPlayer")) {
+		return TFTeam_Unassigned;
+	}
+
+	TFTeam team = (TFTeam)*MAKE_PTR(int*, entity, Entities::pCTFPlayer__m_iTeamNum);
+
+	return team;
+}
+
+inline void FindAndReplaceInString(std::string &str, const std::string &find, const std::string &replace) {
+	if (find.empty())
+		return;
+
+	size_t start_pos = 0;
+
+	while ((start_pos = str.find(find, start_pos)) != std::string::npos) {
+		str.replace(start_pos, find.length(), replace);
+		start_pos += replace.length();
+	}
+}
+
 inline bool IsInteger(const std::string &s) {
    if (s.empty() || !isdigit(s[0])) return false;
 
@@ -51,10 +75,13 @@ PlayerAliases::PlayerAliases() {
 	enabled = new ConVar("statusspec_playeraliases_enabled", "0", FCVAR_NONE, "enable player aliases");
 	esea = new ConVar("statusspec_playeraliases_esea", "0", FCVAR_NONE, "enable player aliases from the ESEA API");
 	etf2l = new ConVar("statusspec_playeraliases_etf2l", "0", FCVAR_NONE, "enable player aliases from the ETF2L API");
+	format_blu = new ConVar("statusspec_playeraliases_format_blu", "%alias%", FCVAR_NONE, "the name format for BLU players");
+	format_red = new ConVar("statusspec_playeraliases_format_red", "%alias%", FCVAR_NONE, "the name format for RED players");
 	get = new ConCommand("statusspec_playeraliases_get", PlayerAliases::GetCustomPlayerAlias, "get a custom player alias", FCVAR_NONE, PlayerAliases::GetCurrentAliasedPlayers);
 	remove = new ConCommand("statusspec_playeraliases_remove", PlayerAliases::RemoveCustomPlayerAlias, "remove a custom player alias", FCVAR_NONE, PlayerAliases::GetCurrentAliasedPlayers);
 	set = new ConCommand("statusspec_playeraliases_set", PlayerAliases::SetCustomPlayerAlias, "set a custom player alias", FCVAR_NONE, PlayerAliases::GetCurrentGamePlayers);
 	twitch = new ConVar("statusspec_playeraliases_twitch", "0", FCVAR_NONE, "enable player aliases from the Twitch API");
+	switch_teams = new ConCommand("statusspec_playeraliases_switch_teams", PlayerAliases::SwitchTeams, "switch name formats for both teams", FCVAR_NONE);
 }
 
 bool PlayerAliases::IsEnabled() {
@@ -65,23 +92,36 @@ bool PlayerAliases::GetPlayerInfoOverride(int ent_num, player_info_t *pinfo) {
 	bool result = Funcs::CallFunc_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, ent_num, pinfo);
 
 	CSteamID playerSteamID = GetClientSteamID(ent_num);
+	TFTeam team = GetPlayerTeam(ent_num);
 
-	std::string playerAlias;
-	if (GetAlias(playerSteamID, playerAlias)) {
-		V_strcpy_safe(pinfo->name, playerAlias.c_str());
+	std::string playerAlias = GetAlias(playerSteamID, pinfo->name);
+
+	std::string gameName;
+
+	if (team == TFTeam_Red) {
+		gameName = format_red->GetString();
 	}
+	else if (team == TFTeam_Blue) {
+		gameName = format_blu->GetString();
+	}
+	else {
+		gameName = "%alias%";
+	}
+
+	FindAndReplaceInString(gameName, "%alias%", playerAlias);
+
+	V_strcpy_safe(pinfo->name, gameName.c_str());
 
 	return result;
 }
 
-bool PlayerAliases::GetAlias(CSteamID player, std::string &alias) {
+std::string PlayerAliases::GetAlias(CSteamID player, std::string gameAlias) {
 	if (!player.IsValid()) {
-		return false;
+		return gameAlias;
 	}
 
 	if (customAliases.find(player) != customAliases.end()) {
-		alias.assign(customAliases[player]);
-		return true;
+		return customAliases[player];
 	}
 
 	if (esea->GetBool()) {
@@ -89,8 +129,7 @@ bool PlayerAliases::GetAlias(CSteamID player, std::string &alias) {
 			RequestESEAPlayerInfo(player);
 		}
 		else if (eseaAliases[player].status == API_SUCCESSFUL) {
-			alias.assign(eseaAliases[player].name);
-			return true;
+			return eseaAliases[player].name;
 		}
 	}
 
@@ -99,8 +138,7 @@ bool PlayerAliases::GetAlias(CSteamID player, std::string &alias) {
 			RequestETF2LPlayerInfo(player);
 		}
 		else if (etf2lAliases[player].status == API_SUCCESSFUL) {
-			alias.assign(etf2lAliases[player].name);
-			return true;
+			return etf2lAliases[player].name;
 		}
 	}
 
@@ -109,12 +147,11 @@ bool PlayerAliases::GetAlias(CSteamID player, std::string &alias) {
 			RequestTwitchUserInfo(player);
 		}
 		else if (twitchAliases[player].status == API_SUCCESSFUL) {
-			alias.assign(twitchAliases[player].name);
-			return true;
+			return twitchAliases[player].name;
 		}
 	}
 	
-	return false;
+	return gameAlias;
 }
 
 void PlayerAliases::GetESEAPlayerInfo(HTTPRequestCompleted_t *requestCompletionInfo, bool bIOFailure) {
@@ -388,4 +425,12 @@ void PlayerAliases::SetCustomPlayerAlias(const CCommand &command) {
 
 	g_PlayerAliases->customAliases[playerSteamID] = command.Arg(2);
 	Msg("Steam ID %llu has been associated with alias '%s'.\n", playerSteamID.ConvertToUint64(), g_PlayerAliases->customAliases[playerSteamID].c_str());
+}
+
+void PlayerAliases::SwitchTeams() {
+	std::string newBluFormat = g_PlayerAliases->format_red->GetString();
+	std::string newRedFormat = g_PlayerAliases->format_blu->GetString();
+
+	g_PlayerAliases->format_blu->SetValue(newBluFormat.c_str());
+	g_PlayerAliases->format_red->SetValue(newRedFormat.c_str());
 }
