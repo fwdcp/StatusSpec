@@ -330,6 +330,21 @@ To properly support status icons, adjust `Resource/UI/SpectatorTournament.res` s
 }
 ```
 
+### Team Overrides
+*override team info in HUD*
+
+#### Console Variables
+* `statusspec_teamoverrides_enabled` - enable team overrides
+* `statusspec_teamoverrides_name_blu` - BLU team name
+* `statusspec_teamoverrides_name_red` - RED team name
+* `statusspec_teamoverrides_names` - enable overrides for team names
+* `statusspec_teamoverrides_score_blu` - BLU team score
+* `statusspec_teamoverrides_score_red` - RED team score
+* `statusspec_teamoverrides_scores` - enable overrides for team scores
+
+#### Console Commands
+* `statusspec_teamoverrides_switch_teams` - switch names and scores for both teams
+
 Thanks
 ------
 **bluee (MattMcNam)** - for the inspiration to do this project and for a lot of code reused from his [AdvSpec project](https://github.com/MattMcNam/advspec)
