@@ -52,12 +52,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 			}
 		}
 
-		if (g_StatusIcons) {
-			if (g_StatusIcons->IsEnabled()) {
-				g_StatusIcons->PreEntityUpdate();
-			}
-		}
-
 		int maxEntity = Interfaces::pClientEntityList->GetHighestEntityIndex();
 
 		for (int i = 0; i < maxEntity; i++) {
@@ -89,12 +83,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 
 			if (g_ProjectileOutlines) {
 				g_ProjectileOutlines->ProcessEntity(entity);
-			}
-
-			if (g_StatusIcons) {
-				if (g_StatusIcons->IsEnabled()) {
-					g_StatusIcons->ProcessEntity(entity);
-				}
 			}
 		}
 

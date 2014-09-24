@@ -50,6 +50,7 @@ public:
 	static int pCWeaponMedigun__m_hHealingTarget;
 	static int pCTFPlayer__m_iKillStreak;
 	static int pCTFGrenadePipebombProjectile__m_iType;
+	static int pCBaseEntity__m_iTeamNum;
 
 	static bool PrepareOffsets();
 	static bool GetClassPropOffset(const char *className, int &offset, int depth, ...);

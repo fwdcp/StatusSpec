@@ -10,18 +10,6 @@
 
 #include "playeraliases.h"
 
-inline TFTeam GetPlayerTeam(int entityIndex) {
-	IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(entityIndex);
-
-	if (!entity || !Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFPlayer")) {
-		return TFTeam_Unassigned;
-	}
-
-	TFTeam team = (TFTeam)*MAKE_PTR(int*, entity, Entities::pCTFPlayer__m_iTeamNum);
-
-	return team;
-}
-
 inline void FindAndReplaceInString(std::string &str, const std::string &find, const std::string &replace) {
 	if (find.empty())
 		return;
@@ -53,24 +41,6 @@ inline CSteamID ConvertTextToSteamID(std::string textID) {
 	return CSteamID();
 }
 
-inline CSteamID GetClientSteamID(int client) {
-	player_info_t playerInfo;
-
-	if (Funcs::CallFunc_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, client, &playerInfo)) {
-		if (playerInfo.friendsID) {
-			static EUniverse universe = k_EUniverseInvalid;
-
-			if (universe == k_EUniverseInvalid) {
-				universe = Interfaces::pSteamAPIContext->SteamUtils()->GetConnectedUniverse();
-			}
-
-			return CSteamID(playerInfo.friendsID, 1, universe, k_EAccountTypeIndividual);
-		}
-	}
-
-	return CSteamID();
-}
-
 PlayerAliases::PlayerAliases() {
 	enabled = new ConVar("statusspec_playeraliases_enabled", "0", FCVAR_NONE, "enable player aliases");
 	esea = new ConVar("statusspec_playeraliases_esea", "0", FCVAR_NONE, "enable player aliases from the ESEA API");
@@ -91,8 +61,10 @@ bool PlayerAliases::IsEnabled() {
 bool PlayerAliases::GetPlayerInfoOverride(int ent_num, player_info_t *pinfo) {
 	bool result = Funcs::CallFunc_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, ent_num, pinfo);
 
-	CSteamID playerSteamID = GetClientSteamID(ent_num);
-	TFTeam team = GetPlayerTeam(ent_num);
+	IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(ent_num);
+
+	CSteamID playerSteamID = Player::GetSteamID(entity);
+	TFTeam team = Player::GetTeam(entity);
 
 	std::string playerAlias = GetAlias(playerSteamID, pinfo->name);
 
@@ -355,7 +327,7 @@ int PlayerAliases::GetCurrentGamePlayers(const char *partial, char commands[COMM
 
 	for (int i = 0; i <= MAX_PLAYERS; i++) {
 		if (Interfaces::GetGameResources()->IsConnected(i)) {
-			CSteamID playerSteamID = GetClientSteamID(i);
+			CSteamID playerSteamID = Player::GetSteamID(Interfaces::pClientEntityList->GetClientEntity(i));
 			
 			if (playerSteamID.IsValid()) {
 				V_snprintf(commands[playerCount], COMMAND_COMPLETION_ITEM_LENGTH, "%s %llu", command.c_str(), playerSteamID.ConvertToUint64());
@@ -365,8 +337,6 @@ int PlayerAliases::GetCurrentGamePlayers(const char *partial, char commands[COMM
 	}
 
 	return playerCount;
-
-
 }
 
 void PlayerAliases::GetCustomPlayerAlias(const CCommand &command) {

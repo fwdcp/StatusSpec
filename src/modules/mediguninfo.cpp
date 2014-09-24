@@ -678,11 +678,11 @@ void MedigunInfo::PreEntityUpdate() {
 }
 
 void MedigunInfo::ProcessEntity(IClientEntity* entity) {
-	if (!Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFPlayer")) {
+	if (!Player::CheckPlayer(entity)) {
 		return;
 	}
 
-	TFTeam team = (TFTeam) *MAKE_PTR(int*, entity, Entities::pCTFPlayer__m_iTeamNum);
+	TFTeam team = Player::GetTeam(entity);
 
 	if (team != TFTeam_Red && team != TFTeam_Blue) {
 		return;

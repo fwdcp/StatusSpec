@@ -61,7 +61,7 @@ bool PlayerOutlines::IsEnabled() {
 }
 
 void PlayerOutlines::ProcessEntity(IClientEntity* entity) {
-	if (!Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFPlayer")) {
+	if (!Player::CheckPlayer(entity)) {
 		return;
 	}
 
@@ -81,7 +81,7 @@ void PlayerOutlines::ProcessEntity(IClientEntity* entity) {
 }
 
 Color PlayerOutlines::GetGlowColor(IClientEntity *entity) {
-	if (!Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFPlayer")) {
+	if (!Player::CheckPlayer(entity)) {
 		return Color(0, 0, 0, 0);
 	}
 
@@ -98,7 +98,7 @@ Color PlayerOutlines::GetGlowColor(IClientEntity *entity) {
 		blue *= 255.0f;
 	}
 	else {
-		TFTeam team = (TFTeam)*MAKE_PTR(int*, entity, Entities::pCTFPlayer__m_iTeamNum);
+		TFTeam team = Player::GetTeam(entity);
 
 		if (!health_adjusted_team_colors->GetBool()) {
 			if (team == TFTeam_Red) {

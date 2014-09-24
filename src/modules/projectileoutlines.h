@@ -24,6 +24,7 @@
 #include "../funcs.h"
 #include "../glows.h"
 #include "../ifaces.h"
+#include "../player.h"
 
 #if defined _WIN32
 #define strtoull _strtoui64
