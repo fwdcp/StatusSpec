@@ -120,13 +120,11 @@ enum TFCond
 	TFCond_HalloweenGiant,
 	TFCond_HalloweenTiny,
 	TFCond_HalloweenInHell,
-	TFCond_HalloweenGhostMode
-};
+	TFCond_HalloweenGhostMode,
 
-enum TFResistType {
-	TFResistType_Bullet,
-	TFResistType_Explosive,
-	TFResistType_Fire
+	TFCond_DodgeChance = 79,
+	TFCond_Parachute,
+	TFCond_BlastJumping,
 };
 
 enum {
@@ -222,6 +220,15 @@ enum {
 	TF_WEAPON_GRENADE_STICKY_BALL,
 	TF_WEAPON_SHOTGUN_BUILDING_RESCUE,
 	TF_WEAPON_CANNON,
+	TF_WEAPON_THROWABLE,
+	TF_WEAPON_GRENADE_THROWABLE,
+	TF_WEAPON_PDA_SPY_BUILD,
+	TF_WEAPON_GRENADE_WATERBALLOON,
+	TF_WEAPON_HARVESTER_SAW,
+	TF_WEAPON_SPELLBOOK,
+	TF_WEAPON_SPELLBOOK_PROJECTILE,
+	TF_WEAPON_SNIPERRIFLE_CLASSIC,
+	TF_WEAPON_PARACHUTE,
 };
 
 static std::array<std::string, 10> tfclassNames = {"", "scout", "sniper", "soldier", "demoman", "medic", "heavy", "pyro", "spy", "engineer"};
@@ -231,6 +238,12 @@ static std::array<std::string, 10> tfclassNames = {"", "scout", "sniper", "soldi
 static std::array<std::string, 9> itemSlots = {"primary", "secondary", "melee", "pda", "pda2", "building", "head", "misc", "action"};
 
 // self-generated
+
+enum TFResistType {
+	TFResistType_Bullet,
+	TFResistType_Explosive,
+	TFResistType_Fire
+};
 
 enum TFGrenadePipebombType {
 	TFGrenadePipebombType_Grenade,
