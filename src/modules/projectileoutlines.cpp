@@ -40,6 +40,8 @@ ProjectileOutlines::ProjectileOutlines() {
 	colors["red"].command = new ConCommand("statusspec_projectileoutlines_color_red", ProjectileOutlines::ColorCommand, "the color used for outlines for RED projectiles", FCVAR_NONE, ProjectileOutlines::GetCurrentColor);
 
 	enabled = new ConVar("statusspec_projectileoutlines_enabled", "0", FCVAR_NONE, "enable projectile outlines");
+	fade = new ConVar("statusspec_projectileoutlines_fade", "0", FCVAR_NONE, "make outlines fade with distance");
+	fade_distance = new ConVar("statusspec_projectileoutlines_fade_distance", "1600", FCVAR_NONE, "the distance (in Hammer units) at which outlines will fade");
 	grenades = new ConVar("statusspec_projectileoutlines_grenades", "0", FCVAR_NONE, "enable outlines for grenades");
 	rockets = new ConVar("statusspec_projectileoutlines_rockets", "0", FCVAR_NONE, "enable outlines for rockets");
 	stickybombs = new ConVar("statusspec_projectileoutlines_stickybombs", "0", FCVAR_NONE, "enable outlines for stickybombs");
@@ -47,6 +49,25 @@ ProjectileOutlines::ProjectileOutlines() {
 
 bool ProjectileOutlines::IsEnabled() {
 	return enabled->GetBool();
+}
+
+void ProjectileOutlines::PreGlowRender(const CViewSetup *pSetup) {
+	if (fade->GetBool()) {
+		for (auto iterator = glows.begin(); iterator != glows.end(); ++iterator) {
+			if (iterator->first.Get()) {
+				vec_t distance = pSetup->origin.DistTo(iterator->first->GetRenderOrigin());
+
+				if (distance > fade_distance->GetFloat()) {
+					Color glowColor = GetGlowColor(iterator->first);
+					float alpha = glowColor.a() / 255.0f;
+
+					float scalar = fade_distance->GetFloat() / distance;
+
+					iterator->second->SetAlpha(alpha * scalar);
+				}
+			}
+		}
+	}
 }
 
 void ProjectileOutlines::ProcessEntity(IClientEntity* entity) {

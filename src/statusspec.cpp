@@ -111,6 +111,18 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 }
 
 bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup) {
+	if (g_PlayerOutlines) {
+		if (g_PlayerOutlines->IsEnabled()) {
+			g_PlayerOutlines->PreGlowRender(pSetup);
+		}
+	}
+
+	if (g_ProjectileOutlines) {
+		if (g_ProjectileOutlines->IsEnabled()) {
+			g_ProjectileOutlines->PreGlowRender(pSetup);
+		}
+	}
+
 	g_GlowObjectManager.RenderGlowEffects(pSetup);
 
 	RETURN_META_VALUE(MRES_OVERRIDE, true);

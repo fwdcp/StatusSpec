@@ -36,6 +36,8 @@ public:
 
 	bool IsEnabled();
 
+	void PreGlowRender(const CViewSetup *pSetup);
+
 	void ProcessEntity(IClientEntity *entity);
 private:
 	std::map<std::string, ColorConCommand_t> colors;
@@ -45,6 +47,8 @@ private:
 	void SetGlowEffect(IClientEntity *entity, bool enabled, Vector color = Vector(1.0f, 1.0f, 1.0f), float alpha = 1.0f);
 
 	ConVar *enabled;
+	ConVar *fade;
+	ConVar *fade_distance;
 	ConVar *grenades;
 	ConVar *rockets;
 	ConVar *stickybombs;
