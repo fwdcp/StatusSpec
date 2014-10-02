@@ -168,25 +168,25 @@ To install, place the `StatusSpec` folder within the `custom` folder in the `tf`
 #### UI Resource Files
 An example file for the freeze info box is included under `Resource/UI/FreezeInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_antifreeze_display_reload_settings` is provided as a replacement.
 
-### Custom Materials
-*allows materials to be swapped out*
+### Custom Textures
+*allows textures to be swapped out*
 
 #### Console Variables
-* `statusspec_custommaterials_enabled` - enable custom materials
+* `statusspec_customtextures_enabled` - enable custom textures
 
 #### Console Commands
-* `statusspec_custommaterials_load_replacement_group <group>` - load a material replacement group
-* `statusspec_custommaterials_unload_replacement_group <group>` - unload a material replacement group
+* `statusspec_customtextures_load_replacement_group <group>` - load a texture replacement group
+* `statusspec_customtextures_unload_replacement_group <group>` - unload a texture replacement group
 
 #### Resource Files
-Player model configuration is loaded from the `Resource/CustomMaterials.res` file. Replacement groups should be configured as sections (whose names are used in the commands for this module). Material replacements should be specified by entries with the path of the old material from the `materials` folder as the key and the path of the new material from the `materials` folder as the value. An example of a configured file is given below:
+Player model configuration is loaded from the `Resource/CustomTextures.res` file. Replacement groups should be configured as sections (whose names are used in the commands for this module). Material replacements should be specified by entries with the path of the old texture from the `materials` folder as the key and the path of the new texture from the `materials` folder as the value. An example of a configured file is given below:
 ```
-"models"
+"textures"
 {
 	"blank"
 	{
-		"signs/team_blue.vmt"	"signs/team_blue_blank.vmt"
-		"signs/team_red.vmt"	"signs/team_red_blank.vmt"
+		"signs/team_blue"	"signs/team_blue_blank"
+		"signs/team_red"	"signs/team_red_blank"
 	}
 }
 ```
