@@ -134,7 +134,7 @@ void LoadoutIcons::ProcessEntity(IClientEntity* entity) {
 
 	int player = ENTITY_INDEX_FROM_ENTITY_OFFSET(entity, Entities::pCEconEntity__m_hOwnerEntity);
 	IClientEntity *playerEntity = Interfaces::pClientEntityList->GetClientEntity(player);
-	TFClassType tfclass = (TFClassType) *MAKE_PTR(int*, playerEntity, Entities::pCTFPlayer__m_iClass);
+	TFClassType tfclass = Player::GetClass(playerEntity);
 	int activeWeapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(playerEntity, Entities::pCTFPlayer__m_hActiveWeapon);
 
 	const char *itemSlot = itemSchema->GetItemKeyData(itemDefinitionIndex, "item_slot");
@@ -204,7 +204,7 @@ void LoadoutIcons::PostEntityUpdate() {
 			continue;
 		}
 		
-		TFClassType tfclass = (TFClassType) *MAKE_PTR(int*, playerEntity, Entities::pCTFPlayer__m_iClass);
+		TFClassType tfclass = Player::GetClass(playerEntity);
 		int activeWeapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(playerEntity, Entities::pCTFPlayer__m_hActiveWeapon);
 		
 		loadoutInfo[player].tfclass = tfclass;

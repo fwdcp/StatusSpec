@@ -24,10 +24,6 @@
 #include "../paint.h"
 #include "../player.h"
 
-#if defined _WIN32
-#define strtoull _strtoui64
-#endif
-
 #define TEXTURE_NULL "vgui/replay/thumbnails/null"
 #define TEXTURE_UBERCHARGE "vgui/replay/thumbnails/ubercharge"
 #define TEXTURE_CRITBOOST "vgui/replay/thumbnails/critboost"

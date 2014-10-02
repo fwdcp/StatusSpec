@@ -11,7 +11,7 @@
 #include "statusspec.h"
 
 AntiFreeze *g_AntiFreeze = nullptr;
-CustomMaterials *g_CustomMaterials = nullptr;
+CustomTextures *g_CustomTextures = nullptr;
 Killstreaks *g_Killstreaks = nullptr;
 LoadoutIcons *g_LoadoutIcons = nullptr;
 LocalPlayer *g_LocalPlayer = nullptr;
@@ -21,6 +21,7 @@ PlayerAliases *g_PlayerAliases = nullptr;
 PlayerModels *g_PlayerModels = nullptr;
 PlayerOutlines *g_PlayerOutlines = nullptr;
 ProjectileOutlines *g_ProjectileOutlines = nullptr;
+SpecGUIOrder *g_SpecGUIOrder = nullptr;
 StatusIcons *g_StatusIcons = nullptr;
 TeamOverrides *g_TeamOverrides = nullptr;
 
@@ -78,6 +79,12 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 			}
 		}
 
+		if (g_SpecGUIOrder) {
+			if (g_SpecGUIOrder->IsEnabled()) {
+				g_SpecGUIOrder->PreEntityUpdate();
+			}
+		}
+
 		int maxEntity = Interfaces::pClientEntityList->GetHighestEntityIndex();
 
 		for (int i = 0; i < maxEntity; i++) {
@@ -110,6 +117,12 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 			if (g_ProjectileOutlines) {
 				g_ProjectileOutlines->ProcessEntity(entity);
 			}
+
+			if (g_SpecGUIOrder) {
+				if (g_SpecGUIOrder->IsEnabled()) {
+					g_SpecGUIOrder->ProcessEntity(entity);
+				}
+			}
 		}
 
 		if (g_AntiFreeze) {
@@ -129,6 +142,12 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 		if (g_LocalPlayer) {
 			if (g_LocalPlayer->IsEnabled()) {
 				g_LocalPlayer->PostEntityUpdate();
+			}
+		}
+
+		if (g_SpecGUIOrder) {
+			if (g_SpecGUIOrder->IsEnabled()) {
+				g_SpecGUIOrder->PostEntityUpdate();
 			}
 		}
 	}
@@ -176,16 +195,6 @@ bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event) {
 	RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEventClientSide, (newEvent));
 }
 
-IMaterial *Hook_IMaterialSystem_FindMaterial(char const* pMaterialName, const char *pTextureGroupName, bool complain, const char *pComplainPrefix) {
-	if (g_CustomMaterials) {
-		if (g_CustomMaterials->IsEnabled()) {
-			RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, nullptr, &IMaterialSystem::FindMaterial, (g_CustomMaterials->LoadMaterialOverride(pMaterialName), pTextureGroupName, complain, pComplainPrefix));
-		}
-	}
-
-	RETURN_META_VALUE(MRES_IGNORED, nullptr);
-}
-
 void Hook_IPanel_PaintTraverse_Pre(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
 	if (Interfaces::pEngineClient->IsDrawingLoadingImage() || !Interfaces::pEngineClient->IsInGame() || !Interfaces::pEngineClient->IsConnected() || Interfaces::pEngineClient->Con_IsVisible()) {
 		RETURN_META(MRES_IGNORED);
@@ -231,6 +240,12 @@ void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VP
 			g_LoadoutIcons->InterceptMessage(vguiPanel, params, ifromPanel);
 		}
 	}
+
+	if (g_SpecGUIOrder) {
+		if (g_SpecGUIOrder->IsEnabled()) {
+			g_SpecGUIOrder->InterceptMessage(vguiPanel, params, ifromPanel);
+		}
+	}
 	
 	if (g_StatusIcons) {
 		if (g_StatusIcons->IsEnabled()) {
@@ -241,6 +256,18 @@ void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VP
 	if (g_TeamOverrides) {
 		if (g_TeamOverrides->IsEnabled()) {
 			g_TeamOverrides->InterceptMessage(vguiPanel, params, ifromPanel);
+		}
+	}
+
+	RETURN_META(MRES_IGNORED);
+}
+
+void Hook_IPanel_SetPos(vgui::VPANEL vguiPanel, int x, int y) {
+	if (g_SpecGUIOrder) {
+		if (g_SpecGUIOrder->IsEnabled()) {
+			if (g_SpecGUIOrder->SetPosOverride(vguiPanel, x, y)) {
+				RETURN_META_NEWPARAMS(MRES_HANDLED, &IPanel::SetPos, (vguiPanel, x, y));
+			}
 		}
 	}
 
@@ -293,16 +320,16 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, Hook_IBaseClientDLL_FrameStageNotify);
 	Funcs::AddHook_IGameEventManager2_FireEvent(Interfaces::pGameEventManager, Hook_IGameEventManager2_FireEvent);
 	Funcs::AddHook_IGameEventManager2_FireEventClientSide(Interfaces::pGameEventManager, Hook_IGameEventManager2_FireEventClientSide);
-	Funcs::AddHook_IMaterialSystem_FindMaterial(g_pMaterialSystem, Hook_IMaterialSystem_FindMaterial);
 	Funcs::AddHook_IPanel_PaintTraverse_Pre(g_pVGuiPanel, Hook_IPanel_PaintTraverse_Pre);
 	Funcs::AddHook_IPanel_PaintTraverse_Post(g_pVGuiPanel, Hook_IPanel_PaintTraverse_Post);
 	Funcs::AddHook_IPanel_SendMessage(g_pVGuiPanel, Hook_IPanel_SendMessage);
+	Funcs::AddHook_IPanel_SetPos(g_pVGuiPanel, Hook_IPanel_SetPos);
 	Funcs::AddHook_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, Hook_IVEngineClient_GetPlayerInfo);
 	
 	ConVar_Register();
 
 	g_AntiFreeze = new AntiFreeze();
-	g_CustomMaterials = new CustomMaterials();
+	g_CustomTextures = new CustomTextures();
 	g_Killstreaks = new Killstreaks();
 	g_LoadoutIcons = new LoadoutIcons();
 	g_LocalPlayer = new LocalPlayer();
@@ -312,6 +339,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_PlayerModels = new PlayerModels();
 	g_PlayerOutlines = new PlayerOutlines();
 	g_ProjectileOutlines = new ProjectileOutlines();
+	g_SpecGUIOrder = new SpecGUIOrder();
 	g_StatusIcons = new StatusIcons();
 	g_TeamOverrides = new TeamOverrides();
 	
@@ -322,7 +350,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 void StatusSpecPlugin::Unload(void)
 {
 	delete g_AntiFreeze;
-	delete g_CustomMaterials;
+	delete g_CustomTextures;
 	delete g_Killstreaks;
 	delete g_LoadoutIcons;
 	delete g_LocalPlayer;
@@ -332,6 +360,7 @@ void StatusSpecPlugin::Unload(void)
 	delete g_PlayerModels;
 	delete g_PlayerOutlines;
 	delete g_ProjectileOutlines;
+	delete g_SpecGUIOrder;
 	delete g_StatusIcons;
 	delete g_TeamOverrides;
 

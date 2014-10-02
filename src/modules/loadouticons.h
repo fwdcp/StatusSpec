@@ -26,6 +26,7 @@
 #include "../ifaces.h"
 #include "../itemschema.h"
 #include "../paint.h"
+#include "../player.h"
 
 #if defined _WIN32
 #define strtoull _strtoui64

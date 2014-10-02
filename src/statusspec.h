@@ -21,7 +21,7 @@
 #include "paint.h"
 
 #include "modules/antifreeze.h"
-#include "modules/custommaterials.h"
+#include "modules/customtextures.h"
 #include "modules/killstreaks.h"
 #include "modules/loadouticons.h"
 #include "modules/localplayer.h"
@@ -31,10 +31,11 @@
 #include "modules/playermodels.h"
 #include "modules/playeroutlines.h"
 #include "modules/projectileoutlines.h"
+#include "modules/specguiorder.h"
 #include "modules/statusicons.h"
 #include "modules/teamoverrides.h"
 
-#define PLUGIN_DESC "StatusSpec v0.19.0"
+#define PLUGIN_DESC "StatusSpec v0.19.1"
 
 int Detour_GetLocalPlayerIndex();
 void __fastcall Detour_C_BaseEntity_SetModelIndex(C_BaseEntity *instance, void *, int index);
@@ -44,10 +45,10 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage);
 bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup);
 bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast = false);
 bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event);
-IMaterial *Hook_IMaterialSystem_FindMaterial(char const* pMaterialName, const char *pTextureGroupName, bool complain = true, const char *pComplainPrefix = NULL);
 void Hook_IPanel_PaintTraverse_Pre(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce);
 void Hook_IPanel_PaintTraverse_Post(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce);
 void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel);
+void Hook_IPanel_SetPos(vgui::VPANEL vguiPanel, int x, int y);
 bool Hook_IVEngineClient_GetPlayerInfo(int ent_num, player_info_t *pinfo);
 
 class StatusSpecPlugin: public IServerPluginCallbacks
