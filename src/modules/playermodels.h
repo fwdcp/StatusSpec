@@ -24,10 +24,6 @@
 #include "../ifaces.h"
 #include "../player.h"
 
-#if defined _WIN32
-#define strtoull _strtoui64
-#endif
-
 class PlayerModels {
 public:
 	PlayerModels();
