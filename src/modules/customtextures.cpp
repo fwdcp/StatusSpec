@@ -15,15 +15,15 @@ CustomTextures::CustomTextures() {
 	textureConfig->LoadFromFile(Interfaces::pFileSystem, "resource/customtextures.res", "mod");
 
 	enabled = new ConVar("statusspec_customtextures_enabled", "0", FCVAR_NONE, "enable custom materials", CustomTextures::ToggleEnabled);
-	load_texture_replacements = new ConCommand("statusspec_customtextures_load_texture_replacements", CustomTextures::LoadTextureReplacements, "load a texture replacement group", FCVAR_NONE);
-	unload_texture_replacements = new ConCommand("statusspec_customtextures_unload_texture_replacements", CustomTextures::UnloadTextureReplacements, "unload a texture replacement group", FCVAR_NONE);
+	load_replacement_group = new ConCommand("statusspec_customtextures_load_replacement_group", CustomTextures::LoadReplacementGroup, "load a texture replacement group", FCVAR_NONE);
+	unload_replacement_group = new ConCommand("statusspec_customtextures_unload_replacement_group", CustomTextures::UnloadReplacementGroup, "unload a texture replacement group", FCVAR_NONE);
 }
 
 bool CustomTextures::IsEnabled() {
 	return enabled->GetBool();
 }
 
-void CustomTextures::LoadTextureReplacements(const CCommand &command) {
+void CustomTextures::LoadReplacementGroup(const CCommand &command) {
 	if (command.ArgC() >= 2) {
 		Warning("Must specify a replacement group to load!\n");
 		return;
@@ -71,7 +71,7 @@ void CustomTextures::ToggleEnabled(IConVar *var, const char *pOldValue, float fl
 	}
 }
 
-void CustomTextures::UnloadTextureReplacements(const CCommand &command) {
+void CustomTextures::UnloadReplacementGroup(const CCommand &command) {
 	if (command.ArgC() >= 2) {
 		Warning("Must specify a replacement group to load!\n");
 		return;

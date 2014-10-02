@@ -33,11 +33,11 @@ private:
 	std::map<std::string, TextureReplacement_t> textureReplacements;
 
 	ConVar *enabled;
-	ConCommand *load_texture_replacements;
-	ConCommand *unload_texture_replacements;
-	static void LoadTextureReplacements(const CCommand &command);
+	ConCommand *load_replacement_group;
+	ConCommand *unload_replacement_group;
+	static void LoadReplacementGroup(const CCommand &command);
 	static void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
-	static void UnloadTextureReplacements(const CCommand &command);
+	static void UnloadReplacementGroup(const CCommand &command);
 };
 
 extern CustomTextures *g_CustomTextures;
