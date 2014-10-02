@@ -8,7 +8,7 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
-**WIP**
+**0.19.0**
 * custom materials
   * new module
 * player aliases
