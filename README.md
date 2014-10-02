@@ -9,10 +9,14 @@ Changelog
 ---------
 
 **WIP**
+* custom materials
+  * new module
 * player aliases
   * add support for ESEA aliases
   * add support for formatting names with prefixes and suffixes
   * remove support for STEAM_ format (only 64-bit IDs accepted now)
+* player models
+  * new module
 * team overrides
   * new module
 
@@ -160,6 +164,29 @@ To install, place the `StatusSpec` folder within the `custom` folder in the `tf`
 #### UI Resource Files
 An example file for the freeze info box is included under `Resource/UI/FreezeInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_antifreeze_display_reload_settings` is provided as a replacement.
 
+### Custom Materials
+*allows materials to be swapped out*
+
+#### Console Variables
+* `statusspec_custommaterials_enabled` - enable custom materials
+
+#### Console Commands
+* `statusspec_custommaterials_load_replacement_group <group>` - load a material replacement group
+* `statusspec_custommaterials_unload_replacement_group <group>` - unload a material replacement group
+
+#### Resource Files
+Player model configuration is loaded from the `Resource/CustomMaterials.res` file. Replacement groups should be configured as sections (whose names are used in the commands for this module). Material replacements should be specified by entries with the path of the old material from the `materials` folder as the key and the path of the new material from the `materials` folder as the value. An example of a configured file is given below:
+```
+"models"
+{
+	"blank"
+	{
+		"signs/team_blue.vmt"	"signs/team_blue_blank.vmt"
+		"signs/team_red.vmt"	"signs/team_red_blank.vmt"
+	}
+}
+```
+
 ### Killstreaks
 *enables killstreak tracking for all weapons, all players*
 
@@ -265,6 +292,39 @@ In addition, the following HUD animations are triggered by this plugin and may b
 * `statusspec_playeraliases_remove <steamid>` - remove an alias for a player
 * `statusspec_playeraliases_set <steamid> <alias>` - set an alias for a player
 * `statusspec_playeraliases_switch_teams` - switch name formats for both teams
+
+### Player Models
+*changes the model used based on the player*
+
+#### Console Variables
+* `statusspec_playermodels_enabled` - enable custom player models
+
+#### Resource Files
+Player model configuration is loaded from the `Resource/PlayerModels.res` file. Within the `players` section, players should be configured with an entry consisting of their Steam ID as the key and a group name from the `groups` section as the value. Within the `groups` section, each group should have a section (named with the group name specified in the `players` section above), and model replacements should be specified by entries with the path of the old model from the `models` folder as the key and the path of the new model from the `models` folder as the value. An example of a configured file is given below:
+```
+"models"
+{
+	"players"
+	{
+		"76561197970669109"	"demo-at-heart"
+	}
+	"groups"
+	{
+		"demo-at-heart"
+		{
+			"player/scout.mdl"		"player/demo.mdl"
+			"player/soldier.mdl"	"player/demo.mdl"
+			"player/pyro.mdl"		"player/demo.mdl"
+			"player/demo.mdl"		"player/demo.mdl"
+			"player/heavy.mdl"		"player/demo.mdl"
+			"player/engineer.mdl"	"player/demo.mdl"
+			"player/medic.mdl"		"player/demo.mdl"
+			"player/sniper.mdl"		"player/demo.mdl"
+			"player/spy.mdl"		"player/demo.mdl"
+		}
+	}
+}
+```
 
 ### Player Outlines
 *displays bright outlines around players that can be seen through walls*
