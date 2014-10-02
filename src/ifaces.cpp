@@ -22,6 +22,7 @@ CDllDemandLoader *Interfaces::pClientModule = nullptr;
 IVEngineClient *Interfaces::pEngineClient = nullptr;
 IFileSystem *Interfaces::pFileSystem = nullptr;
 IGameEventManager2 *Interfaces::pGameEventManager = nullptr;
+IVModelInfoClient *Interfaces::pModelInfoClient = nullptr;
 IVRenderView *Interfaces::pRenderView = nullptr;
 CSteamAPIContext *Interfaces::pSteamAPIContext = nullptr;
 
@@ -85,6 +86,7 @@ bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 	
 	pEngineClient = (IVEngineClient *)interfaceFactory(VENGINE_CLIENT_INTERFACE_VERSION, nullptr);
 	pGameEventManager = (IGameEventManager2 *)interfaceFactory(INTERFACEVERSION_GAMEEVENTSMANAGER2, nullptr);
+	pModelInfoClient = (IVModelInfoClient *)interfaceFactory(VMODELINFO_CLIENT_INTERFACE_VERSION, nullptr);
 	pRenderView = (IVRenderView *)interfaceFactory(VENGINE_RENDERVIEW_INTERFACE_VERSION, nullptr);
 	
 	pClientModule = new CDllDemandLoader(CLIENT_MODULE_FILE);
@@ -104,6 +106,7 @@ bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 	CheckPointerAndWarn(pClientEntityList, IClientEntityList);
 	CheckPointerAndWarn(pEngineClient, IVEngineClient);
 	CheckPointerAndWarn(pGameEventManager, IGameEventManager2);
+	CheckPointerAndWarn(pModelInfoClient, IVModelInfoClient);
 	CheckPointerAndWarn(pRenderView, IVRenderView);
 	CheckPointerAndWarn(g_pFullFileSystem, IFileSystem);
 	CheckPointerAndWarn(g_pMaterialSystem, IMaterialSystem);

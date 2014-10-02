@@ -18,6 +18,7 @@ LocalPlayer *g_LocalPlayer = nullptr;
 MedigunInfo *g_MedigunInfo = nullptr;
 MultiPanel *g_MultiPanel = nullptr;
 PlayerAliases *g_PlayerAliases = nullptr;
+PlayerModels *g_PlayerModels = nullptr;
 PlayerOutlines *g_PlayerOutlines = nullptr;
 ProjectileOutlines *g_ProjectileOutlines = nullptr;
 StatusIcons *g_StatusIcons = nullptr;
@@ -33,6 +34,30 @@ int Detour_GetLocalPlayerIndex() {
 	}
 
 	return Funcs::CallFunc_GetLocalPlayerIndex();
+}
+
+void __fastcall Detour_C_BaseEntity_SetModelIndex(C_BaseEntity *instance, void *, int index) {
+	if (g_PlayerModels) {
+		if (g_PlayerModels->IsEnabled()) {
+			const model_t *oldModel = Interfaces::pModelInfoClient->GetModel(index);
+			const model_t *newModel = g_PlayerModels->SetModelOverride(instance, oldModel);
+			index = Interfaces::pModelInfoClient->GetModelIndex(Interfaces::pModelInfoClient->GetModelName(newModel));
+		}
+	}
+
+	Funcs::CallFunc_C_BaseEntity_SetModelIndex(instance, index);
+}
+
+void __fastcall Detour_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, void *, const model_t *pModel) {
+	if (g_PlayerModels) {
+		if (g_PlayerModels->IsEnabled()) {
+			const model_t *oldModel = pModel;
+			const model_t *newModel = g_PlayerModels->SetModelOverride(instance, oldModel);
+			pModel = newModel;
+		}
+	}
+
+	Funcs::CallFunc_C_BaseEntity_SetModelPointer(instance, pModel);
 }
 
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
@@ -262,6 +287,8 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	}
 
 	Funcs::AddDetour_GetLocalPlayerIndex(Detour_GetLocalPlayerIndex);
+	Funcs::AddDetour_C_BaseEntity_SetModelIndex(Detour_C_BaseEntity_SetModelIndex);
+	Funcs::AddDetour_C_BaseEntity_SetModelPointer(Detour_C_BaseEntity_SetModelPointer);
 	
 	Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, Hook_IBaseClientDLL_FrameStageNotify);
 	Funcs::AddHook_IGameEventManager2_FireEvent(Interfaces::pGameEventManager, Hook_IGameEventManager2_FireEvent);
@@ -282,6 +309,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_MedigunInfo = new MedigunInfo();
 	g_MultiPanel = new MultiPanel();
 	g_PlayerAliases = new PlayerAliases();
+	g_PlayerModels = new PlayerModels();
 	g_PlayerOutlines = new PlayerOutlines();
 	g_ProjectileOutlines = new ProjectileOutlines();
 	g_StatusIcons = new StatusIcons();
@@ -301,6 +329,7 @@ void StatusSpecPlugin::Unload(void)
 	delete g_MedigunInfo;
 	delete g_MultiPanel;
 	delete g_PlayerAliases;
+	delete g_PlayerModels;
 	delete g_PlayerOutlines;
 	delete g_ProjectileOutlines;
 	delete g_StatusIcons;
