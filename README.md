@@ -8,6 +8,14 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**0.19.1**
+* custom materials
+  * removed module
+* custom textures
+  * new module
+* spec GUI order
+  * new module
+
 **0.19.0**
 * custom materials
   * new module
@@ -364,6 +372,12 @@ Player model configuration is loaded from the `Resource/PlayerModels.res` file. 
 #### Console Commands
 * `statusspec_projectileoutlines_color_blu <red> <green> <blue> [alpha]` - the color used for outlines for BLU projectiles
 * `statusspec_projectileoutlines_color_red <red> <green> <blue> [alpha]` - the color used for outlines for RED projectiles
+
+### Spec GUI Order
+*orders the spec GUI more logically than player indices*
+
+#### Console Variables
+* `statusspec_specguiorder_enabled` - enable ordering of spec GUI
 
 ### Status Icons
 *displays icons representing special statuses of a player*
