@@ -24,6 +24,7 @@
 class Player {
 public:
 	static bool CheckPlayer(IClientEntity *entity);
+	static TFClassType GetClass(IClientEntity *entity);
 	static TFTeam GetTeam(IClientEntity *entity);
 	static bool CheckCondition(IClientEntity *entity, TFCond condition);
 	static CSteamID GetSteamID(IClientEntity *entity);

@@ -31,6 +31,7 @@
 #include "modules/playermodels.h"
 #include "modules/playeroutlines.h"
 #include "modules/projectileoutlines.h"
+#include "modules/specguiorder.h"
 #include "modules/statusicons.h"
 #include "modules/teamoverrides.h"
 
@@ -47,6 +48,7 @@ bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event);
 void Hook_IPanel_PaintTraverse_Pre(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce);
 void Hook_IPanel_PaintTraverse_Post(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce);
 void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel);
+void Hook_IPanel_SetPos(vgui::VPANEL vguiPanel, int x, int y);
 bool Hook_IVEngineClient_GetPlayerInfo(int ent_num, player_info_t *pinfo);
 
 class StatusSpecPlugin: public IServerPluginCallbacks
