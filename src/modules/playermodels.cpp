@@ -10,24 +10,6 @@
 
 #include "playermodels.h"
 
-inline CSteamID GetClientSteamID(int client) {
-	player_info_t playerInfo;
-
-	if (Funcs::CallFunc_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, client, &playerInfo)) {
-		if (playerInfo.friendsID) {
-			static EUniverse universe = k_EUniverseInvalid;
-
-			if (universe == k_EUniverseInvalid) {
-				universe = Interfaces::pSteamAPIContext->SteamUtils()->GetConnectedUniverse();
-			}
-
-			return CSteamID(playerInfo.friendsID, 1, universe, k_EAccountTypeIndividual);
-		}
-	}
-
-	return CSteamID();
-}
-
 PlayerModels::PlayerModels() {
 	modelConfig = new KeyValues("models");
 	modelConfig->LoadFromFile(Interfaces::pFileSystem, "resource/playermodels.res", "mod");
@@ -40,11 +22,11 @@ bool PlayerModels::IsEnabled() {
 }
 
 const model_t *PlayerModels::SetModelOverride(C_BaseEntity *entity, const model_t *model) {
-	if (!Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFPlayer")) {
+	if (!Player::CheckPlayer(entity)) {
 		return model;
 	}
 
-	CSteamID playerSteamID = GetClientSteamID(entity->entindex());
+	CSteamID playerSteamID = Player::GetSteamID(entity);
 	std::stringstream stringstream;
 	std::string playerSteamID64;
 	stringstream << playerSteamID.ConvertToUint64();
