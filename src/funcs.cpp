@@ -24,7 +24,6 @@ SH_DECL_HOOK1_void(IBaseClientDLL, FrameStageNotify, SH_NOATTRIB, 0, ClientFrame
 SH_DECL_HOOK1(IClientMode, DoPostScreenSpaceEffects, SH_NOATTRIB, 0, bool, const CViewSetup *);
 SH_DECL_HOOK2(IGameEventManager2, FireEvent, SH_NOATTRIB, 0, bool, IGameEvent *, bool);
 SH_DECL_HOOK1(IGameEventManager2, FireEventClientSide, SH_NOATTRIB, 0, bool, IGameEvent *);
-SH_DECL_HOOK4(IMaterialSystem, FindMaterial, SH_NOATTRIB, 0, IMaterial *, char const *, const char *, bool, const char *);
 SH_DECL_HOOK3_void(IPanel, PaintTraverse, SH_NOATTRIB, 0, VPANEL, bool, bool);
 SH_DECL_HOOK3_void(IPanel, SendMessage, SH_NOATTRIB, 0, VPANEL, KeyValues *, VPANEL);
 SH_DECL_HOOK2(IVEngineClient, GetPlayerInfo, SH_NOATTRIB, 0, bool, int, player_info_t *);
@@ -147,10 +146,6 @@ int Funcs::AddHook_IGameEventManager2_FireEvent(IGameEventManager2 *instance, bo
 
 int Funcs::AddHook_IGameEventManager2_FireEventClientSide(IGameEventManager2 *instance, bool(*hook)(IGameEvent *)) {
 	return SH_ADD_HOOK(IGameEventManager2, FireEventClientSide, instance, SH_STATIC(hook), false);
-}
-
-int Funcs::AddHook_IMaterialSystem_FindMaterial(IMaterialSystem *instance, IMaterial *(*hook)(char const *, const char *, bool, const char *)) {
-	return SH_ADD_HOOK(IMaterialSystem, FindMaterial, instance, hook, false);
 }
 
 int Funcs::AddHook_IPanel_PaintTraverse_Pre(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, bool, bool)) {

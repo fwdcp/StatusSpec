@@ -21,7 +21,6 @@
 #include "paint.h"
 
 #include "modules/antifreeze.h"
-#include "modules/custommaterials.h"
 #include "modules/killstreaks.h"
 #include "modules/loadouticons.h"
 #include "modules/localplayer.h"
@@ -44,7 +43,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage);
 bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup);
 bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast = false);
 bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event);
-IMaterial *Hook_IMaterialSystem_FindMaterial(char const* pMaterialName, const char *pTextureGroupName, bool complain = true, const char *pComplainPrefix = NULL);
 void Hook_IPanel_PaintTraverse_Pre(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce);
 void Hook_IPanel_PaintTraverse_Post(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce);
 void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel);
