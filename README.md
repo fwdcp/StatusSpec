@@ -15,6 +15,10 @@ Changelog
   * add support for ESEA aliases
   * add support for formatting names with prefixes and suffixes
   * remove support for STEAM_ format (only 64-bit IDs accepted now)
+* player outlines
+  * added fading based on distance
+* projectile outlines
+  * added fading based on distance
 * player models
   * new module
 * team overrides
@@ -331,6 +335,8 @@ Player model configuration is loaded from the `Resource/PlayerModels.res` file. 
 
 #### Console Variables
 * `statusspec_playeroutlines_enabled` - enable player outlines
+* `statusspec_playeroutlines_fade` - make outlines fade with distance
+* `statusspec_playeroutlines_fade_distance` - the distance (in Hammer units) at which outlines will fade
 * `statusspec_playeroutlines_health_adjusted_team_colors` - adjusts team colors depending on health of players
 * `statusspec_playeroutlines_team_colors` - override default health-based outline colors with team colors
 
@@ -349,6 +355,8 @@ Player model configuration is loaded from the `Resource/PlayerModels.res` file. 
 
 #### Console Variables
 * `statusspec_projectileoutlines_enabled` - enable projectile outlines
+* `statusspec_projectileoutlines_fade` - make outlines fade with distance
+* `statusspec_projectileoutlines_fade_distance` - the distance (in Hammer units) at which outlines will fade
 * `statusspec_projectileoutlines_grenades` - enable outlines for grenades
 * `statusspec_projectileoutlines_rockets` - enable outlines for rockets
 * `statusspec_projectileoutlines_stickybombs` - enable outlines for stickybombs
