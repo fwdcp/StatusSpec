@@ -14,6 +14,10 @@ bool Player::CheckPlayer(IClientEntity *entity) {
 	return entity && Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFPlayer") && Interfaces::GetGameResources()->IsConnected(entity->entindex());
 }
 
+TFClassType Player::GetClass(IClientEntity *entity) {
+	return (TFClassType)*MAKE_PTR(int*, entity, Entities::pCTFPlayer__m_iClass);
+}
+
 TFTeam Player::GetTeam(IClientEntity *entity) {
 	return (TFTeam)*MAKE_PTR(int*, entity, Entities::pCTFPlayer__m_iTeamNum);
 }
