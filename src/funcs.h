@@ -86,6 +86,7 @@ public:
 	static int AddHook_IPanel_PaintTraverse_Pre(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, bool, bool));
 	static int AddHook_IPanel_PaintTraverse_Post(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, bool, bool));
 	static int AddHook_IPanel_SendMessage(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, KeyValues *, vgui::VPANEL));
+	static int AddHook_IPanel_SetPos(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, int, int));
 	static int AddHook_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, bool(*hook)(int, player_info_t *));
 
 	static int CallFunc_GetLocalPlayerIndex();

@@ -26,6 +26,7 @@ SH_DECL_HOOK2(IGameEventManager2, FireEvent, SH_NOATTRIB, 0, bool, IGameEvent *,
 SH_DECL_HOOK1(IGameEventManager2, FireEventClientSide, SH_NOATTRIB, 0, bool, IGameEvent *);
 SH_DECL_HOOK3_void(IPanel, PaintTraverse, SH_NOATTRIB, 0, VPANEL, bool, bool);
 SH_DECL_HOOK3_void(IPanel, SendMessage, SH_NOATTRIB, 0, VPANEL, KeyValues *, VPANEL);
+SH_DECL_HOOK3_void(IPanel, SetPos, SH_NOATTRIB, 0, VPANEL, int, int);
 SH_DECL_HOOK2(IVEngineClient, GetPlayerInfo, SH_NOATTRIB, 0, bool, int, player_info_t *);
 
 inline bool DataCompare(const BYTE* pData, const BYTE* bSig, const char* szMask)
@@ -158,6 +159,10 @@ int Funcs::AddHook_IPanel_PaintTraverse_Post(vgui::IPanel *instance, void(*hook)
 
 int Funcs::AddHook_IPanel_SendMessage(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, KeyValues *, vgui::VPANEL)) {
 	return SH_ADD_HOOK(IPanel, SendMessage, instance, SH_STATIC(hook), false);
+}
+
+int Funcs::AddHook_IPanel_SetPos(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, int, int)) {
+	return SH_ADD_HOOK(IPanel, SetPos, instance, SH_STATIC(hook), false);
 }
 
 int Funcs::AddHook_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, bool(*hook)(int, player_info_t *)) {
