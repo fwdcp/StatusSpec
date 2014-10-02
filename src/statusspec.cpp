@@ -11,7 +11,7 @@
 #include "statusspec.h"
 
 AntiFreeze *g_AntiFreeze = nullptr;
-CustomMaterials *g_CustomMaterials = nullptr;
+CustomTextures *g_CustomTextures = nullptr;
 Killstreaks *g_Killstreaks = nullptr;
 LoadoutIcons *g_LoadoutIcons = nullptr;
 LocalPlayer *g_LocalPlayer = nullptr;
@@ -176,16 +176,6 @@ bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event) {
 	RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEventClientSide, (newEvent));
 }
 
-IMaterial *Hook_IMaterialSystem_FindMaterial(char const* pMaterialName, const char *pTextureGroupName, bool complain, const char *pComplainPrefix) {
-	if (g_CustomMaterials) {
-		if (g_CustomMaterials->IsEnabled()) {
-			RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, nullptr, &IMaterialSystem::FindMaterial, (g_CustomMaterials->LoadMaterialOverride(pMaterialName), pTextureGroupName, complain, pComplainPrefix));
-		}
-	}
-
-	RETURN_META_VALUE(MRES_IGNORED, nullptr);
-}
-
 void Hook_IPanel_PaintTraverse_Pre(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
 	if (Interfaces::pEngineClient->IsDrawingLoadingImage() || !Interfaces::pEngineClient->IsInGame() || !Interfaces::pEngineClient->IsConnected() || Interfaces::pEngineClient->Con_IsVisible()) {
 		RETURN_META(MRES_IGNORED);
@@ -293,7 +283,6 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, Hook_IBaseClientDLL_FrameStageNotify);
 	Funcs::AddHook_IGameEventManager2_FireEvent(Interfaces::pGameEventManager, Hook_IGameEventManager2_FireEvent);
 	Funcs::AddHook_IGameEventManager2_FireEventClientSide(Interfaces::pGameEventManager, Hook_IGameEventManager2_FireEventClientSide);
-	Funcs::AddHook_IMaterialSystem_FindMaterial(g_pMaterialSystem, Hook_IMaterialSystem_FindMaterial);
 	Funcs::AddHook_IPanel_PaintTraverse_Pre(g_pVGuiPanel, Hook_IPanel_PaintTraverse_Pre);
 	Funcs::AddHook_IPanel_PaintTraverse_Post(g_pVGuiPanel, Hook_IPanel_PaintTraverse_Post);
 	Funcs::AddHook_IPanel_SendMessage(g_pVGuiPanel, Hook_IPanel_SendMessage);
@@ -302,7 +291,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	ConVar_Register();
 
 	g_AntiFreeze = new AntiFreeze();
-	g_CustomMaterials = new CustomMaterials();
+	g_CustomTextures = new CustomTextures();
 	g_Killstreaks = new Killstreaks();
 	g_LoadoutIcons = new LoadoutIcons();
 	g_LocalPlayer = new LocalPlayer();
@@ -322,7 +311,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 void StatusSpecPlugin::Unload(void)
 {
 	delete g_AntiFreeze;
-	delete g_CustomMaterials;
+	delete g_CustomTextures;
 	delete g_Killstreaks;
 	delete g_LoadoutIcons;
 	delete g_LocalPlayer;
