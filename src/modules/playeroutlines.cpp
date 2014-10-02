@@ -52,6 +52,8 @@ PlayerOutlines::PlayerOutlines() {
 	colors["red_buff"].command = new ConCommand("statusspec_playeroutlines_color_red_buff", PlayerOutlines::ColorCommand, "the color used for outlines for RED team players at max buffed health", FCVAR_NONE, PlayerOutlines::GetCurrentColor);
 	
 	enabled = new ConVar("statusspec_playeroutlines_enabled", "0", FCVAR_NONE, "enable player outlines");
+	fade = new ConVar("statusspec_playeroutlines_fade", "0", FCVAR_NONE, "make outlines fade with distance");
+	fade_distance = new ConVar("statusspec_playeroutlines_fade_distance", "3200", FCVAR_NONE, "the distance (in Hammer units) at which outlines will fade");
 	health_adjusted_team_colors = new ConVar("statusspec_playeroutlines_health_adjusted_team_colors", "0", FCVAR_NONE, "adjusts team colors depending on health of players");
 	team_colors = new ConVar("statusspec_playeroutlines_team_colors", "0", FCVAR_NONE, "override default health-based outline colors with team colors");
 }
@@ -60,8 +62,27 @@ bool PlayerOutlines::IsEnabled() {
 	return enabled->GetBool();
 }
 
+void PlayerOutlines::PreGlowRender(const CViewSetup *pSetup) {
+	if (fade->GetBool()) {
+		for (auto iterator = glows.begin(); iterator != glows.end(); ++iterator) {
+			if (iterator->first.Get()) {
+				vec_t distance = pSetup->origin.DistTo(iterator->first->GetRenderOrigin());
+
+				if (distance > fade_distance->GetFloat()) {
+					Color glowColor = GetGlowColor(iterator->first);
+					float alpha = glowColor.a() / 255.0f;
+
+					float scalar = fade_distance->GetFloat() / distance;
+
+					iterator->second->SetAlpha(alpha * scalar);
+				}
+			}
+		}
+	}
+}
+
 void PlayerOutlines::ProcessEntity(IClientEntity* entity) {
-	if (!Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFPlayer")) {
+	if (!Player::CheckPlayer(entity)) {
 		return;
 	}
 
@@ -81,7 +102,7 @@ void PlayerOutlines::ProcessEntity(IClientEntity* entity) {
 }
 
 Color PlayerOutlines::GetGlowColor(IClientEntity *entity) {
-	if (!Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFPlayer")) {
+	if (!Player::CheckPlayer(entity)) {
 		return Color(0, 0, 0, 0);
 	}
 
@@ -98,7 +119,7 @@ Color PlayerOutlines::GetGlowColor(IClientEntity *entity) {
 		blue *= 255.0f;
 	}
 	else {
-		TFTeam team = (TFTeam)*MAKE_PTR(int*, entity, Entities::pCTFPlayer__m_iTeamNum);
+		TFTeam team = Player::GetTeam(entity);
 
 		if (!health_adjusted_team_colors->GetBool()) {
 			if (team == TFTeam_Red) {

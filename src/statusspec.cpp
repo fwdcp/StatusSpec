@@ -11,15 +11,18 @@
 #include "statusspec.h"
 
 AntiFreeze *g_AntiFreeze = nullptr;
+CustomMaterials *g_CustomMaterials = nullptr;
 Killstreaks *g_Killstreaks = nullptr;
 LoadoutIcons *g_LoadoutIcons = nullptr;
 LocalPlayer *g_LocalPlayer = nullptr;
 MedigunInfo *g_MedigunInfo = nullptr;
 MultiPanel *g_MultiPanel = nullptr;
 PlayerAliases *g_PlayerAliases = nullptr;
+PlayerModels *g_PlayerModels = nullptr;
 PlayerOutlines *g_PlayerOutlines = nullptr;
 ProjectileOutlines *g_ProjectileOutlines = nullptr;
 StatusIcons *g_StatusIcons = nullptr;
+TeamOverrides *g_TeamOverrides = nullptr;
 
 static int doPostScreenSpaceEffectsHook;
 
@@ -31,6 +34,30 @@ int Detour_GetLocalPlayerIndex() {
 	}
 
 	return Funcs::CallFunc_GetLocalPlayerIndex();
+}
+
+void __fastcall Detour_C_BaseEntity_SetModelIndex(C_BaseEntity *instance, void *, int index) {
+	if (g_PlayerModels) {
+		if (g_PlayerModels->IsEnabled()) {
+			const model_t *oldModel = Interfaces::pModelInfoClient->GetModel(index);
+			const model_t *newModel = g_PlayerModels->SetModelOverride(instance, oldModel);
+			index = Interfaces::pModelInfoClient->GetModelIndex(Interfaces::pModelInfoClient->GetModelName(newModel));
+		}
+	}
+
+	Funcs::CallFunc_C_BaseEntity_SetModelIndex(instance, index);
+}
+
+void __fastcall Detour_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, void *, const model_t *pModel) {
+	if (g_PlayerModels) {
+		if (g_PlayerModels->IsEnabled()) {
+			const model_t *oldModel = pModel;
+			const model_t *newModel = g_PlayerModels->SetModelOverride(instance, oldModel);
+			pModel = newModel;
+		}
+	}
+
+	Funcs::CallFunc_C_BaseEntity_SetModelPointer(instance, pModel);
 }
 
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
@@ -48,12 +75,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 		if (g_MedigunInfo) {
 			if (g_MedigunInfo->IsEnabled()) {
 				g_MedigunInfo->PreEntityUpdate();
-			}
-		}
-
-		if (g_StatusIcons) {
-			if (g_StatusIcons->IsEnabled()) {
-				g_StatusIcons->PreEntityUpdate();
 			}
 		}
 
@@ -89,12 +110,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 			if (g_ProjectileOutlines) {
 				g_ProjectileOutlines->ProcessEntity(entity);
 			}
-
-			if (g_StatusIcons) {
-				if (g_StatusIcons->IsEnabled()) {
-					g_StatusIcons->ProcessEntity(entity);
-				}
-			}
 		}
 
 		if (g_AntiFreeze) {
@@ -122,6 +137,18 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 }
 
 bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup) {
+	if (g_PlayerOutlines) {
+		if (g_PlayerOutlines->IsEnabled()) {
+			g_PlayerOutlines->PreGlowRender(pSetup);
+		}
+	}
+
+	if (g_ProjectileOutlines) {
+		if (g_ProjectileOutlines->IsEnabled()) {
+			g_ProjectileOutlines->PreGlowRender(pSetup);
+		}
+	}
+
 	g_GlowObjectManager.RenderGlowEffects(pSetup);
 
 	RETURN_META_VALUE(MRES_OVERRIDE, true);
@@ -129,34 +156,34 @@ bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup) {
 
 bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast) {
 	IGameEvent *newEvent = Interfaces::pGameEventManager->DuplicateEvent(event);
+	Interfaces::pGameEventManager->FreeEvent(event);
 
 	if (g_Killstreaks) {
-		if (g_Killstreaks->FireEvent(newEvent)) {
-			Interfaces::pGameEventManager->FreeEvent(event);
-
-			RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEvent, (newEvent, bDontBroadcast));
-		}
+		g_Killstreaks->FireEvent(newEvent);
 	}
-	
-	Interfaces::pGameEventManager->FreeEvent(newEvent);
 
-	RETURN_META_VALUE(MRES_IGNORED, false);
+	RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEvent, (newEvent, bDontBroadcast));
 }
 
 bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event) {
 	IGameEvent *newEvent = Interfaces::pGameEventManager->DuplicateEvent(event);
+	Interfaces::pGameEventManager->FreeEvent(event);
 
 	if (g_Killstreaks) {
-		if (g_Killstreaks->FireEvent(newEvent)) {
-			Interfaces::pGameEventManager->FreeEvent(event);
+		g_Killstreaks->FireEvent(newEvent);
+	}
 
-			RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEventClientSide, (newEvent));
+	RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEventClientSide, (newEvent));
+}
+
+IMaterial *Hook_IMaterialSystem_FindMaterial(char const* pMaterialName, const char *pTextureGroupName, bool complain, const char *pComplainPrefix) {
+	if (g_CustomMaterials) {
+		if (g_CustomMaterials->IsEnabled()) {
+			RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, nullptr, &IMaterialSystem::FindMaterial, (g_CustomMaterials->LoadMaterialOverride(pMaterialName), pTextureGroupName, complain, pComplainPrefix));
 		}
 	}
-	
-	Interfaces::pGameEventManager->FreeEvent(newEvent);
 
-	RETURN_META_VALUE(MRES_IGNORED, false);
+	RETURN_META_VALUE(MRES_IGNORED, nullptr);
 }
 
 void Hook_IPanel_PaintTraverse_Pre(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
@@ -211,6 +238,12 @@ void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VP
 		}
 	}
 
+	if (g_TeamOverrides) {
+		if (g_TeamOverrides->IsEnabled()) {
+			g_TeamOverrides->InterceptMessage(vguiPanel, params, ifromPanel);
+		}
+	}
+
 	RETURN_META(MRES_IGNORED);
 }
 
@@ -254,10 +287,13 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	}
 
 	Funcs::AddDetour_GetLocalPlayerIndex(Detour_GetLocalPlayerIndex);
+	Funcs::AddDetour_C_BaseEntity_SetModelIndex(Detour_C_BaseEntity_SetModelIndex);
+	Funcs::AddDetour_C_BaseEntity_SetModelPointer(Detour_C_BaseEntity_SetModelPointer);
 	
 	Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, Hook_IBaseClientDLL_FrameStageNotify);
 	Funcs::AddHook_IGameEventManager2_FireEvent(Interfaces::pGameEventManager, Hook_IGameEventManager2_FireEvent);
 	Funcs::AddHook_IGameEventManager2_FireEventClientSide(Interfaces::pGameEventManager, Hook_IGameEventManager2_FireEventClientSide);
+	Funcs::AddHook_IMaterialSystem_FindMaterial(g_pMaterialSystem, Hook_IMaterialSystem_FindMaterial);
 	Funcs::AddHook_IPanel_PaintTraverse_Pre(g_pVGuiPanel, Hook_IPanel_PaintTraverse_Pre);
 	Funcs::AddHook_IPanel_PaintTraverse_Post(g_pVGuiPanel, Hook_IPanel_PaintTraverse_Post);
 	Funcs::AddHook_IPanel_SendMessage(g_pVGuiPanel, Hook_IPanel_SendMessage);
@@ -266,15 +302,18 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	ConVar_Register();
 
 	g_AntiFreeze = new AntiFreeze();
+	g_CustomMaterials = new CustomMaterials();
 	g_Killstreaks = new Killstreaks();
 	g_LoadoutIcons = new LoadoutIcons();
 	g_LocalPlayer = new LocalPlayer();
 	g_MedigunInfo = new MedigunInfo();
 	g_MultiPanel = new MultiPanel();
 	g_PlayerAliases = new PlayerAliases();
+	g_PlayerModels = new PlayerModels();
 	g_PlayerOutlines = new PlayerOutlines();
 	g_ProjectileOutlines = new ProjectileOutlines();
 	g_StatusIcons = new StatusIcons();
+	g_TeamOverrides = new TeamOverrides();
 	
 	Msg("%s loaded!\n", PLUGIN_DESC);
 	return true;
@@ -283,15 +322,18 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 void StatusSpecPlugin::Unload(void)
 {
 	delete g_AntiFreeze;
+	delete g_CustomMaterials;
 	delete g_Killstreaks;
 	delete g_LoadoutIcons;
 	delete g_LocalPlayer;
 	delete g_MedigunInfo;
 	delete g_MultiPanel;
 	delete g_PlayerAliases;
+	delete g_PlayerModels;
 	delete g_PlayerOutlines;
 	delete g_ProjectileOutlines;
 	delete g_StatusIcons;
+	delete g_TeamOverrides;
 
 	Funcs::Unload();
 

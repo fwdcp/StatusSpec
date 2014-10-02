@@ -19,10 +19,10 @@
 #include "convar.h"
 #include "vgui/IPanel.h"
 
-#include "../entities.h"
 #include "../enums.h"
 #include "../ifaces.h"
 #include "../paint.h"
+#include "../player.h"
 
 #if defined _WIN32
 #define strtoull _strtoui64
@@ -53,11 +53,6 @@
 #define TEXTURE_BLEEDING "vgui/bleed_drop"
 #define TEXTURE_FIRE "hud/leaderboard_class_pyro"
 
-typedef struct Status_s {
-	TFTeam team;
-	uint32_t conditions[3];
-} Status_t;
-
 class StatusIcons {
 public:
 	StatusIcons();
@@ -68,12 +63,8 @@ public:
 	
 	void NoPaint(vgui::VPANEL vguiPanel);
 	void Paint(vgui::VPANEL vguiPanel);
-	
-	void PreEntityUpdate();
-	void ProcessEntity(IClientEntity* entity);
 private:
 	std::map<std::string, int> playerPanels;
-	std::map<int, Status_t> statusInfo;
 
 	ConVar* enabled;
 	ConVar* max_icons;

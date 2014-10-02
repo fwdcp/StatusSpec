@@ -12,9 +12,9 @@
 
 #include "../stdafx.h"
 
-#include "../entities.h"
 #include "../funcs.h"
 #include "../ifaces.h"
+#include "../player.h"
 
 class LocalPlayer {
 public:

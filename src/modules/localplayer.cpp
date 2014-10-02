@@ -30,7 +30,7 @@ void LocalPlayer::PostEntityUpdate() {
 int LocalPlayer::GetLocalPlayerIndexOverride() {
 	IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(player->GetInt());
 
-	if (IsEnabled() && entity && Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFPlayer")) {
+	if (IsEnabled() && Player::CheckPlayer(entity)) {
 		return player->GetInt();
 	}
 	else {
@@ -42,10 +42,10 @@ void LocalPlayer::SetToCurrentTarget() {
 	int localPlayer = Interfaces::pEngineClient->GetLocalPlayer();
 	IClientEntity *localPlayerEntity = Interfaces::pClientEntityList->GetClientEntity(localPlayer);
 
-	if (Entities::CheckClassBaseclass(localPlayerEntity->GetClientClass(), "DT_TFPlayer")) {
+	if (Player::CheckPlayer(localPlayerEntity)) {
 		C_BaseEntity *targetEntity = Funcs::CallFunc_C_TFPlayer_GetObserverTarget((C_TFPlayer *)localPlayerEntity);
 
-		if (Entities::CheckClassBaseclass(targetEntity->GetClientClass(), "DT_TFPlayer")) {
+		if (Player::CheckPlayer(targetEntity)) {
 			g_LocalPlayer->player->SetValue(targetEntity->entindex());
 			return;
 		}

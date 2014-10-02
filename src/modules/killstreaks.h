@@ -18,6 +18,7 @@
 #include "../entities.h"
 #include "../enums.h"
 #include "../ifaces.h"
+#include "../player.h"
 
 class Killstreaks {
 public:

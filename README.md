@@ -8,6 +8,22 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**0.19.0**
+* custom materials
+  * new module
+* player aliases
+  * add support for ESEA aliases
+  * add support for formatting names with prefixes and suffixes
+  * remove support for STEAM_ format (only 64-bit IDs accepted now)
+* player outlines
+  * added fading based on distance
+* projectile outlines
+  * added fading based on distance
+* player models
+  * new module
+* team overrides
+  * new module
+
 **0.18.0**
 * general
   * added plugin glow system
@@ -152,6 +168,29 @@ To install, place the `StatusSpec` folder within the `custom` folder in the `tf`
 #### UI Resource Files
 An example file for the freeze info box is included under `Resource/UI/FreezeInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_antifreeze_display_reload_settings` is provided as a replacement.
 
+### Custom Materials
+*allows materials to be swapped out*
+
+#### Console Variables
+* `statusspec_custommaterials_enabled` - enable custom materials
+
+#### Console Commands
+* `statusspec_custommaterials_load_replacement_group <group>` - load a material replacement group
+* `statusspec_custommaterials_unload_replacement_group <group>` - unload a material replacement group
+
+#### Resource Files
+Player model configuration is loaded from the `Resource/CustomMaterials.res` file. Replacement groups should be configured as sections (whose names are used in the commands for this module). Material replacements should be specified by entries with the path of the old material from the `materials` folder as the key and the path of the new material from the `materials` folder as the value. An example of a configured file is given below:
+```
+"models"
+{
+	"blank"
+	{
+		"signs/team_blue.vmt"	"signs/team_blue_blank.vmt"
+		"signs/team_red.vmt"	"signs/team_red_blank.vmt"
+	}
+}
+```
+
 ### Killstreaks
 *enables killstreak tracking for all weapons, all players*
 
@@ -246,18 +285,58 @@ In addition, the following HUD animations are triggered by this plugin and may b
 
 #### Console Variables
 * `statusspec_playeraliases_enabled` - enable player aliases
+* `statusspec_playeraliases_esea` - enable player aliases from the ESEA API
 * `statusspec_playeraliases_etf2l` - enable player aliases from the ETF2L API
+* `statusspec_playeraliases_format_blu` - the name format for BLU players
+* `statusspec_playeraliases_format_red` - the name format for RED players
+* `statusspec_playeraliases_twitch` - enable player aliases from the Twitch API
 
 #### Console Commands
 * `statusspec_playeraliases_get <steamid>` - get an alias for a player
 * `statusspec_playeraliases_remove <steamid>` - remove an alias for a player
 * `statusspec_playeraliases_set <steamid> <alias>` - set an alias for a player
+* `statusspec_playeraliases_switch_teams` - switch name formats for both teams
+
+### Player Models
+*changes the model used based on the player*
+
+#### Console Variables
+* `statusspec_playermodels_enabled` - enable custom player models
+
+#### Resource Files
+Player model configuration is loaded from the `Resource/PlayerModels.res` file. Within the `players` section, players should be configured with an entry consisting of their Steam ID as the key and a group name from the `groups` section as the value. Within the `groups` section, each group should have a section (named with the group name specified in the `players` section above), and model replacements should be specified by entries with the path of the old model from the `models` folder as the key and the path of the new model from the `models` folder as the value. An example of a configured file is given below:
+```
+"models"
+{
+	"players"
+	{
+		"76561197970669109"	"demo-at-heart"
+	}
+	"groups"
+	{
+		"demo-at-heart"
+		{
+			"player/scout.mdl"		"player/demo.mdl"
+			"player/soldier.mdl"	"player/demo.mdl"
+			"player/pyro.mdl"		"player/demo.mdl"
+			"player/demo.mdl"		"player/demo.mdl"
+			"player/heavy.mdl"		"player/demo.mdl"
+			"player/engineer.mdl"	"player/demo.mdl"
+			"player/medic.mdl"		"player/demo.mdl"
+			"player/sniper.mdl"		"player/demo.mdl"
+			"player/spy.mdl"		"player/demo.mdl"
+		}
+	}
+}
+```
 
 ### Player Outlines
 *displays bright outlines around players that can be seen through walls*
 
 #### Console Variables
 * `statusspec_playeroutlines_enabled` - enable player outlines
+* `statusspec_playeroutlines_fade` - make outlines fade with distance
+* `statusspec_playeroutlines_fade_distance` - the distance (in Hammer units) at which outlines will fade
 * `statusspec_playeroutlines_health_adjusted_team_colors` - adjusts team colors depending on health of players
 * `statusspec_playeroutlines_team_colors` - override default health-based outline colors with team colors
 
@@ -276,6 +355,8 @@ In addition, the following HUD animations are triggered by this plugin and may b
 
 #### Console Variables
 * `statusspec_projectileoutlines_enabled` - enable projectile outlines
+* `statusspec_projectileoutlines_fade` - make outlines fade with distance
+* `statusspec_projectileoutlines_fade_distance` - the distance (in Hammer units) at which outlines will fade
 * `statusspec_projectileoutlines_grenades` - enable outlines for grenades
 * `statusspec_projectileoutlines_rockets` - enable outlines for rockets
 * `statusspec_projectileoutlines_stickybombs` - enable outlines for stickybombs
@@ -322,6 +403,21 @@ To properly support status icons, adjust `Resource/UI/SpectatorTournament.res` s
 	...	
 }
 ```
+
+### Team Overrides
+*override team info in HUD*
+
+#### Console Variables
+* `statusspec_teamoverrides_enabled` - enable team overrides
+* `statusspec_teamoverrides_name_blu` - BLU team name
+* `statusspec_teamoverrides_name_red` - RED team name
+* `statusspec_teamoverrides_names` - enable overrides for team names
+* `statusspec_teamoverrides_score_blu` - BLU team score
+* `statusspec_teamoverrides_score_red` - RED team score
+* `statusspec_teamoverrides_scores` - enable overrides for team scores
+
+#### Console Commands
+* `statusspec_teamoverrides_switch_teams` - switch names and scores for both teams
 
 Thanks
 ------

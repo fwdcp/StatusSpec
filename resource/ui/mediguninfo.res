@@ -28,7 +28,7 @@
 		"pinCorner"		"0"
 		"visible" 		"1"
 		"enabled" 		"1"
-		"fillcolor" 	"NotoDark"
+		"fillcolor" 	"TransparentBlack"
 	}
 	
 	"MedigunInfoRedBackground"
@@ -64,8 +64,8 @@
 		"textAlignment"	"left"
 		"dulltext"		"0"
 		"brighttext"	"0"
-		"font"			"Noto8"
-		"fgcolor"		"NotoWhite"
+		"font"			"DefaultVerySmall"
+		"fgcolor"		"HudWhite"
 	}
 	
 	"MedigunInfoRedChargeLabel"
@@ -85,8 +85,8 @@
 		"textAlignment"	"center"
 		"dulltext"		"0"
 		"brighttext"	"0"
-		"font"			"Noto8"
-		"fgcolor"		"NotoWhite"
+		"font"			"DefaultVerySmall"
+		"fgcolor"		"HudWhite"
 	}
 
 	"MedigunInfoRedIndividualChargesLabel"
@@ -106,8 +106,8 @@
 		"textAlignment"	"center"
 		"dulltext"		"0"
 		"brighttext"	"0"
-		"font"			"Noto8"
-		"fgcolor"		"NotoWhite"
+		"font"			"DefaultVerySmall"
+		"fgcolor"		"HudWhite"
 	}
 	
 	"MedigunInfoRedChargeAdvantageLabel"
@@ -127,8 +127,8 @@
 		"textAlignment"	"center"
 		"dulltext"		"0"
 		"brighttext"	"0"
-		"font"			"Noto8"
-		"fgcolor"		"NotoWhite"
+		"font"			"DefaultVerySmall"
+		"fgcolor"		"HudWhite"
 	}
 	
 	"MedigunInfoRedChargeMeter"
@@ -148,8 +148,8 @@
 		"textAlignment"		"Left"
 		"dulltext"			"0"
 		"brighttext"		"0"
-		"bgcolor_override"	"NotoMedicBarBG"
-		"fgcolor_override" 	"NotoMedicBarNormal"
+		"bgcolor_override"	"ProgressBackground"
+		"fgcolor_override" 	"ProgressOffWhite"
 		"direction"			"east"
 		"variable"			"redcharge"
 	}
@@ -171,8 +171,8 @@
 		"textAlignment"		"Left"
 		"dulltext"			"0"
 		"brighttext"		"0"
-		"bgcolor_override"	"NotoMedicBarBG"
-		"fgcolor_override" 	"NotoMedicBarNormal"
+		"bgcolor_override"	"ProgressBackground"
+		"fgcolor_override" 	"ProgressOffWhite"
 		"direction"			"east"
 		"variable"			"redcharge1"
 	}
@@ -194,8 +194,8 @@
 		"textAlignment"		"Left"
 		"dulltext"			"0"
 		"brighttext"		"0"
-		"bgcolor_override"	"NotoMedicBarBG"
-		"fgcolor_override" 	"NotoMedicBarNormal"
+		"bgcolor_override"	"ProgressBackground"
+		"fgcolor_override" 	"ProgressOffWhite"
 		"direction"			"east"
 		"variable"			"redcharge2"
 	}
@@ -217,8 +217,8 @@
 		"textAlignment"		"Left"
 		"dulltext"			"0"
 		"brighttext"		"0"
-		"bgcolor_override"	"NotoMedicBarBG"
-		"fgcolor_override" 	"NotoMedicBarNormal"
+		"bgcolor_override"	"ProgressBackground"
+		"fgcolor_override" 	"ProgressOffWhite"
 		"direction"			"east"
 		"variable"			"redcharge3"
 	}
@@ -240,8 +240,8 @@
 		"textAlignment"		"Left"
 		"dulltext"			"0"
 		"brighttext"		"0"
-		"bgcolor_override"	"NotoMedicBarBG"
-		"fgcolor_override" 	"NotoMedicBarNormal"
+		"bgcolor_override"	"ProgressBackground"
+		"fgcolor_override" 	"ProgressOffWhite"
 		"direction"			"east"
 		"variable"			"redcharge4"
 	}
@@ -293,8 +293,8 @@
 		"textAlignment"	"left"
 		"dulltext"		"0"
 		"brighttext"	"0"
-		"font"			"Noto8"
-		"fgcolor"		"NotoWhite"
+		"font"			"DefaultVerySmall"
+		"fgcolor"		"HudWhite"
 	}
 	
 	"MedigunInfoBluChargeLabel"
@@ -314,8 +314,8 @@
 		"textAlignment"	"center"
 		"dulltext"		"0"
 		"brighttext"	"0"
-		"font"			"Noto8"
-		"fgcolor"		"NotoWhite"
+		"font"			"DefaultVerySmall"
+		"fgcolor"		"HudWhite"
 	}
 
 	"MedigunInfoBluIndividualChargesLabel"
@@ -335,8 +335,8 @@
 		"textAlignment"	"center"
 		"dulltext"		"0"
 		"brighttext"	"0"
-		"font"			"Noto8"
-		"fgcolor"		"NotoWhite"
+		"font"			"DefaultVerySmall"
+		"fgcolor"		"HudWhite"
 	}
 	
 	"MedigunInfoBluChargeAdvantageLabel"
@@ -356,8 +356,8 @@
 		"textAlignment"	"center"
 		"dulltext"		"0"
 		"brighttext"	"0"
-		"font"			"Noto8"
-		"fgcolor"		"NotoWhite"
+		"font"			"DefaultVerySmall"
+		"fgcolor"		"HudWhite"
 	}
 	
 	"MedigunInfoBluChargeMeter"
@@ -377,8 +377,8 @@
 		"textAlignment"		"Left"
 		"dulltext"			"0"
 		"brighttext"		"0"
-		"bgcolor_override"	"NotoMedicBarBG"
-		"fgcolor_override" 	"NotoMedicBarNormal"
+		"bgcolor_override"	"ProgressBackground"
+		"fgcolor_override" 	"ProgressOffWhite"
 		"direction"			"east"
 		"variable"			"blucharge"
 	}
@@ -400,8 +400,8 @@
 		"textAlignment"		"Left"
 		"dulltext"			"0"
 		"brighttext"		"0"
-		"bgcolor_override"	"NotoMedicBarBG"
-		"fgcolor_override" 	"NotoMedicBarNormal"
+		"bgcolor_override"	"ProgressBackground"
+		"fgcolor_override" 	"ProgressOffWhite"
 		"direction"			"east"
 		"variable"			"blucharge1"
 	}
@@ -423,8 +423,8 @@
 		"textAlignment"		"Left"
 		"dulltext"			"0"
 		"brighttext"		"0"
-		"bgcolor_override"	"NotoMedicBarBG"
-		"fgcolor_override" 	"NotoMedicBarNormal"
+		"bgcolor_override"	"ProgressBackground"
+		"fgcolor_override" 	"ProgressOffWhite"
 		"direction"			"east"
 		"variable"			"blucharge2"
 	}
@@ -446,8 +446,8 @@
 		"textAlignment"		"Left"
 		"dulltext"			"0"
 		"brighttext"		"0"
-		"bgcolor_override"	"NotoMedicBarBG"
-		"fgcolor_override" 	"NotoMedicBarNormal"
+		"bgcolor_override"	"ProgressBackground"
+		"fgcolor_override" 	"ProgressOffWhite"
 		"direction"			"east"
 		"variable"			"blucharge3"
 	}
@@ -469,8 +469,8 @@
 		"textAlignment"		"Left"
 		"dulltext"			"0"
 		"brighttext"		"0"
-		"bgcolor_override"	"NotoMedicBarBG"
-		"fgcolor_override" 	"NotoMedicBarNormal"
+		"bgcolor_override"	"ProgressBackground"
+		"fgcolor_override" 	"ProgressOffWhite"
 		"direction"			"east"
 		"variable"			"blucharge4"
 	}

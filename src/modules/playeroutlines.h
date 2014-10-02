@@ -18,13 +18,13 @@
 
 #include "convar.h"
 #include "ehandle.h"
-#include "vgui/IVGui.h"
 
 #include "../enums.h"
 #include "../entities.h"
 #include "../funcs.h"
 #include "../glows.h"
 #include "../ifaces.h"
+#include "../player.h"
 
 #if defined _WIN32
 #define strtoull _strtoui64
@@ -36,6 +36,8 @@ public:
 
 	bool IsEnabled();
 
+	void PreGlowRender(const CViewSetup *pSetup);
+
 	void ProcessEntity(IClientEntity *entity);
 private:
 	std::map<std::string, ColorConCommand_t> colors;
@@ -45,6 +47,8 @@ private:
 	void SetGlowEffect(IClientEntity *entity, bool enabled, Vector color = Vector(1.0f, 1.0f, 1.0f), float alpha = 1.0f);
 	
 	ConVar *enabled;
+	ConVar *fade;
+	ConVar *fade_distance;
 	ConVar *health_adjusted_team_colors;
 	ConVar *team_colors;
 	static void ColorCommand(const CCommand &command);
