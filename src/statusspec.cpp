@@ -11,6 +11,7 @@
 #include "statusspec.h"
 
 AntiFreeze *g_AntiFreeze = nullptr;
+CustomTextures *g_CustomTextures = nullptr;
 Killstreaks *g_Killstreaks = nullptr;
 LoadoutIcons *g_LoadoutIcons = nullptr;
 LocalPlayer *g_LocalPlayer = nullptr;
@@ -290,6 +291,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	ConVar_Register();
 
 	g_AntiFreeze = new AntiFreeze();
+	g_CustomTextures = new CustomTextures();
 	g_Killstreaks = new Killstreaks();
 	g_LoadoutIcons = new LoadoutIcons();
 	g_LocalPlayer = new LocalPlayer();
@@ -309,6 +311,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 void StatusSpecPlugin::Unload(void)
 {
 	delete g_AntiFreeze;
+	delete g_CustomTextures;
 	delete g_Killstreaks;
 	delete g_LoadoutIcons;
 	delete g_LocalPlayer;
