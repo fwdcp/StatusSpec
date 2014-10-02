@@ -32,51 +32,51 @@ char const *CustomMaterials::LoadMaterialOverride(char const *material) {
 }
 
 void CustomMaterials::LoadReplacementGroup(const CCommand &command) {
-	if (command.ArgC() >= 2) {
-		const char *group = command.Arg(1);
+	if (command.ArgC() < 2) {
+		Warning("Usage: statusspec_custommaterials_load_replacement_group <group>\n");
+		return;
+	}
 
-		KeyValues *replacementsConfig = g_CustomMaterials->materialConfig->FindKey(group);
+	const char *group = command.Arg(1);
 
-		if (replacementsConfig) {
-			FOR_EACH_VALUE(replacementsConfig, materialReplacement) {
-				std::string original = materialReplacement->GetName();
+	KeyValues *replacementsConfig = g_CustomMaterials->materialConfig->FindKey(group);
 
-				g_CustomMaterials->materialReplacements[original].group = group;
-				g_CustomMaterials->materialReplacements[original].replacement = materialReplacement->GetString();
-			}
-		}
-		else {
-			Warning("Must specify a valid replacement group to load!\n");
+	if (replacementsConfig) {
+		FOR_EACH_VALUE(replacementsConfig, materialReplacement) {
+			std::string original = materialReplacement->GetName();
+
+			g_CustomMaterials->materialReplacements[original].group = group;
+			g_CustomMaterials->materialReplacements[original].replacement = materialReplacement->GetString();
 		}
 	}
 	else {
-		Warning("Must specify a replacement group to load!\n");
+		Warning("Must specify a valid replacement group to load!\n");
 	}
 }
 
 void CustomMaterials::UnloadReplacementGroup(const CCommand &command) {
-	if (command.ArgC() >= 2) {
-		const char *group = command.Arg(1);
+	if (command.ArgC() < 2) {
+		Warning("Usage: statusspec_custommaterials_unload_replacement_group <group>\n");
+		return;
+	}
 
-		KeyValues *replacementsConfig = g_CustomMaterials->materialConfig->FindKey(group);
+	const char *group = command.Arg(1);
 
-		if (replacementsConfig) {
-			auto iterator = g_CustomMaterials->materialReplacements.begin();
+	KeyValues *replacementsConfig = g_CustomMaterials->materialConfig->FindKey(group);
 
-			while (iterator != g_CustomMaterials->materialReplacements.end()) {
-				if (iterator->second.group.compare(group) == 0) {
-					g_CustomMaterials->materialReplacements.erase(iterator++);
-				}
-				else {
-					++iterator;
-				}
+	if (replacementsConfig) {
+		auto iterator = g_CustomMaterials->materialReplacements.begin();
+
+		while (iterator != g_CustomMaterials->materialReplacements.end()) {
+			if (iterator->second.group.compare(group) == 0) {
+				g_CustomMaterials->materialReplacements.erase(iterator++);
 			}
-		}
-		else {
-			Warning("Must specify a valid replacement group to unload!\n");
+			else {
+				++iterator;
+			}
 		}
 	}
 	else {
-		Warning("Must specify a replacement group to unload!\n");
+		Warning("Must specify a valid replacement group to unload!\n");
 	}
 }

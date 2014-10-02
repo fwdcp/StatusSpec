@@ -340,9 +340,9 @@ int PlayerAliases::GetCurrentGamePlayers(const char *partial, char commands[COMM
 }
 
 void PlayerAliases::GetCustomPlayerAlias(const CCommand &command) {
-	if (command.ArgC() < 1)
+	if (command.ArgC() < 2)
 	{
-		Warning("Usage: statusspec_player_alias_get <steamid>\n");
+		Warning("Usage: statusspec_playeraliases_get <steamid>\n");
 		return;
 	}
 
@@ -362,9 +362,9 @@ void PlayerAliases::GetCustomPlayerAlias(const CCommand &command) {
 }
 
 void PlayerAliases::RemoveCustomPlayerAlias(const CCommand &command) {
-	if (command.ArgC() < 1)
+	if (command.ArgC() < 2)
 	{
-		Warning("Usage: statusspec_player_alias_remove <steamid>\n");
+		Warning("Usage: statusspec_playeraliases_remove <steamid>\n");
 		return;
 	}
 
@@ -380,9 +380,9 @@ void PlayerAliases::RemoveCustomPlayerAlias(const CCommand &command) {
 }
 
 void PlayerAliases::SetCustomPlayerAlias(const CCommand &command) {
-	if (command.ArgC() < 2)
+	if (command.ArgC() < 3)
 	{
-		Warning("Usage: statusspec_player_alias_set <steamid> <alias>\n");
+		Warning("Usage: statusspec_playeraliases_set <steamid> <alias>\n");
 		return;
 	}
 
