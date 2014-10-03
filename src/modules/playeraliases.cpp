@@ -63,6 +63,10 @@ bool PlayerAliases::GetPlayerInfoOverride(int ent_num, player_info_t *pinfo) {
 
 	IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(ent_num);
 
+	if (!Player::CheckPlayer(entity)) {
+		return result;
+	}
+
 	CSteamID playerSteamID = Player::GetSteamID(entity);
 	TFTeam team = Player::GetTeam(entity);
 
@@ -326,15 +330,19 @@ int PlayerAliases::GetCurrentGamePlayers(const char *partial, char commands[COMM
 	std::getline(ss, command, ' ');
 
 	for (int i = 0; i <= MAX_PLAYERS; i++) {
-		if (Interfaces::GetGameResources()->IsConnected(i)) {
-			CSteamID playerSteamID = Player::GetSteamID(Interfaces::pClientEntityList->GetClientEntity(i));
-			
-			if (playerSteamID.IsValid()) {
-				V_snprintf(commands[playerCount], COMMAND_COMPLETION_ITEM_LENGTH, "%s %llu", command.c_str(), playerSteamID.ConvertToUint64());
-				playerCount++;
-			}
+		IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
+
+		if (!Player::CheckPlayer(entity)) {
+			continue;
 		}
-	}
+
+		CSteamID playerSteamID = Player::GetSteamID(entity);
+			
+		if (playerSteamID.IsValid()) {
+			V_snprintf(commands[playerCount], COMMAND_COMPLETION_ITEM_LENGTH, "%s %llu", command.c_str(), playerSteamID.ConvertToUint64());
+			playerCount++;
+		}
+}
 
 	return playerCount;
 }

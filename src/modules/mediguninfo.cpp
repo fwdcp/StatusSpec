@@ -678,38 +678,43 @@ void MedigunInfo::PreEntityUpdate() {
 }
 
 void MedigunInfo::ProcessEntity(IClientEntity* entity) {
-	if (!Player::CheckPlayer(entity)) {
-		return;
-	}
-
-	TFTeam team = Player::GetTeam(entity);
-
-	if (team != TFTeam_Red && team != TFTeam_Blue) {
-		return;
-	}
-
-	if (!Interfaces::GetGameResources()->IsAlive(entity->entindex())) {
-		return;
-	}
-
-	for (int i = 0; i < MAX_WEAPONS; i++) {
-		int weapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(entity, Entities::pCTFPlayer__m_hMyWeapons[i]);
-		IClientEntity *weaponEntity = Interfaces::pClientEntityList->GetClientEntity(weapon);
-
-		if (!weaponEntity || !Entities::CheckClassBaseclass(weaponEntity->GetClientClass(), "DT_WeaponMedigun")) {
-			continue;
+	try {
+		if (!Player::CheckPlayer(entity)) {
+			return;
 		}
 
-		Medigun_t medigun;
+		TFTeam team = Player::GetTeam(entity);
 
-		medigun.itemDefinitionIndex = *MAKE_PTR(int*, weaponEntity, Entities::pCEconEntity__m_iItemDefinitionIndex);
-		medigun.chargeRelease = *MAKE_PTR(bool*, weaponEntity, Entities::pCWeaponMedigun__m_bChargeRelease);
-		medigun.chargeResistType = *MAKE_PTR(int*, weaponEntity, Entities::pCWeaponMedigun__m_nChargeResistType);
-		medigun.chargeLevel = *MAKE_PTR(float*, weaponEntity, Entities::pCWeaponMedigun__m_flChargeLevel);
-
-		if (medigunInfo.find(team) == medigunInfo.end() || medigunInfo[team].chargeLevel <= 0.0f && medigun.chargeLevel >= 0.0f) {
-			medigunInfo[team] = medigun;
+		if (team != TFTeam_Red && team != TFTeam_Blue) {
+			return;
 		}
+
+		if (!Interfaces::GetGameResources()->IsAlive(entity->entindex())) {
+			return;
+		}
+
+		for (int i = 0; i < MAX_WEAPONS; i++) {
+			int weapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(entity, Entities::pCTFPlayer__m_hMyWeapons[i]);
+			IClientEntity *weaponEntity = Interfaces::pClientEntityList->GetClientEntity(weapon);
+
+			if (!weaponEntity || !Entities::CheckClassBaseclass(weaponEntity->GetClientClass(), "DT_WeaponMedigun")) {
+				continue;
+			}
+
+			Medigun_t medigun;
+
+			medigun.itemDefinitionIndex = *MAKE_PTR(int*, weaponEntity, Entities::pCEconEntity__m_iItemDefinitionIndex);
+			medigun.chargeRelease = *MAKE_PTR(bool*, weaponEntity, Entities::pCWeaponMedigun__m_bChargeRelease);
+			medigun.chargeResistType = *MAKE_PTR(int*, weaponEntity, Entities::pCWeaponMedigun__m_nChargeResistType);
+			medigun.chargeLevel = *MAKE_PTR(float*, weaponEntity, Entities::pCWeaponMedigun__m_flChargeLevel);
+
+			if (medigunInfo.find(team) == medigunInfo.end() || medigunInfo[team].chargeLevel <= 0.0f && medigun.chargeLevel >= 0.0f) {
+				medigunInfo[team] = medigun;
+			}
+		}
+	}
+	catch (bad_pointer &e) {
+		Warning(e.what());
 	}
 }
 

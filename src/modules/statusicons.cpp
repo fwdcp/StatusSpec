@@ -45,26 +45,31 @@ bool StatusIcons::IsEnabled() {
 }
 
 void StatusIcons::InterceptMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel) {
-	std::string originPanelName = g_pVGuiPanel->GetName(ifromPanel);
+	try {
+		std::string originPanelName = g_pVGuiPanel->GetName(ifromPanel);
 
-	if (originPanelName.substr(0, 11).compare("playerpanel") == 0 && strcmp(params->GetName(), "DialogVariables") == 0) {
-		const char *playerName = params->GetString("playername", NULL);
+		if (originPanelName.substr(0, 11).compare("playerpanel") == 0 && strcmp(params->GetName(), "DialogVariables") == 0) {
+			const char *playerName = params->GetString("playername", NULL);
 		
-		if (playerName) {
-			for (int i = 0; i <= MAX_PLAYERS; i++) {
-				IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
+			if (playerName) {
+				for (int i = 0; i <= MAX_PLAYERS; i++) {
+					IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
 			
-				if (entity == nullptr || !Interfaces::GetGameResources()->IsConnected(i)) {
-					continue;
-				}
+					if (!Player::CheckPlayer(entity)) {
+						continue;
+					}
 			
-				if (strcmp(playerName, Interfaces::GetGameResources()->GetPlayerName(i)) == 0) {
-					playerPanels[originPanelName] = i;
+					if (strcmp(playerName, Interfaces::GetGameResources()->GetPlayerName(i)) == 0) {
+						playerPanels[originPanelName] = i;
 
-					break;
+						break;
+					}
 				}
 			}
 		}
+	}
+	catch (bad_pointer &e) {
+		Warning(e.what());
 	}
 }
 

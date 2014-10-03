@@ -11,7 +11,14 @@
 #include "player.h"
 
 bool Player::CheckPlayer(IClientEntity *entity) {
-	return entity && Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFPlayer") && Interfaces::GetGameResources()->IsConnected(entity->entindex());
+	try {
+		return entity && Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFPlayer") && Interfaces::GetGameResources()->IsConnected(entity->entindex());
+	}
+	catch (bad_pointer &e) {
+		Warning(e.what());
+	}
+
+	return false;
 }
 
 TFClassType Player::GetClass(IClientEntity *entity) {

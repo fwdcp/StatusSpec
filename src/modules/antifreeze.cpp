@@ -45,21 +45,26 @@ void AntiFreeze::Paint(vgui::VPANEL vguiPanel) {
 }
 
 void AntiFreeze::ProcessEntity(IClientEntity *entity) {
-	int index = entity->entindex();
+	try {
+		int index = entity->entindex();
 
-	if (Interfaces::GetGameResources()->IsConnected(index) && Interfaces::GetGameResources()->GetTeam(index) != TEAM_UNASSIGNED && Interfaces::GetGameResources()->GetTeam(index) != TEAM_SPECTATOR) {
-		Vector origin = entity->GetAbsOrigin();
-		QAngle angles = entity->GetAbsAngles();
+		if (Player::CheckPlayer(entity) && Interfaces::GetGameResources()->GetTeam(index) != TEAM_UNASSIGNED && Interfaces::GetGameResources()->GetTeam(index) != TEAM_SPECTATOR) {
+			Vector origin = entity->GetAbsOrigin();
+			QAngle angles = entity->GetAbsAngles();
 
-		if (entityInfo.find(index) == entityInfo.end()) {
-			entitiesUpdated = true;
+			if (entityInfo.find(index) == entityInfo.end()) {
+				entitiesUpdated = true;
+			}
+			else if (entityInfo[index].origin != origin || entityInfo[index].angles != angles) {
+				entitiesUpdated = true;
+			}
+
+			entityInfo[index].origin = origin;
+			entityInfo[index].angles = angles;
 		}
-		else if (entityInfo[index].origin != origin || entityInfo[index].angles != angles) {
-			entitiesUpdated = true;
-		}
-
-		entityInfo[index].origin = origin;
-		entityInfo[index].angles = angles;
+	}
+	catch (bad_pointer &e) {
+		Warning(e.what());
 	}
 }
 
