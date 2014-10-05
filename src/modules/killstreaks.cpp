@@ -63,11 +63,11 @@ bool Killstreaks::FireEvent(IGameEvent *event) {
 		}
 
 		if (assisterUserID != -1) {
-			IClientEntity *assister = Interfaces::pClientEntityList->GetClientEntity(Interfaces::pEngineClient->GetPlayerForUserID(assisterUserID));
+			Player assister = Interfaces::pEngineClient->GetPlayerForUserID(assisterUserID);
 
-			if (Player::CheckPlayer(assister)) {
+			if (assister) {
 				for (int i = 0; i < MAX_WEAPONS; i++) {
-					IClientEntity *weapon = Interfaces::pClientEntityList->GetClientEntity(ENTITY_INDEX_FROM_ENTITY_OFFSET(assister, Entities::pCTFPlayer__m_hMyWeapons[i]));
+					IClientEntity *weapon = Interfaces::pClientEntityList->GetClientEntity(ENTITY_INDEX_FROM_ENTITY_OFFSET(assister.GetEntity(), Entities::pCTFPlayer__m_hMyWeapons[i]));
 
 					if (!weapon || !Entities::CheckClassBaseclass(weapon->GetClientClass(), "DT_WeaponMedigun")) {
 						continue;
@@ -106,15 +106,17 @@ bool Killstreaks::FireEvent(IGameEvent *event) {
 
 void Killstreaks::ProcessEntity(IClientEntity* entity) {
 	try {
-		if (!Player::CheckPlayer(entity)) {
+		Player player = entity;
+
+		if (!player) {
 			return;
 		}
 
 		if (IsEnabled()) {
-			int *killstreakPlayer = MAKE_PTR(int *, entity, Entities::pCTFPlayer__m_iKillStreak);
+			int *killstreakPlayer = MAKE_PTR(int *, player.GetEntity(), Entities::pCTFPlayer__m_iKillStreak);
 			*killstreakPlayer = 0;
 
-			int *killstreakGlobal = MAKE_PTR(int *, Interfaces::GetGameResources(), Entities::pCTFPlayerResource__m_iKillstreak[entity->entindex()]);
+			int *killstreakGlobal = MAKE_PTR(int *, Interfaces::GetGameResources(), Entities::pCTFPlayerResource__m_iKillstreak[player->entindex()]);
 			*killstreakGlobal = 0;
 		}
 	}
@@ -131,13 +133,12 @@ void Killstreaks::PostEntityUpdate() {
 
 	for (auto iterator = currentKillstreaks.begin(); iterator != currentKillstreaks.end(); ++iterator) {
 		try {
-			int player = Interfaces::pEngineClient->GetPlayerForUserID(iterator->first);
-			IClientEntity *playerEntity = Interfaces::pClientEntityList->GetClientEntity(player);
+			Player player = Interfaces::pEngineClient->GetPlayerForUserID(iterator->first);
 
-			if (IsEnabled() && Interfaces::GetGameResources()->IsAlive(player)) {
+			if (IsEnabled() && player.IsAlive()) {
 				int currentKillstreak = GetCurrentKillstreak(iterator->first);
 
-				int *killstreakPlayer = MAKE_PTR(int *, playerEntity, Entities::pCTFPlayer__m_iKillStreak);
+				int *killstreakPlayer = MAKE_PTR(int *, player.GetEntity(), Entities::pCTFPlayer__m_iKillStreak);
 				*killstreakPlayer = currentKillstreak;
 
 				int *killstreakGlobal = MAKE_PTR(int *, Interfaces::GetGameResources(), Entities::pCTFPlayerResource__m_iKillstreak[player]);
@@ -164,13 +165,13 @@ void Killstreaks::ToggleEnabled(IConVar *var, const char *pOldValue, float flOld
 	if (!g_Killstreaks->IsEnabled()) {
 		for (int i = 0; i <= MAX_PLAYERS; i++) {
 			try {
-				IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
+				Player player = i;
 
-				if (!Player::CheckPlayer(entity)) {
+				if (!player) {
 					continue;
 				}
 
-				int *killstreak = MAKE_PTR(int *, Interfaces::GetGameResources(), Entities::pCTFPlayerResource__m_iKillstreak[entity->entindex()]);
+				int *killstreak = MAKE_PTR(int *, Interfaces::GetGameResources(), Entities::pCTFPlayerResource__m_iKillstreak[player->entindex()]);
 				*killstreak = 0;
 			}
 			catch (bad_pointer &e) {

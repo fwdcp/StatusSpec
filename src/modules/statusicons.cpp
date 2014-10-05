@@ -45,31 +45,26 @@ bool StatusIcons::IsEnabled() {
 }
 
 void StatusIcons::InterceptMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel) {
-	try {
-		std::string originPanelName = g_pVGuiPanel->GetName(ifromPanel);
+	std::string originPanelName = g_pVGuiPanel->GetName(ifromPanel);
 
-		if (originPanelName.substr(0, 11).compare("playerpanel") == 0 && strcmp(params->GetName(), "DialogVariables") == 0) {
-			const char *playerName = params->GetString("playername", NULL);
+	if (originPanelName.substr(0, 11).compare("playerpanel") == 0 && strcmp(params->GetName(), "DialogVariables") == 0) {
+		const char *playerName = params->GetString("playername", NULL);
 		
-			if (playerName) {
-				for (int i = 0; i <= MAX_PLAYERS; i++) {
-					IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
+		if (playerName) {
+			for (int i = 0; i <= MAX_PLAYERS; i++) {
+				Player player = i;
 			
-					if (!Player::CheckPlayer(entity)) {
-						continue;
-					}
+				if (!player) {
+					continue;
+				}
 			
-					if (strcmp(playerName, Interfaces::GetGameResources()->GetPlayerName(i)) == 0) {
-						playerPanels[originPanelName] = i;
+				if (strcmp(playerName, player.GetName()) == 0) {
+					playerPanels[originPanelName] = player;
 
-						break;
-					}
+					break;
 				}
 			}
 		}
-	}
-	catch (bad_pointer &e) {
-		Warning(e.what());
 	}
 }
 
@@ -117,16 +112,15 @@ void StatusIcons::Paint(vgui::VPANEL vguiPanel) {
 			return;
 		}
 		
-		int player = playerPanels[playerPanelName];
-		IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(player);
+		Player player = playerPanels[playerPanelName];
 
-		if (!Player::CheckPlayer(entity)) {
+		if (!player) {
 			return;
 		}
 
-		TFTeam team = Player::GetTeam(entity);
+		TFTeam team = player.GetTeam();
 		
-		if (Player::CheckCondition(entity, TFCond_Ubercharged)) {
+		if (player.CheckCondition(TFCond_Ubercharged)) {
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
@@ -142,7 +136,7 @@ void StatusIcons::Paint(vgui::VPANEL vguiPanel) {
 			return;
 		}
 		
-		if (Player::CheckCondition(entity, TFCond_Kritzkrieged)) {
+		if (player.CheckCondition(TFCond_Kritzkrieged)) {
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
@@ -158,7 +152,7 @@ void StatusIcons::Paint(vgui::VPANEL vguiPanel) {
 			return;
 		}
 		
-		if (Player::CheckCondition(entity, TFCond_MegaHeal)) {
+		if (player.CheckCondition(TFCond_MegaHeal)) {
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
@@ -179,7 +173,7 @@ void StatusIcons::Paint(vgui::VPANEL vguiPanel) {
 			return;
 		}
 		
-		if (Player::CheckCondition(entity, TFCond_UberBulletResist)) {
+		if (player.CheckCondition(TFCond_UberBulletResist)) {
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
@@ -197,7 +191,7 @@ void StatusIcons::Paint(vgui::VPANEL vguiPanel) {
 			
 			icons++;
 		}
-		else if (Player::CheckCondition(entity, TFCond_SmallBulletResist)) {
+		else if (player.CheckCondition(TFCond_SmallBulletResist)) {
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
@@ -218,7 +212,7 @@ void StatusIcons::Paint(vgui::VPANEL vguiPanel) {
 			return;
 		}
 		
-		if (Player::CheckCondition(entity, TFCond_UberBlastResist)) {
+		if (player.CheckCondition(TFCond_UberBlastResist)) {
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
@@ -236,7 +230,7 @@ void StatusIcons::Paint(vgui::VPANEL vguiPanel) {
 			
 			icons++;
 		}
-		else if (Player::CheckCondition(entity, TFCond_SmallBlastResist)) {
+		else if (player.CheckCondition(TFCond_SmallBlastResist)) {
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
@@ -257,7 +251,7 @@ void StatusIcons::Paint(vgui::VPANEL vguiPanel) {
 			return;
 		}
 		
-		if (Player::CheckCondition(entity, TFCond_UberFireResist)) {
+		if (player.CheckCondition(TFCond_UberFireResist)) {
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
@@ -275,7 +269,7 @@ void StatusIcons::Paint(vgui::VPANEL vguiPanel) {
 			
 			icons++;
 		}
-		else if (Player::CheckCondition(entity, TFCond_SmallFireResist)) {
+		else if (player.CheckCondition(TFCond_SmallFireResist)) {
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
@@ -296,7 +290,7 @@ void StatusIcons::Paint(vgui::VPANEL vguiPanel) {
 			return;
 		}
 		
-		if (Player::CheckCondition(entity, TFCond_Buffed)) {
+		if (player.CheckCondition(TFCond_Buffed)) {
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
@@ -317,7 +311,7 @@ void StatusIcons::Paint(vgui::VPANEL vguiPanel) {
 			return;
 		}
 		
-		if (Player::CheckCondition(entity, TFCond_DefenseBuffed)) {
+		if (player.CheckCondition(TFCond_DefenseBuffed)) {
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
@@ -338,7 +332,7 @@ void StatusIcons::Paint(vgui::VPANEL vguiPanel) {
 			return;
 		}
 		
-		if (Player::CheckCondition(entity, TFCond_RegenBuffed)) {
+		if (player.CheckCondition(TFCond_RegenBuffed)) {
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
@@ -359,7 +353,7 @@ void StatusIcons::Paint(vgui::VPANEL vguiPanel) {
 			return;
 		}
 		
-		if (Player::CheckCondition(entity, TFCond_Jarated)) {
+		if (player.CheckCondition(TFCond_Jarated)) {
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
@@ -375,7 +369,7 @@ void StatusIcons::Paint(vgui::VPANEL vguiPanel) {
 			return;
 		}
 		
-		if (Player::CheckCondition(entity, TFCond_Milked)) {
+		if (player.CheckCondition(TFCond_Milked)) {
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
@@ -391,7 +385,7 @@ void StatusIcons::Paint(vgui::VPANEL vguiPanel) {
 			return;
 		}
 		
-		if (Player::CheckCondition(entity, TFCond_MarkedForDeath) || Player::CheckCondition(entity, TFCond_MarkedForDeathSilent)) {
+		if (player.CheckCondition(TFCond_MarkedForDeath) || player.CheckCondition(TFCond_MarkedForDeathSilent)) {
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
@@ -407,7 +401,7 @@ void StatusIcons::Paint(vgui::VPANEL vguiPanel) {
 			return;
 		}
 		
-		if (Player::CheckCondition(entity, TFCond_Bleeding)) {
+		if (player.CheckCondition(TFCond_Bleeding)) {
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			
@@ -423,7 +417,7 @@ void StatusIcons::Paint(vgui::VPANEL vguiPanel) {
 			return;
 		}
 		
-		if (Player::CheckCondition(entity, TFCond_OnFire)) {
+		if (player.CheckCondition(TFCond_OnFire)) {
 			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
 			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
 			

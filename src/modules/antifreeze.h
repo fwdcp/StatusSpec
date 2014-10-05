@@ -46,7 +46,7 @@ public:
 	void PostEntityUpdate();
 private:
 	bool entitiesUpdated;
-	std::map<int, EntityInfo_t> entityInfo;
+	std::map<Player, EntityInfo_t> entityInfo;
 	vgui::EditablePanel *freezeInfoPanel;
 	double lastEntityUpdate;
 	vgui::HPanel specguiPanel;

@@ -82,10 +82,10 @@ private:
 	Color filter_nonactive_color;
 	std::map<int, std::string> itemIconTextures;
 	ItemSchema* itemSchema;
-	std::map<int, Loadout_t> loadoutInfo;
-	std::map<std::string, int> playerPanels;
+	std::map<Player, Loadout_t> loadoutInfo;
+	std::map<std::string, Player> playerPanels;
 
-	void DrawSlotIcon(int player, int weapon, int &width, int size);
+	void DrawSlotIcon(Player player, int weapon, int &width, int size);
 
 	ConVar* enabled;
 	ConCommand* filter_active;

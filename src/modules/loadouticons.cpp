@@ -10,7 +10,7 @@
 
 #include "loadouticons.h"
 
-#define SHOW_SLOT_ICON(slot) DrawSlotIcon(i, loadoutInfo[i].slot, iconsWide, iconSize);
+#define SHOW_SLOT_ICON(slot) DrawSlotIcon(player, loadoutInfo[player].slot, iconsWide, iconSize);
 
 inline int ColorRangeRestrict(int color) {
 	if (color < 0) return 0;
@@ -48,31 +48,26 @@ bool LoadoutIcons::IsEnabled() {
 }
 
 void LoadoutIcons::InterceptMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel) {
-	try {
-		std::string originPanelName = g_pVGuiPanel->GetName(ifromPanel);
+	std::string originPanelName = g_pVGuiPanel->GetName(ifromPanel);
 
-		if (originPanelName.substr(0, 11).compare("playerpanel") == 0 && strcmp(params->GetName(), "DialogVariables") == 0) {
-			const char *playerName = params->GetString("playername", NULL);
+	if (originPanelName.substr(0, 11).compare("playerpanel") == 0 && strcmp(params->GetName(), "DialogVariables") == 0) {
+		const char *playerName = params->GetString("playername", NULL);
 		
-			if (playerName) {
-				for (int i = 0; i <= MAX_PLAYERS; i++) {
-					IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
+		if (playerName) {
+			for (int i = 0; i <= MAX_PLAYERS; i++) {
+				Player player = i;
 			
-					if (!Player::CheckPlayer(entity)) {
-						continue;
-					}
+				if (!player) {
+					continue;
+				}
 			
-					if (strcmp(playerName, Interfaces::GetGameResources()->GetPlayerName(i)) == 0) {
-						playerPanels[originPanelName] = i;
+				if (strcmp(playerName, player.GetName()) == 0) {
+					playerPanels[originPanelName] = player;
 
-						break;
-					}
+					break;
 				}
 			}
 		}
-	}
-	catch (bad_pointer &e) {
-		Warning(e.what());
 	}
 }
 
@@ -87,7 +82,7 @@ void LoadoutIcons::Paint(vgui::VPANEL vguiPanel) {
 			return;
 		}
 		
-		int i = playerPanels[playerPanelName];
+		Player player = playerPanels[playerPanelName];
 		
 		int iconsWide, iconsTall;
 		
@@ -96,7 +91,7 @@ void LoadoutIcons::Paint(vgui::VPANEL vguiPanel) {
 		int iconSize = iconsTall;
 		iconsWide = 0;
 
-		if (loadoutInfo[i].tfclass == TFClass_Engineer) {
+		if (loadoutInfo[player].tfclass == TFClass_Engineer) {
 			SHOW_SLOT_ICON(primary);
 			SHOW_SLOT_ICON(secondary);
 			SHOW_SLOT_ICON(melee);
@@ -107,7 +102,7 @@ void LoadoutIcons::Paint(vgui::VPANEL vguiPanel) {
 				SHOW_SLOT_ICON(building);
 			}
 		}
-		else if (loadoutInfo[i].tfclass == TFClass_Spy) {
+		else if (loadoutInfo[player].tfclass == TFClass_Spy) {
 			SHOW_SLOT_ICON(secondary);
 			SHOW_SLOT_ICON(building);
 			SHOW_SLOT_ICON(melee);
@@ -137,10 +132,9 @@ void LoadoutIcons::ProcessEntity(IClientEntity* entity) {
 
 	int itemDefinitionIndex = *MAKE_PTR(int*, entity, Entities::pCEconEntity__m_iItemDefinitionIndex);
 
-	int player = ENTITY_INDEX_FROM_ENTITY_OFFSET(entity, Entities::pCEconEntity__m_hOwnerEntity);
-	IClientEntity *playerEntity = Interfaces::pClientEntityList->GetClientEntity(player);
-	TFClassType tfclass = Player::GetClass(playerEntity);
-	int activeWeapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(playerEntity, Entities::pCTFPlayer__m_hActiveWeapon);
+	Player player = ENTITY_INDEX_FROM_ENTITY_OFFSET(entity, Entities::pCEconEntity__m_hOwnerEntity);
+	TFClassType tfclass = player.GetClass();
+	int activeWeapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(player.GetEntity(), Entities::pCTFPlayer__m_hActiveWeapon);
 
 	const char *itemSlot = itemSchema->GetItemKeyData(itemDefinitionIndex, "item_slot");
 			
@@ -202,20 +196,19 @@ void LoadoutIcons::ProcessEntity(IClientEntity* entity) {
 
 void LoadoutIcons::PostEntityUpdate() {
 	for (auto iterator = loadoutInfo.begin(); iterator != loadoutInfo.end(); iterator++) {
-		int player = iterator->first;
-		IClientEntity *playerEntity = Interfaces::pClientEntityList->GetClientEntity(player);
+		Player player = iterator->first;
 			
-		if (!playerEntity) {
+		if (!player) {
 			continue;
 		}
 		
-		TFClassType tfclass = Player::GetClass(playerEntity);
-		int activeWeapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(playerEntity, Entities::pCTFPlayer__m_hActiveWeapon);
+		TFClassType tfclass = player.GetClass();
+		int activeWeapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(player.GetEntity(), Entities::pCTFPlayer__m_hActiveWeapon);
 		
 		loadoutInfo[player].tfclass = tfclass;
 
 		for (int i = 0; i < MAX_WEAPONS; i++) {
-			int weapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(playerEntity, Entities::pCTFPlayer__m_hMyWeapons[i]);
+			int weapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(player.GetEntity(), Entities::pCTFPlayer__m_hMyWeapons[i]);
 			IClientEntity *weaponEntity = Interfaces::pClientEntityList->GetClientEntity(weapon);
 			
 			if (!weaponEntity || !Entities::CheckClassBaseclass(weaponEntity->GetClientClass(), "DT_EconEntity")) {
@@ -280,7 +273,7 @@ void LoadoutIcons::PostEntityUpdate() {
 	}
 }
 
-void LoadoutIcons::DrawSlotIcon(int player, int weapon, int &width, int size) {
+void LoadoutIcons::DrawSlotIcon(Player player, int weapon, int &width, int size) {
 	if (only_active->GetBool()) {
 		if (weapon != -1 && loadoutInfo[player].activeWeaponSlot == weapon) {
 			Paint::DrawTexture(itemIconTextures[weapon], width, 0, size, size, filter_active_color);

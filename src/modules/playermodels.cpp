@@ -22,11 +22,13 @@ bool PlayerModels::IsEnabled() {
 }
 
 const model_t *PlayerModels::SetModelOverride(C_BaseEntity *entity, const model_t *model) {
-	if (!Player::CheckPlayer(entity)) {
+	Player player = entity;
+
+	if (!player) {
 		return model;
 	}
 
-	CSteamID playerSteamID = Player::GetSteamID(entity);
+	CSteamID playerSteamID = player.GetSteamID();
 	std::stringstream stringstream;
 	std::string playerSteamID64;
 	stringstream << playerSteamID.ConvertToUint64();

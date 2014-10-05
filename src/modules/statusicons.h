@@ -60,7 +60,7 @@ public:
 	void NoPaint(vgui::VPANEL vguiPanel);
 	void Paint(vgui::VPANEL vguiPanel);
 private:
-	std::map<std::string, int> playerPanels;
+	std::map<std::string, Player> playerPanels;
 
 	ConVar* enabled;
 	ConVar* max_icons;
