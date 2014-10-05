@@ -43,7 +43,7 @@ private:
 	std::map<std::string, ColorConCommand_t> colors;
 	std::map<EHANDLE, CGlowObject *> glows;
 
-	Color GetGlowColor(IClientEntity *entity);
+	Color GetGlowColor(Player player);
 	void SetGlowEffect(IClientEntity *entity, bool enabled, Vector color = Vector(1.0f, 1.0f, 1.0f), float alpha = 1.0f);
 	
 	ConVar *enabled;

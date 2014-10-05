@@ -37,6 +37,7 @@ public:
 	static int pCTFPlayer__m_nPlayerCondEx2;
 	static int pCTFPlayer__m_hActiveWeapon;
 	static int pCTFPlayer__m_hMyWeapons[MAX_WEAPONS];
+	static int pCTFPlayer__m_iHealth;
 	static int pCEconEntity__m_hOwnerEntity;
 	static int pCEconEntity__m_iItemDefinitionIndex;
 	static int pCWeaponMedigun__m_bChargeRelease;

@@ -45,21 +45,21 @@ void AntiFreeze::Paint(vgui::VPANEL vguiPanel) {
 }
 
 void AntiFreeze::ProcessEntity(IClientEntity *entity) {
-	int index = entity->entindex();
+	Player player = entity;
 
-	if (Interfaces::GetGameResources()->IsConnected(index) && Interfaces::GetGameResources()->GetTeam(index) != TEAM_UNASSIGNED && Interfaces::GetGameResources()->GetTeam(index) != TEAM_SPECTATOR) {
-		Vector origin = entity->GetAbsOrigin();
-		QAngle angles = entity->GetAbsAngles();
+	if (player && player.GetTeam() != TFTeam_Unassigned && player.GetTeam() != TFTeam_Spectator) {
+		Vector origin = player->GetAbsOrigin();
+		QAngle angles = player->GetAbsAngles();
 
-		if (entityInfo.find(index) == entityInfo.end()) {
+		if (entityInfo.find(player) == entityInfo.end()) {
 			entitiesUpdated = true;
 		}
-		else if (entityInfo[index].origin != origin || entityInfo[index].angles != angles) {
+		else if (entityInfo[player].origin != origin || entityInfo[player].angles != angles) {
 			entitiesUpdated = true;
 		}
 
-		entityInfo[index].origin = origin;
-		entityInfo[index].angles = angles;
+		entityInfo[player].origin = origin;
+		entityInfo[player].angles = angles;
 	}
 }
 

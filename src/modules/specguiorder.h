@@ -40,10 +40,10 @@ public:
 	void ProcessEntity(IClientEntity *entity);
 	void PostEntityUpdate();
 private:
-	std::list<int> bluPlayers;
-	std::map<std::string, int> playerPanels;
+	std::list<Player> bluPlayers;
+	std::map<std::string, Player> playerPanels;
 	KeyValues *specguiSettings;
-	std::list<int> redPlayers;
+	std::list<Player> redPlayers;
 
 	ConVar* enabled;
 };

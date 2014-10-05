@@ -65,11 +65,11 @@ bool PlayerOutlines::IsEnabled() {
 void PlayerOutlines::PreGlowRender(const CViewSetup *pSetup) {
 	if (fade->GetBool()) {
 		for (auto iterator = glows.begin(); iterator != glows.end(); ++iterator) {
-			if (iterator->first.Get()) {
+			if (iterator->first) {
 				vec_t distance = pSetup->origin.DistTo(iterator->first->GetRenderOrigin());
 
 				if (distance > fade_distance->GetFloat()) {
-					Color glowColor = GetGlowColor(iterator->first);
+					Color glowColor = GetGlowColor(iterator->first.Get());
 					float alpha = glowColor.a() / 255.0f;
 
 					float scalar = fade_distance->GetFloat() / distance;
@@ -82,27 +82,29 @@ void PlayerOutlines::PreGlowRender(const CViewSetup *pSetup) {
 }
 
 void PlayerOutlines::ProcessEntity(IClientEntity* entity) {
-	if (!Player::CheckPlayer(entity)) {
+	Player player = entity;
+
+	if (!player) {
 		return;
 	}
 
 	if (IsEnabled()) {
-		Color glowColor = GetGlowColor(entity);
+		Color glowColor = GetGlowColor(player);
 
 		float red = glowColor.r() / 255.0f;
 		float green = glowColor.g() / 255.0f;
 		float blue = glowColor.b() / 255.0f;
 		float alpha = glowColor.a() / 255.0f;
 
-		SetGlowEffect(entity, true, Vector(red, green, blue), alpha);
+		SetGlowEffect(player, true, Vector(red, green, blue), alpha);
 	}
 	else {
-		SetGlowEffect(entity, false);
+		SetGlowEffect(player, false);
 	}
 }
 
-Color PlayerOutlines::GetGlowColor(IClientEntity *entity) {
-	if (!Player::CheckPlayer(entity)) {
+Color PlayerOutlines::GetGlowColor(Player player) {
+	if (!player) {
 		return Color(0, 0, 0, 0);
 	}
 
@@ -112,14 +114,14 @@ Color PlayerOutlines::GetGlowColor(IClientEntity *entity) {
 	float alpha = 255.0f;
 
 	if (!team_colors->GetBool()) {
-		Funcs::CallFunc_C_TFPlayer_GetGlowEffectColor((C_TFPlayer *)entity, &red, &green, &blue);
+		Funcs::CallFunc_C_TFPlayer_GetGlowEffectColor((C_TFPlayer *)player.GetEntity(), &red, &green, &blue);
 
 		red *= 255.0f;
 		green *= 255.0f;
 		blue *= 255.0f;
 	}
 	else {
-		TFTeam team = Player::GetTeam(entity);
+		TFTeam team = player.GetTeam();
 
 		if (!health_adjusted_team_colors->GetBool()) {
 			if (team == TFTeam_Red) {
@@ -136,8 +138,8 @@ Color PlayerOutlines::GetGlowColor(IClientEntity *entity) {
 			}
 		}
 		else {
-			int health = *MAKE_PTR(int*, Interfaces::GetGameResources(), Entities::pCTFPlayerResource__m_iHealth[entity->entindex()]);
-			int maxHealth = *MAKE_PTR(int*, Interfaces::GetGameResources(), Entities::pCTFPlayerResource__m_iMaxHealth[entity->entindex()]);
+			int health = player.GetHealth();
+			int maxHealth = player.GetMaxHealth();
 
 			// CTFPlayerResource isn't giving us proper values so let's calculate it manually
 			int maxBuffedHealth = ((maxHealth / 5) * 3 / 2) * 5;

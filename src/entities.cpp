@@ -24,6 +24,7 @@ int Entities::pCTFPlayer__m_nPlayerCondEx = 0;
 int Entities::pCTFPlayer__m_nPlayerCondEx2 = 0;
 int Entities::pCTFPlayer__m_hActiveWeapon = 0;
 int Entities::pCTFPlayer__m_hMyWeapons[MAX_WEAPONS] = { 0 };
+int Entities::pCTFPlayer__m_iHealth = 0;
 int Entities::pCEconEntity__m_hOwnerEntity = 0;
 int Entities::pCEconEntity__m_iItemDefinitionIndex = 0;
 int Entities::pCWeaponMedigun__m_bChargeRelease = 0;
@@ -52,6 +53,7 @@ bool Entities::PrepareOffsets() {
 		sprintf(elementName, "%03i", i);
 		RETRIEVE_OFFSET(pCTFPlayer__m_hMyWeapons[i], GetClassPropOffset("CTFPlayer", pCTFPlayer__m_hMyWeapons[i], 2, "m_hMyWeapons", elementName));
 	}
+	RETRIEVE_OFFSET(pCTFPlayer__m_iHealth, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_iHealth, 1, "m_iHealth"));
 	RETRIEVE_OFFSET(pCEconEntity__m_hOwnerEntity, GetClassPropOffset("CEconEntity", pCEconEntity__m_hOwnerEntity, 1, "m_hOwnerEntity"));
 	RETRIEVE_OFFSET(pCEconEntity__m_iItemDefinitionIndex, GetClassPropOffset("CEconEntity", pCEconEntity__m_iItemDefinitionIndex, 1, "m_iItemDefinitionIndex"));
 	RETRIEVE_OFFSET(pCWeaponMedigun__m_bChargeRelease, GetClassPropOffset("CWeaponMedigun", pCWeaponMedigun__m_bChargeRelease, 1, "m_bChargeRelease"));

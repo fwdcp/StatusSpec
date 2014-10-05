@@ -24,6 +24,7 @@
 
 #include "../entities.h"
 #include "../ifaces.h"
+#include "../player.h"
 
 #define PERFORM_LAYOUT_COMMAND new KeyValues("Command", "Command", "performlayout")
 #define SPEC_GUI_NAME "specgui"
@@ -45,7 +46,7 @@ public:
 	void PostEntityUpdate();
 private:
 	bool entitiesUpdated;
-	std::map<int, EntityInfo_t> entityInfo;
+	std::map<Player, EntityInfo_t> entityInfo;
 	vgui::EditablePanel *freezeInfoPanel;
 	double lastEntityUpdate;
 	vgui::HPanel specguiPanel;

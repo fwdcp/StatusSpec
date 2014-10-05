@@ -678,22 +678,24 @@ void MedigunInfo::PreEntityUpdate() {
 }
 
 void MedigunInfo::ProcessEntity(IClientEntity* entity) {
-	if (!Player::CheckPlayer(entity)) {
+	Player player = entity;
+
+	if (!player) {
 		return;
 	}
 
-	TFTeam team = Player::GetTeam(entity);
+	TFTeam team = player.GetTeam();
 
 	if (team != TFTeam_Red && team != TFTeam_Blue) {
 		return;
 	}
 
-	if (!Interfaces::GetGameResources()->IsAlive(entity->entindex())) {
+	if (!player.IsAlive()) {
 		return;
 	}
 
 	for (int i = 0; i < MAX_WEAPONS; i++) {
-		int weapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(entity, Entities::pCTFPlayer__m_hMyWeapons[i]);
+		int weapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(player.GetEntity(), Entities::pCTFPlayer__m_hMyWeapons[i]);
 		IClientEntity *weaponEntity = Interfaces::pClientEntityList->GetClientEntity(weapon);
 
 		if (!weaponEntity || !Entities::CheckClassBaseclass(weaponEntity->GetClientClass(), "DT_WeaponMedigun")) {
