@@ -53,54 +53,44 @@ inline DWORD FindPattern(DWORD dwAddress, DWORD dwSize, BYTE* pbSig, const char*
 IClientMode* Interfaces::GetClientMode() {
 #if defined _WIN32
 	static DWORD pointer = NULL;
-	if (!pointer)
+
+	if (!pointer) {
 		pointer = FindPattern((DWORD)GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE)CLIENTMODE_SIG, CLIENTMODE_MASK) + CLIENTMODE_OFFSET;
+
+		if (!pointer) {
+			throw bad_pointer("IClientMode");
+		}
+	}
+
 	return **(IClientMode***)(pointer);
 #else
-	return nullptr;
+	throw bad_pointer("IClientMode");
 #endif
 }
 
 IGameResources* Interfaces::GetGameResources() {
 #if defined _WIN32
 	static DWORD pointer = NULL;
-	if (!pointer)
-		pointer = FindPattern((DWORD) GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE) GAMERESOURCES_SIG, GAMERESOURCES_MASK);
+
+	if (!pointer) {
+		pointer = FindPattern((DWORD)GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE)GAMERESOURCES_SIG, GAMERESOURCES_MASK);
+
+		if (!pointer) {
+			throw bad_pointer("IGameResources");
+		}
+	}
+
 	typedef IGameResources* (*GGR_t) (void);
 	GGR_t GGR = (GGR_t) pointer;
 	IGameResources *gr = GGR();
-	if (gr) {
-		return gr;
+
+	if (!gr) {
+		throw bad_pointer("IGameResources");
 	}
-	else {
-		static CHandle<C_PlayerResource> pr;
 
-		if (!pr.IsValid()) {
-			if (Interfaces::pClientEntityList) {
-				int maxEntity = Interfaces::pClientEntityList->GetHighestEntityIndex();
-
-				for (int i = 0; i < maxEntity; i++) {
-					IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
-
-					if (Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_PlayerResource")) {
-						pr = dynamic_cast<C_PlayerResource *>(entity);
-
-						break;
-					}
-				}
-			}
-		}
-
-		if (!pr.IsValid()) {
-			// no hope for us, throw the exception
-
-			throw bad_pointer("IGameResources");
-		}
-
-		return pr.Get();
-	}
+	return gr;
 #else
-	return nullptr;
+	throw bad_pointer("IGameResources");
 #endif
 }
 
