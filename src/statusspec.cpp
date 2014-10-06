@@ -11,6 +11,7 @@
 #include "statusspec.h"
 
 AntiFreeze *g_AntiFreeze = nullptr;
+CameraTools *g_CameraTools = nullptr;
 CustomTextures *g_CustomTextures = nullptr;
 Killstreaks *g_Killstreaks = nullptr;
 LoadoutIcons *g_LoadoutIcons = nullptr;
@@ -67,6 +68,10 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 	}
 
 	if (curStage == FRAME_RENDER_START) {
+		if (g_CameraTools) {
+			g_CameraTools->PreEntityUpdate();
+		}
+
 		if (g_LoadoutIcons) {
 			if (g_LoadoutIcons->IsEnabled()) {
 				g_LoadoutIcons->PreEntityUpdate();
@@ -98,6 +103,10 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 				g_AntiFreeze->ProcessEntity(entity);
 			}
 
+			if (g_CameraTools) {
+				g_CameraTools->ProcessEntity(entity);
+			}
+
 			if (g_LoadoutIcons) {
 				if (g_LoadoutIcons->IsEnabled()) {
 					g_LoadoutIcons->ProcessEntity(entity);
@@ -127,6 +136,10 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 
 		if (g_AntiFreeze) {
 			g_AntiFreeze->PostEntityUpdate();
+		}
+
+		if (g_CameraTools) {
+			g_CameraTools->PostEntityUpdate();
 		}
 
 		if (g_Killstreaks) {
@@ -329,6 +342,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	ConVar_Register();
 
 	g_AntiFreeze = new AntiFreeze();
+	g_CameraTools = new CameraTools();
 	g_CustomTextures = new CustomTextures();
 	g_Killstreaks = new Killstreaks();
 	g_LoadoutIcons = new LoadoutIcons();
@@ -350,6 +364,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 void StatusSpecPlugin::Unload(void)
 {
 	delete g_AntiFreeze;
+	delete g_CameraTools;
 	delete g_CustomTextures;
 	delete g_Killstreaks;
 	delete g_LoadoutIcons;

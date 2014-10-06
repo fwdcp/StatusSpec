@@ -180,6 +180,13 @@ To install, place the `StatusSpec` folder within the `custom` folder in the `tf`
 #### UI Resource Files
 An example file for the freeze info box is included under `Resource/UI/FreezeInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_antifreeze_display_reload_settings` is provided as a replacement.
 
+### Camera Tools
+*allows more options for managing the camera*
+
+#### Console Commands
+* `statusspec_cameratools_spec_player <team> <position>` - spec a certain player
+* `statusspec_cameratools_spec_pos <x> <y> <z> <yaw> <pitch>` - spec a certain camera position
+
 ### Custom Textures
 *allows textures to be swapped out*
 

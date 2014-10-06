@@ -86,6 +86,17 @@ inline SMP_t GetSMPFunc() {
 #endif
 }
 
+inline SPT_t GetSPTFunc() {
+#if defined _WIN32
+	static DWORD pointer = NULL;
+	if (!pointer)
+		pointer = FindPattern((DWORD)GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE)SETPRIMARYTARGET_SIG, SETPRIMARYTARGET_MASK);
+	return (SPT_t)(pointer);
+#else
+	return nullptr;
+#endif
+}
+
 GLPI_t Funcs::getLocalPlayerIndexOriginal = nullptr;
 SMI_t Funcs::setModelIndexOriginal = nullptr;
 SMP_t Funcs::setModelPointerOriginal = nullptr;
@@ -196,6 +207,10 @@ void Funcs::CallFunc_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, const 
 	else {
 		GetSMPFunc()(instance, pModel);
 	}
+}
+
+void Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(C_HLTVCamera *instance, int nEntity) {
+	GetSPTFunc()(instance, nEntity);
 }
 
 void Funcs::CallFunc_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *instance, float *r, float *g, float *b) {
