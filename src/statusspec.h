@@ -21,6 +21,7 @@
 #include "paint.h"
 
 #include "modules/antifreeze.h"
+#include "modules/cameratools.h"
 #include "modules/customtextures.h"
 #include "modules/killstreaks.h"
 #include "modules/loadouticons.h"
