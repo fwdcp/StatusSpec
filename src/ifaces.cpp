@@ -94,6 +94,24 @@ IGameResources* Interfaces::GetGameResources() {
 #endif
 }
 
+C_HLTVCamera* Interfaces::GetHLTVCamera() {
+#if defined _WIN32
+	static DWORD pointer = NULL;
+
+	if (!pointer) {
+		pointer = FindPattern((DWORD)GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE)HLTVCAMERA_SIG, HLTVCAMERA_MASK) + HLTVCAMERA_OFFSET;
+
+		if (!pointer) {
+			throw bad_pointer("C_HLTVCamera");
+		}
+	}
+
+	return *(C_HLTVCamera**)(pointer);
+#else
+	throw bad_pointer("C_HLTVCamera");
+#endif
+}
+
 bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory) {
 	ConnectTier1Libraries(&interfaceFactory, 1);
 	ConnectTier2Libraries(&interfaceFactory, 1);

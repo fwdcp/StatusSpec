@@ -24,6 +24,7 @@
 #include "engine/ivmodelinfo.h"
 #include "entitylist_base.h"
 #include "filesystem.h"
+#include "hltvcamera.h"
 #include "icliententitylist.h"
 #include "iclientmode.h"
 #include "igameevents.h"
@@ -52,6 +53,9 @@
 #define CLIENTMODE_SIG "\xC7\x05\x00\x00\x00\x00\x00\x00\x00\x00\xE8\x00\x00\x00\x00\x68\x00\x00\x00\x00\x8B\xC8"
 #define CLIENTMODE_MASK "xx????????x????x????xx"
 #define CLIENTMODE_OFFSET 2
+#define HLTVCAMERA_SIG "\xB9\x00\x00\x00\x00\xE8\x00\x00\x00\x00\x68\x00\x00\x00\x00\xC7\x05\x00\x00\x00\x00\x00\x00\x00\x00\xC6\x05\x00\x00\x00\x00\x00"
+#define HLTVCAMERA_MASK "x????x????x????xx????xxxxxx????x"
+#define HLTVCAMERA_OFFSET 1
 #define noexcept _NOEXCEPT
 #elif defined __APPLE__
 #define CLIENT_MODULE_FILE "tf/bin/client.dylib"
@@ -95,6 +99,7 @@ class Interfaces {
 		static CSteamAPIContext *pSteamAPIContext;
 		static IClientMode *GetClientMode();
 		static IGameResources *GetGameResources();
+		static C_HLTVCamera *GetHLTVCamera();
 	private:
 		static CDllDemandLoader *pClientModule;
 };
