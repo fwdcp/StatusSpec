@@ -18,6 +18,7 @@
 
 #include "cbase.h"
 #include "cdll_int.h"
+#include "hltvcamera.h"
 #include "iclientmode.h"
 #include "igameevents.h"
 #include "igameresources.h"
@@ -35,6 +36,7 @@ class C_TFPlayer;
 typedef int(*GLPI_t)(void);
 typedef void(__thiscall *SMI_t)(C_BaseEntity *, int);
 typedef void(__thiscall *SMP_t)(C_BaseEntity *, const model_t *);
+typedef void(__thiscall *SPT_t)(C_HLTVCamera *, int);
 typedef void(__fastcall *SMIH_t)(C_BaseEntity *, void *, int);
 typedef void(__fastcall *SMPH_t)(C_BaseEntity *, void *, const model_t *);
 
@@ -62,6 +64,8 @@ typedef void(__fastcall *SMPH_t)(C_BaseEntity *, void *, const model_t *);
 #define SETMODELINDEX_MASK "xxxxxxxxxxxxx????"
 #define SETMODELPOINTER_SIG "\x55\x8B\xEC\x56\x8B\xF1\x57\x8B\x7D\x08\x3B\x7E\x00\x74\x00"
 #define SETMODELPOINTER_MASK "xxxxxxxxxxxx?x?"
+#define SETPRIMARYTARGET_SIG "\x55\x8B\xEC\x8B\x45\x08\x83\xEC\x00\x53\x56\x8B\xF1"
+#define SETPRIMARYTARGET_MASK "xxxxxxxx?xxxx"
 #endif
 
 extern SourceHook::ISourceHook *g_SHPtr;
@@ -92,6 +96,7 @@ public:
 	static int CallFunc_GetLocalPlayerIndex();
 	static void CallFunc_C_BaseEntity_SetModelIndex(C_BaseEntity *instance, int index);
 	static void CallFunc_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, const model_t *pModel);
+	static void CallFunc_C_HLTVCamera_SetPrimaryTarget(C_HLTVCamera *instance, int nEntity);
 
 	static void CallFunc_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *instance, float *r, float *g, float *b);
 	static int CallFunc_C_TFPlayer_GetObserverMode(C_TFPlayer *instance);
