@@ -210,6 +210,14 @@ Player model configuration is loaded from the `Resource/CustomTextures.res` file
 }
 ```
 
+### FOV Override
+*forces the FOV used to be consistent even if players have different FOVs*
+
+#### Console Variables
+* `statusspec_fovoverride_enabled` - enable FOV override
+* `statusspec_fovoverride_fov` - the FOV value used
+* `statusspec_fovoverride_zoomed` - enable FOV override even when sniper rifle is zoomed
+
 ### Killstreaks
 *enables killstreak tracking for all weapons, all players*
 
