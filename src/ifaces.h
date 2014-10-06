@@ -24,6 +24,7 @@
 #include "engine/ivmodelinfo.h"
 #include "entitylist_base.h"
 #include "filesystem.h"
+#include "game/server/iplayerinfo.h"
 #include "hltvcamera.h"
 #include "icliententitylist.h"
 #include "iclientmode.h"
@@ -95,6 +96,7 @@ class Interfaces {
 		static IFileSystem *pFileSystem;
 		static IGameEventManager2 *pGameEventManager;
 		static IVModelInfoClient *pModelInfoClient;
+		static IPlayerInfoManager *pPlayerInfoManager;
 		static IVRenderView *pRenderView;
 		static CSteamAPIContext *pSteamAPIContext;
 		static IClientMode *GetClientMode();
