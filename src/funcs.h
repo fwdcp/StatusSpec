@@ -57,6 +57,7 @@ typedef void(__fastcall *SMPH_t)(C_BaseEntity *, void *, const model_t *);
 #define OFFSET_CALCVIEW 230
 #define OFFSET_GETOBSERVERMODE 241
 #define OFFSET_GETOBSERVERTARGET 242
+#define OFFSET_GETFOV 269
 #define CLIENT_MODULE_SIZE 0xC74EC0
 #define GETLOCALPLAYERINDEX_SIG "\xE8\x00\x00\x00\x00\x85\xC0\x74\x08\x8D\x48\x08\x8B\x01\xFF\x60\x24\x33\xC0\xC3"
 #define GETLOCALPLAYERINDEX_MASK "x????xxxxxxxxxxxxxxx"
@@ -85,6 +86,7 @@ public:
 	static bool AddDetour_C_BaseEntity_SetModelIndex(SMIH_t detour);
 	static bool AddDetour_C_BaseEntity_SetModelPointer(SMPH_t detour);
 
+	static int AddHook_C_TFPlayer_GetFOV(C_TFPlayer *instance, float(*hook)());
 	static int AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, void(*hook)(ClientFrameStage_t));
 	static int AddHook_IClientMode_DoPostScreenSpaceEffects(IClientMode *instance, bool(*hook)(const CViewSetup *));
 	static int AddHook_IGameEventManager2_FireEvent(IGameEventManager2 *instance, bool(*hook)(IGameEvent *, bool));
@@ -100,6 +102,7 @@ public:
 	static void CallFunc_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, const model_t *pModel);
 	static void CallFunc_C_HLTVCamera_SetPrimaryTarget(C_HLTVCamera *instance, int nEntity);
 
+	static float CallFunc_C_TFPlayer_GetFOV(C_TFPlayer *instance);
 	static void CallFunc_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *instance, float *r, float *g, float *b);
 	static int CallFunc_C_TFPlayer_GetHealth(C_TFPlayer *instance);
 	static int CallFunc_C_TFPlayer_GetMaxHealth(C_TFPlayer *instance);

@@ -17,6 +17,7 @@ SourceHook::ISourceHook *g_SHPtr = &g_SourceHook;
 int g_PLID = 0;
 
 SH_DECL_MANUALHOOK5_void(C_TFPlayer_CalcView, OFFSET_CALCVIEW, 0, 0, Vector &, QAngle &, float &, float &, float &);
+SH_DECL_MANUALHOOK0(C_TFPlayer_GetFOV, OFFSET_GETFOV, 0, 0, float);
 SH_DECL_MANUALHOOK3_void(C_TFPlayer_GetGlowEffectColor, OFFSET_GETGLOWEFFECTCOLOR, 0, 0, float *, float *, float *);
 SH_DECL_MANUALHOOK0(C_TFPlayer_GetHealth, OFFSET_GETHEALTH, 0, 0, int);
 SH_DECL_MANUALHOOK0(C_TFPlayer_GetMaxHealth, OFFSET_GETMAXHEALTH, 0, 0, int);
@@ -146,6 +147,10 @@ bool Funcs::AddDetour_C_BaseEntity_SetModelPointer(SMPH_t detour) {
 	return false;
 }
 
+int Funcs::AddHook_C_TFPlayer_GetFOV(C_TFPlayer *instance, float(*hook)()) {
+	return SH_ADD_MANUALHOOK(C_TFPlayer_GetFOV, instance, SH_STATIC(hook), false);
+}
+
 int Funcs::AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, void(*hook)(ClientFrameStage_t)) {
 	return SH_ADD_HOOK(IBaseClientDLL, FrameStageNotify, instance, SH_STATIC(hook), false);
 }
@@ -211,6 +216,10 @@ void Funcs::CallFunc_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, const 
 
 void Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(C_HLTVCamera *instance, int nEntity) {
 	GetSPTFunc()(instance, nEntity);
+}
+
+float Funcs::CallFunc_C_TFPlayer_GetFOV(C_TFPlayer *instance) {
+	return SH_MCALL(instance, C_TFPlayer_GetFOV)();
 }
 
 void Funcs::CallFunc_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *instance, float *r, float *g, float *b) {
