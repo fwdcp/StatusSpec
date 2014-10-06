@@ -153,30 +153,16 @@ TFClassType Player::GetClass() const {
 }
 
 int Player::GetHealth() const {
-	try {
-		if (playerEntity.IsValid()) {
-			return *MAKE_PTR(int*, Interfaces::GetGameResources(), Entities::pCTFPlayerResource__m_iHealth[playerEntity->entindex()]);
-		}
-	}
-	catch (bad_pointer &e) {
-		Warning(e.what());
-
-		if (playerEntity.IsValid()) {
-			return *MAKE_PTR(int*, playerEntity.Get(), Entities::pCTFPlayer__m_iHealth);
-		}
+	if (playerEntity.IsValid()) {
+		return Funcs::CallFunc_C_TFPlayer_GetHealth((C_TFPlayer *)playerEntity.Get());
 	}
 
 	return 0;
 }
 
 int Player::GetMaxHealth() const {
-	try {
-		if (playerEntity.IsValid()) {
-			return *MAKE_PTR(int*, Interfaces::GetGameResources(), Entities::pCTFPlayerResource__m_iMaxHealth[playerEntity->entindex()]);
-		}
-	}
-	catch (bad_pointer &e) {
-		Warning(e.what());
+	if (playerEntity.IsValid()) {
+		return Funcs::CallFunc_C_TFPlayer_GetMaxHealth((C_TFPlayer *)playerEntity.Get());
 	}
 
 	return 0;
@@ -193,6 +179,22 @@ const char *Player::GetName() const {
 	}
 	
 	return "";
+}
+
+int Player::GetObserverMode() const {
+	if (playerEntity.IsValid()) {
+		return Funcs::CallFunc_C_TFPlayer_GetObserverMode((C_TFPlayer *)playerEntity.Get());
+	}
+
+	return OBS_MODE_NONE;
+}
+
+C_BaseEntity *Player::GetObserverTarget() const {
+	if (playerEntity.IsValid()) {
+		return Funcs::CallFunc_C_TFPlayer_GetObserverTarget((C_TFPlayer *)playerEntity.Get());
+	}
+
+	return playerEntity->GetBaseEntity();
 }
 
 CSteamID Player::GetSteamID() const {

@@ -47,6 +47,8 @@ typedef void(__fastcall *SMPH_t)(C_BaseEntity *, void *, const model_t *);
 #endif
 
 #if defined _WIN32
+#define OFFSET_GETHEALTH 106
+#define OFFSET_GETMAXHEALTH 107
 #define OFFSET_GETGLOWEFFECTCOLOR 224
 #define OFFSET_UPDATEGLOWEFFECT 225
 #define OFFSET_DESTROYGLOWEFFECT 226
@@ -94,6 +96,8 @@ public:
 	static void CallFunc_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, const model_t *pModel);
 
 	static void CallFunc_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *instance, float *r, float *g, float *b);
+	static int CallFunc_C_TFPlayer_GetHealth(C_TFPlayer *instance);
+	static int CallFunc_C_TFPlayer_GetMaxHealth(C_TFPlayer *instance);
 	static int CallFunc_C_TFPlayer_GetObserverMode(C_TFPlayer *instance);
 	static C_BaseEntity *CallFunc_C_TFPlayer_GetObserverTarget(C_TFPlayer *instance);
 	static bool CallFunc_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, int ent_num, player_info_t *pinfo);

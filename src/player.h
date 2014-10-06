@@ -55,6 +55,8 @@ public:
 	int GetHealth() const;
 	int GetMaxHealth() const;
 	const char *GetName() const;
+	int GetObserverMode() const;
+	C_BaseEntity *GetObserverTarget() const;
 	CSteamID GetSteamID() const;
 	TFTeam GetTeam() const;
 	bool IsAlive() const;

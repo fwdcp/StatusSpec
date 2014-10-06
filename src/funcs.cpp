@@ -18,6 +18,8 @@ int g_PLID = 0;
 
 SH_DECL_MANUALHOOK5_void(C_TFPlayer_CalcView, OFFSET_CALCVIEW, 0, 0, Vector &, QAngle &, float &, float &, float &);
 SH_DECL_MANUALHOOK3_void(C_TFPlayer_GetGlowEffectColor, OFFSET_GETGLOWEFFECTCOLOR, 0, 0, float *, float *, float *);
+SH_DECL_MANUALHOOK0(C_TFPlayer_GetHealth, OFFSET_GETHEALTH, 0, 0, int);
+SH_DECL_MANUALHOOK0(C_TFPlayer_GetMaxHealth, OFFSET_GETMAXHEALTH, 0, 0, int);
 SH_DECL_MANUALHOOK0(C_TFPlayer_GetObserverMode, OFFSET_GETOBSERVERMODE, 0, 0, int);
 SH_DECL_MANUALHOOK0(C_TFPlayer_GetObserverTarget, OFFSET_GETOBSERVERTARGET, 0, 0, C_BaseEntity *);
 SH_DECL_HOOK1_void(IBaseClientDLL, FrameStageNotify, SH_NOATTRIB, 0, ClientFrameStage_t);
@@ -196,16 +198,24 @@ void Funcs::CallFunc_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, const 
 	}
 }
 
+void Funcs::CallFunc_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *instance, float *r, float *g, float *b) {
+	SH_MCALL(instance, C_TFPlayer_GetGlowEffectColor)(r, g, b);
+}
+
+int Funcs::CallFunc_C_TFPlayer_GetHealth(C_TFPlayer *instance) {
+	return SH_MCALL(instance, C_TFPlayer_GetHealth)();
+}
+
+int Funcs::CallFunc_C_TFPlayer_GetMaxHealth(C_TFPlayer *instance) {
+	return SH_MCALL(instance, C_TFPlayer_GetMaxHealth)();
+}
+
 int Funcs::CallFunc_C_TFPlayer_GetObserverMode(C_TFPlayer *instance) {
 	return SH_MCALL(instance, C_TFPlayer_GetObserverMode)();
 }
 
 C_BaseEntity *Funcs::CallFunc_C_TFPlayer_GetObserverTarget(C_TFPlayer *instance) {
 	return SH_MCALL(instance, C_TFPlayer_GetObserverTarget)();
-}
-
-void Funcs::CallFunc_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *instance, float *r, float *g, float *b) {
-	SH_MCALL(instance, C_TFPlayer_GetGlowEffectColor)(r, g, b);
 }
 
 bool Funcs::CallFunc_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, int ent_num, player_info_t *pinfo) {

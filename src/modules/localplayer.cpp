@@ -42,7 +42,7 @@ void LocalPlayer::SetToCurrentTarget() {
 	Player localPlayer = Interfaces::pEngineClient->GetLocalPlayer();
 
 	if (localPlayer) {
-		Player targetPlayer = Funcs::CallFunc_C_TFPlayer_GetObserverTarget((C_TFPlayer *)targetPlayer.GetEntity());
+		Player targetPlayer = localPlayer.GetObserverTarget();
 
 		if (targetPlayer) {
 			g_LocalPlayer->player->SetValue(targetPlayer->entindex());
