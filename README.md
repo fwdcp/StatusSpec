@@ -13,6 +13,8 @@ Changelog
   * new module
 * FOV override
   * new module
+* killstreaks
+  * added functionality to track total kills in killfeed
 * player outlines
   * fix health-based team-colored outlines
 * spec GUI order
@@ -233,6 +235,7 @@ Player model configuration is loaded from the `Resource/CustomTextures.res` file
 
 #### Console Variables
 * `statusspec_killstreaks_enabled` - enable killstreaks display
+* `statusspec_killstreaks_total_killfeed` - display total kills for player in killfeed instead of only kills with single weapon
 
 ### Loadout Icons
 *displays icons to represent weapons in a player's loadout*

@@ -35,6 +35,7 @@ private:
 	int GetCurrentKillstreak(int userid);
 
 	ConVar *enabled;
+	ConVar *total_killfeed;
 	static void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
 
