@@ -8,6 +8,14 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**0.20.1**
+* general
+  * fix crashing due to invalid entities
+* camera tools
+  * add command to prevent speccing dead players
+* spec GUI order
+  * fix gaps in between players
+
 **0.20.0**
 * camera tools
   * new module
@@ -198,6 +206,7 @@ An example file for the freeze info box is included under `Resource/UI/FreezeInf
 
 #### Console Commands
 * `statusspec_cameratools_spec_player <team> <position>` - spec a certain player
+* `statusspec_cameratools_spec_player_alive` - prevent speccing dead players
 * `statusspec_cameratools_spec_pos <x> <y> <z> <yaw> <pitch>` - spec a certain camera position
 
 ### Custom Textures
