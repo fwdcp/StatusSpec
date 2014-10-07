@@ -8,7 +8,7 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
-**WIP**
+**0.20.0**
 * camera tools
   * new module
 * FOV override
