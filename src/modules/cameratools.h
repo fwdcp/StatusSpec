@@ -35,6 +35,7 @@ private:
 	std::vector<Player> redPlayers;
 
 	ConCommand *spec_player;
+	ConVar *spec_player_alive;
 	ConCommand *spec_pos;
 	static void SpecPlayer(const CCommand &command);
 	static void SpecPosition(const CCommand &command);

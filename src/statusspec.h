@@ -37,7 +37,7 @@
 #include "modules/statusicons.h"
 #include "modules/teamoverrides.h"
 
-#define PLUGIN_DESC "StatusSpec v0.20.0"
+#define PLUGIN_DESC "StatusSpec v0.20.1"
 
 int Detour_GetLocalPlayerIndex();
 void __fastcall Detour_C_BaseEntity_SetModelIndex(C_BaseEntity *instance, void *, int index);

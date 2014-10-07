@@ -69,13 +69,13 @@ bool SpecGUIOrder::SetPosOverride(vgui::VPANEL vguiPanel, int &x, int &y) {
 				position = std::distance(redPlayers.rbegin(), std::find(redPlayers.rbegin(), redPlayers.rend(), player));
 			}
 
-			int baseX = specguiSettings->FindKey("specgui")->GetInt("team2_player_base_offset_x");
-			int baseY = specguiSettings->FindKey("specgui")->GetInt("team2_player_base_y");
-			int deltaX = specguiSettings->FindKey("specgui")->GetInt("team2_player_delta_x");
-			int deltaY = specguiSettings->FindKey("specgui")->GetInt("team2_player_delta_y");
+			int baseX = g_pVGuiSchemeManager->GetProportionalScaledValue(specguiSettings->FindKey("specgui")->GetInt("team2_player_base_offset_x"));
+			int baseY = g_pVGuiSchemeManager->GetProportionalScaledValue(specguiSettings->FindKey("specgui")->GetInt("team2_player_base_y"));
+			int deltaX = g_pVGuiSchemeManager->GetProportionalScaledValue(specguiSettings->FindKey("specgui")->GetInt("team2_player_delta_x"));
+			int deltaY = g_pVGuiSchemeManager->GetProportionalScaledValue(specguiSettings->FindKey("specgui")->GetInt("team2_player_delta_y"));
 
-			x = g_pVGuiSchemeManager->GetProportionalScaledValue(baseX + (position * deltaX));
-			y = g_pVGuiSchemeManager->GetProportionalScaledValue(baseY + (position * deltaY));
+			x = baseX + (position * deltaX);
+			y = baseY + (position * deltaY);
 
 			return true;
 		}
@@ -89,13 +89,13 @@ bool SpecGUIOrder::SetPosOverride(vgui::VPANEL vguiPanel, int &x, int &y) {
 				position = std::distance(bluPlayers.rbegin(), std::find(bluPlayers.rbegin(), bluPlayers.rend(), player));
 			}
 
-			int baseX = specguiSettings->FindKey("specgui")->GetInt("team1_player_base_offset_x");
-			int baseY = specguiSettings->FindKey("specgui")->GetInt("team1_player_base_y");
-			int deltaX = specguiSettings->FindKey("specgui")->GetInt("team1_player_delta_x");
-			int deltaY = specguiSettings->FindKey("specgui")->GetInt("team1_player_delta_y");
+			int baseX = g_pVGuiSchemeManager->GetProportionalScaledValue(specguiSettings->FindKey("specgui")->GetInt("team1_player_base_offset_x"));
+			int baseY = g_pVGuiSchemeManager->GetProportionalScaledValue(specguiSettings->FindKey("specgui")->GetInt("team1_player_base_y"));
+			int deltaX = g_pVGuiSchemeManager->GetProportionalScaledValue(specguiSettings->FindKey("specgui")->GetInt("team1_player_delta_x"));
+			int deltaY = g_pVGuiSchemeManager->GetProportionalScaledValue(specguiSettings->FindKey("specgui")->GetInt("team1_player_delta_y"));
 
-			x = g_pVGuiSchemeManager->GetProportionalScaledValue(baseX + (position * deltaX));
-			y = g_pVGuiSchemeManager->GetProportionalScaledValue(baseY + (position * deltaY));
+			x = baseX + (position * deltaX);
+			y = baseY + (position * deltaY);
 
 			return true;
 		}
