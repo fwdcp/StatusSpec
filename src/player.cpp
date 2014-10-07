@@ -41,7 +41,7 @@ Player& Player::operator=(const Player &player) {
 }
 
 bool Player::operator==(int entindex) const {
-	if (playerEntity.IsValid()) {
+	if (IsValid()) {
 		return playerEntity->entindex() == entindex;
 	}
 
@@ -119,8 +119,12 @@ bool Player::operator>=(const Player &player) const {
 }
 
 Player::operator bool() const {
+	return IsValid();
+}
+
+bool Player::IsValid() const {
 	try {
-		return playerEntity.IsValid() && Entities::CheckClassBaseclass(playerEntity->GetClientClass(), "DT_TFPlayer") && Interfaces::GetGameResources()->IsConnected(playerEntity->entindex());
+		return playerEntity.IsValid() && playerEntity.Get() && Entities::CheckClassBaseclass(playerEntity->GetClientClass(), "DT_TFPlayer") && Interfaces::GetGameResources()->IsConnected(playerEntity->entindex());
 	}
 	catch (bad_pointer &e) {
 		Warning(e.what());
@@ -142,7 +146,7 @@ IClientEntity *Player::GetEntity() const {
 }
 
 bool Player::CheckCondition(TFCond condition) const {
-	if (playerEntity.IsValid()) {
+	if (IsValid()) {
 		uint32_t playerCond = *MAKE_PTR(uint32_t*, playerEntity.Get(), Entities::pCTFPlayer__m_nPlayerCond);
 		uint32_t condBits = *MAKE_PTR(uint32_t*, playerEntity.Get(), Entities::pCTFPlayer___condition_bits);
 		uint32_t playerCondEx = *MAKE_PTR(uint32_t*, playerEntity.Get(), Entities::pCTFPlayer__m_nPlayerCondEx);
@@ -174,7 +178,7 @@ bool Player::CheckCondition(TFCond condition) const {
 }
 
 TFClassType Player::GetClass() const {
-	if (playerEntity.IsValid()) {
+	if (IsValid()) {
 		return (TFClassType)*MAKE_PTR(int*, playerEntity.Get(), Entities::pCTFPlayer__m_iClass);
 	}
 
@@ -182,7 +186,7 @@ TFClassType Player::GetClass() const {
 }
 
 int Player::GetHealth() const {
-	if (playerEntity.IsValid()) {
+	if (IsValid()) {
 		return Funcs::CallFunc_C_TFPlayer_GetHealth((C_TFPlayer *)playerEntity.Get());
 	}
 
@@ -190,7 +194,7 @@ int Player::GetHealth() const {
 }
 
 int Player::GetMaxHealth() const {
-	if (playerEntity.IsValid()) {
+	if (IsValid()) {
 		return Funcs::CallFunc_C_TFPlayer_GetMaxHealth((C_TFPlayer *)playerEntity.Get());
 	}
 
@@ -199,7 +203,7 @@ int Player::GetMaxHealth() const {
 
 const char *Player::GetName() const {
 	try {
-		if (playerEntity.IsValid()) {
+		if (IsValid()) {
 			return Interfaces::GetGameResources()->GetPlayerName(playerEntity->entindex());
 		}
 	}
@@ -211,7 +215,7 @@ const char *Player::GetName() const {
 }
 
 int Player::GetObserverMode() const {
-	if (playerEntity.IsValid()) {
+	if (IsValid()) {
 		return Funcs::CallFunc_C_TFPlayer_GetObserverMode((C_TFPlayer *)playerEntity.Get());
 	}
 
@@ -219,7 +223,7 @@ int Player::GetObserverMode() const {
 }
 
 C_BaseEntity *Player::GetObserverTarget() const {
-	if (playerEntity.IsValid()) {
+	if (IsValid()) {
 		return Funcs::CallFunc_C_TFPlayer_GetObserverTarget((C_TFPlayer *)playerEntity.Get());
 	}
 
@@ -227,7 +231,7 @@ C_BaseEntity *Player::GetObserverTarget() const {
 }
 
 CSteamID Player::GetSteamID() const {
-	if (playerEntity.IsValid()) {
+	if (IsValid()) {
 		player_info_t playerInfo;
 
 		if (Funcs::CallFunc_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, playerEntity->entindex(), &playerInfo)) {
@@ -248,14 +252,18 @@ CSteamID Player::GetSteamID() const {
 
 TFTeam Player::GetTeam() const {
 	try {
-		if (playerEntity.IsValid()) {
-			return (TFTeam)Interfaces::GetGameResources()->GetTeam(playerEntity->entindex());
+		if (IsValid()) {
+			int entindex = playerEntity->entindex();
+			IGameResources *gameResources = Interfaces::GetGameResources();
+			TFTeam team = (TFTeam)gameResources->GetTeam(entindex);
+
+			return team;
 		}
 	}
 	catch (bad_pointer &e) {
 		Warning(e.what());
 
-		if (playerEntity.IsValid()) {
+		if (IsValid()) {
 			return (TFTeam)*MAKE_PTR(int*, playerEntity.Get(), Entities::pCTFPlayer__m_iTeamNum);
 		}
 	}
@@ -265,7 +273,7 @@ TFTeam Player::GetTeam() const {
 
 bool Player::IsAlive() const {
 	try {
-		if (playerEntity.IsValid()) {
+		if (IsValid()) {
 			return Interfaces::GetGameResources()->IsAlive(playerEntity->entindex());
 		}
 	}

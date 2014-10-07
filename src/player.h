@@ -65,4 +65,6 @@ public:
 	bool IsAlive() const;
 private:
 	CHandle<IClientEntity> playerEntity;
+
+	bool IsValid() const;
 };
