@@ -15,6 +15,7 @@ Changelog
   * new module
 * killstreaks
   * added functionality to track total kills in killfeed
+  * prevent double tracking of kills in local servers
 * player outlines
   * fix health-based team-colored outlines
 * spec GUI order

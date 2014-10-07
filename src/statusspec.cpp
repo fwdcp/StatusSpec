@@ -208,10 +208,6 @@ bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast) {
 	IGameEvent *newEvent = Interfaces::pGameEventManager->DuplicateEvent(event);
 	Interfaces::pGameEventManager->FreeEvent(event);
 
-	if (g_Killstreaks) {
-		g_Killstreaks->FireEvent(newEvent);
-	}
-
 	RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEvent, (newEvent, bDontBroadcast));
 }
 
