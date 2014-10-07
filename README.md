@@ -15,6 +15,8 @@ Changelog
   * new module
 * player outlines
   * fix health-based team-colored outlines
+* spec GUI order
+  * added reverse ordering of players
 
 **0.19.2**
 * general
@@ -405,6 +407,8 @@ Player model configuration is loaded from the `Resource/PlayerModels.res` file. 
 
 #### Console Variables
 * `statusspec_specguiorder_enabled` - enable ordering of spec GUI
+* `statusspec_specguiorder_reverse_blu` - reverse order for BLU players
+* `statusspec_specguiorder_reverse_red` - reverse order for RED players
 
 ### Status Icons
 *displays icons representing special statuses of a player*
