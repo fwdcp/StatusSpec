@@ -82,7 +82,7 @@ bool SpecGUIOrder::SetPosOverride(vgui::VPANEL vguiPanel, int &x, int &y) {
 		else if (team == TFTeam_Blue) {
 			int position;
 
-			if (!reverse_red->GetBool()) {
+			if (!reverse_blu->GetBool()) {
 				position = std::distance(bluPlayers.begin(), std::find(bluPlayers.begin(), bluPlayers.end(), player));
 			}
 			else {
