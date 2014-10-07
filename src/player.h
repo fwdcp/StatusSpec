@@ -33,28 +33,33 @@ public:
 	Player& operator=(IClientEntity *entity);
 	Player& operator=(const Player &player);
 
-	bool operator==(int entindex);
-	bool operator==(IClientEntity *entity);
-	bool operator==(const Player &player);
+	bool operator==(int entindex) const;
+	bool operator==(IClientEntity *entity) const;
+	bool operator==(const Player &player) const;
 
-	bool operator!=(int entindex);
-	bool operator!=(IClientEntity *entity);
-	bool operator!=(const Player &player);
+	bool operator!=(int entindex) const;
+	bool operator!=(IClientEntity *entity) const;
+	bool operator!=(const Player &player) const;
 
 	bool operator<(const Player &player) const;
+	bool operator<=(const Player &player) const;
+	bool operator>(const Player &player) const;
+	bool operator>=(const Player &player) const;
 
 	operator bool() const;
 	operator IClientEntity *() const;
 
 	IClientEntity *operator->() const;
 
-	IClientEntity *GetEntity();
+	IClientEntity *GetEntity() const;
 
 	bool CheckCondition(TFCond condition) const;
 	TFClassType GetClass() const;
 	int GetHealth() const;
 	int GetMaxHealth() const;
 	const char *GetName() const;
+	int GetObserverMode() const;
+	C_BaseEntity *GetObserverTarget() const;
 	CSteamID GetSteamID() const;
 	TFTeam GetTeam() const;
 	bool IsAlive() const;

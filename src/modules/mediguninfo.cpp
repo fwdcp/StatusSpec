@@ -11,7 +11,7 @@
 #include "mediguninfo.h"
 
 inline void StartAnimationSequence(const char *sequenceName) {
-	// Interfaces::GetClientMode()->GetViewportAnimationController()->StartAnimationSequence(sequenceName);
+	Interfaces::GetClientMode()->GetViewportAnimationController()->StartAnimationSequence(sequenceName);
 }
 
 MedigunInfo::MedigunInfo() {

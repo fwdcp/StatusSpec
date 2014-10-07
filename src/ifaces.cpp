@@ -23,6 +23,7 @@ IVEngineClient *Interfaces::pEngineClient = nullptr;
 IFileSystem *Interfaces::pFileSystem = nullptr;
 IGameEventManager2 *Interfaces::pGameEventManager = nullptr;
 IVModelInfoClient *Interfaces::pModelInfoClient = nullptr;
+IPlayerInfoManager *Interfaces::pPlayerInfoManager = nullptr;
 IVRenderView *Interfaces::pRenderView = nullptr;
 CSteamAPIContext *Interfaces::pSteamAPIContext = nullptr;
 
@@ -53,54 +54,62 @@ inline DWORD FindPattern(DWORD dwAddress, DWORD dwSize, BYTE* pbSig, const char*
 IClientMode* Interfaces::GetClientMode() {
 #if defined _WIN32
 	static DWORD pointer = NULL;
-	if (!pointer)
+
+	if (!pointer) {
 		pointer = FindPattern((DWORD)GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE)CLIENTMODE_SIG, CLIENTMODE_MASK) + CLIENTMODE_OFFSET;
+
+		if (!pointer) {
+			throw bad_pointer("IClientMode");
+		}
+	}
+
 	return **(IClientMode***)(pointer);
 #else
-	return nullptr;
+	throw bad_pointer("IClientMode");
 #endif
 }
 
 IGameResources* Interfaces::GetGameResources() {
 #if defined _WIN32
 	static DWORD pointer = NULL;
-	if (!pointer)
-		pointer = FindPattern((DWORD) GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE) GAMERESOURCES_SIG, GAMERESOURCES_MASK);
+
+	if (!pointer) {
+		pointer = FindPattern((DWORD)GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE)GAMERESOURCES_SIG, GAMERESOURCES_MASK);
+
+		if (!pointer) {
+			throw bad_pointer("IGameResources");
+		}
+	}
+
 	typedef IGameResources* (*GGR_t) (void);
 	GGR_t GGR = (GGR_t) pointer;
 	IGameResources *gr = GGR();
-	if (gr) {
-		return gr;
+
+	if (!gr) {
+		throw bad_pointer("IGameResources");
 	}
-	else {
-		static CHandle<C_PlayerResource> pr;
 
-		if (!pr.IsValid()) {
-			if (Interfaces::pClientEntityList) {
-				int maxEntity = Interfaces::pClientEntityList->GetHighestEntityIndex();
-
-				for (int i = 0; i < maxEntity; i++) {
-					IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
-
-					if (Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_PlayerResource")) {
-						pr = dynamic_cast<C_PlayerResource *>(entity);
-
-						break;
-					}
-				}
-			}
-		}
-
-		if (!pr.IsValid()) {
-			// no hope for us, throw the exception
-
-			throw bad_pointer("IGameResources");
-		}
-
-		return pr.Get();
-	}
+	return gr;
 #else
-	return nullptr;
+	throw bad_pointer("IGameResources");
+#endif
+}
+
+C_HLTVCamera* Interfaces::GetHLTVCamera() {
+#if defined _WIN32
+	static DWORD pointer = NULL;
+
+	if (!pointer) {
+		pointer = FindPattern((DWORD)GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE)HLTVCAMERA_SIG, HLTVCAMERA_MASK) + HLTVCAMERA_OFFSET;
+
+		if (!pointer) {
+			throw bad_pointer("C_HLTVCamera");
+		}
+	}
+
+	return *(C_HLTVCamera**)(pointer);
+#else
+	throw bad_pointer("C_HLTVCamera");
 #endif
 }
 
@@ -117,6 +126,7 @@ bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 	pEngineClient = (IVEngineClient *)interfaceFactory(VENGINE_CLIENT_INTERFACE_VERSION, nullptr);
 	pGameEventManager = (IGameEventManager2 *)interfaceFactory(INTERFACEVERSION_GAMEEVENTSMANAGER2, nullptr);
 	pModelInfoClient = (IVModelInfoClient *)interfaceFactory(VMODELINFO_CLIENT_INTERFACE_VERSION, nullptr);
+	pPlayerInfoManager = (IPlayerInfoManager *)gameServerFactory(INTERFACEVERSION_PLAYERINFOMANAGER, nullptr);
 	pRenderView = (IVRenderView *)interfaceFactory(VENGINE_RENDERVIEW_INTERFACE_VERSION, nullptr);
 	
 	pClientModule = new CDllDemandLoader(CLIENT_MODULE_FILE);

@@ -40,7 +40,7 @@ Player& Player::operator=(const Player &player) {
 	return *this;
 }
 
-bool Player::operator==(int entindex) {
+bool Player::operator==(int entindex) const {
 	if (playerEntity.IsValid()) {
 		return playerEntity->entindex() == entindex;
 	}
@@ -48,23 +48,23 @@ bool Player::operator==(int entindex) {
 	return false;
 }
 
-bool Player::operator==(IClientEntity *entity) {
+bool Player::operator==(IClientEntity *entity) const {
 	return playerEntity == entity;
 }
 
-bool Player::operator==(const Player &player) {
+bool Player::operator==(const Player &player) const {
 	return playerEntity == player.playerEntity;
 }
 
-bool Player::operator!=(int entindex) {
+bool Player::operator!=(int entindex) const {
 	return !(*this == entindex);
 }
 
-bool Player::operator!=(IClientEntity *entity) {
+bool Player::operator!=(IClientEntity *entity) const {
 	return !(*this == entity);
 }
 
-bool Player::operator!=(const Player &player) {
+bool Player::operator!=(const Player &player) const {
 	return !(playerEntity == player.playerEntity);
 }
 
@@ -89,6 +89,35 @@ bool Player::operator<(const Player &player) const {
 	return false;
 }
 
+bool Player::operator<=(const Player &player) const {
+	return *this == player || *this < player;
+}
+
+bool Player::operator>(const Player &player) const {
+	if (!player) {
+		return true;
+	}
+
+	if (GetTeam() > player.GetTeam()) {
+		return false;
+	}
+
+	static std::array<TFClassType, 10> classes = { TFClass_Unknown, TFClass_Scout, TFClass_Soldier, TFClass_Pyro, TFClass_DemoMan, TFClass_Heavy, TFClass_Engineer, TFClass_Medic, TFClass_Sniper, TFClass_Spy };
+
+	int firstClass = std::distance(classes.begin(), std::find(classes.begin(), classes.end(), GetClass()));
+	int secondClass = std::distance(classes.begin(), std::find(classes.begin(), classes.end(), player.GetClass()));
+
+	if (firstClass > secondClass) {
+		return true;
+	}
+
+	return false;
+}
+
+bool Player::operator>=(const Player &player) const {
+	return *this == player || *this > player;
+}
+
 Player::operator bool() const {
 	try {
 		return playerEntity.IsValid() && Entities::CheckClassBaseclass(playerEntity->GetClientClass(), "DT_TFPlayer") && Interfaces::GetGameResources()->IsConnected(playerEntity->entindex());
@@ -108,7 +137,7 @@ IClientEntity *Player::operator->() const {
 	return playerEntity;
 }
 
-IClientEntity *Player::GetEntity() {
+IClientEntity *Player::GetEntity() const {
 	return playerEntity;
 }
 
@@ -153,30 +182,16 @@ TFClassType Player::GetClass() const {
 }
 
 int Player::GetHealth() const {
-	try {
-		if (playerEntity.IsValid()) {
-			return *MAKE_PTR(int*, Interfaces::GetGameResources(), Entities::pCTFPlayerResource__m_iHealth[playerEntity->entindex()]);
-		}
-	}
-	catch (bad_pointer &e) {
-		Warning(e.what());
-
-		if (playerEntity.IsValid()) {
-			return *MAKE_PTR(int*, playerEntity.Get(), Entities::pCTFPlayer__m_iHealth);
-		}
+	if (playerEntity.IsValid()) {
+		return Funcs::CallFunc_C_TFPlayer_GetHealth((C_TFPlayer *)playerEntity.Get());
 	}
 
 	return 0;
 }
 
 int Player::GetMaxHealth() const {
-	try {
-		if (playerEntity.IsValid()) {
-			return *MAKE_PTR(int*, Interfaces::GetGameResources(), Entities::pCTFPlayerResource__m_iMaxHealth[playerEntity->entindex()]);
-		}
-	}
-	catch (bad_pointer &e) {
-		Warning(e.what());
+	if (playerEntity.IsValid()) {
+		return Funcs::CallFunc_C_TFPlayer_GetMaxHealth((C_TFPlayer *)playerEntity.Get());
 	}
 
 	return 0;
@@ -193,6 +208,22 @@ const char *Player::GetName() const {
 	}
 	
 	return "";
+}
+
+int Player::GetObserverMode() const {
+	if (playerEntity.IsValid()) {
+		return Funcs::CallFunc_C_TFPlayer_GetObserverMode((C_TFPlayer *)playerEntity.Get());
+	}
+
+	return OBS_MODE_NONE;
+}
+
+C_BaseEntity *Player::GetObserverTarget() const {
+	if (playerEntity.IsValid()) {
+		return Funcs::CallFunc_C_TFPlayer_GetObserverTarget((C_TFPlayer *)playerEntity.Get());
+	}
+
+	return playerEntity->GetBaseEntity();
 }
 
 CSteamID Player::GetSteamID() const {

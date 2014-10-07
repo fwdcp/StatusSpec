@@ -45,7 +45,9 @@ private:
 	KeyValues *specguiSettings;
 	std::list<Player> redPlayers;
 
-	ConVar* enabled;
+	ConVar *enabled;
+	ConVar *reverse_blu;
+	ConVar *reverse_red;
 };
 
 extern SpecGUIOrder *g_SpecGUIOrder;

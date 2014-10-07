@@ -12,6 +12,8 @@
 
 SpecGUIOrder::SpecGUIOrder() {
 	enabled = new ConVar("statusspec_specguiorder_enabled", "0", FCVAR_NONE, "enable ordering of spec GUI");
+	reverse_blu = new ConVar("statusspec_specguiorder_reverse_blu", "0", FCVAR_NONE, "reverse order for BLU players");
+	reverse_red = new ConVar("statusspec_specguiorder_reverse_red", "0", FCVAR_NONE, "reverse order for RED players");
 
 	specguiSettings = new KeyValues("Resource/UI/SpectatorTournament.res");
 	specguiSettings->LoadFromFile(Interfaces::pFileSystem, "resource/ui/spectatortournament.res", "mod");
@@ -58,7 +60,14 @@ bool SpecGUIOrder::SetPosOverride(vgui::VPANEL vguiPanel, int &x, int &y) {
 		TFTeam team = player.GetTeam();
 
 		if (team == TFTeam_Red) {
-			int position = std::distance(redPlayers.begin(), std::find(redPlayers.begin(), redPlayers.end(), player));
+			int position;
+			
+			if (!reverse_red->GetBool()) {
+				position = std::distance(redPlayers.begin(), std::find(redPlayers.begin(), redPlayers.end(), player));
+			}
+			else {
+				position = std::distance(redPlayers.rbegin(), std::find(redPlayers.rbegin(), redPlayers.rend(), player));
+			}
 
 			int baseX = specguiSettings->FindKey("specgui")->GetInt("team2_player_base_offset_x");
 			int baseY = specguiSettings->FindKey("specgui")->GetInt("team2_player_base_y");
@@ -71,7 +80,14 @@ bool SpecGUIOrder::SetPosOverride(vgui::VPANEL vguiPanel, int &x, int &y) {
 			return true;
 		}
 		else if (team == TFTeam_Blue) {
-			int position = std::distance(bluPlayers.begin(), std::find(bluPlayers.begin(), bluPlayers.end(), player));
+			int position;
+
+			if (!reverse_blu->GetBool()) {
+				position = std::distance(bluPlayers.begin(), std::find(bluPlayers.begin(), bluPlayers.end(), player));
+			}
+			else {
+				position = std::distance(bluPlayers.rbegin(), std::find(bluPlayers.rbegin(), bluPlayers.rend(), player));
+			}
 
 			int baseX = specguiSettings->FindKey("specgui")->GetInt("team1_player_base_offset_x");
 			int baseY = specguiSettings->FindKey("specgui")->GetInt("team1_player_base_y");

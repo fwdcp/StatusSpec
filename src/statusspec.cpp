@@ -11,7 +11,9 @@
 #include "statusspec.h"
 
 AntiFreeze *g_AntiFreeze = nullptr;
+CameraTools *g_CameraTools = nullptr;
 CustomTextures *g_CustomTextures = nullptr;
+FOVOverride *g_FOVOverride = nullptr;
 Killstreaks *g_Killstreaks = nullptr;
 LoadoutIcons *g_LoadoutIcons = nullptr;
 LocalPlayer *g_LocalPlayer = nullptr;
@@ -26,6 +28,7 @@ StatusIcons *g_StatusIcons = nullptr;
 TeamOverrides *g_TeamOverrides = nullptr;
 
 static int doPostScreenSpaceEffectsHook;
+static int getFOVHook;
 
 int Detour_GetLocalPlayerIndex() {
 	if (g_LocalPlayer) {
@@ -61,12 +64,28 @@ void __fastcall Detour_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, void
 	Funcs::CallFunc_C_BaseEntity_SetModelPointer(instance, pModel);
 }
 
+float Hook_C_BasePlayer_GetFOV() {
+	if (g_FOVOverride) {
+		if (g_FOVOverride->IsEnabled()) {
+			C_TFPlayer *player = META_IFACEPTR(C_TFPlayer);
+
+			RETURN_META_VALUE(MRES_SUPERCEDE, g_FOVOverride->GetFOVOverride(player));
+		}
+	}
+
+	RETURN_META_VALUE(MRES_IGNORED, 0.0f);
+}
+
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 	if (!doPostScreenSpaceEffectsHook && Interfaces::GetClientMode()) {
 		doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), Hook_IClientMode_DoPostScreenSpaceEffects);
 	}
 
 	if (curStage == FRAME_RENDER_START) {
+		if (g_CameraTools) {
+			g_CameraTools->PreEntityUpdate();
+		}
+
 		if (g_LoadoutIcons) {
 			if (g_LoadoutIcons->IsEnabled()) {
 				g_LoadoutIcons->PreEntityUpdate();
@@ -94,8 +113,16 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 				continue;
 			}
 
+			if (!getFOVHook && Player(entity)) {
+				getFOVHook = Funcs::AddHook_C_TFPlayer_GetFOV((C_TFPlayer *)entity, Hook_C_BasePlayer_GetFOV);
+			}
+
 			if (g_AntiFreeze) {
 				g_AntiFreeze->ProcessEntity(entity);
+			}
+
+			if (g_CameraTools) {
+				g_CameraTools->ProcessEntity(entity);
 			}
 
 			if (g_LoadoutIcons) {
@@ -127,6 +154,10 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 
 		if (g_AntiFreeze) {
 			g_AntiFreeze->PostEntityUpdate();
+		}
+
+		if (g_CameraTools) {
+			g_CameraTools->PostEntityUpdate();
 		}
 
 		if (g_Killstreaks) {
@@ -176,10 +207,6 @@ bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup) {
 bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast) {
 	IGameEvent *newEvent = Interfaces::pGameEventManager->DuplicateEvent(event);
 	Interfaces::pGameEventManager->FreeEvent(event);
-
-	if (g_Killstreaks) {
-		g_Killstreaks->FireEvent(newEvent);
-	}
 
 	RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEvent, (newEvent, bDontBroadcast));
 }
@@ -329,7 +356,9 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	ConVar_Register();
 
 	g_AntiFreeze = new AntiFreeze();
+	g_CameraTools = new CameraTools();
 	g_CustomTextures = new CustomTextures();
+	g_FOVOverride = new FOVOverride();
 	g_Killstreaks = new Killstreaks();
 	g_LoadoutIcons = new LoadoutIcons();
 	g_LocalPlayer = new LocalPlayer();
@@ -350,7 +379,9 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 void StatusSpecPlugin::Unload(void)
 {
 	delete g_AntiFreeze;
+	delete g_CameraTools;
 	delete g_CustomTextures;
+	delete g_FOVOverride;
 	delete g_Killstreaks;
 	delete g_LoadoutIcons;
 	delete g_LocalPlayer;

@@ -17,7 +17,10 @@ SourceHook::ISourceHook *g_SHPtr = &g_SourceHook;
 int g_PLID = 0;
 
 SH_DECL_MANUALHOOK5_void(C_TFPlayer_CalcView, OFFSET_CALCVIEW, 0, 0, Vector &, QAngle &, float &, float &, float &);
+SH_DECL_MANUALHOOK0(C_TFPlayer_GetFOV, OFFSET_GETFOV, 0, 0, float);
 SH_DECL_MANUALHOOK3_void(C_TFPlayer_GetGlowEffectColor, OFFSET_GETGLOWEFFECTCOLOR, 0, 0, float *, float *, float *);
+SH_DECL_MANUALHOOK0(C_TFPlayer_GetHealth, OFFSET_GETHEALTH, 0, 0, int);
+SH_DECL_MANUALHOOK0(C_TFPlayer_GetMaxHealth, OFFSET_GETMAXHEALTH, 0, 0, int);
 SH_DECL_MANUALHOOK0(C_TFPlayer_GetObserverMode, OFFSET_GETOBSERVERMODE, 0, 0, int);
 SH_DECL_MANUALHOOK0(C_TFPlayer_GetObserverTarget, OFFSET_GETOBSERVERTARGET, 0, 0, C_BaseEntity *);
 SH_DECL_HOOK1_void(IBaseClientDLL, FrameStageNotify, SH_NOATTRIB, 0, ClientFrameStage_t);
@@ -84,6 +87,17 @@ inline SMP_t GetSMPFunc() {
 #endif
 }
 
+inline SPT_t GetSPTFunc() {
+#if defined _WIN32
+	static DWORD pointer = NULL;
+	if (!pointer)
+		pointer = FindPattern((DWORD)GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE)SETPRIMARYTARGET_SIG, SETPRIMARYTARGET_MASK);
+	return (SPT_t)(pointer);
+#else
+	return nullptr;
+#endif
+}
+
 GLPI_t Funcs::getLocalPlayerIndexOriginal = nullptr;
 SMI_t Funcs::setModelIndexOriginal = nullptr;
 SMP_t Funcs::setModelPointerOriginal = nullptr;
@@ -131,6 +145,10 @@ bool Funcs::AddDetour_C_BaseEntity_SetModelPointer(SMPH_t detour) {
 	}
 
 	return false;
+}
+
+int Funcs::AddHook_C_TFPlayer_GetFOV(C_TFPlayer *instance, float(*hook)()) {
+	return SH_ADD_MANUALHOOK(C_TFPlayer_GetFOV, instance, SH_STATIC(hook), false);
 }
 
 int Funcs::AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, void(*hook)(ClientFrameStage_t)) {
@@ -196,16 +214,32 @@ void Funcs::CallFunc_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, const 
 	}
 }
 
+void Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(C_HLTVCamera *instance, int nEntity) {
+	GetSPTFunc()(instance, nEntity);
+}
+
+float Funcs::CallFunc_C_TFPlayer_GetFOV(C_TFPlayer *instance) {
+	return SH_MCALL(instance, C_TFPlayer_GetFOV)();
+}
+
+void Funcs::CallFunc_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *instance, float *r, float *g, float *b) {
+	SH_MCALL(instance, C_TFPlayer_GetGlowEffectColor)(r, g, b);
+}
+
+int Funcs::CallFunc_C_TFPlayer_GetHealth(C_TFPlayer *instance) {
+	return SH_MCALL(instance, C_TFPlayer_GetHealth)();
+}
+
+int Funcs::CallFunc_C_TFPlayer_GetMaxHealth(C_TFPlayer *instance) {
+	return SH_MCALL(instance, C_TFPlayer_GetMaxHealth)();
+}
+
 int Funcs::CallFunc_C_TFPlayer_GetObserverMode(C_TFPlayer *instance) {
 	return SH_MCALL(instance, C_TFPlayer_GetObserverMode)();
 }
 
 C_BaseEntity *Funcs::CallFunc_C_TFPlayer_GetObserverTarget(C_TFPlayer *instance) {
 	return SH_MCALL(instance, C_TFPlayer_GetObserverTarget)();
-}
-
-void Funcs::CallFunc_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *instance, float *r, float *g, float *b) {
-	SH_MCALL(instance, C_TFPlayer_GetGlowEffectColor)(r, g, b);
 }
 
 bool Funcs::CallFunc_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, int ent_num, player_info_t *pinfo) {

@@ -12,6 +12,7 @@
 
 Killstreaks::Killstreaks() {
 	enabled = new ConVar("statusspec_killstreaks_enabled", "0", FCVAR_NONE, "enable killstreaks display", Killstreaks::ToggleEnabled);
+	total_killfeed = new ConVar("statusspec_killstreaks_total_killfeed", "0", FCVAR_NONE, "display total kills for player in killfeed instead of only kills with single weapon");
 }
 
 bool Killstreaks::IsEnabled() {
@@ -37,19 +38,18 @@ bool Killstreaks::FireEvent(IGameEvent *event) {
 				currentKillstreaks[attackerUserID][weaponID]++;
 
 				if (IsEnabled()) {
-					int attackerKillstreak = 0;
-
-					for (auto iterator = currentKillstreaks[victimUserID].begin(); iterator != currentKillstreaks[victimUserID].end(); ++iterator) {
-						attackerKillstreak += iterator->second;
-					}
-
 					event->SetInt("kill_streak_total", GetCurrentKillstreak(attackerUserID));
 
-					if (weaponID != TF_WEAPON_NONE) {
-						event->SetInt("kill_streak_wep", currentKillstreaks[attackerUserID][weaponID]);
+					if (total_killfeed->GetBool()) {
+						event->SetInt("kill_streak_wep", GetCurrentKillstreak(attackerUserID));
 					}
 					else {
-						event->SetInt("kill_streak_wep", 0);
+						if (weaponID != TF_WEAPON_NONE) {
+							event->SetInt("kill_streak_wep", currentKillstreaks[attackerUserID][weaponID]);
+						}
+						else {
+							event->SetInt("kill_streak_wep", 0);
+						}
 					}
 				
 				}

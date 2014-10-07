@@ -21,7 +21,9 @@
 #include "paint.h"
 
 #include "modules/antifreeze.h"
+#include "modules/cameratools.h"
 #include "modules/customtextures.h"
+#include "modules/fovoverride.h"
 #include "modules/killstreaks.h"
 #include "modules/loadouticons.h"
 #include "modules/localplayer.h"
@@ -35,12 +37,13 @@
 #include "modules/statusicons.h"
 #include "modules/teamoverrides.h"
 
-#define PLUGIN_DESC "StatusSpec v0.19.2"
+#define PLUGIN_DESC "StatusSpec v0.20.0"
 
 int Detour_GetLocalPlayerIndex();
 void __fastcall Detour_C_BaseEntity_SetModelIndex(C_BaseEntity *instance, void *, int index);
 void __fastcall Detour_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, void *, const model_t *pModel);
 
+float Hook_C_BasePlayer_GetFOV();
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage);
 bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup);
 bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast = false);

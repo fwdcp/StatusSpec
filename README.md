@@ -8,6 +8,19 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**0.20.0**
+* camera tools
+  * new module
+* FOV override
+  * new module
+* killstreaks
+  * added functionality to track total kills in killfeed
+  * prevent double tracking of kills in local servers
+* player outlines
+  * fix health-based team-colored outlines
+* spec GUI order
+  * added reverse ordering of players
+
 **0.19.2**
 * general
   * fixed crashes
@@ -180,6 +193,13 @@ To install, place the `StatusSpec` folder within the `custom` folder in the `tf`
 #### UI Resource Files
 An example file for the freeze info box is included under `Resource/UI/FreezeInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_antifreeze_display_reload_settings` is provided as a replacement.
 
+### Camera Tools
+*allows more options for managing the camera*
+
+#### Console Commands
+* `statusspec_cameratools_spec_player <team> <position>` - spec a certain player
+* `statusspec_cameratools_spec_pos <x> <y> <z> <yaw> <pitch>` - spec a certain camera position
+
 ### Custom Textures
 *allows textures to be swapped out*
 
@@ -203,11 +223,20 @@ Player model configuration is loaded from the `Resource/CustomTextures.res` file
 }
 ```
 
+### FOV Override
+*forces the FOV used to be consistent even if players have different FOVs*
+
+#### Console Variables
+* `statusspec_fovoverride_enabled` - enable FOV override
+* `statusspec_fovoverride_fov` - the FOV value used
+* `statusspec_fovoverride_zoomed` - enable FOV override even when sniper rifle is zoomed
+
 ### Killstreaks
 *enables killstreak tracking for all weapons, all players*
 
 #### Console Variables
 * `statusspec_killstreaks_enabled` - enable killstreaks display
+* `statusspec_killstreaks_total_killfeed` - display total kills for player in killfeed instead of only kills with single weapon
 
 ### Loadout Icons
 *displays icons to represent weapons in a player's loadout*
@@ -382,6 +411,8 @@ Player model configuration is loaded from the `Resource/PlayerModels.res` file. 
 
 #### Console Variables
 * `statusspec_specguiorder_enabled` - enable ordering of spec GUI
+* `statusspec_specguiorder_reverse_blu` - reverse order for BLU players
+* `statusspec_specguiorder_reverse_red` - reverse order for RED players
 
 ### Status Icons
 *displays icons representing special statuses of a player*
