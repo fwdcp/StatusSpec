@@ -20,9 +20,9 @@ MedigunInfo::MedigunInfo() {
 	mainPanel = vgui::INVALID_PANEL;
 
 	dynamic_meters = new ConVar("statusspec_mediguninfo_dynamic_meters", "0", FCVAR_NONE, "enable charge meters to change based on medigun");
-	enabled = new ConVar("statusspec_mediguninfo_enabled", "0", FCVAR_NONE, "enable medigun info", MedigunInfo::ToggleEnabled);
+	enabled = new ConVar("statusspec_mediguninfo_enabled", "0", FCVAR_NONE, "enable medigun info", [](IConVar *var, const char *pOldValue, float flOldValue) { g_MedigunInfo->ToggleEnabled(var, pOldValue, flOldValue); });
 	individual_charge_meters = new ConVar("statusspec_mediguninfo_individual_charge_meters", "1", FCVAR_NONE, "enable individual charge meters (for Vaccinator)");
-	reload_settings = new ConCommand("statusspec_mediguninfo_reload_settings", MedigunInfo::ReloadSettings, "reload settings for the medigun info HUD from the resource file", FCVAR_NONE);
+	reload_settings = new ConCommand("statusspec_mediguninfo_reload_settings", []() { g_MedigunInfo->ReloadSettings(); }, "reload settings for the medigun info HUD from the resource file", FCVAR_NONE);
 }
 
 bool MedigunInfo::IsEnabled() {
@@ -801,23 +801,23 @@ void MedigunInfo::InitHud() {
 }
 
 void MedigunInfo::ReloadSettings() {
-	if (g_MedigunInfo->panels.find("MedigunInfo") != g_MedigunInfo->panels.end()) {
-		((vgui::EditablePanel *) g_MedigunInfo->panels["MedigunInfo"])->LoadControlSettings("Resource/UI/MedigunInfo.res");
+	if (panels.find("MedigunInfo") != panels.end()) {
+		((vgui::EditablePanel *) panels["MedigunInfo"])->LoadControlSettings("Resource/UI/MedigunInfo.res");
 	}
 
-	g_MedigunInfo->dynamicMeterSettings = new KeyValues("MedigunInfoDynamicMeters");
-	g_MedigunInfo->dynamicMeterSettings->LoadFromFile(Interfaces::pFileSystem, "resource/ui/mediguninfodynamicmeters.res", "mod");
+	dynamicMeterSettings = new KeyValues("MedigunInfoDynamicMeters");
+	dynamicMeterSettings->LoadFromFile(Interfaces::pFileSystem, "resource/ui/mediguninfodynamicmeters.res", "mod");
 }
 
 void MedigunInfo::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
-	bool enabled = g_MedigunInfo->IsEnabled();
+	bool enabled = IsEnabled();
 
 	if (enabled) {
-		g_MedigunInfo->InitHud();
+		InitHud();
 	}
 
-	if (g_MedigunInfo->panels.find("MedigunInfo") != g_MedigunInfo->panels.end()) {
-		g_MedigunInfo->panels["MedigunInfo"]->SetEnabled(enabled);
-		g_MedigunInfo->panels["MedigunInfo"]->SetVisible(enabled);
+	if (panels.find("MedigunInfo") != panels.end()) {
+		panels["MedigunInfo"]->SetEnabled(enabled);
+		panels["MedigunInfo"]->SetVisible(enabled);
 	}
 }

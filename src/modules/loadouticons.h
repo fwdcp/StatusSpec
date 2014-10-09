@@ -92,8 +92,8 @@ private:
 	ConCommand* filter_nonactive;
 	ConVar* nonloadout;
 	ConVar *only_active;
-	static int GetCurrentFilter(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]);
-	static void SetFilter(const CCommand &command);
+	int GetCurrentFilter(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]);
+	void SetFilter(const CCommand &command);
 };
 
 extern LoadoutIcons *g_LoadoutIcons;

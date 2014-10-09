@@ -75,8 +75,8 @@ private:
 	ConVar *enabled;
 	ConVar *individual_charge_meters;
 	ConCommand* reload_settings;
-	static void ReloadSettings();
-	static void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
+	void ReloadSettings();
+	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
 
 extern MedigunInfo *g_MedigunInfo;

@@ -87,12 +87,12 @@ private:
 	ConCommand *set;
 	ConCommand *switch_teams;
 	ConVar *twitch;
-	static int GetCurrentAliasedPlayers(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]);
-	static int GetCurrentGamePlayers(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]);
-	static void GetCustomPlayerAlias(const CCommand &command);
-	static void RemoveCustomPlayerAlias(const CCommand &command);
-	static void SetCustomPlayerAlias(const CCommand &command);
-	static void SwitchTeams();
+	int GetCurrentAliasedPlayers(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]);
+	int GetCurrentGamePlayers(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]);
+	void GetCustomPlayerAlias(const CCommand &command);
+	void RemoveCustomPlayerAlias(const CCommand &command);
+	void SetCustomPlayerAlias(const CCommand &command);
+	void SwitchTeams();
 };
 
 extern PlayerAliases *g_PlayerAliases;

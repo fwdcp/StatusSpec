@@ -37,8 +37,8 @@ private:
 	ConCommand *spec_player;
 	ConVar *spec_player_alive;
 	ConCommand *spec_pos;
-	static void SpecPlayer(const CCommand &command);
-	static void SpecPosition(const CCommand &command);
+	void SpecPlayer(const CCommand &command);
+	void SpecPosition(const CCommand &command);
 };
 
 class HLTVCameraOverride : public C_HLTVCamera {

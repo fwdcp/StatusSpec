@@ -35,9 +35,9 @@ private:
 	ConVar *enabled;
 	ConCommand *load_replacement_group;
 	ConCommand *unload_replacement_group;
-	static void LoadReplacementGroup(const CCommand &command);
-	static void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
-	static void UnloadReplacementGroup(const CCommand &command);
+	void LoadReplacementGroup(const CCommand &command);
+	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
+	void UnloadReplacementGroup(const CCommand &command);
 };
 
 extern CustomTextures *g_CustomTextures;

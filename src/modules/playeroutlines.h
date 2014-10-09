@@ -51,8 +51,8 @@ private:
 	ConVar *fade_distance;
 	ConVar *health_adjusted_team_colors;
 	ConVar *team_colors;
-	static void ColorCommand(const CCommand &command);
-	static int GetCurrentColor(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]);
+	void ColorCommand(const CCommand &command);
+	int GetCurrentColor(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]);
 };
 
 extern PlayerOutlines *g_PlayerOutlines;

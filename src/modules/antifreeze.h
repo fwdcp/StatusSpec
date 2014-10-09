@@ -58,8 +58,8 @@ private:
 	ConCommand *display_reload_settings;
 	ConVar *display_threshold;
 	ConVar *enabled;
-	static void ReloadSettings();
-	static void ToggleDisplay(IConVar *var, const char *pOldValue, float flOldValue);
+	void ReloadSettings();
+	void ToggleDisplay(IConVar *var, const char *pOldValue, float flOldValue);
 };
 
 extern AntiFreeze *g_AntiFreeze;

@@ -20,9 +20,9 @@ inline bool IsInteger(const std::string &s) {
 }
 
 CameraTools::CameraTools() {
-	spec_player = new ConCommand("statusspec_cameratools_spec_player", CameraTools::SpecPlayer, "spec a certain player", FCVAR_NONE);
+	spec_player = new ConCommand("statusspec_cameratools_spec_player", [](const CCommand &command) { g_CameraTools->SpecPlayer(command); }, "spec a certain player", FCVAR_NONE);
 	spec_player_alive = new ConVar("statusspec_cameratools_spec_player_alive", "1", FCVAR_NONE, "prevent speccing dead players");
-	spec_pos = new ConCommand("statusspec_cameratools_spec_pos", CameraTools::SpecPosition, "spec a certain camera position", FCVAR_NONE);
+	spec_pos = new ConCommand("statusspec_cameratools_spec_pos", [](const CCommand &command) { g_CameraTools->SpecPosition(command); }, "spec a certain camera position", FCVAR_NONE);
 }
 
 void CameraTools::PreEntityUpdate() {
@@ -58,32 +58,32 @@ void CameraTools::SpecPlayer(const CCommand &command) {
 			if (atoi(command.Arg(1)) == TFTeam_Blue) {
 				int player = atoi(command.Arg(2));
 
-				if (player < 0 || player >= g_CameraTools->bluPlayers.size()) {
+				if (player < 0 || player >= bluPlayers.size()) {
 					Warning("Must specify a valid player position.\n");
 
 					return;
 				}
 
-				if (g_CameraTools->spec_player_alive->GetBool() && !g_CameraTools->bluPlayers[player].IsAlive()) {
+				if (spec_player_alive->GetBool() && !bluPlayers[player].IsAlive()) {
 					return;
 				}
 
-				Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(Interfaces::GetHLTVCamera(), g_CameraTools->bluPlayers[player]->entindex());
+				Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(Interfaces::GetHLTVCamera(), bluPlayers[player]->entindex());
 			}
 			else if (atoi(command.Arg(1)) == TFTeam_Red) {
 				int player = atoi(command.Arg(2));
 
-				if (player < 0 || player >= g_CameraTools->redPlayers.size()) {
+				if (player < 0 || player >= redPlayers.size()) {
 					Warning("Must specify a valid player position.\n");
 
 					return;
 				}
 
-				if (g_CameraTools->spec_player_alive->GetBool() && !g_CameraTools->redPlayers[player].IsAlive()) {
+				if (spec_player_alive->GetBool() && !redPlayers[player].IsAlive()) {
 					return;
 				}
 
-				Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(Interfaces::GetHLTVCamera(), g_CameraTools->redPlayers[player]->entindex());
+				Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(Interfaces::GetHLTVCamera(), redPlayers[player]->entindex());
 			}
 		}
 		catch (bad_pointer &e) {

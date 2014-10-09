@@ -30,8 +30,7 @@ private:
 	ConVar *player;
 	ConVar *track_spec_target;
 	ConCommand *set_current_target;
-
-	static void SetToCurrentTarget();
+	void SetToCurrentTarget();
 };
 
 extern LocalPlayer *g_LocalPlayer;

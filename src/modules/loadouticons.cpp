@@ -33,8 +33,8 @@ LoadoutIcons::LoadoutIcons() {
 	itemSchema = new ItemSchema();
 
 	enabled = new ConVar("statusspec_loadouticons_enabled", "0", FCVAR_NONE, "enable loadout icons");
-	filter_active = new ConCommand("statusspec_loadouticons_filter_active", LoadoutIcons::SetFilter, "the RGBA filter applied to the icon for an active item", FCVAR_NONE, LoadoutIcons::GetCurrentFilter);
-	filter_nonactive = new ConCommand("statusspec_loadouticons_filter_nonactive", LoadoutIcons::SetFilter, "the RGBA filter applied to the icon for a nonactive item", FCVAR_NONE, LoadoutIcons::GetCurrentFilter);
+	filter_active = new ConCommand("statusspec_loadouticons_filter_active", [](const CCommand &command) { g_LoadoutIcons->SetFilter(command); }, "the RGBA filter applied to the icon for an active item", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_LoadoutIcons->GetCurrentFilter(partial, commands); });
+	filter_nonactive = new ConCommand("statusspec_loadouticons_filter_nonactive", [](const CCommand &command) { g_LoadoutIcons->SetFilter(command); }, "the RGBA filter applied to the icon for a nonactive item", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_LoadoutIcons->GetCurrentFilter(partial, commands); });
 	nonloadout = new ConVar("statusspec_loadouticons_nonloadout", "0", FCVAR_NONE, "enable loadout icons for nonloadout items");
 	only_active = new ConVar("statusspec_loadouticons_only_active", "0", FCVAR_NONE, "only display loadout icons for the active weapon");
 }
@@ -300,12 +300,12 @@ int LoadoutIcons::GetCurrentFilter(const char *partial, char commands[COMMAND_CO
 	std::getline(ss, command, ' ');
 
 	if (stricmp(command.c_str(), "statusspec_loadouticons_filter_active") == 0) {
-		V_snprintf(commands[0], COMMAND_COMPLETION_ITEM_LENGTH, "%s %i %i %i %i", command.c_str(), g_LoadoutIcons->filter_active_color.r(), g_LoadoutIcons->filter_active_color.g(), g_LoadoutIcons->filter_active_color.b(), g_LoadoutIcons->filter_active_color.a());
+		V_snprintf(commands[0], COMMAND_COMPLETION_ITEM_LENGTH, "%s %i %i %i %i", command.c_str(), filter_active_color.r(), filter_active_color.g(), filter_active_color.b(), filter_active_color.a());
 		
 		return 1;
 	}
 	else if (stricmp(command.c_str(), "statusspec_loadouticons_filter_nonactive") == 0) {
-		V_snprintf(commands[0], COMMAND_COMPLETION_ITEM_LENGTH, "%s %i %i %i %i", command.c_str(), g_LoadoutIcons->filter_nonactive_color.r(), g_LoadoutIcons->filter_nonactive_color.g(), g_LoadoutIcons->filter_nonactive_color.b(), g_LoadoutIcons->filter_nonactive_color.a());
+		V_snprintf(commands[0], COMMAND_COMPLETION_ITEM_LENGTH, "%s %i %i %i %i", command.c_str(), filter_nonactive_color.r(), filter_nonactive_color.g(), filter_nonactive_color.b(), filter_nonactive_color.a());
 
 		return 1;
 	}
@@ -317,11 +317,11 @@ int LoadoutIcons::GetCurrentFilter(const char *partial, char commands[COMMAND_CO
 void LoadoutIcons::SetFilter(const CCommand &command) {
 	if (command.ArgC() == 0) {
 		if (stricmp(command.Arg(0), "statusspec_loadouticons_filter_active")) {
-			Msg("The current active loadout item icon filter is rgba(%i, %i, %i, %i).\n", g_LoadoutIcons->filter_active_color.r(), g_LoadoutIcons->filter_active_color.g(), g_LoadoutIcons->filter_active_color.b(), g_LoadoutIcons->filter_active_color.a());
+			Msg("The current active loadout item icon filter is rgba(%i, %i, %i, %i).\n", filter_active_color.r(), filter_active_color.g(), filter_active_color.b(), filter_active_color.a());
 			return;
 		}
 		else if (stricmp(command.Arg(0), "statusspec_loadouticons_filter_nonactive")) {
-			Msg("The current nonactive loadout item icon filter is rgba(%i, %i, %i, %i).\n", g_LoadoutIcons->filter_nonactive_color.r(), g_LoadoutIcons->filter_nonactive_color.g(), g_LoadoutIcons->filter_nonactive_color.b(), g_LoadoutIcons->filter_nonactive_color.a());
+			Msg("The current nonactive loadout item icon filter is rgba(%i, %i, %i, %i).\n", filter_nonactive_color.r(), filter_nonactive_color.g(), filter_nonactive_color.b(), filter_nonactive_color.a());
 			return;
 		}
 	}
@@ -337,11 +337,11 @@ void LoadoutIcons::SetFilter(const CCommand &command) {
 	int alpha = ColorRangeRestrict(std::stoi(command.Arg(4)));
 
 	if (stricmp(command.Arg(0), "statusspec_loadouticons_filter_active")) {
-		g_LoadoutIcons->filter_active_color.SetColor(red, green, blue, alpha);
+		filter_active_color.SetColor(red, green, blue, alpha);
 		Msg("Set active loadout item icon filter to rgba(%i, %i, %i, %i).\n", red, green, blue, alpha);
 	}
 	else if (stricmp(command.Arg(0), "statusspec_loadouticons_filter_nonactive")) {
-		g_LoadoutIcons->filter_nonactive_color.SetColor(red, green, blue, alpha);
+		filter_nonactive_color.SetColor(red, green, blue, alpha);
 		Msg("Set nonactive loadout item icon filter to rgba(%i, %i, %i, %i).\n", red, green, blue, alpha);
 	}
 	else {

@@ -17,8 +17,8 @@ AntiFreeze::AntiFreeze() {
 	specguiPanel = vgui::INVALID_PANEL;
 	topPanel = vgui::INVALID_PANEL;
 
-	display = new ConVar("statusspec_antifreeze_display", "0", FCVAR_NONE, "enables display of an info panel when a freeze is detected", AntiFreeze::ToggleDisplay);
-	display_reload_settings = new ConCommand("statusspec_antifreeze_display_reload_settings", AntiFreeze::ReloadSettings, "reload settings for the freeze info panel from the resource file", FCVAR_NONE);
+	display = new ConVar("statusspec_antifreeze_display", "0", FCVAR_NONE, "enables display of an info panel when a freeze is detected", [](IConVar *var, const char *pOldValue, float flOldValue) { g_AntiFreeze->ToggleDisplay(var, pOldValue, flOldValue); });
+	display_reload_settings = new ConCommand("statusspec_antifreeze_display_reload_settings", []() { g_AntiFreeze->ReloadSettings(); }, "reload settings for the freeze info panel from the resource file", FCVAR_NONE);
 	display_threshold = new ConVar("statusspec_antifreeze_display_threshold", "1", FCVAR_NONE, "the time of a freeze (in seconds) before the info panel is displayed");
 	enabled = new ConVar("statusspec_antifreeze_enabled", "0", FCVAR_NONE, "enable antifreeze (forces the spectator GUI to refresh)");
 }
@@ -107,20 +107,20 @@ void AntiFreeze::InitHud() {
 }
 
 void AntiFreeze::ReloadSettings() {
-	if (g_AntiFreeze->freezeInfoPanel) {
-		g_AntiFreeze->freezeInfoPanel->LoadControlSettings("Resource/UI/FreezeInfo.res");
+	if (freezeInfoPanel) {
+		freezeInfoPanel->LoadControlSettings("Resource/UI/FreezeInfo.res");
 	}
 }
 
 void AntiFreeze::ToggleDisplay(IConVar *var, const char *pOldValue, float flOldValue) {
-	bool enabled = g_AntiFreeze->display->GetBool();
+	bool enabled = display->GetBool();
 
 	if (enabled) {
-		g_AntiFreeze->InitHud();
+		InitHud();
 	}
 
-	if (g_AntiFreeze->freezeInfoPanel) {
-		g_AntiFreeze->freezeInfoPanel->SetEnabled(enabled);
-		g_AntiFreeze->freezeInfoPanel->SetVisible(enabled);
+	if (freezeInfoPanel) {
+		freezeInfoPanel->SetEnabled(enabled);
+		freezeInfoPanel->SetVisible(enabled);
 	}
 }

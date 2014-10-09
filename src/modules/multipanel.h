@@ -32,8 +32,8 @@ private:
 
 	ConVar *console;
 	ConVar *scoreboard;
-	static void ToggleConsole(IConVar *var, const char *pOldValue, float flOldValue);
-	static void ToggleScoreboard(IConVar *var, const char *pOldValue, float flOldValue);
+	void ToggleConsole(IConVar *var, const char *pOldValue, float flOldValue);
+	void ToggleScoreboard(IConVar *var, const char *pOldValue, float flOldValue);
 };
 
 extern MultiPanel *g_MultiPanel;

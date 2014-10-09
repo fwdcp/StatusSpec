@@ -32,11 +32,12 @@ public:
 	void PostEntityUpdate();
 private:
 	std::map<int, std::map<int, int>> currentKillstreaks;
+
 	int GetCurrentKillstreak(int userid);
 
 	ConVar *enabled;
 	ConVar *total_killfeed;
-	static void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
+	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
 
 extern Killstreaks *g_Killstreaks;

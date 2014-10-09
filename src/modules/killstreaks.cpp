@@ -11,7 +11,7 @@
 #include "killstreaks.h"
 
 Killstreaks::Killstreaks() {
-	enabled = new ConVar("statusspec_killstreaks_enabled", "0", FCVAR_NONE, "enable killstreaks display", Killstreaks::ToggleEnabled);
+	enabled = new ConVar("statusspec_killstreaks_enabled", "0", FCVAR_NONE, "enable killstreaks display", [](IConVar *var, const char *pOldValue, float flOldValue) { g_Killstreaks->ToggleEnabled(var, pOldValue, flOldValue); });
 	total_killfeed = new ConVar("statusspec_killstreaks_total_killfeed", "0", FCVAR_NONE, "display total kills for player in killfeed instead of only kills with single weapon");
 }
 
@@ -162,7 +162,7 @@ int Killstreaks::GetCurrentKillstreak(int userid) {
 }
 
 void Killstreaks::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
-	if (!g_Killstreaks->IsEnabled()) {
+	if (!IsEnabled()) {
 		for (int i = 0; i <= MAX_PLAYERS; i++) {
 			try {
 				Player player = i;

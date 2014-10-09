@@ -14,8 +14,8 @@ MultiPanel::MultiPanel() {
 	consoleDialog = nullptr;
 	scoreboardPanel = vgui::INVALID_PANEL;
 
-	console = new ConVar("statusspec_multipanel_console", "0", FCVAR_NONE, "displays a console in the HUD", MultiPanel::ToggleConsole);
-	scoreboard = new ConVar("statusspec_multipanel_scoreboard", "0", FCVAR_NONE, "displays the scoreboard", MultiPanel::ToggleScoreboard);
+	console = new ConVar("statusspec_multipanel_console", "0", FCVAR_NONE, "displays a console in the HUD", [](IConVar *var, const char *pOldValue, float flOldValue) { g_MultiPanel->ToggleConsole(var, pOldValue, flOldValue); });
+	scoreboard = new ConVar("statusspec_multipanel_scoreboard", "0", FCVAR_NONE, "displays the scoreboard", [](IConVar *var, const char *pOldValue, float flOldValue) { g_MultiPanel->ToggleScoreboard(var, pOldValue, flOldValue); });
 }
 
 void MultiPanel::InitHud() {
@@ -48,28 +48,28 @@ void MultiPanel::InitHud() {
 }
 
 void MultiPanel::ToggleConsole(IConVar *var, const char *pOldValue, float flOldValue) {
-	bool enabled = g_MultiPanel->console->GetBool();
+	bool enabled = console->GetBool();
 
-	if (!g_MultiPanel->consoleDialog) {
-		g_MultiPanel->InitHud();
+	if (!consoleDialog) {
+		InitHud();
 	}
 
-	if (g_MultiPanel->consoleDialog) {
+	if (consoleDialog) {
 		if (enabled) {
-			g_MultiPanel->consoleDialog->Activate();
+			consoleDialog->Activate();
 		}
 		else {
-			g_MultiPanel->consoleDialog->Hide();
+			consoleDialog->Hide();
 		}
 	}
 }
 
 void MultiPanel::ToggleScoreboard(IConVar *var, const char *pOldValue, float flOldValue) {
-	if (g_MultiPanel->scoreboardPanel == vgui::INVALID_PANEL) {
-		g_MultiPanel->InitHud();
+	if (scoreboardPanel == vgui::INVALID_PANEL) {
+		InitHud();
 	}
 
-	if (g_MultiPanel->scoreboardPanel != vgui::INVALID_PANEL) {
+	if (scoreboardPanel != vgui::INVALID_PANEL) {
 		IClientMode *clientMode = Interfaces::GetClientMode();
 
 		if (clientMode) {
@@ -81,6 +81,6 @@ void MultiPanel::ToggleScoreboard(IConVar *var, const char *pOldValue, float flO
 			}
 		}
 
-		g_pVGuiPanel->SetVisible(g_pVGui->HandleToPanel(g_MultiPanel->scoreboardPanel), g_MultiPanel->scoreboard->GetBool());
+		g_pVGuiPanel->SetVisible(g_pVGui->HandleToPanel(scoreboardPanel), scoreboard->GetBool());
 	}
 }

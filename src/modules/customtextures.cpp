@@ -14,9 +14,9 @@ CustomTextures::CustomTextures() {
 	textureConfig = new KeyValues("textures");
 	textureConfig->LoadFromFile(Interfaces::pFileSystem, "resource/customtextures.res", "mod");
 
-	enabled = new ConVar("statusspec_customtextures_enabled", "0", FCVAR_NONE, "enable custom materials", CustomTextures::ToggleEnabled);
-	load_replacement_group = new ConCommand("statusspec_customtextures_load_replacement_group", CustomTextures::LoadReplacementGroup, "load a texture replacement group", FCVAR_NONE);
-	unload_replacement_group = new ConCommand("statusspec_customtextures_unload_replacement_group", CustomTextures::UnloadReplacementGroup, "unload a texture replacement group", FCVAR_NONE);
+	enabled = new ConVar("statusspec_customtextures_enabled", "0", FCVAR_NONE, "enable custom materials", [](IConVar *var, const char *pOldValue, float flOldValue) { g_CustomTextures->ToggleEnabled(var, pOldValue, flOldValue); });
+	load_replacement_group = new ConCommand("statusspec_customtextures_load_replacement_group", [](const CCommand &command) { g_CustomTextures->LoadReplacementGroup(command); }, "load a texture replacement group", FCVAR_NONE);
+	unload_replacement_group = new ConCommand("statusspec_customtextures_unload_replacement_group", [](const CCommand &command) { g_CustomTextures->UnloadReplacementGroup(command); }, "unload a texture replacement group", FCVAR_NONE);
 }
 
 bool CustomTextures::IsEnabled() {
@@ -31,24 +31,24 @@ void CustomTextures::LoadReplacementGroup(const CCommand &command) {
 
 	const char *group = command.Arg(1);
 
-	KeyValues *replacementsConfig = g_CustomTextures->textureConfig->FindKey(group);
+	KeyValues *replacementsConfig = textureConfig->FindKey(group);
 
 	if (replacementsConfig) {
 		FOR_EACH_VALUE(replacementsConfig, textureReplacement) {
 			std::string original = textureReplacement->GetName();
 
-			if (g_CustomTextures->textureReplacements.find(original) != g_CustomTextures->textureReplacements.end()) {
-				if (g_CustomTextures->IsEnabled()) {
+			if (textureReplacements.find(original) != textureReplacements.end()) {
+				if (IsEnabled()) {
 					g_pMaterialSystem->RemoveTextureAlias(original.c_str());
 				}
 
-				g_CustomTextures->textureReplacements.erase(original);
+				textureReplacements.erase(original);
 			}
 				
-			g_CustomTextures->textureReplacements[original].group = group;
-			g_CustomTextures->textureReplacements[original].replacement = textureReplacement->GetString();
+			textureReplacements[original].group = group;
+			textureReplacements[original].replacement = textureReplacement->GetString();
 
-			if (g_CustomTextures->IsEnabled()) {
+			if (IsEnabled()) {
 				g_pMaterialSystem->AddTextureAlias(textureReplacement->GetName(), textureReplacement->GetString());
 			}
 		}
@@ -59,13 +59,13 @@ void CustomTextures::LoadReplacementGroup(const CCommand &command) {
 }
 
 void CustomTextures::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
-	if (g_CustomTextures->IsEnabled()) {
-		for (auto iterator = g_CustomTextures->textureReplacements.begin(); iterator != g_CustomTextures->textureReplacements.end(); ++iterator) {
+	if (IsEnabled()) {
+		for (auto iterator = textureReplacements.begin(); iterator != textureReplacements.end(); ++iterator) {
 			g_pMaterialSystem->AddTextureAlias(iterator->first.c_str(), iterator->second.replacement.c_str());
 		}
 	}
 	else {
-		for (auto iterator = g_CustomTextures->textureReplacements.begin(); iterator != g_CustomTextures->textureReplacements.end(); ++iterator) {
+		for (auto iterator = textureReplacements.begin(); iterator != textureReplacements.end(); ++iterator) {
 			g_pMaterialSystem->RemoveTextureAlias(iterator->first.c_str());
 		}
 	}
@@ -79,18 +79,18 @@ void CustomTextures::UnloadReplacementGroup(const CCommand &command) {
 
 	const char *group = command.Arg(1);
 
-	KeyValues *replacementsConfig = g_CustomTextures->textureConfig->FindKey(group);
+	KeyValues *replacementsConfig = textureConfig->FindKey(group);
 
 	if (replacementsConfig) {
-		auto iterator = g_CustomTextures->textureReplacements.begin();
+		auto iterator = textureReplacements.begin();
 
-		while (iterator != g_CustomTextures->textureReplacements.end()) {
+		while (iterator != textureReplacements.end()) {
 			if (iterator->second.group.compare(group) == 0) {
-				if (g_CustomTextures->IsEnabled()) {
+				if (IsEnabled()) {
 					g_pMaterialSystem->RemoveTextureAlias(iterator->first.c_str());
 				}
 
-				g_CustomTextures->textureReplacements.erase(iterator++);
+				textureReplacements.erase(iterator++);
 			}
 			else {
 				++iterator;
