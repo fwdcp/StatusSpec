@@ -86,16 +86,15 @@ public:
 	static bool AddDetour_C_BaseEntity_SetModelIndex(SMIH_t detour);
 	static bool AddDetour_C_BaseEntity_SetModelPointer(SMPH_t detour);
 
-	static int AddHook_C_TFPlayer_GetFOV(C_TFPlayer *instance, float(*hook)());
-	static int AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, void(*hook)(ClientFrameStage_t));
-	static int AddHook_IClientMode_DoPostScreenSpaceEffects(IClientMode *instance, bool(*hook)(const CViewSetup *));
-	static int AddHook_IGameEventManager2_FireEvent(IGameEventManager2 *instance, bool(*hook)(IGameEvent *, bool));
-	static int AddHook_IGameEventManager2_FireEventClientSide(IGameEventManager2 *instance, bool(*hook)(IGameEvent *));
-	static int AddHook_IPanel_PaintTraverse_Pre(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, bool, bool));
-	static int AddHook_IPanel_PaintTraverse_Post(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, bool, bool));
-	static int AddHook_IPanel_SendMessage(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, KeyValues *, vgui::VPANEL));
-	static int AddHook_IPanel_SetPos(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, int, int));
-	static int AddHook_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, bool(*hook)(int, player_info_t *));
+	static int AddHook_C_TFPlayer_GetFOV(C_TFPlayer *instance, fastdelegate::FastDelegate0<float> hook, bool post);
+	static int AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, fastdelegate::FastDelegate1<ClientFrameStage_t> hook, bool post);
+	static int AddHook_IClientMode_DoPostScreenSpaceEffects(IClientMode *instance, fastdelegate::FastDelegate1<const CViewSetup *, bool> hook, bool post);
+	static int AddHook_IGameEventManager2_FireEvent(IGameEventManager2 *instance, fastdelegate::FastDelegate2<IGameEvent *, bool, bool> hook, bool post);
+	static int AddHook_IGameEventManager2_FireEventClientSide(IGameEventManager2 *instance, fastdelegate::FastDelegate1<IGameEvent *, bool> hook, bool post);
+	static int AddHook_IPanel_PaintTraverse(vgui::IPanel *instance, fastdelegate::FastDelegate3<vgui::VPANEL, bool, bool> hook, bool post);
+	static int AddHook_IPanel_SendMessage(vgui::IPanel *instance, fastdelegate::FastDelegate3<vgui::VPANEL, KeyValues *, vgui::VPANEL> hook, bool post);
+	static int AddHook_IPanel_SetPos(vgui::IPanel *instance, fastdelegate::FastDelegate3<vgui::VPANEL, int, int> hook, bool post);
+	static int AddHook_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, fastdelegate::FastDelegate2<int, player_info_t *, bool> hook, bool post);
 
 	static int CallFunc_GetLocalPlayerIndex();
 	static void CallFunc_C_BaseEntity_SetModelIndex(C_BaseEntity *instance, int index);

@@ -78,7 +78,7 @@ float Hook_C_BasePlayer_GetFOV() {
 
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 	if (!doPostScreenSpaceEffectsHook && Interfaces::GetClientMode()) {
-		doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), Hook_IClientMode_DoPostScreenSpaceEffects);
+		doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), SH_STATIC(Hook_IClientMode_DoPostScreenSpaceEffects), false);
 	}
 
 	if (curStage == FRAME_RENDER_START) {
@@ -114,7 +114,7 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 			}
 
 			if (!getFOVHook && Player(entity)) {
-				getFOVHook = Funcs::AddHook_C_TFPlayer_GetFOV((C_TFPlayer *)entity, Hook_C_BasePlayer_GetFOV);
+				getFOVHook = Funcs::AddHook_C_TFPlayer_GetFOV((C_TFPlayer *)entity, SH_STATIC(Hook_C_BasePlayer_GetFOV), false);
 			}
 
 			if (g_AntiFreeze) {
@@ -344,14 +344,14 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	Funcs::AddDetour_C_BaseEntity_SetModelIndex(Detour_C_BaseEntity_SetModelIndex);
 	Funcs::AddDetour_C_BaseEntity_SetModelPointer(Detour_C_BaseEntity_SetModelPointer);
 	
-	Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, Hook_IBaseClientDLL_FrameStageNotify);
-	Funcs::AddHook_IGameEventManager2_FireEvent(Interfaces::pGameEventManager, Hook_IGameEventManager2_FireEvent);
-	Funcs::AddHook_IGameEventManager2_FireEventClientSide(Interfaces::pGameEventManager, Hook_IGameEventManager2_FireEventClientSide);
-	Funcs::AddHook_IPanel_PaintTraverse_Pre(g_pVGuiPanel, Hook_IPanel_PaintTraverse_Pre);
-	Funcs::AddHook_IPanel_PaintTraverse_Post(g_pVGuiPanel, Hook_IPanel_PaintTraverse_Post);
-	Funcs::AddHook_IPanel_SendMessage(g_pVGuiPanel, Hook_IPanel_SendMessage);
-	Funcs::AddHook_IPanel_SetPos(g_pVGuiPanel, Hook_IPanel_SetPos);
-	Funcs::AddHook_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, Hook_IVEngineClient_GetPlayerInfo);
+	Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, SH_STATIC(Hook_IBaseClientDLL_FrameStageNotify), false);
+	Funcs::AddHook_IGameEventManager2_FireEvent(Interfaces::pGameEventManager, SH_STATIC(Hook_IGameEventManager2_FireEvent), false);
+	Funcs::AddHook_IGameEventManager2_FireEventClientSide(Interfaces::pGameEventManager, SH_STATIC(Hook_IGameEventManager2_FireEventClientSide), false);
+	Funcs::AddHook_IPanel_PaintTraverse(g_pVGuiPanel, SH_STATIC(Hook_IPanel_PaintTraverse_Pre), false);
+	Funcs::AddHook_IPanel_PaintTraverse(g_pVGuiPanel, SH_STATIC(Hook_IPanel_PaintTraverse_Post), true);
+	Funcs::AddHook_IPanel_SendMessage(g_pVGuiPanel, SH_STATIC(Hook_IPanel_SendMessage), false);
+	Funcs::AddHook_IPanel_SetPos(g_pVGuiPanel, SH_STATIC(Hook_IPanel_SetPos), false);
+	Funcs::AddHook_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, SH_STATIC(Hook_IVEngineClient_GetPlayerInfo), false);
 	
 	ConVar_Register();
 
