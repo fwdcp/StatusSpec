@@ -92,12 +92,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 			}
 		}
 
-		if (g_MedigunInfo) {
-			if (g_MedigunInfo->IsEnabled()) {
-				g_MedigunInfo->PreEntityUpdate();
-			}
-		}
-
 		if (g_SpecGUIOrder) {
 			if (g_SpecGUIOrder->IsEnabled()) {
 				g_SpecGUIOrder->PreEntityUpdate();
@@ -128,12 +122,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 			if (g_LoadoutIcons) {
 				if (g_LoadoutIcons->IsEnabled()) {
 					g_LoadoutIcons->ProcessEntity(entity);
-				}
-			}
-
-			if (g_MedigunInfo) {
-				if (g_MedigunInfo->IsEnabled()) {
-					g_MedigunInfo->ProcessEntity(entity);
 				}
 			}
 
@@ -230,12 +218,6 @@ void Hook_IPanel_PaintTraverse_Pre(vgui::VPANEL vguiPanel, bool forceRepaint, bo
 	if (g_AntiFreeze) {
 		if (g_AntiFreeze->IsEnabled()) {
 			g_AntiFreeze->Paint(vguiPanel);
-		}
-	}
-
-	if (g_MedigunInfo) {
-		if (g_MedigunInfo->IsEnabled()) {
-			g_MedigunInfo->Paint(vguiPanel);
 		}
 	}
 
