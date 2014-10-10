@@ -124,7 +124,7 @@ Player::operator bool() const {
 
 bool Player::IsValid() const {
 	try {
-		return playerEntity.IsValid() && playerEntity.Get() && Entities::CheckClassBaseclass(playerEntity->GetClientClass(), "DT_TFPlayer") && Interfaces::GetGameResources()->IsConnected(playerEntity->entindex());
+		return playerEntity.IsValid() && playerEntity.Get() && playerEntity->entindex() >= 1 && playerEntity->entindex() <= MAX_PLAYERS && Entities::CheckClassBaseclass(playerEntity->GetClientClass(), "DT_TFPlayer") && Interfaces::GetGameResources()->IsConnected(playerEntity->entindex());
 	}
 	catch (bad_pointer &e) {
 		Warning(e.what());
