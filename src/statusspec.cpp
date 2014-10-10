@@ -108,7 +108,7 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 			}
 
 			if (!getFOVHook && Player(entity)) {
-				getFOVHook = Funcs::AddHook_C_TFPlayer_GetFOV((C_TFPlayer *)entity, SH_STATIC(Hook_C_BasePlayer_GetFOV), false);
+				getFOVHook = Funcs::AddGlobalHook_C_TFPlayer_GetFOV((C_TFPlayer *)entity, SH_STATIC(Hook_C_BasePlayer_GetFOV), false);
 			}
 
 			if (g_CameraTools) {

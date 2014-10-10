@@ -147,7 +147,7 @@ bool Funcs::AddDetour_C_BaseEntity_SetModelPointer(SMPH_t detour) {
 	return false;
 }
 
-int Funcs::AddHook_C_TFPlayer_GetFOV(C_TFPlayer *instance, fastdelegate::FastDelegate0<float> hook, bool post) {
+int Funcs::AddGlobalHook_C_TFPlayer_GetFOV(C_TFPlayer *instance, fastdelegate::FastDelegate0<float> hook, bool post) {
 	return SH_ADD_MANUALHOOK(C_TFPlayer_GetFOV, instance, hook, post);
 }
 

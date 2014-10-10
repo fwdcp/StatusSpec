@@ -86,7 +86,7 @@ public:
 	static bool AddDetour_C_BaseEntity_SetModelIndex(SMIH_t detour);
 	static bool AddDetour_C_BaseEntity_SetModelPointer(SMPH_t detour);
 
-	static int AddHook_C_TFPlayer_GetFOV(C_TFPlayer *instance, fastdelegate::FastDelegate0<float> hook, bool post);
+	static int AddGlobalHook_C_TFPlayer_GetFOV(C_TFPlayer *instance, fastdelegate::FastDelegate0<float> hook, bool post);
 	static int AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, fastdelegate::FastDelegate1<ClientFrameStage_t> hook, bool post);
 	static int AddHook_IClientMode_DoPostScreenSpaceEffects(IClientMode *instance, fastdelegate::FastDelegate1<const CViewSetup *, bool> hook, bool post);
 	static int AddHook_IGameEventManager2_FireEvent(IGameEventManager2 *instance, fastdelegate::FastDelegate2<IGameEvent *, bool, bool> hook, bool post);
