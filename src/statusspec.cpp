@@ -262,12 +262,6 @@ void Hook_IPanel_SetPos(vgui::VPANEL vguiPanel, int x, int y) {
 }
 
 bool Hook_IVEngineClient_GetPlayerInfo(int ent_num, player_info_t *pinfo) {
-	if (g_PlayerAliases) {
-		if (g_PlayerAliases->IsEnabled()) {
-			RETURN_META_VALUE(MRES_SUPERCEDE, g_PlayerAliases->GetPlayerInfoOverride(ent_num, pinfo));
-		}
-	}
-	
 	RETURN_META_VALUE(MRES_IGNORED, false);
 }
 
