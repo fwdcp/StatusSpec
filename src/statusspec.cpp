@@ -202,14 +202,6 @@ bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event) {
 	RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEventClientSide, (newEvent));
 }
 
-void Hook_IPanel_PaintTraverse_Pre(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
-	if (Interfaces::pEngineClient->IsDrawingLoadingImage() || !Interfaces::pEngineClient->IsInGame() || !Interfaces::pEngineClient->IsConnected() || Interfaces::pEngineClient->Con_IsVisible()) {
-		RETURN_META(MRES_IGNORED);
-	}
-
-	RETURN_META(MRES_IGNORED);
-}
-
 void Hook_IPanel_PaintTraverse_Post(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
 	if (g_LoadoutIcons) {
 		if (g_LoadoutIcons->IsEnabled()) {
@@ -315,7 +307,6 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, SH_STATIC(Hook_IBaseClientDLL_FrameStageNotify), false);
 	Funcs::AddHook_IGameEventManager2_FireEvent(Interfaces::pGameEventManager, SH_STATIC(Hook_IGameEventManager2_FireEvent), false);
 	Funcs::AddHook_IGameEventManager2_FireEventClientSide(Interfaces::pGameEventManager, SH_STATIC(Hook_IGameEventManager2_FireEventClientSide), false);
-	Funcs::AddHook_IPanel_PaintTraverse(g_pVGuiPanel, SH_STATIC(Hook_IPanel_PaintTraverse_Pre), false);
 	Funcs::AddHook_IPanel_PaintTraverse(g_pVGuiPanel, SH_STATIC(Hook_IPanel_PaintTraverse_Post), true);
 	Funcs::AddHook_IPanel_SendMessage(g_pVGuiPanel, SH_STATIC(Hook_IPanel_SendMessage), false);
 	Funcs::AddHook_IPanel_SetPos(g_pVGuiPanel, SH_STATIC(Hook_IPanel_SetPos), false);

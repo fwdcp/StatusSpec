@@ -48,7 +48,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage);
 bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup);
 bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast = false);
 bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event);
-void Hook_IPanel_PaintTraverse_Pre(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce);
 void Hook_IPanel_PaintTraverse_Post(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce);
 void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel);
 void Hook_IPanel_SetPos(vgui::VPANEL vguiPanel, int x, int y);
