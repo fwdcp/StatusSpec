@@ -57,8 +57,6 @@ class MedigunInfo {
 public:
 	MedigunInfo();
 
-	bool IsEnabled();
-
 	void FrameHook(ClientFrameStage_t curStage);
 private:
 	KeyValues *dynamicMeterSettings;

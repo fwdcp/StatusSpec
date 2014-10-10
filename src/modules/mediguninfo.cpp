@@ -25,10 +25,6 @@ MedigunInfo::MedigunInfo() {
 	reload_settings = new ConCommand("statusspec_mediguninfo_reload_settings", []() { g_MedigunInfo->ReloadSettings(); }, "reload settings for the medigun info HUD from the resource file", FCVAR_NONE);
 }
 
-bool MedigunInfo::IsEnabled() {
-	return enabled->GetBool();
-}
-
 void MedigunInfo::FrameHook(ClientFrameStage_t curStage) {
 	if (curStage == FRAME_NET_UPDATE_END) {
 		medigunInfo.clear();
@@ -811,7 +807,7 @@ void MedigunInfo::ReloadSettings() {
 }
 
 void MedigunInfo::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
-	if (IsEnabled()) {
+	if (enabled->GetBool()) {
 		InitHud();
 
 		if (!frameHook) {
