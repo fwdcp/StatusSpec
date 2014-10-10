@@ -59,6 +59,8 @@ void AntiFreeze::FrameHook(ClientFrameStage_t curStage) {
 			}
 		}
 	}
+
+	RETURN_META(MRES_IGNORED);
 }
 
 void AntiFreeze::GetSpecGUI() {

@@ -108,6 +108,8 @@ void MedigunInfo::FrameHook(ClientFrameStage_t curStage) {
 
 		Paint();
 	}
+
+	RETURN_META(MRES_IGNORED);
 }
 
 void MedigunInfo::InitHud() {
