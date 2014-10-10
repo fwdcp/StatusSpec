@@ -111,10 +111,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 				getFOVHook = Funcs::AddHook_C_TFPlayer_GetFOV((C_TFPlayer *)entity, SH_STATIC(Hook_C_BasePlayer_GetFOV), false);
 			}
 
-			if (g_AntiFreeze) {
-				g_AntiFreeze->ProcessEntity(entity);
-			}
-
 			if (g_CameraTools) {
 				g_CameraTools->ProcessEntity(entity);
 			}
@@ -138,10 +134,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 					g_SpecGUIOrder->ProcessEntity(entity);
 				}
 			}
-		}
-
-		if (g_AntiFreeze) {
-			g_AntiFreeze->PostEntityUpdate();
 		}
 
 		if (g_CameraTools) {
@@ -213,12 +205,6 @@ bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event) {
 void Hook_IPanel_PaintTraverse_Pre(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
 	if (Interfaces::pEngineClient->IsDrawingLoadingImage() || !Interfaces::pEngineClient->IsInGame() || !Interfaces::pEngineClient->IsConnected() || Interfaces::pEngineClient->Con_IsVisible()) {
 		RETURN_META(MRES_IGNORED);
-	}
-
-	if (g_AntiFreeze) {
-		if (g_AntiFreeze->IsEnabled()) {
-			g_AntiFreeze->Paint(vguiPanel);
-		}
 	}
 
 	RETURN_META(MRES_IGNORED);
