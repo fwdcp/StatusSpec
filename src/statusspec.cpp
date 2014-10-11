@@ -209,10 +209,6 @@ void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VP
 	RETURN_META(MRES_IGNORED);
 }
 
-void Hook_IPanel_SetPos(vgui::VPANEL vguiPanel, int x, int y) {
-	RETURN_META(MRES_IGNORED);
-}
-
 // The plugin is a static singleton that is exported as an interface
 StatusSpecPlugin g_StatusSpecPlugin;
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(StatusSpecPlugin, IServerPluginCallbacks, INTERFACEVERSION_ISERVERPLUGINCALLBACKS, g_StatusSpecPlugin);
@@ -251,7 +247,6 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	Funcs::AddHook_IGameEventManager2_FireEventClientSide(Interfaces::pGameEventManager, SH_STATIC(Hook_IGameEventManager2_FireEventClientSide), false);
 	Funcs::AddHook_IPanel_PaintTraverse(g_pVGuiPanel, SH_STATIC(Hook_IPanel_PaintTraverse_Post), true);
 	Funcs::AddHook_IPanel_SendMessage(g_pVGuiPanel, SH_STATIC(Hook_IPanel_SendMessage), false);
-	Funcs::AddHook_IPanel_SetPos(g_pVGuiPanel, SH_STATIC(Hook_IPanel_SetPos), false);
 	
 	ConVar_Register();
 
