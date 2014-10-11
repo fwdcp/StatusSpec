@@ -26,14 +26,18 @@ AntiFreeze::AntiFreeze() {
 
 void AntiFreeze::FrameHook(ClientFrameStage_t curStage) {
 	if (curStage == FRAME_NET_UPDATE_END) {
-		lastEntityUpdate = Plat_FloatTime();
+		if (display->GetBool()) {
+			lastEntityUpdate = Plat_FloatTime();
+		}
 
-		GetSpecGUI();
+		if (enabled->GetBool()) {
+			GetSpecGUI();
 
-		if (enabled->GetBool() && specguiPanel != vgui::INVALID_PANEL) {
-			vgui::VPANEL specguiVPanel = g_pVGui->HandleToPanel(specguiPanel);
+			if (specguiPanel != vgui::INVALID_PANEL) {
+				vgui::VPANEL specguiVPanel = g_pVGui->HandleToPanel(specguiPanel);
 
-			g_pVGuiPanel->SendMessage(specguiVPanel, performLayoutCommand, specguiVPanel);
+				g_pVGuiPanel->SendMessage(specguiVPanel, performLayoutCommand, specguiVPanel);
+			}
 		}
 	}
 	else if (curStage == FRAME_START) {
