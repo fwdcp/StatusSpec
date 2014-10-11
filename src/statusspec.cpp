@@ -64,10 +64,6 @@ void __fastcall Detour_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, void
 	Funcs::CallFunc_C_BaseEntity_SetModelPointer(instance, pModel);
 }
 
-float Hook_C_BasePlayer_GetFOV() {
-	RETURN_META_VALUE(MRES_IGNORED, 0.0f);
-}
-
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 	if (!doPostScreenSpaceEffectsHook && Interfaces::GetClientMode()) {
 		doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), SH_STATIC(Hook_IClientMode_DoPostScreenSpaceEffects), false);
@@ -97,10 +93,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 		
 			if (!entity) {
 				continue;
-			}
-
-			if (!getFOVHook && Player(entity)) {
-				getFOVHook = Funcs::AddGlobalHook_C_TFPlayer_GetFOV((C_TFPlayer *)entity, SH_STATIC(Hook_C_BasePlayer_GetFOV), false);
 			}
 
 			if (g_CameraTools) {
