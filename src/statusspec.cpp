@@ -65,14 +65,6 @@ void __fastcall Detour_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, void
 }
 
 float Hook_C_BasePlayer_GetFOV() {
-	if (g_FOVOverride) {
-		if (g_FOVOverride->IsEnabled()) {
-			C_TFPlayer *player = META_IFACEPTR(C_TFPlayer);
-
-			RETURN_META_VALUE(MRES_SUPERCEDE, g_FOVOverride->GetFOVOverride(player));
-		}
-	}
-
 	RETURN_META_VALUE(MRES_IGNORED, 0.0f);
 }
 
