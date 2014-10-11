@@ -80,12 +80,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 			}
 		}
 
-		if (g_SpecGUIOrder) {
-			if (g_SpecGUIOrder->IsEnabled()) {
-				g_SpecGUIOrder->PreEntityUpdate();
-			}
-		}
-
 		int maxEntity = Interfaces::pClientEntityList->GetHighestEntityIndex();
 
 		for (int i = 0; i < maxEntity; i++) {
@@ -112,12 +106,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 			if (g_ProjectileOutlines) {
 				g_ProjectileOutlines->ProcessEntity(entity);
 			}
-
-			if (g_SpecGUIOrder) {
-				if (g_SpecGUIOrder->IsEnabled()) {
-					g_SpecGUIOrder->ProcessEntity(entity);
-				}
-			}
 		}
 
 		if (g_CameraTools) {
@@ -137,12 +125,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 		if (g_LocalPlayer) {
 			if (g_LocalPlayer->IsEnabled()) {
 				g_LocalPlayer->PostEntityUpdate();
-			}
-		}
-
-		if (g_SpecGUIOrder) {
-			if (g_SpecGUIOrder->IsEnabled()) {
-				g_SpecGUIOrder->PostEntityUpdate();
 			}
 		}
 	}
@@ -211,12 +193,6 @@ void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VP
 			g_LoadoutIcons->InterceptMessage(vguiPanel, params, ifromPanel);
 		}
 	}
-
-	if (g_SpecGUIOrder) {
-		if (g_SpecGUIOrder->IsEnabled()) {
-			g_SpecGUIOrder->InterceptMessage(vguiPanel, params, ifromPanel);
-		}
-	}
 	
 	if (g_StatusIcons) {
 		if (g_StatusIcons->IsEnabled()) {
@@ -234,14 +210,6 @@ void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VP
 }
 
 void Hook_IPanel_SetPos(vgui::VPANEL vguiPanel, int x, int y) {
-	if (g_SpecGUIOrder) {
-		if (g_SpecGUIOrder->IsEnabled()) {
-			if (g_SpecGUIOrder->SetPosOverride(vguiPanel, x, y)) {
-				RETURN_META_NEWPARAMS(MRES_HANDLED, &IPanel::SetPos, (vguiPanel, x, y));
-			}
-		}
-	}
-
 	RETURN_META(MRES_IGNORED);
 }
 
