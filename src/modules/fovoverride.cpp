@@ -52,7 +52,10 @@ bool FOVOverride::HookGetFOV() {
 
 		if (player) {
 			getFOVHook = Funcs::AddGlobalHook_C_TFPlayer_GetFOV((C_TFPlayer *)player.GetEntity(), SH_MEMBER(this, &FOVOverride::GetFOVOverride), false);
-			return true;
+
+			if (getFOVHook) {
+				return true;
+			}
 		}
 	}
 
