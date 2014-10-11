@@ -28,7 +28,6 @@ StatusIcons *g_StatusIcons = nullptr;
 TeamOverrides *g_TeamOverrides = nullptr;
 
 static int doPostScreenSpaceEffectsHook;
-static int getFOVHook;
 
 int Detour_GetLocalPlayerIndex() {
 	if (g_LocalPlayer) {
