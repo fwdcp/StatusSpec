@@ -51,9 +51,7 @@ void SpecGUIOrder::FrameHook(ClientFrameStage_t curStage) {
 }
 
 void SpecGUIOrder::SetPosOverride(vgui::VPANEL vguiPanel, int x, int y) {
-	std::string panelName = g_pVGuiPanel->GetName(vguiPanel);
-
-	if (panelName.substr(0, 11).compare("playerpanel") == 0) {
+	if (strcmp(g_pVGuiPanel->GetClassName(vguiPanel), "CTFPlayerPanel") == 0) {
 		vgui::EditablePanel *panel = dynamic_cast<vgui::EditablePanel *>(g_pVGuiPanel->GetPanel(vguiPanel, "ClientDLL"));
 
 		if (panel) {
