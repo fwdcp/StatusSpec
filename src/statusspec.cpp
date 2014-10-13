@@ -69,10 +69,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 	}
 
 	if (curStage == FRAME_RENDER_START) {
-		if (g_CameraTools) {
-			g_CameraTools->PreEntityUpdate();
-		}
-
 		int maxEntity = Interfaces::pClientEntityList->GetHighestEntityIndex();
 
 		for (int i = 0; i < maxEntity; i++) {
@@ -82,10 +78,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 				continue;
 			}
 
-			if (g_CameraTools) {
-				g_CameraTools->ProcessEntity(entity);
-			}
-
 			if (g_PlayerOutlines) {
 				g_PlayerOutlines->ProcessEntity(entity);
 			}
@@ -93,10 +85,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 			if (g_ProjectileOutlines) {
 				g_ProjectileOutlines->ProcessEntity(entity);
 			}
-		}
-
-		if (g_CameraTools) {
-			g_CameraTools->PostEntityUpdate();
 		}
 
 		if (g_LocalPlayer) {

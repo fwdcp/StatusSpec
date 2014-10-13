@@ -17,6 +17,8 @@
 #include <vector>
 
 #include "convar.h"
+#include "vgui/IScheme.h"
+#include "vgui_controls/EditablePanel.h"
 
 #include "../enums.h"
 #include "../funcs.h"
@@ -26,13 +28,8 @@
 class CameraTools {
 public:
 	CameraTools();
-
-	void PreEntityUpdate();
-	void ProcessEntity(IClientEntity *entity);
-	void PostEntityUpdate();
 private:
-	std::vector<Player> bluPlayers;
-	std::vector<Player> redPlayers;
+	KeyValues *specguiSettings;
 
 	ConCommand *spec_player;
 	ConVar *spec_player_alive;
