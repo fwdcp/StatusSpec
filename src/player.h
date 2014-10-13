@@ -73,6 +73,7 @@ public:
 	C_BaseEntity *GetObserverTarget() const;
 	CSteamID GetSteamID() const;
 	TFTeam GetTeam() const;
+	int GetUserID() const;
 	bool IsAlive() const;
 private:
 	CHandle<IClientEntity> playerEntity;

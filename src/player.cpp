@@ -343,6 +343,18 @@ TFTeam Player::GetTeam() const {
 	return TFTeam_Unassigned;
 }
 
+int Player::GetUserID() const {
+	if (IsValid()) {
+		player_info_t playerInfo;
+
+		if (Funcs::CallFunc_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, playerEntity->entindex(), &playerInfo)) {
+			return playerInfo.userID;
+		}
+	}
+
+	return 0;
+}
+
 bool Player::IsAlive() const {
 	try {
 		if (IsValid()) {
