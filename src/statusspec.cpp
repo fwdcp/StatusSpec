@@ -99,10 +99,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 			g_CameraTools->PostEntityUpdate();
 		}
 
-		if (g_Killstreaks) {
-			g_Killstreaks->PostEntityUpdate();
-		}
-
 		if (g_LocalPlayer) {
 			if (g_LocalPlayer->IsEnabled()) {
 				g_LocalPlayer->PostEntityUpdate();
@@ -141,10 +137,6 @@ bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast) {
 bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event) {
 	IGameEvent *newEvent = Interfaces::pGameEventManager->DuplicateEvent(event);
 	Interfaces::pGameEventManager->FreeEvent(event);
-
-	if (g_Killstreaks) {
-		g_Killstreaks->FireEvent(newEvent);
-	}
 
 	RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEventClientSide, (newEvent));
 }

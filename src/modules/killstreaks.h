@@ -24,14 +24,13 @@ class Killstreaks {
 public:
 	Killstreaks();
 
-	bool IsEnabled();
-
-	bool FireEvent(IGameEvent *event);
-
-	void ProcessEntity(IClientEntity* entity);
-	void PostEntityUpdate();
+	bool FireEventClientSideOverride(IGameEvent *event);
+	void FrameHook(ClientFrameStage_t curStage);
 private:
 	std::map<int, std::map<int, int>> currentKillstreaks;
+	int fireEventClientSideHook;
+	int frameHook;
+	EHANDLE gameResourcesEntity;
 
 	int GetCurrentKillstreak(int userid);
 
