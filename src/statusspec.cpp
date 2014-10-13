@@ -29,14 +29,6 @@ TeamOverrides *g_TeamOverrides = nullptr;
 
 static int doPostScreenSpaceEffectsHook;
 
-void __fastcall Detour_C_BaseEntity_SetModelIndex(C_BaseEntity *instance, void *, int index) {
-	Funcs::CallFunc_C_BaseEntity_SetModelIndex(instance, index);
-}
-
-void __fastcall Detour_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, void *, const model_t *pModel) {
-	Funcs::CallFunc_C_BaseEntity_SetModelPointer(instance, pModel);
-}
-
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 	if (!doPostScreenSpaceEffectsHook && Interfaces::GetClientMode()) {
 		doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), SH_STATIC(Hook_IClientMode_DoPostScreenSpaceEffects), false);
@@ -134,9 +126,6 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 		Warning("[%s] Unable to initialize hooking!", PLUGIN_DESC);
 		return false;
 	}
-
-	Funcs::AddDetour_C_BaseEntity_SetModelIndex(Detour_C_BaseEntity_SetModelIndex);
-	Funcs::AddDetour_C_BaseEntity_SetModelPointer(Detour_C_BaseEntity_SetModelPointer);
 	
 	Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, SH_STATIC(Hook_IBaseClientDLL_FrameStageNotify), false);
 	Funcs::AddHook_IPanel_PaintTraverse(g_pVGuiPanel, SH_STATIC(Hook_IPanel_PaintTraverse_Post), true);
