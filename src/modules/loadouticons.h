@@ -79,6 +79,7 @@ private:
 	std::map<Player, Loadout_t> loadoutInfo;
 	std::map<vgui::HPanel, std::map<std::string, vgui::Panel *>> loadoutIconPanels;
 
+	void DisableHUD();
 	void DisplayIcon(vgui::ImagePanel *panel, int itemDefinitionIndex, bool active);
 	void DisplayIcons(vgui::VPANEL playerPanel);
 	void HideIcon(vgui::ImagePanel *panel);

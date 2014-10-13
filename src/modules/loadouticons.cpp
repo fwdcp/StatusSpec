@@ -216,6 +216,9 @@ void LoadoutIcons::FrameHook(ClientFrameStage_t curStage) {
 									vgui::EditablePanel *loadoutIcons = dynamic_cast<vgui::EditablePanel *>(g_pVGuiPanel->GetPanel(loadoutIconsVPanel, "ClientDLL"));
 
 									if (loadoutIcons) {
+										loadoutIcons->SetEnabled(true);
+										loadoutIcons->SetVisible(true);
+
 										if (loadoutIcons->GetChildCount() == 0) {
 											InitIcons(loadoutIcons);
 										}
@@ -231,6 +234,37 @@ void LoadoutIcons::FrameHook(ClientFrameStage_t curStage) {
 
 					break;
 				}
+			}
+		}
+	}
+}
+
+void LoadoutIcons::DisableHUD() {
+	if (Interfaces::GetClientMode() && Interfaces::GetClientMode()->GetViewport()) {
+		vgui::VPANEL viewport = Interfaces::GetClientMode()->GetViewport()->GetVPanel();
+
+		for (int i = 0; i < g_pVGuiPanel->GetChildCount(viewport); i++) {
+			vgui::VPANEL specgui = g_pVGuiPanel->GetChild(viewport, i);
+
+			if (strcmp(g_pVGuiPanel->GetName(specgui), "specgui") == 0) {
+				for (int i = 0; i < g_pVGuiPanel->GetChildCount(specgui); i++) {
+					vgui::VPANEL playerPanel = g_pVGuiPanel->GetChild(specgui, i);
+
+					if (strcmp(g_pVGuiPanel->GetClassName(playerPanel), "CTFPlayerPanel") == 0) {
+						for (int i = 0; i < g_pVGuiPanel->GetChildCount(playerPanel); i++) {
+							vgui::VPANEL loadoutIconsVPanel = g_pVGuiPanel->GetChild(playerPanel, i);
+
+							if (strcmp(g_pVGuiPanel->GetName(loadoutIconsVPanel), "LoadoutIcons") == 0) {
+								g_pVGuiPanel->SetEnabled(loadoutIconsVPanel, false);
+								g_pVGuiPanel->SetVisible(loadoutIconsVPanel, false);
+
+								break;
+							}
+						}
+					}
+				}
+
+				break;
 			}
 		}
 	}
@@ -413,6 +447,8 @@ void LoadoutIcons::ToggleEnabled(IConVar *var, const char *pOldValue, float flOl
 		}
 	}
 	else {
+		DisableHUD();
+
 		if (frameHook) {
 			if (Funcs::RemoveHook(frameHook)) {
 				frameHook = 0;
