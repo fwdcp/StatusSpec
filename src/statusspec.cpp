@@ -73,12 +73,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 			g_CameraTools->PreEntityUpdate();
 		}
 
-		if (g_LoadoutIcons) {
-			if (g_LoadoutIcons->IsEnabled()) {
-				g_LoadoutIcons->PreEntityUpdate();
-			}
-		}
-
 		int maxEntity = Interfaces::pClientEntityList->GetHighestEntityIndex();
 
 		for (int i = 0; i < maxEntity; i++) {
@@ -90,12 +84,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 
 			if (g_CameraTools) {
 				g_CameraTools->ProcessEntity(entity);
-			}
-
-			if (g_LoadoutIcons) {
-				if (g_LoadoutIcons->IsEnabled()) {
-					g_LoadoutIcons->ProcessEntity(entity);
-				}
 			}
 
 			if (g_PlayerOutlines) {
@@ -113,12 +101,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 
 		if (g_Killstreaks) {
 			g_Killstreaks->PostEntityUpdate();
-		}
-
-		if (g_LoadoutIcons) {
-			if (g_LoadoutIcons->IsEnabled()) {
-				g_LoadoutIcons->PostEntityUpdate();
-			}
 		}
 
 		if (g_LocalPlayer) {
@@ -168,12 +150,6 @@ bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event) {
 }
 
 void Hook_IPanel_PaintTraverse_Post(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
-	if (g_LoadoutIcons) {
-		if (g_LoadoutIcons->IsEnabled()) {
-			g_LoadoutIcons->Paint(vguiPanel);
-		}
-	}
-
 	if (g_StatusIcons) {
 		if (g_StatusIcons->IsEnabled()) {
 			g_StatusIcons->Paint(vguiPanel);
@@ -187,12 +163,6 @@ void Hook_IPanel_PaintTraverse_Post(vgui::VPANEL vguiPanel, bool forceRepaint, b
 }
 
 void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel) {
-	if (g_LoadoutIcons) {
-		if (g_LoadoutIcons->IsEnabled()) {
-			g_LoadoutIcons->InterceptMessage(vguiPanel, params, ifromPanel);
-		}
-	}
-	
 	if (g_StatusIcons) {
 		if (g_StatusIcons->IsEnabled()) {
 			g_StatusIcons->InterceptMessage(vguiPanel, params, ifromPanel);
