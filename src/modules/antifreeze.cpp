@@ -77,6 +77,8 @@ void AntiFreeze::GetSpecGUI() {
 
 				if (strcmp(g_pVGuiPanel->GetName(panel), "specgui") == 0) {
 					specguiPanel = g_pVGui->PanelToHandle(panel);
+
+					break;
 				}
 			}
 		}

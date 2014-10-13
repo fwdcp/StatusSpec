@@ -106,6 +106,8 @@ void SpecGUIOrder::SetPosOverride(vgui::VPANEL vguiPanel, int x, int y) {
 
 							RETURN_META_NEWPARAMS(MRES_HANDLED, &IPanel::SetPos, (vguiPanel, newX, newY));
 						}
+
+						break;
 					}
 				}
 			}
