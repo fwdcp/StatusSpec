@@ -195,6 +195,8 @@ void Killstreaks::FrameHook(ClientFrameStage_t curStage) {
 				}
 			}
 		}
+
+		RETURN_META(MRES_HANDLED);
 	}
 	else if (curStage == FRAME_START) {
 		if (!Interfaces::pEngineClient->IsInGame()) {
