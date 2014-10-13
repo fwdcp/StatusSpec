@@ -169,12 +169,6 @@ void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VP
 		}
 	}
 
-	if (g_TeamOverrides) {
-		if (g_TeamOverrides->IsEnabled()) {
-			g_TeamOverrides->InterceptMessage(vguiPanel, params, ifromPanel);
-		}
-	}
-
 	RETURN_META(MRES_IGNORED);
 }
 
