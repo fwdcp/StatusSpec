@@ -29,10 +29,6 @@ TeamOverrides *g_TeamOverrides = nullptr;
 
 static int doPostScreenSpaceEffectsHook;
 
-int Detour_GetLocalPlayerIndex() {
-	return Funcs::CallFunc_GetLocalPlayerIndex();
-}
-
 void __fastcall Detour_C_BaseEntity_SetModelIndex(C_BaseEntity *instance, void *, int index) {
 	if (g_PlayerModels) {
 		if (g_PlayerModels->IsEnabled()) {
@@ -155,7 +151,6 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 		return false;
 	}
 
-	Funcs::AddDetour_GetLocalPlayerIndex(Detour_GetLocalPlayerIndex);
 	Funcs::AddDetour_C_BaseEntity_SetModelIndex(Detour_C_BaseEntity_SetModelIndex);
 	Funcs::AddDetour_C_BaseEntity_SetModelPointer(Detour_C_BaseEntity_SetModelPointer);
 	

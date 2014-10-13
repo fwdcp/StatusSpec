@@ -39,7 +39,6 @@
 
 #define PLUGIN_DESC "StatusSpec v0.20.1"
 
-int Detour_GetLocalPlayerIndex();
 void __fastcall Detour_C_BaseEntity_SetModelIndex(C_BaseEntity *instance, void *, int index);
 void __fastcall Detour_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, void *, const model_t *pModel);
 
