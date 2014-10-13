@@ -30,26 +30,10 @@ TeamOverrides *g_TeamOverrides = nullptr;
 static int doPostScreenSpaceEffectsHook;
 
 void __fastcall Detour_C_BaseEntity_SetModelIndex(C_BaseEntity *instance, void *, int index) {
-	if (g_PlayerModels) {
-		if (g_PlayerModels->IsEnabled()) {
-			const model_t *oldModel = Interfaces::pModelInfoClient->GetModel(index);
-			const model_t *newModel = g_PlayerModels->SetModelOverride(instance, oldModel);
-			index = Interfaces::pModelInfoClient->GetModelIndex(Interfaces::pModelInfoClient->GetModelName(newModel));
-		}
-	}
-
 	Funcs::CallFunc_C_BaseEntity_SetModelIndex(instance, index);
 }
 
 void __fastcall Detour_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, void *, const model_t *pModel) {
-	if (g_PlayerModels) {
-		if (g_PlayerModels->IsEnabled()) {
-			const model_t *oldModel = pModel;
-			const model_t *newModel = g_PlayerModels->SetModelOverride(instance, oldModel);
-			pModel = newModel;
-		}
-	}
-
 	Funcs::CallFunc_C_BaseEntity_SetModelPointer(instance, pModel);
 }
 
