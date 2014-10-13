@@ -30,12 +30,6 @@ TeamOverrides *g_TeamOverrides = nullptr;
 static int doPostScreenSpaceEffectsHook;
 
 int Detour_GetLocalPlayerIndex() {
-	if (g_LocalPlayer) {
-		if (g_LocalPlayer->IsEnabled()) {
-			return g_LocalPlayer->GetLocalPlayerIndexOverride();
-		}
-	}
-
 	return Funcs::CallFunc_GetLocalPlayerIndex();
 }
 
@@ -84,12 +78,6 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 
 			if (g_ProjectileOutlines) {
 				g_ProjectileOutlines->ProcessEntity(entity);
-			}
-		}
-
-		if (g_LocalPlayer) {
-			if (g_LocalPlayer->IsEnabled()) {
-				g_LocalPlayer->PostEntityUpdate();
 			}
 		}
 	}
