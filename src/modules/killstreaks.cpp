@@ -11,8 +11,12 @@
 #include "killstreaks.h"
 
 Killstreaks::Killstreaks() {
+	bluTopKillstreak = 0;
+	bluTopKillstreakPlayer = 0;
 	fireEventClientSideHook = 0;
 	frameHook = 0;
+	redTopKillstreak = 0;
+	redTopKillstreakPlayer = 0;
 
 	enabled = new ConVar("statusspec_killstreaks_enabled", "0", FCVAR_NONE, "enable killstreaks display", [](IConVar *var, const char *pOldValue, float flOldValue) { g_Killstreaks->ToggleEnabled(var, pOldValue, flOldValue); });
 	total_killfeed = new ConVar("statusspec_killstreaks_total_killfeed", "0", FCVAR_NONE, "display total kills for player in killfeed instead of only kills with single weapon");
@@ -25,6 +29,8 @@ bool Killstreaks::FireEventClientSideOverride(IGameEvent *event) {
 		if (userID != -1) {
 			currentKillstreaks.erase(userID);
 		}
+
+		RETURN_META_VALUE(MRES_HANDLED, false);
 	}
 	else if (strcmp(event->GetName(), "player_death") == 0) {
 		int victimUserID = event->GetInt("userid", -1);
@@ -47,6 +53,23 @@ bool Killstreaks::FireEventClientSideOverride(IGameEvent *event) {
 					}
 					else {
 						event->SetInt("kill_streak_wep", 0);
+					}
+				}
+
+				Player attacker = Interfaces::pEngineClient->GetPlayerForUserID(attackerUserID);
+
+				if (attacker) {
+					if (attacker.GetTeam() == TFTeam_Red) {
+						if (GetCurrentKillstreak(attackerUserID) > redTopKillstreak) {
+							redTopKillstreak = GetCurrentKillstreak(attackerUserID);
+							redTopKillstreakPlayer = attackerUserID;
+						}
+					}
+					else if (attacker.GetTeam() == TFTeam_Blue) {
+						if (GetCurrentKillstreak(attackerUserID) > bluTopKillstreak) {
+							bluTopKillstreak = GetCurrentKillstreak(attackerUserID);
+							bluTopKillstreakPlayer = attackerUserID;
+						}
 					}
 				}
 			}
@@ -74,6 +97,19 @@ bool Killstreaks::FireEventClientSideOverride(IGameEvent *event) {
 
 						if (healingTarget == Interfaces::pEngineClient->GetPlayerForUserID(attackerUserID)) {
 							currentKillstreaks[assisterUserID][TF_WEAPON_MEDIGUN]++;
+
+							if (assister.GetTeam() == TFTeam_Red) {
+								if (GetCurrentKillstreak(assisterUserID) > redTopKillstreak) {
+									redTopKillstreak = GetCurrentKillstreak(assisterUserID);
+									redTopKillstreakPlayer = assisterUserID;
+								}
+							}
+							else if (assister.GetTeam() == TFTeam_Blue) {
+								if (GetCurrentKillstreak(assisterUserID) > bluTopKillstreak) {
+									bluTopKillstreak = GetCurrentKillstreak(assisterUserID);
+									bluTopKillstreakPlayer = assisterUserID;
+								}
+							}
 						}
 					}
 				}
@@ -85,9 +121,31 @@ bool Killstreaks::FireEventClientSideOverride(IGameEvent *event) {
 		if (victimUserID != -1) {
 			event->SetInt("kill_streak_victim", GetCurrentKillstreak(victimUserID));
 		}
+
+		RETURN_META_VALUE(MRES_HANDLED, false);
+	}
+	else if (strcmp(event->GetName(), "teamplay_win_panel") == 0) {
+		if (event->GetInt("winning_team") == TFTeam_Red) {
+			event->SetInt("killstreak_player_1", Interfaces::pEngineClient->GetPlayerForUserID(redTopKillstreakPlayer));
+			event->SetInt("killstreak_player_1_count", redTopKillstreak);
+		}
+		else if (event->GetInt("winning_team") == TFTeam_Blue) {
+			event->SetInt("killstreak_player_1", Interfaces::pEngineClient->GetPlayerForUserID(bluTopKillstreakPlayer));
+			event->SetInt("killstreak_player_1_count", bluTopKillstreak);
+		}
+
+		RETURN_META_VALUE(MRES_HANDLED, false);
+	}
+	else if (strcmp(event->GetName(), "teamplay_round_start") == 0) {
+		bluTopKillstreak = 0;
+		bluTopKillstreakPlayer = 0;
+		redTopKillstreak = 0;
+		redTopKillstreakPlayer = 0;
+
+		RETURN_META_VALUE(MRES_IGNORED, false);
 	}
 
-	RETURN_META_VALUE(MRES_HANDLED, false);
+	RETURN_META_VALUE(MRES_IGNORED, false);
 }
 
 void Killstreaks::FrameHook(ClientFrameStage_t curStage) {
