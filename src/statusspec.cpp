@@ -127,20 +127,6 @@ bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup) {
 	RETURN_META_VALUE(MRES_OVERRIDE, true);
 }
 
-bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast) {
-	IGameEvent *newEvent = Interfaces::pGameEventManager->DuplicateEvent(event);
-	Interfaces::pGameEventManager->FreeEvent(event);
-
-	RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEvent, (newEvent, bDontBroadcast));
-}
-
-bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event) {
-	IGameEvent *newEvent = Interfaces::pGameEventManager->DuplicateEvent(event);
-	Interfaces::pGameEventManager->FreeEvent(event);
-
-	RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEventClientSide, (newEvent));
-}
-
 void Hook_IPanel_PaintTraverse_Post(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
 	if (g_StatusIcons) {
 		if (g_StatusIcons->IsEnabled()) {
@@ -198,8 +184,6 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	Funcs::AddDetour_C_BaseEntity_SetModelPointer(Detour_C_BaseEntity_SetModelPointer);
 	
 	Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, SH_STATIC(Hook_IBaseClientDLL_FrameStageNotify), false);
-	Funcs::AddHook_IGameEventManager2_FireEvent(Interfaces::pGameEventManager, SH_STATIC(Hook_IGameEventManager2_FireEvent), false);
-	Funcs::AddHook_IGameEventManager2_FireEventClientSide(Interfaces::pGameEventManager, SH_STATIC(Hook_IGameEventManager2_FireEventClientSide), false);
 	Funcs::AddHook_IPanel_PaintTraverse(g_pVGuiPanel, SH_STATIC(Hook_IPanel_PaintTraverse_Post), true);
 	Funcs::AddHook_IPanel_SendMessage(g_pVGuiPanel, SH_STATIC(Hook_IPanel_SendMessage), false);
 	
