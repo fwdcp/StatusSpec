@@ -27,22 +27,22 @@ SpecGUIOrder *g_SpecGUIOrder = nullptr;
 StatusIcons *g_StatusIcons = nullptr;
 TeamOverrides *g_TeamOverrides = nullptr;
 
-static int doPostScreenSpaceEffectsHook;
+static int doPostScreenSpaceEffectsHook = 0;
+static int frameHook = 0;
 
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
-	if (!doPostScreenSpaceEffectsHook && Interfaces::GetClientMode()) {
-		doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), SH_STATIC(Hook_IClientMode_DoPostScreenSpaceEffects), false);
+	if (!doPostScreenSpaceEffectsHook) {
+		try {
+			doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), SH_STATIC(Hook_IClientMode_DoPostScreenSpaceEffects), false);
+		}
+		catch (bad_pointer &e) {
+			Warning(e.what());
+		}
 	}
 
-	if (curStage == FRAME_RENDER_START) {
-		int maxEntity = Interfaces::pClientEntityList->GetHighestEntityIndex();
-
-		for (int i = 0; i < maxEntity; i++) {
-			IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
-		
-			if (!entity) {
-				continue;
-			}
+	if (doPostScreenSpaceEffectsHook) {
+		if (Funcs::RemoveHook(frameHook)) {
+			frameHook = 0;
 		}
 	}
 
@@ -106,8 +106,20 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 		Warning("[%s] Unable to initialize hooking!", PLUGIN_DESC);
 		return false;
 	}
-	
-	Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, SH_STATIC(Hook_IBaseClientDLL_FrameStageNotify), false);
+
+	if (!doPostScreenSpaceEffectsHook) {
+		try {
+			doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), SH_STATIC(Hook_IClientMode_DoPostScreenSpaceEffects), false);
+		}
+		catch (bad_pointer &e) {
+			Warning(e.what());
+		}
+
+		if (!doPostScreenSpaceEffectsHook && !frameHook) {
+			frameHook = Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, SH_STATIC(Hook_IBaseClientDLL_FrameStageNotify), true);
+		}
+	}
+
 	Funcs::AddHook_IPanel_PaintTraverse(g_pVGuiPanel, SH_STATIC(Hook_IPanel_PaintTraverse_Post), true);
 	Funcs::AddHook_IPanel_SendMessage(g_pVGuiPanel, SH_STATIC(Hook_IPanel_SendMessage), false);
 	
