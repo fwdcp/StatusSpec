@@ -33,7 +33,7 @@ LoadoutIcons::LoadoutIcons() {
 
 	enabled = new ConVar("statusspec_loadouticons_enabled", "0", FCVAR_NONE, "enable loadout icons", [](IConVar *var, const char *pOldValue, float flOldValue) { g_LoadoutIcons->ToggleEnabled(var, pOldValue, flOldValue); });
 	filter_active = new ConCommand("statusspec_loadouticons_filter_active", [](const CCommand &command) { g_LoadoutIcons->SetFilter(command); }, "the RGBA filter applied to the icon for an active item", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_LoadoutIcons->GetCurrentFilter(partial, commands); });
-	filter_inactive = new ConCommand("statusspec_loadouticons_filter_inactive", [](const CCommand &command) { g_LoadoutIcons->SetFilter(command); }, "the RGBA filter applied to the icon for a inactive item", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_LoadoutIcons->GetCurrentFilter(partial, commands); });
+	filter_inactive = new ConCommand("statusspec_loadouticons_filter_inactive", [](const CCommand &command) { g_LoadoutIcons->SetFilter(command); }, "the RGBA filter applied to the icon for an inactive item", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_LoadoutIcons->GetCurrentFilter(partial, commands); });
 	nonloadout = new ConVar("statusspec_loadouticons_nonloadout", "0", FCVAR_NONE, "enable loadout icons for nonloadout items");
 	only_active = new ConVar("statusspec_loadouticons_only_active", "0", FCVAR_NONE, "only display loadout icons for the active weapon");
 }
