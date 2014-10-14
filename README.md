@@ -267,23 +267,23 @@ The configuration file for the loadout icons is `Resource/UI/LoadoutIcons.res`. 
 	"specgui"
 	{
 		...
-	       
+		   
 		"playerpanels_kv"
 		{
 			...
 			
 			"LoadoutIcons"
-            {
-                "ControlName"   "EditablePanel"
-                "fieldName"     "LoadoutIcons"
-                "xpos"          "160"
-                "ypos"          "0"
-                "zpos"          "2"
-                "wide"          "45"
-                "tall"          "15"
-                "visible"       "1"
-                "enabled"       "1"
-            }
+			{
+				"ControlName"   "EditablePanel"
+				"fieldName"	 "LoadoutIcons"
+				"xpos"		  "160"
+				"ypos"		  "0"
+				"zpos"		  "2"
+				"wide"		  "45"
+				"tall"		  "15"
+				"visible"	   "1"
+				"enabled"	   "1"
+			}
 		}
 	}
 	
@@ -439,23 +439,23 @@ The configuration file for the status icons is `Resource/UI/StatusIcon.res`. A c
 	"specgui"
 	{
 		...
-	       
+		   
 		"playerpanels_kv"
 		{
 			...
 			
 			"StatusIcons"
-            {
-                "ControlName"   "EditablePanel"
-                "fieldName"     "StatusIcons"
-                "xpos"          "160"
-                "ypos"          "0"
-                "zpos"          "8"
-                "wide"          "45"
-                "tall"          "15"
-                "visible"       "1"
-                "enabled"       "1"
-            }
+			{
+				"ControlName"   "EditablePanel"
+				"fieldName"	 "StatusIcons"
+				"xpos"		  "160"
+				"ypos"		  "0"
+				"zpos"		  "8"
+				"wide"		  "45"
+				"tall"		  "15"
+				"visible"	   "1"
+				"enabled"	   "1"
+			}
 		}
 	}
 	
