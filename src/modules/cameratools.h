@@ -1,12 +1,12 @@
 /*
-*  cameratools.h
-*  StatusSpec project
-*
-*  Copyright (c) 2014 thesupremecommander
-*  BSD 2-Clause License
-*  http://opensource.org/licenses/BSD-2-Clause
-*
-*/
+ *  cameratools.h
+ *  StatusSpec project
+ *
+ *  Copyright (c) 2014 thesupremecommander
+ *  BSD 2-Clause License
+ *  http://opensource.org/licenses/BSD-2-Clause
+ *
+ */
 
 #pragma once
 

@@ -1,12 +1,12 @@
 /*
-*  projectileoutlines.cpp
-*  StatusSpec project
-*
-*  Copyright (c) 2014 thesupremecommander
-*  BSD 2-Clause License
-*  http://opensource.org/licenses/BSD-2-Clause
-*
-*/
+ *  projectileoutlines.cpp
+ *  StatusSpec project
+ *
+ *  Copyright (c) 2014 thesupremecommander
+ *  BSD 2-Clause License
+ *  http://opensource.org/licenses/BSD-2-Clause
+ *
+ */
 
 #include "projectileoutlines.h"
 

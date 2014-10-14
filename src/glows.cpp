@@ -1,9 +1,9 @@
 /*
-*  glows.cpp
-*  StatusSpec project
-*  Derived from the Source SDK
-*
-*/
+ *  glows.cpp
+ *  StatusSpec project
+ *  Derived from the Source SDK
+ *
+ */
 
 #define CLIENT_DLL
 

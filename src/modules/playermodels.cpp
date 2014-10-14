@@ -1,12 +1,12 @@
 /*
-*  playermodels.cpp
-*  StatusSpec project
-*
-*  Copyright (c) 2014 thesupremecommander
-*  BSD 2-Clause License
-*  http://opensource.org/licenses/BSD-2-Clause
-*
-*/
+ *  playermodels.cpp
+ *  StatusSpec project
+ *
+ *  Copyright (c) 2014 thesupremecommander
+ *  BSD 2-Clause License
+ *  http://opensource.org/licenses/BSD-2-Clause
+ *
+ */
 
 #include "playermodels.h"
 

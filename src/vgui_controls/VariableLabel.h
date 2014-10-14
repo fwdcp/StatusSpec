@@ -1,8 +1,8 @@
 /*
-*  VariableLabel.h
-*  StatusSpec project
-*
-*/
+ *  VariableLabel.h
+ *  StatusSpec project
+ *
+ */
 
 #pragma once
 
