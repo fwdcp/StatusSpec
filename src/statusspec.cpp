@@ -55,14 +55,6 @@ bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup) {
 	RETURN_META_VALUE(MRES_OVERRIDE, true);
 }
 
-void Hook_IPanel_PaintTraverse_Post(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
-	RETURN_META(MRES_IGNORED);
-}
-
-void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel) {
-	RETURN_META(MRES_IGNORED);
-}
-
 // The plugin is a static singleton that is exported as an interface
 StatusSpecPlugin g_StatusSpecPlugin;
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(StatusSpecPlugin, IServerPluginCallbacks, INTERFACEVERSION_ISERVERPLUGINCALLBACKS, g_StatusSpecPlugin);
@@ -104,9 +96,6 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 			frameHook = Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, SH_STATIC(Hook_IBaseClientDLL_FrameStageNotify), true);
 		}
 	}
-
-	Funcs::AddHook_IPanel_PaintTraverse(g_pVGuiPanel, SH_STATIC(Hook_IPanel_PaintTraverse_Post), true);
-	Funcs::AddHook_IPanel_SendMessage(g_pVGuiPanel, SH_STATIC(Hook_IPanel_SendMessage), false);
 	
 	ConVar_Register();
 
