@@ -14,7 +14,7 @@ Player::Player(int entindex) {
 	playerEntity = Interfaces::pClientEntityList->GetClientEntity(entindex);
 }
 
-Player::Player(IClientEntity* entity) {
+Player::Player(IClientEntity *entity) {
 	playerEntity = entity;
 }
 
@@ -24,7 +24,7 @@ Player& Player::operator=(int entindex) {
 	return *this;
 }
 
-Player& Player::operator=(IClientEntity* entity) {
+Player& Player::operator=(IClientEntity *entity) {
 	playerEntity = entity;
 
 	return *this;

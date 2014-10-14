@@ -75,7 +75,7 @@ private:
 	Color filter_inactive_color;
 	int frameHook;
 	std::map<int, std::string> itemIconTextures;
-	ItemSchema* itemSchema;
+	ItemSchema *itemSchema;
 	std::map<Player, Loadout_t> loadoutInfo;
 	std::map<vgui::HPanel, std::map<std::string, vgui::Panel *>> loadoutIconPanels;
 

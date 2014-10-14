@@ -70,7 +70,7 @@ private:
 	ConVar *dynamic_meters;
 	ConVar *enabled;
 	ConVar *individual_charge_meters;
-	ConCommand* reload_settings;
+	ConCommand *reload_settings;
 	void ReloadSettings();
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };

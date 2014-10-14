@@ -1,5 +1,5 @@
 /*
-*  specguiorder.h
+*  cameratools.h
 *  StatusSpec project
 *
 *  Copyright (c) 2014 thesupremecommander
