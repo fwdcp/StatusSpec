@@ -63,6 +63,10 @@ IClientMode* Interfaces::GetClientMode() {
 		}
 	}
 
+	if (!**(IClientMode***)pointer) {
+		throw bad_pointer("IClientMode");
+	}
+
 	return **(IClientMode***)(pointer);
 #else
 	throw bad_pointer("IClientMode");
@@ -105,6 +109,10 @@ C_HLTVCamera* Interfaces::GetHLTVCamera() {
 		if (!pointer) {
 			throw bad_pointer("C_HLTVCamera");
 		}
+	}
+
+	if (!*(C_HLTVCamera**)pointer) {
+		throw bad_pointer("C_HLTVCamera");
 	}
 
 	return *(C_HLTVCamera**)(pointer);

@@ -22,13 +22,18 @@ class FOVOverride {
 public:
 	FOVOverride();
 
-	bool IsEnabled();
-
-	float GetFOVOverride(C_TFPlayer *instance);
+	void FrameHook(ClientFrameStage_t curStage);
+	float GetFOVOverride();
 private:
+	bool HookGetFOV();
+
+	int frameHook;
+	int getFOVHook;
+
 	ConVar *enabled;
 	ConVar *fov;
 	ConVar *zoomed;
+	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
 
 extern FOVOverride *g_FOVOverride;

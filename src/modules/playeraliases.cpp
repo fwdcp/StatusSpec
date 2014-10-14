@@ -42,7 +42,9 @@ inline CSteamID ConvertTextToSteamID(std::string textID) {
 }
 
 PlayerAliases::PlayerAliases() {
-	enabled = new ConVar("statusspec_playeraliases_enabled", "0", FCVAR_NONE, "enable player aliases");
+	getPlayerInfoHook = 0;
+
+	enabled = new ConVar("statusspec_playeraliases_enabled", "0", FCVAR_NONE, "enable player aliases", [](IConVar *var, const char *pOldValue, float flOldValue) { g_PlayerAliases->ToggleEnabled(var, pOldValue, flOldValue); });
 	esea = new ConVar("statusspec_playeraliases_esea", "0", FCVAR_NONE, "enable player aliases from the ESEA API");
 	etf2l = new ConVar("statusspec_playeraliases_etf2l", "0", FCVAR_NONE, "enable player aliases from the ETF2L API");
 	format_blu = new ConVar("statusspec_playeraliases_format_blu", "%alias%", FCVAR_NONE, "the name format for BLU players");
@@ -54,17 +56,13 @@ PlayerAliases::PlayerAliases() {
 	switch_teams = new ConCommand("statusspec_playeraliases_switch_teams", []() { g_PlayerAliases->SwitchTeams(); }, "switch name formats for both teams", FCVAR_NONE);
 }
 
-bool PlayerAliases::IsEnabled() {
-	return enabled->GetBool();
-}
-
 bool PlayerAliases::GetPlayerInfoOverride(int ent_num, player_info_t *pinfo) {
 	bool result = Funcs::CallFunc_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, ent_num, pinfo);
 
 	Player player = ent_num;
 
 	if (!player) {
-		return result;
+		RETURN_META_VALUE(MRES_IGNORED, false);
 	}
 
 	CSteamID playerSteamID = player.GetSteamID();
@@ -88,7 +86,7 @@ bool PlayerAliases::GetPlayerInfoOverride(int ent_num, player_info_t *pinfo) {
 
 	V_strcpy_safe(pinfo->name, gameName.c_str());
 
-	return result;
+	RETURN_META_VALUE(MRES_SUPERCEDE, result);
 }
 
 std::string PlayerAliases::GetAlias(CSteamID player, std::string gameAlias) {
@@ -411,4 +409,19 @@ void PlayerAliases::SwitchTeams() {
 
 	format_blu->SetValue(newBluFormat.c_str());
 	format_red->SetValue(newRedFormat.c_str());
+}
+
+void PlayerAliases::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
+	if (enabled->GetBool()) {
+		if (!getPlayerInfoHook) {
+			getPlayerInfoHook = Funcs::AddHook_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, SH_MEMBER(this, &PlayerAliases::GetPlayerInfoOverride), false);
+		}
+	}
+	else {
+		if (getPlayerInfoHook) {
+			if (Funcs::RemoveHook(getPlayerInfoHook)) {
+				getPlayerInfoHook = 0;
+			}
+		}
+	}
 }

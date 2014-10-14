@@ -20,17 +20,19 @@ class LocalPlayer {
 public:
 	LocalPlayer();
 
-	bool IsEnabled();
-
-	void PostEntityUpdate();
-
+	void FrameHook(ClientFrameStage_t curStage);
 	int GetLocalPlayerIndexOverride();
 private:
+	int frameHook;
+	bool getLocalPlayerIndexDetoured;
+
 	ConVar *enabled;
 	ConVar *player;
 	ConVar *track_spec_target;
 	ConCommand *set_current_target;
 	void SetToCurrentTarget();
+	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
+	void ToggleTrackSpecTarget(IConVar *var, const char *pOldValue, float flOldValue);
 };
 
 extern LocalPlayer *g_LocalPlayer;

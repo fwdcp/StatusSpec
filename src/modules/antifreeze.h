@@ -26,7 +26,7 @@
 #include "../ifaces.h"
 #include "../player.h"
 
-#define PERFORM_LAYOUT_COMMAND new KeyValues("Command", "Command", "performlayout")
+#define PERFORM_LAYOUT_COMMAND 
 #define SPEC_GUI_NAME "specgui"
 #define TOP_PANEL_NAME "MatSystemTopPanel"
 
@@ -39,19 +39,16 @@ class AntiFreeze {
 public:
 	AntiFreeze();
 
-	bool IsEnabled();
-
-	void Paint(vgui::VPANEL vguiPanel);
-	void ProcessEntity(IClientEntity* entity);
-	void PostEntityUpdate();
+	void FrameHook(ClientFrameStage_t curStage);
 private:
 	bool entitiesUpdated;
-	std::map<Player, EntityInfo_t> entityInfo;
+	int frameHook;
 	vgui::EditablePanel *freezeInfoPanel;
 	double lastEntityUpdate;
+	KeyValues *performLayoutCommand;
 	vgui::HPanel specguiPanel;
-	vgui::HPanel topPanel;
 
+	void GetSpecGUI();
 	void InitHud();
 
 	ConVar *display;
@@ -60,6 +57,7 @@ private:
 	ConVar *enabled;
 	void ReloadSettings();
 	void ToggleDisplay(IConVar *var, const char *pOldValue, float flOldValue);
+	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
 
 extern AntiFreeze *g_AntiFreeze;

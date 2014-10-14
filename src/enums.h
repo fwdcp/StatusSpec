@@ -239,6 +239,14 @@ static std::array<std::string, 9> itemSlots = {"primary", "secondary", "melee", 
 
 // self-generated
 
+enum TFMedigun {
+	TFMedigun_Unknown,
+	TFMedigun_MediGun,
+	TFMedigun_Kritzkrieg,
+	TFMedigun_QuickFix,
+	TFMedigun_Vaccinator
+};
+
 enum TFResistType {
 	TFResistType_Bullet,
 	TFResistType_Explosive,

@@ -59,23 +59,22 @@ class PlayerAliases {
 public:
 	PlayerAliases();
 
-	bool IsEnabled();
-
 	bool GetPlayerInfoOverride(int ent_num, player_info_t *pinfo);
 
 	void GetESEAPlayerInfo(HTTPRequestCompleted_t *requestCompletionInfo, bool bIOFailure);
 	void GetETF2LPlayerInfo(HTTPRequestCompleted_t *requestCompletionInfo, bool bIOFailure);
 	void GetTwitchUserInfo(HTTPRequestCompleted_t *requestCompletionInfo, bool bIOFailure);
-	void RequestESEAPlayerInfo(CSteamID player);
-	void RequestETF2LPlayerInfo(CSteamID player);
-	void RequestTwitchUserInfo(CSteamID player);
 private:
 	std::map<CSteamID, std::string> customAliases;
 	std::map<CSteamID, APIAlias_t> eseaAliases;
 	std::map<CSteamID, APIAlias_t> etf2lAliases;
+	int getPlayerInfoHook;
 	std::map<CSteamID, APIAlias_t> twitchAliases;
 
 	std::string GetAlias(CSteamID player, std::string gameAlias);
+	void RequestESEAPlayerInfo(CSteamID player);
+	void RequestETF2LPlayerInfo(CSteamID player);
+	void RequestTwitchUserInfo(CSteamID player);
 
 	ConVar *enabled;
 	ConVar *esea;
@@ -93,6 +92,7 @@ private:
 	void RemoveCustomPlayerAlias(const CCommand &command);
 	void SetCustomPlayerAlias(const CCommand &command);
 	void SwitchTeams();
+	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
 
 extern PlayerAliases *g_PlayerAliases;

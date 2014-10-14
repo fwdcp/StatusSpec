@@ -11,55 +11,44 @@
 #include "statusicons.h"
 
 StatusIcons::StatusIcons() {
-	enabled = new ConVar("statusspec_statusicons_enabled", "0", FCVAR_NONE, "enable status icons");
-	max_icons = new ConVar("statusspec_statusicons_max_icons", "5", FCVAR_NONE, "maximum number of icons to show");
+	frameHook = 0;
 
-	Paint::InitializeTexture(TEXTURE_NULL);
-	Paint::InitializeTexture(TEXTURE_UBERCHARGE);
-	Paint::InitializeTexture(TEXTURE_CRITBOOST);
-	Paint::InitializeTexture(TEXTURE_MEGAHEALRED);
-	Paint::InitializeTexture(TEXTURE_MEGAHEALBLU);
-	Paint::InitializeTexture(TEXTURE_RESISTSHIELDRED);
-	Paint::InitializeTexture(TEXTURE_RESISTSHIELDBLU);
-	Paint::InitializeTexture(TEXTURE_BULLETRESISTRED);
-	Paint::InitializeTexture(TEXTURE_BLASTRESISTRED);
-	Paint::InitializeTexture(TEXTURE_FIRERESISTRED);
-	Paint::InitializeTexture(TEXTURE_BULLETRESISTBLU);
-	Paint::InitializeTexture(TEXTURE_BLASTRESISTBLU);
-	Paint::InitializeTexture(TEXTURE_FIRERESISTBLU);
-	Paint::InitializeTexture(TEXTURE_BUFFBANNERRED);
-	Paint::InitializeTexture(TEXTURE_BUFFBANNERBLU);
-	Paint::InitializeTexture(TEXTURE_BATTALIONSBACKUPRED);
-	Paint::InitializeTexture(TEXTURE_BATTALIONSBACKUPBLU);
-	Paint::InitializeTexture(TEXTURE_CONCHERORRED);
-	Paint::InitializeTexture(TEXTURE_CONCHERORBLU);
-	Paint::InitializeTexture(TEXTURE_JARATE);
-	Paint::InitializeTexture(TEXTURE_MADMILK);
-	Paint::InitializeTexture(TEXTURE_MARKFORDEATH);
-	Paint::InitializeTexture(TEXTURE_BLEEDING);
-	Paint::InitializeTexture(TEXTURE_FIRE);
+	delta_x = new ConVar("statusspec_statusicons_delta_x", "15", FCVAR_NONE, "change in the x direction for each icon");
+	delta_y = new ConVar("statusspec_statusicons_delta_y", "0", FCVAR_NONE, "change in the y direction for each icon");
+	enabled = new ConVar("statusspec_statusicons_enabled", "0", FCVAR_NONE, "enable status icons", [](IConVar *var, const char *pOldValue, float flOldValue) { g_StatusIcons->ToggleEnabled(var, pOldValue, flOldValue); });
 }
 
-bool StatusIcons::IsEnabled() {
-	return enabled->GetBool();
-}
+void StatusIcons::FrameHook(ClientFrameStage_t curStage) {
+	if (curStage == FRAME_NET_UPDATE_END) {
+		if (Interfaces::GetClientMode() && Interfaces::GetClientMode()->GetViewport()) {
+			vgui::VPANEL viewport = Interfaces::GetClientMode()->GetViewport()->GetVPanel();
 
-void StatusIcons::InterceptMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel) {
-	std::string originPanelName = g_pVGuiPanel->GetName(ifromPanel);
+			for (int i = 0; i < g_pVGuiPanel->GetChildCount(viewport); i++) {
+				vgui::VPANEL specgui = g_pVGuiPanel->GetChild(viewport, i);
 
-	if (originPanelName.substr(0, 11).compare("playerpanel") == 0 && strcmp(params->GetName(), "DialogVariables") == 0) {
-		const char *playerName = params->GetString("playername", NULL);
-		
-		if (playerName) {
-			for (int i = 0; i <= MAX_PLAYERS; i++) {
-				Player player = i;
-			
-				if (!player) {
-					continue;
-				}
-			
-				if (strcmp(playerName, player.GetName()) == 0) {
-					playerPanels[originPanelName] = player;
+				if (strcmp(g_pVGuiPanel->GetName(specgui), "specgui") == 0) {
+					for (int i = 0; i < g_pVGuiPanel->GetChildCount(specgui); i++) {
+						vgui::VPANEL playerPanel = g_pVGuiPanel->GetChild(specgui, i);
+
+						if (strcmp(g_pVGuiPanel->GetClassName(playerPanel), "CTFPlayerPanel") == 0) {
+							for (int i = 0; i < g_pVGuiPanel->GetChildCount(playerPanel); i++) {
+								vgui::VPANEL statusIconsVPanel = g_pVGuiPanel->GetChild(playerPanel, i);
+
+								if (strcmp(g_pVGuiPanel->GetName(statusIconsVPanel), "StatusIcons") == 0) {
+									vgui::EditablePanel *statusIcons = dynamic_cast<vgui::EditablePanel *>(g_pVGuiPanel->GetPanel(statusIconsVPanel, "ClientDLL"));
+
+									if (statusIcons) {
+										statusIcons->SetEnabled(true);
+										statusIcons->SetVisible(true);
+
+										DisplayIcons(playerPanel);
+									}
+
+									break;
+								}
+							}
+						}
+					}
 
 					break;
 				}
@@ -68,369 +57,242 @@ void StatusIcons::InterceptMessage(vgui::VPANEL vguiPanel, KeyValues *params, vg
 	}
 }
 
-void StatusIcons::NoPaint(vgui::VPANEL vguiPanel) {
-	const char *panelName = g_pVGuiPanel->GetName(vguiPanel);
-	
-	if (strcmp(panelName, "statusicons") == 0) {
-		vgui::VPANEL playerPanel = g_pVGuiPanel->GetParent(vguiPanel);
-		int iconsWide, iconsTall, playerWide, playerTall;
-		
-		g_pVGuiPanel->GetSize(vguiPanel, iconsWide, iconsTall);
-		g_pVGuiPanel->GetSize(playerPanel, playerWide, playerTall);
-		
-		playerWide -= iconsWide;
-		iconsWide -= iconsWide;
-		
-		g_pVGuiPanel->SetSize(vguiPanel, iconsWide, iconsTall);
-		g_pVGuiPanel->SetSize(playerPanel, playerWide, playerTall);
+void StatusIcons::ClearIcons(vgui::VPANEL statusIconsPanel) {
+	while (g_pVGuiPanel->GetChildCount(statusIconsPanel) != 0) {
+		vgui::VPANEL child = g_pVGuiPanel->GetChild(statusIconsPanel, 0);
+		g_pVGuiPanel->DeletePanel(child);
 	}
 }
 
-void StatusIcons::Paint(vgui::VPANEL vguiPanel) {
-	const char *panelName = g_pVGuiPanel->GetName(vguiPanel);
-	
-	if (strcmp(panelName, "statusicons") == 0) {
-		vgui::VPANEL playerPanel = g_pVGuiPanel->GetParent(vguiPanel);
-		int iconsWide, iconsTall, playerWide, playerTall;
-		
-		g_pVGuiPanel->GetSize(vguiPanel, iconsWide, iconsTall);
-		g_pVGuiPanel->GetSize(playerPanel, playerWide, playerTall);
-		
-		playerWide -= iconsWide;
-		iconsWide -= iconsWide;
-		
-		int iconSize = iconsTall;
-		int icons = 0;
-		int maxIcons = max_icons->GetInt();
-		
-		g_pVGuiPanel->SetSize(vguiPanel, iconsWide, iconsTall);
-		g_pVGuiPanel->SetSize(playerPanel, playerWide, playerTall);
-		
-		const char *playerPanelName = g_pVGuiPanel->GetName(playerPanel);
-		
-		if (playerPanels.find(playerPanelName) == playerPanels.end()) {
-			return;
-		}
-		
-		Player player = playerPanels[playerPanelName];
+void StatusIcons::DisableHUD() {
+	if (Interfaces::GetClientMode() && Interfaces::GetClientMode()->GetViewport()) {
+		vgui::VPANEL viewport = Interfaces::GetClientMode()->GetViewport()->GetVPanel();
 
-		if (!player) {
-			return;
-		}
+		for (int i = 0; i < g_pVGuiPanel->GetChildCount(viewport); i++) {
+			vgui::VPANEL specgui = g_pVGuiPanel->GetChild(viewport, i);
 
-		TFTeam team = player.GetTeam();
-		
-		if (player.CheckCondition(TFCond_Ubercharged)) {
-			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
-			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
-			
-			Paint::DrawTexture(TEXTURE_UBERCHARGE, iconsWide, 0, iconSize, iconSize);
-			
-			playerWide += iconSize;
-			iconsWide += iconSize;
-			
-			icons++;
-		}
-		
-		if (icons >= maxIcons) {
-			return;
-		}
-		
-		if (player.CheckCondition(TFCond_Kritzkrieged)) {
-			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
-			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
-			
-			Paint::DrawTexture(TEXTURE_CRITBOOST, iconsWide, 0, iconSize, iconSize);
-			
-			playerWide += iconSize;
-			iconsWide += iconSize;
-			
-			icons++;
-		}
-		
-		if (icons >= maxIcons) {
-			return;
-		}
-		
-		if (player.CheckCondition(TFCond_MegaHeal)) {
-			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
-			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
-			
-			if (team == TFTeam_Red) {
-				Paint::DrawTexture(TEXTURE_MEGAHEALRED, iconsWide, 0, iconSize, iconSize);
+			if (strcmp(g_pVGuiPanel->GetName(specgui), "specgui") == 0) {
+				for (int i = 0; i < g_pVGuiPanel->GetChildCount(specgui); i++) {
+					vgui::VPANEL playerPanel = g_pVGuiPanel->GetChild(specgui, i);
+
+					if (strcmp(g_pVGuiPanel->GetClassName(playerPanel), "CTFPlayerPanel") == 0) {
+						for (int i = 0; i < g_pVGuiPanel->GetChildCount(playerPanel); i++) {
+							vgui::VPANEL statusIconsVPanel = g_pVGuiPanel->GetChild(playerPanel, i);
+
+							if (strcmp(g_pVGuiPanel->GetName(statusIconsVPanel), "StatusIcons") == 0) {
+								ClearIcons(statusIconsVPanel);
+
+								break;
+							}
+						}
+					}
+				}
+
+				break;
 			}
-			else if (team == TFTeam_Blue) {
-				Paint::DrawTexture(TEXTURE_MEGAHEALBLU, iconsWide, 0, iconSize, iconSize);
+		}
+	}
+}
+
+void StatusIcons::DisplayIcon(vgui::EditablePanel *panel, const char *iconTexture) {
+	if (panel) {
+		int offset = panel->GetChildCount();
+
+		vgui::EditablePanel *iconContainer = new vgui::EditablePanel(panel, "StatusIcon");
+		vgui::ImagePanel *icon = new vgui::ImagePanel(iconContainer, "StatusIconImage");
+
+		iconContainer->LoadControlSettings("Resource/UI/StatusIcon.res");
+
+		iconContainer->SetEnabled(true);
+		iconContainer->SetVisible(true);
+
+		int deltaX = g_pVGuiSchemeManager->GetProportionalScaledValue(delta_x->GetInt());
+		int deltaY = g_pVGuiSchemeManager->GetProportionalScaledValue(delta_y->GetInt());
+
+		iconContainer->SetPos(offset * deltaX, offset * deltaY);
+
+		icon->SetEnabled(true);
+		icon->SetVisible(true);
+
+		std::string iconPath = "../";
+		iconPath += iconTexture;
+
+		icon->SetImage(iconPath.c_str());
+	}
+}
+
+void StatusIcons::DisplayIcons(vgui::VPANEL playerPanel) {
+	if (strcmp(g_pVGuiPanel->GetClassName(playerPanel), "CTFPlayerPanel") == 0) {
+		vgui::EditablePanel *panel = dynamic_cast<vgui::EditablePanel *>(g_pVGuiPanel->GetPanel(playerPanel, "ClientDLL"));
+
+		if (panel) {
+			KeyValues *dialogVariables = panel->GetDialogVariables();
+
+			if (dialogVariables) {
+				const char *name = dialogVariables->GetString("playername");
+
+				for (int i = 1; i <= MAX_PLAYERS; i++) {
+					Player player = i;
+
+					if (player && strcmp(player.GetName(), name) == 0) {
+						for (int i = 0; i < g_pVGuiPanel->GetChildCount(playerPanel); i++) {
+							vgui::VPANEL statusIconsVPanel = g_pVGuiPanel->GetChild(playerPanel, i);
+
+							if (strcmp(g_pVGuiPanel->GetName(statusIconsVPanel), "StatusIcons") == 0) {
+								ClearIcons(statusIconsVPanel);
+
+								vgui::EditablePanel *statusIcons = dynamic_cast<vgui::EditablePanel *>(g_pVGuiPanel->GetPanel(statusIconsVPanel, "ClientDLL"));
+
+								if (statusIcons) {
+									TFTeam team = player.GetTeam();
+
+									if (player.CheckCondition(TFCond_Ubercharged)) {
+										DisplayIcon(statusIcons, TEXTURE_UBERCHARGE);
+									}
+
+									if (player.CheckCondition(TFCond_Kritzkrieged)) {
+										DisplayIcon(statusIcons, TEXTURE_CRITBOOST);
+									}
+
+									if (player.CheckCondition(TFCond_MegaHeal)) {
+										if (team == TFTeam_Red) {
+											DisplayIcon(statusIcons, TEXTURE_MEGAHEALRED);
+										}
+										else if (team == TFTeam_Blue) {
+											DisplayIcon(statusIcons, TEXTURE_MEGAHEALBLU);
+										}
+									}
+
+									if (player.CheckCondition(TFCond_UberBulletResist)) {
+										if (team == TFTeam_Red) {
+											DisplayIcon(statusIcons, TEXTURE_RESISTSHIELDRED);
+											DisplayIcon(statusIcons, TEXTURE_BULLETRESISTRED);
+										}
+										else if (team == TFTeam_Blue) {
+											DisplayIcon(statusIcons, TEXTURE_RESISTSHIELDBLU);
+											DisplayIcon(statusIcons, TEXTURE_BULLETRESISTBLU);
+										}
+									}
+									else if (player.CheckCondition(TFCond_SmallBulletResist)) {
+										if (team == TFTeam_Red) {
+											DisplayIcon(statusIcons, TEXTURE_BULLETRESISTRED);
+										}
+										else if (team == TFTeam_Blue) {
+											DisplayIcon(statusIcons, TEXTURE_BULLETRESISTBLU);
+										}
+									}
+
+									if (player.CheckCondition(TFCond_UberBlastResist)) {
+										if (team == TFTeam_Red) {
+											DisplayIcon(statusIcons, TEXTURE_RESISTSHIELDRED);
+											DisplayIcon(statusIcons, TEXTURE_BLASTRESISTRED);
+										}
+										else if (team == TFTeam_Blue) {
+											DisplayIcon(statusIcons, TEXTURE_RESISTSHIELDBLU);
+											DisplayIcon(statusIcons, TEXTURE_BLASTRESISTBLU);
+										}
+									}
+									else if (player.CheckCondition(TFCond_SmallBlastResist)) {
+										if (team == TFTeam_Red) {
+											DisplayIcon(statusIcons, TEXTURE_BLASTRESISTRED);
+										}
+										else if (team == TFTeam_Blue) {
+											DisplayIcon(statusIcons, TEXTURE_BLASTRESISTBLU);
+										}
+									}
+
+									if (player.CheckCondition(TFCond_UberFireResist)) {
+										if (team == TFTeam_Red) {
+											DisplayIcon(statusIcons, TEXTURE_RESISTSHIELDRED);
+											DisplayIcon(statusIcons, TEXTURE_FIRERESISTRED);
+										}
+										else if (team == TFTeam_Blue) {
+											DisplayIcon(statusIcons, TEXTURE_RESISTSHIELDBLU);
+											DisplayIcon(statusIcons, TEXTURE_FIRERESISTBLU);
+										}
+									}
+									else if (player.CheckCondition(TFCond_SmallFireResist)) {
+										if (team == TFTeam_Red) {
+											DisplayIcon(statusIcons, TEXTURE_FIRERESISTRED);
+										}
+										else if (team == TFTeam_Blue) {
+											DisplayIcon(statusIcons, TEXTURE_FIRERESISTBLU);
+										}
+									}
+
+									if (player.CheckCondition(TFCond_Buffed)) {
+										if (team == TFTeam_Red) {
+											DisplayIcon(statusIcons, TEXTURE_BUFFBANNERRED);
+										}
+										else if (team == TFTeam_Blue) {
+											DisplayIcon(statusIcons, TEXTURE_BUFFBANNERBLU);
+										}
+									}
+
+									if (player.CheckCondition(TFCond_DefenseBuffed)) {
+										if (team == TFTeam_Red) {
+											DisplayIcon(statusIcons, TEXTURE_BATTALIONSBACKUPRED);
+										}
+										else if (team == TFTeam_Blue) {
+											DisplayIcon(statusIcons, TEXTURE_BATTALIONSBACKUPBLU);
+										}
+									}
+
+									if (player.CheckCondition(TFCond_RegenBuffed)) {
+										if (team == TFTeam_Red) {
+											DisplayIcon(statusIcons, TEXTURE_CONCHERORRED);
+										}
+										else if (team == TFTeam_Blue) {
+											DisplayIcon(statusIcons, TEXTURE_CONCHERORBLU);
+										}
+									}
+
+									if (player.CheckCondition(TFCond_Jarated)) {
+										DisplayIcon(statusIcons, TEXTURE_JARATE);
+									}
+
+									if (player.CheckCondition(TFCond_Milked)) {
+										DisplayIcon(statusIcons, TEXTURE_MADMILK);
+									}
+
+									if (player.CheckCondition(TFCond_MarkedForDeath) || player.CheckCondition(TFCond_MarkedForDeathSilent)) {
+										DisplayIcon(statusIcons, TEXTURE_MARKFORDEATH);
+									}
+
+									if (player.CheckCondition(TFCond_Bleeding)) {
+										DisplayIcon(statusIcons, TEXTURE_BLEEDING);
+									}
+
+									if (player.CheckCondition(TFCond_OnFire)) {
+										DisplayIcon(statusIcons, TEXTURE_FIRE);
+									}
+								}
+
+								break;
+							}
+						}
+
+						break;
+					}
+				}
 			}
-			
-			playerWide += iconSize;
-			iconsWide += iconSize;
-			
-			icons++;
 		}
-		
-		if (icons >= maxIcons) {
-			return;
+	}
+}
+
+void StatusIcons::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
+	if (enabled->GetBool()) {
+		if (!frameHook) {
+			frameHook = Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, SH_MEMBER(this, &StatusIcons::FrameHook), true);
 		}
-		
-		if (player.CheckCondition(TFCond_UberBulletResist)) {
-			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
-			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
-			
-			if (team == TFTeam_Red) {
-				Paint::DrawTexture(TEXTURE_RESISTSHIELDRED, iconsWide, 0, iconSize, iconSize);
-				Paint::DrawTexture(TEXTURE_BULLETRESISTRED, iconsWide, 0, iconSize, iconSize);
+	}
+	else {
+		DisableHUD();
+
+		if (frameHook) {
+			if (Funcs::RemoveHook(frameHook)) {
+				frameHook = 0;
 			}
-			else if (team == TFTeam_Blue) {
-				Paint::DrawTexture(TEXTURE_RESISTSHIELDBLU, iconsWide, 0, iconSize, iconSize);
-				Paint::DrawTexture(TEXTURE_BULLETRESISTBLU, iconsWide, 0, iconSize, iconSize);
-			}
-			
-			playerWide += iconSize;
-			iconsWide += iconSize;
-			
-			icons++;
-		}
-		else if (player.CheckCondition(TFCond_SmallBulletResist)) {
-			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
-			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
-			
-			if (team == TFTeam_Red) {
-				Paint::DrawTexture(TEXTURE_BULLETRESISTRED, iconsWide, 0, iconSize, iconSize);
-			}
-			else if (team == TFTeam_Blue) {
-				Paint::DrawTexture(TEXTURE_BULLETRESISTBLU, iconsWide, 0, iconSize, iconSize);
-			}
-			
-			playerWide += iconSize;
-			iconsWide += iconSize;
-			
-			icons++;
-		}
-		
-		if (icons >= maxIcons) {
-			return;
-		}
-		
-		if (player.CheckCondition(TFCond_UberBlastResist)) {
-			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
-			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
-			
-			if (team == TFTeam_Red) {
-				Paint::DrawTexture(TEXTURE_RESISTSHIELDRED, iconsWide, 0, iconSize, iconSize);
-				Paint::DrawTexture(TEXTURE_BLASTRESISTRED, iconsWide, 0, iconSize, iconSize);
-			}
-			else if (team == TFTeam_Blue) {
-				Paint::DrawTexture(TEXTURE_RESISTSHIELDBLU, iconsWide, 0, iconSize, iconSize);
-				Paint::DrawTexture(TEXTURE_BLASTRESISTBLU, iconsWide, 0, iconSize, iconSize);
-			}
-			
-			playerWide += iconSize;
-			iconsWide += iconSize;
-			
-			icons++;
-		}
-		else if (player.CheckCondition(TFCond_SmallBlastResist)) {
-			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
-			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
-			
-			if (team == TFTeam_Red) {
-				Paint::DrawTexture(TEXTURE_BLASTRESISTRED, iconsWide, 0, iconSize, iconSize);
-			}
-			else if (team == TFTeam_Blue) {
-				Paint::DrawTexture(TEXTURE_BLASTRESISTBLU, iconsWide, 0, iconSize, iconSize);
-			}
-			
-			playerWide += iconSize;
-			iconsWide += iconSize;
-			
-			icons++;
-		}
-		
-		if (icons >= maxIcons) {
-			return;
-		}
-		
-		if (player.CheckCondition(TFCond_UberFireResist)) {
-			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
-			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
-			
-			if (team == TFTeam_Red) {
-				Paint::DrawTexture(TEXTURE_RESISTSHIELDRED, iconsWide, 0, iconSize, iconSize);
-				Paint::DrawTexture(TEXTURE_FIRERESISTRED, iconsWide, 0, iconSize, iconSize);
-			}
-			else if (team == TFTeam_Blue) {
-				Paint::DrawTexture(TEXTURE_RESISTSHIELDBLU, iconsWide, 0, iconSize, iconSize);
-				Paint::DrawTexture(TEXTURE_FIRERESISTBLU, iconsWide, 0, iconSize, iconSize);
-			}
-			
-			playerWide += iconSize;
-			iconsWide += iconSize;
-			
-			icons++;
-		}
-		else if (player.CheckCondition(TFCond_SmallFireResist)) {
-			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
-			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
-			
-			if (team == TFTeam_Red) {
-				Paint::DrawTexture(TEXTURE_FIRERESISTRED, iconsWide, 0, iconSize, iconSize);
-			}
-			else if (team == TFTeam_Blue) {
-				Paint::DrawTexture(TEXTURE_FIRERESISTBLU, iconsWide, 0, iconSize, iconSize);
-			}
-			
-			playerWide += iconSize;
-			iconsWide += iconSize;
-			
-			icons++;
-		}
-		
-		if (icons >= maxIcons) {
-			return;
-		}
-		
-		if (player.CheckCondition(TFCond_Buffed)) {
-			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
-			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
-			
-			if (team == TFTeam_Red) {
-				Paint::DrawTexture(TEXTURE_BUFFBANNERRED, iconsWide, 0, iconSize, iconSize);
-			}
-			else if (team == TFTeam_Blue) {
-				Paint::DrawTexture(TEXTURE_BUFFBANNERBLU, iconsWide, 0, iconSize, iconSize);
-			}
-			
-			playerWide += iconSize;
-			iconsWide += iconSize;
-			
-			icons++;
-		}
-		
-		if (icons >= maxIcons) {
-			return;
-		}
-		
-		if (player.CheckCondition(TFCond_DefenseBuffed)) {
-			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
-			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
-			
-			if (team == TFTeam_Red) {
-				Paint::DrawTexture(TEXTURE_BATTALIONSBACKUPRED, iconsWide, 0, iconSize, iconSize);
-			}
-			else if (team == TFTeam_Blue) {
-				Paint::DrawTexture(TEXTURE_BATTALIONSBACKUPBLU, iconsWide, 0, iconSize, iconSize);
-			}
-			
-			playerWide += iconSize;
-			iconsWide += iconSize;
-			
-			icons++;
-		}
-		
-		if (icons >= maxIcons) {
-			return;
-		}
-		
-		if (player.CheckCondition(TFCond_RegenBuffed)) {
-			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
-			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
-			
-			if (team == TFTeam_Red) {
-				Paint::DrawTexture(TEXTURE_CONCHERORRED, iconsWide, 0, iconSize, iconSize);
-			}
-			else if (team == TFTeam_Blue) {
-				Paint::DrawTexture(TEXTURE_CONCHERORBLU, iconsWide, 0, iconSize, iconSize);
-			}
-			
-			playerWide += iconSize;
-			iconsWide += iconSize;
-			
-			icons++;
-		}
-		
-		if (icons >= maxIcons) {
-			return;
-		}
-		
-		if (player.CheckCondition(TFCond_Jarated)) {
-			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
-			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
-			
-			Paint::DrawTexture(TEXTURE_JARATE, iconsWide, 0, iconSize, iconSize);
-			
-			playerWide += iconSize;
-			iconsWide += iconSize;
-			
-			icons++;
-		}
-		
-		if (icons >= maxIcons) {
-			return;
-		}
-		
-		if (player.CheckCondition(TFCond_Milked)) {
-			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
-			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
-			
-			Paint::DrawTexture(TEXTURE_MADMILK, iconsWide, 0, iconSize, iconSize);
-			
-			playerWide += iconSize;
-			iconsWide += iconSize;
-			
-			icons++;
-		}
-		
-		if (icons >= maxIcons) {
-			return;
-		}
-		
-		if (player.CheckCondition(TFCond_MarkedForDeath) || player.CheckCondition(TFCond_MarkedForDeathSilent)) {
-			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
-			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
-			
-			Paint::DrawTexture(TEXTURE_MARKFORDEATH, iconsWide, 0, iconSize, iconSize);
-			
-			playerWide += iconSize;
-			iconsWide += iconSize;
-			
-			icons++;
-		}
-		
-		if (icons >= maxIcons) {
-			return;
-		}
-		
-		if (player.CheckCondition(TFCond_Bleeding)) {
-			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
-			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
-			
-			Paint::DrawTexture(TEXTURE_BLEEDING, iconsWide, 0, iconSize, iconSize, Color(255, 0, 0, 255));
-			
-			playerWide += iconSize;
-			iconsWide += iconSize;
-			
-			icons++;
-		}
-		
-		if (icons >= maxIcons) {
-			return;
-		}
-		
-		if (player.CheckCondition(TFCond_OnFire)) {
-			g_pVGuiPanel->SetSize(vguiPanel, iconsWide + iconsTall, iconsTall);
-			g_pVGuiPanel->SetSize(playerPanel, playerWide + iconsTall, playerTall);
-			
-			Paint::DrawTexture(TEXTURE_FIRE, iconsWide, 0, iconSize, iconSize);
-			
-			playerWide += iconSize;
-			iconsWide += iconSize;
-			
-			icons++;
-		}
-		
-		if (icons >= maxIcons) {
-			return;
 		}
 	}
 }

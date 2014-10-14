@@ -20,34 +20,29 @@
 #include "convar.h"
 #include "vgui/IPanel.h"
 #include "vgui/IScheme.h"
+#include "vgui_controls/EditablePanel.h"
 
 #include "../enums.h"
 #include "../ifaces.h"
-#include "../paint.h"
 #include "../player.h"
 
 class SpecGUIOrder {
 public:
 	SpecGUIOrder();
 
-	bool IsEnabled();
-
-	void InterceptMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel);
-
-	bool SetPosOverride(vgui::VPANEL vguiPanel, int &x, int &y);
-
-	void PreEntityUpdate();
-	void ProcessEntity(IClientEntity *entity);
-	void PostEntityUpdate();
+	void FrameHook(ClientFrameStage_t curStage);
+	void SetPosOverride(vgui::VPANEL vguiPanel, int x, int y);
 private:
 	std::list<Player> bluPlayers;
-	std::map<std::string, Player> playerPanels;
+	int frameHook;
+	int setPosHook;
 	KeyValues *specguiSettings;
 	std::list<Player> redPlayers;
 
 	ConVar *enabled;
 	ConVar *reverse_blu;
 	ConVar *reverse_red;
+	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
 
 extern SpecGUIOrder *g_SpecGUIOrder;

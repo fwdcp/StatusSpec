@@ -50,19 +50,17 @@ PlayerOutlines::PlayerOutlines() {
 	colors["red_full"].command = new ConCommand("statusspec_playeroutlines_color_red_full", [](const CCommand &command) { g_PlayerOutlines->ColorCommand(command); }, "the color used for outlines for RED team players at full health", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_PlayerOutlines->GetCurrentColor(partial, commands); });
 	colors["red_buff"].color = Color(184, 56, 59, 255);
 	colors["red_buff"].command = new ConCommand("statusspec_playeroutlines_color_red_buff", [](const CCommand &command) { g_PlayerOutlines->ColorCommand(command); }, "the color used for outlines for RED team players at max buffed health", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_PlayerOutlines->GetCurrentColor(partial, commands); });
+	doPostScreenSpaceEffectsHook = 0;
+	frameHook = 0;
 	
-	enabled = new ConVar("statusspec_playeroutlines_enabled", "0", FCVAR_NONE, "enable player outlines");
-	fade = new ConVar("statusspec_playeroutlines_fade", "0", FCVAR_NONE, "make outlines fade with distance");
+	enabled = new ConVar("statusspec_playeroutlines_enabled", "0", FCVAR_NONE, "enable player outlines", [](IConVar *var, const char *pOldValue, float flOldValue) { g_PlayerOutlines->ToggleEnabled(var, pOldValue, flOldValue); });
+	fade = new ConVar("statusspec_playeroutlines_fade", "0", FCVAR_NONE, "make outlines fade with distance", [](IConVar *var, const char *pOldValue, float flOldValue) { g_PlayerOutlines->ToggleFade(var, pOldValue, flOldValue); });
 	fade_distance = new ConVar("statusspec_playeroutlines_fade_distance", "3200", FCVAR_NONE, "the distance (in Hammer units) at which outlines will fade");
 	health_adjusted_team_colors = new ConVar("statusspec_playeroutlines_health_adjusted_team_colors", "0", FCVAR_NONE, "adjusts team colors depending on health of players");
 	team_colors = new ConVar("statusspec_playeroutlines_team_colors", "0", FCVAR_NONE, "override default health-based outline colors with team colors");
 }
 
-bool PlayerOutlines::IsEnabled() {
-	return enabled->GetBool();
-}
-
-void PlayerOutlines::PreGlowRender(const CViewSetup *pSetup) {
+bool PlayerOutlines::DoPostScreenSpaceEffectsHook(const CViewSetup *pSetup) {
 	if (fade->GetBool()) {
 		for (auto iterator = glows.begin(); iterator != glows.end(); ++iterator) {
 			if (iterator->first) {
@@ -79,28 +77,46 @@ void PlayerOutlines::PreGlowRender(const CViewSetup *pSetup) {
 			}
 		}
 	}
+
+	RETURN_META_VALUE(MRES_IGNORED, false);
 }
 
-void PlayerOutlines::ProcessEntity(IClientEntity* entity) {
-	Player player = entity;
+void PlayerOutlines::FrameHook(ClientFrameStage_t curStage) {
+	if (curStage == FRAME_NET_UPDATE_END) {
+		for (int i = 1; i <= MAX_PLAYERS; i++) {
+			Player player = i;
 
-	if (!player) {
-		return;
+			if (!player) {
+				return;
+			}
+
+			if (enabled->GetBool()) {
+				Color glowColor = GetGlowColor(player);
+
+				float red = glowColor.r() / 255.0f;
+				float green = glowColor.g() / 255.0f;
+				float blue = glowColor.b() / 255.0f;
+				float alpha = glowColor.a() / 255.0f;
+
+				SetGlowEffect(player, true, Vector(red, green, blue), alpha);
+			}
+			else {
+				SetGlowEffect(player, false);
+			}
+		}
+	}
+	else if (curStage == FRAME_START) {
+		if (fade->GetBool() && !doPostScreenSpaceEffectsHook) {
+			try {
+				doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), SH_MEMBER(this, &PlayerOutlines::DoPostScreenSpaceEffectsHook), false);
+			}
+			catch (bad_pointer &e) {
+				Warning(e.what());
+			}
+		}
 	}
 
-	if (IsEnabled()) {
-		Color glowColor = GetGlowColor(player);
-
-		float red = glowColor.r() / 255.0f;
-		float green = glowColor.g() / 255.0f;
-		float blue = glowColor.b() / 255.0f;
-		float alpha = glowColor.a() / 255.0f;
-
-		SetGlowEffect(player, true, Vector(red, green, blue), alpha);
-	}
-	else {
-		SetGlowEffect(player, false);
-	}
+	RETURN_META(MRES_IGNORED);
 }
 
 Color PlayerOutlines::GetGlowColor(Player player) {
@@ -306,4 +322,39 @@ int PlayerOutlines::GetCurrentColor(const char *partial, char commands[COMMAND_C
 	}
 
 	return 0;
+}
+
+void PlayerOutlines::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
+	if (enabled->GetBool()) {
+		if (!frameHook) {
+			frameHook = Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, SH_MEMBER(this, &PlayerOutlines::FrameHook), true);
+		}
+	}
+	else {
+		if (frameHook) {
+			if (Funcs::RemoveHook(frameHook)) {
+				frameHook = 0;
+			}
+		}
+	}
+}
+
+void PlayerOutlines::ToggleFade(IConVar *var, const char *pOldValue, float flOldValue) {
+	if (fade->GetBool()) {
+		if (!doPostScreenSpaceEffectsHook) {
+			try {
+				doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), SH_MEMBER(this, &PlayerOutlines::DoPostScreenSpaceEffectsHook), false);
+			}
+			catch (bad_pointer &e) {
+				Warning(e.what());
+			}
+		}
+	}
+	else {
+		if (doPostScreenSpaceEffectsHook) {
+			if (Funcs::RemoveHook(doPostScreenSpaceEffectsHook)) {
+				doPostScreenSpaceEffectsHook = 0;
+			}
+		}
+	}
 }

@@ -34,13 +34,12 @@ class ProjectileOutlines {
 public:
 	ProjectileOutlines();
 
-	bool IsEnabled();
-
-	void PreGlowRender(const CViewSetup *pSetup);
-
-	void ProcessEntity(IClientEntity *entity);
+	bool DoPostScreenSpaceEffectsHook(const CViewSetup *pSetup);
+	void FrameHook(ClientFrameStage_t curStage);
 private:
 	std::map<std::string, ColorConCommand_t> colors;
+	int doPostScreenSpaceEffectsHook;
+	int frameHook;
 	std::map<EHANDLE, CGlowObject *> glows;
 
 	Color GetGlowColor(IClientEntity *entity);
@@ -54,6 +53,8 @@ private:
 	ConVar *stickybombs;
 	void ColorCommand(const CCommand &command);
 	int GetCurrentColor(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]);
+	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
+	void ToggleFade(IConVar *var, const char *pOldValue, float flOldValue);
 };
 
 extern ProjectileOutlines *g_ProjectileOutlines;

@@ -47,9 +47,9 @@
 #define VGUI_TEXTURE_FIRERESISTBLU "replay/thumbnails/defense_buff_fire_blue"
 
 typedef struct Medigun_s {
-	int itemDefinitionIndex;
+	TFMedigun type;
 	float chargeLevel;
-	int chargeResistType;
+	TFResistType chargeResistType;
 	bool chargeRelease;
 } Medigun_t;
 
@@ -57,19 +57,15 @@ class MedigunInfo {
 public:
 	MedigunInfo();
 
-	bool IsEnabled();
-	
-	void Paint(vgui::VPANEL vguiPanel);
-	
-	void PreEntityUpdate();
-	void ProcessEntity(IClientEntity* entity);
+	void FrameHook(ClientFrameStage_t curStage);
 private:
 	KeyValues *dynamicMeterSettings;
-	vgui::HPanel mainPanel;
+	int frameHook;
 	std::map<TFTeam, Medigun_t> medigunInfo;
 	std::map<std::string, vgui::Panel *> panels;
 
 	void InitHud();
+	void Paint();
 	
 	ConVar *dynamic_meters;
 	ConVar *enabled;
