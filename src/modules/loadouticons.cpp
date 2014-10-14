@@ -367,7 +367,7 @@ void LoadoutIcons::DisplayIcons(vgui::VPANEL playerPanel) {
 void LoadoutIcons::HideIcon(vgui::ImagePanel *panel) {
 	if (panel) {
 		panel->SetVisible(false);
-		panel->SetImage("dev/null");
+		panel->SetImage("../dev/null");
 	}
 }
 
