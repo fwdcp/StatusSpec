@@ -12,13 +12,9 @@
 
 #include "stdafx.h"
 
-#include "entities.h"
-#include "enums.h"
 #include "funcs.h"
 #include "glows.h"
 #include "ifaces.h"
-#include "itemschema.h"
-#include "paint.h"
 
 #include "modules/antifreeze.h"
 #include "modules/cameratools.h"
@@ -37,7 +33,7 @@
 #include "modules/statusicons.h"
 #include "modules/teamoverrides.h"
 
-#define PLUGIN_DESC "StatusSpec v0.20.1"
+#define PLUGIN_DESC "StatusSpec v0.21.0-beta1"
 
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage);
 bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup);

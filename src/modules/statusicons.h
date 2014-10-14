@@ -23,7 +23,6 @@
 
 #include "../enums.h"
 #include "../ifaces.h"
-#include "../paint.h"
 #include "../player.h"
 
 #define TEXTURE_NULL "vgui/replay/thumbnails/null"

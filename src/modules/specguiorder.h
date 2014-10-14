@@ -24,7 +24,6 @@
 
 #include "../enums.h"
 #include "../ifaces.h"
-#include "../paint.h"
 #include "../player.h"
 
 class SpecGUIOrder {
