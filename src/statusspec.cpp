@@ -25,6 +25,7 @@ PlayerOutlines *g_PlayerOutlines = nullptr;
 ProjectileOutlines *g_ProjectileOutlines = nullptr;
 SpecGUIOrder *g_SpecGUIOrder = nullptr;
 StatusIcons *g_StatusIcons = nullptr;
+TeamHealthComparison *g_TeamHealthComparison = nullptr;
 TeamOverrides *g_TeamOverrides = nullptr;
 
 static int doPostScreenSpaceEffectsHook = 0;
@@ -114,6 +115,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_ProjectileOutlines = new ProjectileOutlines();
 	g_SpecGUIOrder = new SpecGUIOrder();
 	g_StatusIcons = new StatusIcons();
+	g_TeamHealthComparison = new TeamHealthComparison();
 	g_TeamOverrides = new TeamOverrides();
 	
 	Msg("%s loaded!\n", PLUGIN_DESC);
@@ -137,6 +139,7 @@ void StatusSpecPlugin::Unload(void)
 	delete g_ProjectileOutlines;
 	delete g_SpecGUIOrder;
 	delete g_StatusIcons;
+	delete g_TeamHealthComparison;
 	delete g_TeamOverrides;
 
 	Funcs::Unload();
