@@ -56,25 +56,10 @@ bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup) {
 }
 
 void Hook_IPanel_PaintTraverse_Post(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
-	if (g_StatusIcons) {
-		if (g_StatusIcons->IsEnabled()) {
-			g_StatusIcons->Paint(vguiPanel);
-		}
-		else {
-			g_StatusIcons->NoPaint(vguiPanel);
-		}
-	}
-
 	RETURN_META(MRES_IGNORED);
 }
 
 void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel) {
-	if (g_StatusIcons) {
-		if (g_StatusIcons->IsEnabled()) {
-			g_StatusIcons->InterceptMessage(vguiPanel, params, ifromPanel);
-		}
-	}
-
 	RETURN_META(MRES_IGNORED);
 }
 
