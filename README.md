@@ -8,6 +8,16 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**WIP**
+* general
+  * optimized plugin
+* camera tools
+  * player selection now based on spec GUI position (independent of spec GUI order module)
+* loadout icons
+  * revamped to use VGUI system
+* status icons
+  * revamped to use VGUI system
+
 **0.20.1**
 * general
   * fix crashing due to invalid entities
