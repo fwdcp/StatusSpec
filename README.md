@@ -473,6 +473,18 @@ The configuration file for the status icons is `Resource/UI/StatusIcon.res`. A c
 }
 ```
 
+### Team Health Comparison
+*displays a comparison of total health between the two teams*
+
+#### Console Variables
+* `statusspec_teamhealthcomparison_enabled` - enable team health comparison
+
+#### Console Commands
+* `statusspec_teamhealthcomparison_reload_settings` - reload settings for the team health comparison HUD from the resource file
+
+#### UI Resource Files
+The configuration file for the team health comparison HUD is `Resource/UI/TeamHealthComparison.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_teamhealthcomparison_reload_settings` is provided as a replacement.
+
 ### Team Overrides
 *override team info in HUD*
 

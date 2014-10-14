@@ -31,6 +31,7 @@
 #include "modules/projectileoutlines.h"
 #include "modules/specguiorder.h"
 #include "modules/statusicons.h"
+#include "modules/teamhealthcomparison.h"
 #include "modules/teamoverrides.h"
 
 #define PLUGIN_DESC "StatusSpec v0.21.0-beta1"
