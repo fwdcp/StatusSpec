@@ -11,6 +11,7 @@
 #include "custommaterials.h"
 
 CustomMaterials::CustomMaterials() {
+	findMaterialHook = 0;
 	materialConfig = new KeyValues("materials");
 	materialConfig->LoadFromFile(Interfaces::pFileSystem, "resource/custommaterials.res", "mod");
 
