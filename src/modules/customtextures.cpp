@@ -20,7 +20,7 @@ CustomTextures::CustomTextures() {
 }
 
 void CustomTextures::LoadReplacementGroup(const CCommand &command) {
-	if (command.ArgC() >= 2) {
+	if (command.ArgC() < 2) {
 		Warning("Must specify a replacement group to load!\n");
 		return;
 	}
@@ -68,7 +68,7 @@ void CustomTextures::ToggleEnabled(IConVar *var, const char *pOldValue, float fl
 }
 
 void CustomTextures::UnloadReplacementGroup(const CCommand &command) {
-	if (command.ArgC() >= 2) {
+	if (command.ArgC() < 2) {
 		Warning("Must specify a replacement group to load!\n");
 		return;
 	}
