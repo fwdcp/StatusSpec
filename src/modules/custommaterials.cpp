@@ -28,7 +28,7 @@ IMaterial *CustomMaterials::FindMaterialOverride(char const *pMaterialName, cons
 }
 
 void CustomMaterials::LoadReplacementGroup(const CCommand &command) {
-	if (command.ArgC() >= 2) {
+	if (command.ArgC() < 2) {
 		Warning("Must specify a replacement group to load!\n");
 		return;
 	}
@@ -70,7 +70,7 @@ void CustomMaterials::ToggleEnabled(IConVar *var, const char *pOldValue, float f
 }
 
 void CustomMaterials::UnloadReplacementGroup(const CCommand &command) {
-	if (command.ArgC() >= 2) {
+	if (command.ArgC() < 2) {
 		Warning("Must specify a replacement group to load!\n");
 		return;
 	}
