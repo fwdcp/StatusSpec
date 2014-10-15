@@ -18,6 +18,7 @@
 
 #include "modules/antifreeze.h"
 #include "modules/cameratools.h"
+#include "modules/custommaterials.h"
 #include "modules/customtextures.h"
 #include "modules/fovoverride.h"
 #include "modules/killstreaks.h"
