@@ -1,12 +1,12 @@
 /*
-*  player.cpp
-*  StatusSpec project
-*
-*  Copyright (c) 2014 thesupremecommander
-*  BSD 2-Clause License
-*  http://opensource.org/licenses/BSD-2-Clause
-*
-*/
+ *  player.cpp
+ *  StatusSpec project
+ *
+ *  Copyright (c) 2014 thesupremecommander
+ *  BSD 2-Clause License
+ *  http://opensource.org/licenses/BSD-2-Clause
+ *
+ */
 
 #include "player.h"
 
@@ -14,7 +14,7 @@ Player::Player(int entindex) {
 	playerEntity = Interfaces::pClientEntityList->GetClientEntity(entindex);
 }
 
-Player::Player(IClientEntity* entity) {
+Player::Player(IClientEntity *entity) {
 	playerEntity = entity;
 }
 
@@ -24,7 +24,7 @@ Player& Player::operator=(int entindex) {
 	return *this;
 }
 
-Player& Player::operator=(IClientEntity* entity) {
+Player& Player::operator=(IClientEntity *entity) {
 	playerEntity = entity;
 
 	return *this;
@@ -41,35 +41,95 @@ Player& Player::operator=(const Player &player) {
 }
 
 bool Player::operator==(int entindex) const {
-	if (IsValid()) {
-		return playerEntity->entindex() == entindex;
+	return IsEqualTo(Player(entindex));
+}
+
+bool Player::operator==(IClientEntity *entity) const {
+	return IsEqualTo(Player(entity));
+}
+
+bool Player::operator==(const Player &player) const {
+	return IsEqualTo(player);
+}
+
+bool Player::operator!=(int entindex) const {
+	return IsNotEqualTo(Player(entindex));
+}
+
+bool Player::operator!=(IClientEntity *entity) const {
+	return IsNotEqualTo(Player(entity));
+}
+
+bool Player::operator!=(const Player &player) const {
+	return IsNotEqualTo(player);
+}
+
+bool Player::operator<(int entindex) const {
+	return IsLessThan(Player(entindex));
+}
+
+bool Player::operator<(IClientEntity *entity) const {
+	return IsLessThan(Player(entity));
+}
+
+bool Player::operator<(const Player &player) const {
+	return IsLessThan(player);
+}
+
+bool Player::operator<=(int entindex) const {
+	return IsLessThanOrEqualTo(Player(entindex));
+}
+
+bool Player::operator<=(IClientEntity *entity) const {
+	return IsLessThanOrEqualTo(Player(entity));
+}
+
+bool Player::operator<=(const Player &player) const {
+	return IsLessThanOrEqualTo(player);
+}
+
+bool Player::operator>(int entindex) const {
+	return IsGreaterThan(Player(entindex));
+}
+
+bool Player::operator>(IClientEntity *entity) const {
+	return IsGreaterThan(Player(entity));
+}
+
+bool Player::operator>(const Player &player) const {
+	return IsGreaterThan(player);
+}
+
+bool Player::operator>=(int entindex) const {
+	return IsGreaterThanOrEqualTo(Player(entindex));
+}
+
+bool Player::operator>=(IClientEntity *entity) const {
+	return IsGreaterThanOrEqualTo(Player(entity));
+}
+
+bool Player::operator>=(const Player &player) const {
+	return IsGreaterThanOrEqualTo(player);
+}
+
+bool Player::IsEqualTo(const Player &player) const {
+	if (IsValid() && player.IsValid()) {
+		return playerEntity == player.playerEntity;
 	}
 
 	return false;
 }
 
-bool Player::operator==(IClientEntity *entity) const {
-	return playerEntity == entity;
+bool Player::IsNotEqualTo(const Player &player) const {
+	return !IsEqualTo(player);
 }
 
-bool Player::operator==(const Player &player) const {
-	return playerEntity == player.playerEntity;
-}
+bool Player::IsLessThan(const Player &player) const {
+	if (!IsValid()) {
+		return true;
+	}
 
-bool Player::operator!=(int entindex) const {
-	return !(*this == entindex);
-}
-
-bool Player::operator!=(IClientEntity *entity) const {
-	return !(*this == entity);
-}
-
-bool Player::operator!=(const Player &player) const {
-	return !(playerEntity == player.playerEntity);
-}
-
-bool Player::operator<(const Player &player) const {
-	if (!player) {
+	if (!player.IsValid()) {
 		return false;
 	}
 
@@ -86,15 +146,23 @@ bool Player::operator<(const Player &player) const {
 		return true;
 	}
 
+	if (this->GetEntity()->entindex() < player.GetEntity()->entindex()) {
+		return true;
+	}
+
 	return false;
 }
 
-bool Player::operator<=(const Player &player) const {
-	return *this == player || *this < player;
+bool Player::IsLessThanOrEqualTo(const Player &player) const {
+	return IsEqualTo(player) || IsLessThan(player);
 }
 
-bool Player::operator>(const Player &player) const {
-	if (!player) {
+bool Player::IsGreaterThan(const Player &player) const {
+	if (!IsValid()) {
+		return false;
+	}
+
+	if (!player.IsValid()) {
 		return true;
 	}
 
@@ -111,11 +179,15 @@ bool Player::operator>(const Player &player) const {
 		return true;
 	}
 
+	if (this->GetEntity()->entindex() > player.GetEntity()->entindex()) {
+		return true;
+	}
+
 	return false;
 }
 
-bool Player::operator>=(const Player &player) const {
-	return *this == player || *this > player;
+bool Player::IsGreaterThanOrEqualTo(const Player &player) const {
+	return IsEqualTo(player) || IsGreaterThan(player);
 }
 
 Player::operator bool() const {
@@ -124,7 +196,7 @@ Player::operator bool() const {
 
 bool Player::IsValid() const {
 	try {
-		return playerEntity.IsValid() && playerEntity.Get() && Entities::CheckClassBaseclass(playerEntity->GetClientClass(), "DT_TFPlayer") && Interfaces::GetGameResources()->IsConnected(playerEntity->entindex());
+		return playerEntity.IsValid() && playerEntity.Get() && playerEntity->entindex() >= 1 && playerEntity->entindex() <= MAX_PLAYERS && Entities::CheckClassBaseclass(playerEntity->GetClientClass(), "DT_TFPlayer") && Interfaces::GetGameResources()->IsConnected(playerEntity->entindex());
 	}
 	catch (bad_pointer &e) {
 		Warning(e.what());
@@ -269,6 +341,18 @@ TFTeam Player::GetTeam() const {
 	}
 
 	return TFTeam_Unassigned;
+}
+
+int Player::GetUserID() const {
+	if (IsValid()) {
+		player_info_t playerInfo;
+
+		if (Funcs::CallFunc_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, playerEntity->entindex(), &playerInfo)) {
+			return playerInfo.userID;
+		}
+	}
+
+	return 0;
 }
 
 bool Player::IsAlive() const {

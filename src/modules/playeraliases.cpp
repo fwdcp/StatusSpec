@@ -42,20 +42,18 @@ inline CSteamID ConvertTextToSteamID(std::string textID) {
 }
 
 PlayerAliases::PlayerAliases() {
-	enabled = new ConVar("statusspec_playeraliases_enabled", "0", FCVAR_NONE, "enable player aliases");
+	getPlayerInfoHook = 0;
+
+	enabled = new ConVar("statusspec_playeraliases_enabled", "0", FCVAR_NONE, "enable player aliases", [](IConVar *var, const char *pOldValue, float flOldValue) { g_PlayerAliases->ToggleEnabled(var, pOldValue, flOldValue); });
 	esea = new ConVar("statusspec_playeraliases_esea", "0", FCVAR_NONE, "enable player aliases from the ESEA API");
 	etf2l = new ConVar("statusspec_playeraliases_etf2l", "0", FCVAR_NONE, "enable player aliases from the ETF2L API");
 	format_blu = new ConVar("statusspec_playeraliases_format_blu", "%alias%", FCVAR_NONE, "the name format for BLU players");
 	format_red = new ConVar("statusspec_playeraliases_format_red", "%alias%", FCVAR_NONE, "the name format for RED players");
-	get = new ConCommand("statusspec_playeraliases_get", PlayerAliases::GetCustomPlayerAlias, "get a custom player alias", FCVAR_NONE, PlayerAliases::GetCurrentAliasedPlayers);
-	remove = new ConCommand("statusspec_playeraliases_remove", PlayerAliases::RemoveCustomPlayerAlias, "remove a custom player alias", FCVAR_NONE, PlayerAliases::GetCurrentAliasedPlayers);
-	set = new ConCommand("statusspec_playeraliases_set", PlayerAliases::SetCustomPlayerAlias, "set a custom player alias", FCVAR_NONE, PlayerAliases::GetCurrentGamePlayers);
+	get = new ConCommand("statusspec_playeraliases_get", [](const CCommand &command) { g_PlayerAliases->GetCustomPlayerAlias(command); }, "get a custom player alias", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_PlayerAliases->GetCurrentAliasedPlayers(partial, commands); });
+	remove = new ConCommand("statusspec_playeraliases_remove", [](const CCommand &command) { g_PlayerAliases->RemoveCustomPlayerAlias(command); }, "remove a custom player alias", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_PlayerAliases->GetCurrentAliasedPlayers(partial, commands); });
+	set = new ConCommand("statusspec_playeraliases_set", [](const CCommand &command) { g_PlayerAliases->SetCustomPlayerAlias(command); }, "set a custom player alias", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_PlayerAliases->GetCurrentGamePlayers(partial, commands); });
 	twitch = new ConVar("statusspec_playeraliases_twitch", "0", FCVAR_NONE, "enable player aliases from the Twitch API");
-	switch_teams = new ConCommand("statusspec_playeraliases_switch_teams", PlayerAliases::SwitchTeams, "switch name formats for both teams", FCVAR_NONE);
-}
-
-bool PlayerAliases::IsEnabled() {
-	return enabled->GetBool();
+	switch_teams = new ConCommand("statusspec_playeraliases_switch_teams", []() { g_PlayerAliases->SwitchTeams(); }, "switch name formats for both teams", FCVAR_NONE);
 }
 
 bool PlayerAliases::GetPlayerInfoOverride(int ent_num, player_info_t *pinfo) {
@@ -64,7 +62,7 @@ bool PlayerAliases::GetPlayerInfoOverride(int ent_num, player_info_t *pinfo) {
 	Player player = ent_num;
 
 	if (!player) {
-		return result;
+		RETURN_META_VALUE(MRES_IGNORED, false);
 	}
 
 	CSteamID playerSteamID = player.GetSteamID();
@@ -88,7 +86,7 @@ bool PlayerAliases::GetPlayerInfoOverride(int ent_num, player_info_t *pinfo) {
 
 	V_strcpy_safe(pinfo->name, gameName.c_str());
 
-	return result;
+	RETURN_META_VALUE(MRES_SUPERCEDE, result);
 }
 
 std::string PlayerAliases::GetAlias(CSteamID player, std::string gameAlias) {
@@ -312,7 +310,7 @@ int PlayerAliases::GetCurrentAliasedPlayers(const char *partial, char commands[C
 	std::string command;
 	std::getline(ss, command, ' ');
 
-	for (auto playerAlias = g_PlayerAliases->customAliases.begin(); playerAlias != g_PlayerAliases->customAliases.end() && playerCount < COMMAND_COMPLETION_MAXITEMS; ++playerAlias) {
+	for (auto playerAlias = customAliases.begin(); playerAlias != customAliases.end() && playerCount < COMMAND_COMPLETION_MAXITEMS; ++playerAlias) {
 		CSteamID playerSteamID = playerAlias->first;
 
 		V_snprintf(commands[playerCount], COMMAND_COMPLETION_ITEM_LENGTH, "%s %llu", command.c_str(), playerSteamID.ConvertToUint64());
@@ -361,8 +359,8 @@ void PlayerAliases::GetCustomPlayerAlias(const CCommand &command) {
 		return;
 	}
 
-	if (g_PlayerAliases->customAliases.find(playerSteamID) != g_PlayerAliases->customAliases.end()) {
-		Msg("Steam ID %llu has an associated alias '%s'.\n", playerSteamID.ConvertToUint64(), g_PlayerAliases->customAliases[playerSteamID].c_str());
+	if (customAliases.find(playerSteamID) != customAliases.end()) {
+		Msg("Steam ID %llu has an associated alias '%s'.\n", playerSteamID.ConvertToUint64(), customAliases[playerSteamID].c_str());
 	}
 	else {
 		Msg("Steam ID %llu does not have an associated alias.\n", playerSteamID.ConvertToUint64());
@@ -383,7 +381,7 @@ void PlayerAliases::RemoveCustomPlayerAlias(const CCommand &command) {
 		return;
 	}
 
-	g_PlayerAliases->customAliases.erase(playerSteamID);
+	customAliases.erase(playerSteamID);
 	Msg("Alias associated with Steam ID %llu erased.\n", playerSteamID.ConvertToUint64());
 }
 
@@ -401,14 +399,29 @@ void PlayerAliases::SetCustomPlayerAlias(const CCommand &command) {
 		return;
 	}
 
-	g_PlayerAliases->customAliases[playerSteamID] = command.Arg(2);
-	Msg("Steam ID %llu has been associated with alias '%s'.\n", playerSteamID.ConvertToUint64(), g_PlayerAliases->customAliases[playerSteamID].c_str());
+	customAliases[playerSteamID] = command.Arg(2);
+	Msg("Steam ID %llu has been associated with alias '%s'.\n", playerSteamID.ConvertToUint64(), customAliases[playerSteamID].c_str());
 }
 
 void PlayerAliases::SwitchTeams() {
-	std::string newBluFormat = g_PlayerAliases->format_red->GetString();
-	std::string newRedFormat = g_PlayerAliases->format_blu->GetString();
+	std::string newBluFormat = format_red->GetString();
+	std::string newRedFormat = format_blu->GetString();
 
-	g_PlayerAliases->format_blu->SetValue(newBluFormat.c_str());
-	g_PlayerAliases->format_red->SetValue(newRedFormat.c_str());
+	format_blu->SetValue(newBluFormat.c_str());
+	format_red->SetValue(newRedFormat.c_str());
+}
+
+void PlayerAliases::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
+	if (enabled->GetBool()) {
+		if (!getPlayerInfoHook) {
+			getPlayerInfoHook = Funcs::AddHook_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, SH_MEMBER(this, &PlayerAliases::GetPlayerInfoOverride), false);
+		}
+	}
+	else {
+		if (getPlayerInfoHook) {
+			if (Funcs::RemoveHook(getPlayerInfoHook)) {
+				getPlayerInfoHook = 0;
+			}
+		}
+	}
 }

@@ -12,6 +12,7 @@
 
 AntiFreeze *g_AntiFreeze = nullptr;
 CameraTools *g_CameraTools = nullptr;
+CustomMaterials *g_CustomMaterials = nullptr;
 CustomTextures *g_CustomTextures = nullptr;
 FOVOverride *g_FOVOverride = nullptr;
 Killstreaks *g_Killstreaks = nullptr;
@@ -25,161 +26,25 @@ PlayerOutlines *g_PlayerOutlines = nullptr;
 ProjectileOutlines *g_ProjectileOutlines = nullptr;
 SpecGUIOrder *g_SpecGUIOrder = nullptr;
 StatusIcons *g_StatusIcons = nullptr;
+TeamHealthComparison *g_TeamHealthComparison = nullptr;
 TeamOverrides *g_TeamOverrides = nullptr;
 
-static int doPostScreenSpaceEffectsHook;
-static int getFOVHook;
-
-int Detour_GetLocalPlayerIndex() {
-	if (g_LocalPlayer) {
-		if (g_LocalPlayer->IsEnabled()) {
-			return g_LocalPlayer->GetLocalPlayerIndexOverride();
-		}
-	}
-
-	return Funcs::CallFunc_GetLocalPlayerIndex();
-}
-
-void __fastcall Detour_C_BaseEntity_SetModelIndex(C_BaseEntity *instance, void *, int index) {
-	if (g_PlayerModels) {
-		if (g_PlayerModels->IsEnabled()) {
-			const model_t *oldModel = Interfaces::pModelInfoClient->GetModel(index);
-			const model_t *newModel = g_PlayerModels->SetModelOverride(instance, oldModel);
-			index = Interfaces::pModelInfoClient->GetModelIndex(Interfaces::pModelInfoClient->GetModelName(newModel));
-		}
-	}
-
-	Funcs::CallFunc_C_BaseEntity_SetModelIndex(instance, index);
-}
-
-void __fastcall Detour_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, void *, const model_t *pModel) {
-	if (g_PlayerModels) {
-		if (g_PlayerModels->IsEnabled()) {
-			const model_t *oldModel = pModel;
-			const model_t *newModel = g_PlayerModels->SetModelOverride(instance, oldModel);
-			pModel = newModel;
-		}
-	}
-
-	Funcs::CallFunc_C_BaseEntity_SetModelPointer(instance, pModel);
-}
-
-float Hook_C_BasePlayer_GetFOV() {
-	if (g_FOVOverride) {
-		if (g_FOVOverride->IsEnabled()) {
-			C_TFPlayer *player = META_IFACEPTR(C_TFPlayer);
-
-			RETURN_META_VALUE(MRES_SUPERCEDE, g_FOVOverride->GetFOVOverride(player));
-		}
-	}
-
-	RETURN_META_VALUE(MRES_IGNORED, 0.0f);
-}
+static int doPostScreenSpaceEffectsHook = 0;
+static int frameHook = 0;
 
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
-	if (!doPostScreenSpaceEffectsHook && Interfaces::GetClientMode()) {
-		doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), Hook_IClientMode_DoPostScreenSpaceEffects);
+	if (!doPostScreenSpaceEffectsHook) {
+		try {
+			doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), SH_STATIC(Hook_IClientMode_DoPostScreenSpaceEffects), false);
+		}
+		catch (bad_pointer &e) {
+			Warning(e.what());
+		}
 	}
 
-	if (curStage == FRAME_RENDER_START) {
-		if (g_CameraTools) {
-			g_CameraTools->PreEntityUpdate();
-		}
-
-		if (g_LoadoutIcons) {
-			if (g_LoadoutIcons->IsEnabled()) {
-				g_LoadoutIcons->PreEntityUpdate();
-			}
-		}
-
-		if (g_MedigunInfo) {
-			if (g_MedigunInfo->IsEnabled()) {
-				g_MedigunInfo->PreEntityUpdate();
-			}
-		}
-
-		if (g_SpecGUIOrder) {
-			if (g_SpecGUIOrder->IsEnabled()) {
-				g_SpecGUIOrder->PreEntityUpdate();
-			}
-		}
-
-		int maxEntity = Interfaces::pClientEntityList->GetHighestEntityIndex();
-
-		for (int i = 0; i < maxEntity; i++) {
-			IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
-		
-			if (!entity) {
-				continue;
-			}
-
-			if (!getFOVHook && Player(entity)) {
-				getFOVHook = Funcs::AddHook_C_TFPlayer_GetFOV((C_TFPlayer *)entity, Hook_C_BasePlayer_GetFOV);
-			}
-
-			if (g_AntiFreeze) {
-				g_AntiFreeze->ProcessEntity(entity);
-			}
-
-			if (g_CameraTools) {
-				g_CameraTools->ProcessEntity(entity);
-			}
-
-			if (g_LoadoutIcons) {
-				if (g_LoadoutIcons->IsEnabled()) {
-					g_LoadoutIcons->ProcessEntity(entity);
-				}
-			}
-
-			if (g_MedigunInfo) {
-				if (g_MedigunInfo->IsEnabled()) {
-					g_MedigunInfo->ProcessEntity(entity);
-				}
-			}
-
-			if (g_PlayerOutlines) {
-				g_PlayerOutlines->ProcessEntity(entity);
-			}
-
-			if (g_ProjectileOutlines) {
-				g_ProjectileOutlines->ProcessEntity(entity);
-			}
-
-			if (g_SpecGUIOrder) {
-				if (g_SpecGUIOrder->IsEnabled()) {
-					g_SpecGUIOrder->ProcessEntity(entity);
-				}
-			}
-		}
-
-		if (g_AntiFreeze) {
-			g_AntiFreeze->PostEntityUpdate();
-		}
-
-		if (g_CameraTools) {
-			g_CameraTools->PostEntityUpdate();
-		}
-
-		if (g_Killstreaks) {
-			g_Killstreaks->PostEntityUpdate();
-		}
-
-		if (g_LoadoutIcons) {
-			if (g_LoadoutIcons->IsEnabled()) {
-				g_LoadoutIcons->PostEntityUpdate();
-			}
-		}
-
-		if (g_LocalPlayer) {
-			if (g_LocalPlayer->IsEnabled()) {
-				g_LocalPlayer->PostEntityUpdate();
-			}
-		}
-
-		if (g_SpecGUIOrder) {
-			if (g_SpecGUIOrder->IsEnabled()) {
-				g_SpecGUIOrder->PostEntityUpdate();
-			}
+	if (doPostScreenSpaceEffectsHook) {
+		if (Funcs::RemoveHook(frameHook)) {
+			frameHook = 0;
 		}
 	}
 
@@ -187,128 +52,9 @@ void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
 }
 
 bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup) {
-	if (g_PlayerOutlines) {
-		if (g_PlayerOutlines->IsEnabled()) {
-			g_PlayerOutlines->PreGlowRender(pSetup);
-		}
-	}
-
-	if (g_ProjectileOutlines) {
-		if (g_ProjectileOutlines->IsEnabled()) {
-			g_ProjectileOutlines->PreGlowRender(pSetup);
-		}
-	}
-
 	g_GlowObjectManager.RenderGlowEffects(pSetup);
 
 	RETURN_META_VALUE(MRES_OVERRIDE, true);
-}
-
-bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast) {
-	IGameEvent *newEvent = Interfaces::pGameEventManager->DuplicateEvent(event);
-	Interfaces::pGameEventManager->FreeEvent(event);
-
-	RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEvent, (newEvent, bDontBroadcast));
-}
-
-bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event) {
-	IGameEvent *newEvent = Interfaces::pGameEventManager->DuplicateEvent(event);
-	Interfaces::pGameEventManager->FreeEvent(event);
-
-	if (g_Killstreaks) {
-		g_Killstreaks->FireEvent(newEvent);
-	}
-
-	RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, false, &IGameEventManager2::FireEventClientSide, (newEvent));
-}
-
-void Hook_IPanel_PaintTraverse_Pre(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
-	if (Interfaces::pEngineClient->IsDrawingLoadingImage() || !Interfaces::pEngineClient->IsInGame() || !Interfaces::pEngineClient->IsConnected() || Interfaces::pEngineClient->Con_IsVisible()) {
-		RETURN_META(MRES_IGNORED);
-	}
-
-	if (g_AntiFreeze) {
-		if (g_AntiFreeze->IsEnabled()) {
-			g_AntiFreeze->Paint(vguiPanel);
-		}
-	}
-
-	if (g_MedigunInfo) {
-		if (g_MedigunInfo->IsEnabled()) {
-			g_MedigunInfo->Paint(vguiPanel);
-		}
-	}
-
-	RETURN_META(MRES_IGNORED);
-}
-
-void Hook_IPanel_PaintTraverse_Post(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce = true) {
-	if (g_LoadoutIcons) {
-		if (g_LoadoutIcons->IsEnabled()) {
-			g_LoadoutIcons->Paint(vguiPanel);
-		}
-	}
-
-	if (g_StatusIcons) {
-		if (g_StatusIcons->IsEnabled()) {
-			g_StatusIcons->Paint(vguiPanel);
-		}
-		else {
-			g_StatusIcons->NoPaint(vguiPanel);
-		}
-	}
-
-	RETURN_META(MRES_IGNORED);
-}
-
-void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel) {
-	if (g_LoadoutIcons) {
-		if (g_LoadoutIcons->IsEnabled()) {
-			g_LoadoutIcons->InterceptMessage(vguiPanel, params, ifromPanel);
-		}
-	}
-
-	if (g_SpecGUIOrder) {
-		if (g_SpecGUIOrder->IsEnabled()) {
-			g_SpecGUIOrder->InterceptMessage(vguiPanel, params, ifromPanel);
-		}
-	}
-	
-	if (g_StatusIcons) {
-		if (g_StatusIcons->IsEnabled()) {
-			g_StatusIcons->InterceptMessage(vguiPanel, params, ifromPanel);
-		}
-	}
-
-	if (g_TeamOverrides) {
-		if (g_TeamOverrides->IsEnabled()) {
-			g_TeamOverrides->InterceptMessage(vguiPanel, params, ifromPanel);
-		}
-	}
-
-	RETURN_META(MRES_IGNORED);
-}
-
-void Hook_IPanel_SetPos(vgui::VPANEL vguiPanel, int x, int y) {
-	if (g_SpecGUIOrder) {
-		if (g_SpecGUIOrder->IsEnabled()) {
-			if (g_SpecGUIOrder->SetPosOverride(vguiPanel, x, y)) {
-				RETURN_META_NEWPARAMS(MRES_HANDLED, &IPanel::SetPos, (vguiPanel, x, y));
-			}
-		}
-	}
-
-	RETURN_META(MRES_IGNORED);
-}
-
-bool Hook_IVEngineClient_GetPlayerInfo(int ent_num, player_info_t *pinfo) {
-	if (g_PlayerAliases) {
-		if (g_PlayerAliases->IsEnabled()) {
-			RETURN_META_VALUE(MRES_SUPERCEDE, g_PlayerAliases->GetPlayerInfoOverride(ent_num, pinfo));
-		}
-	}
-	
-	RETURN_META_VALUE(MRES_IGNORED, false);
 }
 
 // The plugin is a static singleton that is exported as an interface
@@ -340,23 +86,24 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 		return false;
 	}
 
-	Funcs::AddDetour_GetLocalPlayerIndex(Detour_GetLocalPlayerIndex);
-	Funcs::AddDetour_C_BaseEntity_SetModelIndex(Detour_C_BaseEntity_SetModelIndex);
-	Funcs::AddDetour_C_BaseEntity_SetModelPointer(Detour_C_BaseEntity_SetModelPointer);
-	
-	Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, Hook_IBaseClientDLL_FrameStageNotify);
-	Funcs::AddHook_IGameEventManager2_FireEvent(Interfaces::pGameEventManager, Hook_IGameEventManager2_FireEvent);
-	Funcs::AddHook_IGameEventManager2_FireEventClientSide(Interfaces::pGameEventManager, Hook_IGameEventManager2_FireEventClientSide);
-	Funcs::AddHook_IPanel_PaintTraverse_Pre(g_pVGuiPanel, Hook_IPanel_PaintTraverse_Pre);
-	Funcs::AddHook_IPanel_PaintTraverse_Post(g_pVGuiPanel, Hook_IPanel_PaintTraverse_Post);
-	Funcs::AddHook_IPanel_SendMessage(g_pVGuiPanel, Hook_IPanel_SendMessage);
-	Funcs::AddHook_IPanel_SetPos(g_pVGuiPanel, Hook_IPanel_SetPos);
-	Funcs::AddHook_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, Hook_IVEngineClient_GetPlayerInfo);
+	if (!doPostScreenSpaceEffectsHook) {
+		try {
+			doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), SH_STATIC(Hook_IClientMode_DoPostScreenSpaceEffects), false);
+		}
+		catch (bad_pointer &e) {
+			Warning(e.what());
+		}
+
+		if (!doPostScreenSpaceEffectsHook && !frameHook) {
+			frameHook = Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, SH_STATIC(Hook_IBaseClientDLL_FrameStageNotify), true);
+		}
+	}
 	
 	ConVar_Register();
 
 	g_AntiFreeze = new AntiFreeze();
 	g_CameraTools = new CameraTools();
+	g_CustomMaterials = new CustomMaterials();
 	g_CustomTextures = new CustomTextures();
 	g_FOVOverride = new FOVOverride();
 	g_Killstreaks = new Killstreaks();
@@ -370,6 +117,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_ProjectileOutlines = new ProjectileOutlines();
 	g_SpecGUIOrder = new SpecGUIOrder();
 	g_StatusIcons = new StatusIcons();
+	g_TeamHealthComparison = new TeamHealthComparison();
 	g_TeamOverrides = new TeamOverrides();
 	
 	Msg("%s loaded!\n", PLUGIN_DESC);
@@ -380,6 +128,7 @@ void StatusSpecPlugin::Unload(void)
 {
 	delete g_AntiFreeze;
 	delete g_CameraTools;
+	delete g_CustomMaterials;
 	delete g_CustomTextures;
 	delete g_FOVOverride;
 	delete g_Killstreaks;
@@ -393,6 +142,7 @@ void StatusSpecPlugin::Unload(void)
 	delete g_ProjectileOutlines;
 	delete g_SpecGUIOrder;
 	delete g_StatusIcons;
+	delete g_TeamHealthComparison;
 	delete g_TeamOverrides;
 
 	Funcs::Unload();

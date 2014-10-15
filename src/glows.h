@@ -1,9 +1,9 @@
 /*
-*  glows.h
-*  StatusSpec project
-*  Derived from the Source SDK
-*
-*/
+ *  glows.h
+ *  StatusSpec project
+ *  Derived from the Source SDK
+ *
+ */
 
 #pragma once
 

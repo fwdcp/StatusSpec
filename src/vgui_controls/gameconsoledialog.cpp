@@ -1,9 +1,9 @@
 /*
-*  gameconsoledialog.cpp
-*  StatusSpec project
-*  Derived from the Alien Swarm SDK
-*
-*/
+ *  gameconsoledialog.cpp
+ *  StatusSpec project
+ *  Derived from the Alien Swarm SDK
+ *
+ */
 
 #include "GameConsoleDialog.h"
 

@@ -51,7 +51,7 @@ inline DWORD FindPattern(DWORD dwAddress, DWORD dwSize, BYTE* pbSig, const char*
 	return 0;
 }
 
-IClientMode* Interfaces::GetClientMode() {
+IClientMode *Interfaces::GetClientMode() {
 #if defined _WIN32
 	static DWORD pointer = NULL;
 
@@ -63,13 +63,17 @@ IClientMode* Interfaces::GetClientMode() {
 		}
 	}
 
+	if (!**(IClientMode***)pointer) {
+		throw bad_pointer("IClientMode");
+	}
+
 	return **(IClientMode***)(pointer);
 #else
 	throw bad_pointer("IClientMode");
 #endif
 }
 
-IGameResources* Interfaces::GetGameResources() {
+IGameResources *Interfaces::GetGameResources() {
 #if defined _WIN32
 	static DWORD pointer = NULL;
 
@@ -81,7 +85,7 @@ IGameResources* Interfaces::GetGameResources() {
 		}
 	}
 
-	typedef IGameResources* (*GGR_t) (void);
+	typedef IGameResources *(*GGR_t)(void);
 	GGR_t GGR = (GGR_t) pointer;
 	IGameResources *gr = GGR();
 
@@ -95,7 +99,7 @@ IGameResources* Interfaces::GetGameResources() {
 #endif
 }
 
-C_HLTVCamera* Interfaces::GetHLTVCamera() {
+C_HLTVCamera *Interfaces::GetHLTVCamera() {
 #if defined _WIN32
 	static DWORD pointer = NULL;
 
@@ -105,6 +109,10 @@ C_HLTVCamera* Interfaces::GetHLTVCamera() {
 		if (!pointer) {
 			throw bad_pointer("C_HLTVCamera");
 		}
+	}
+
+	if (!*(C_HLTVCamera**)pointer) {
+		throw bad_pointer("C_HLTVCamera");
 	}
 
 	return *(C_HLTVCamera**)(pointer);

@@ -18,14 +18,16 @@
 
 #include "Color.h"
 #include "convar.h"
-#include "vgui/IPanel.h"
 #include "KeyValues.h"
+#include "vgui/IPanel.h"
+#include "vgui/IVGui.h"
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/ImagePanel.h"
 
 #include "../entities.h"
 #include "../enums.h"
 #include "../ifaces.h"
 #include "../itemschema.h"
-#include "../paint.h"
 #include "../player.h"
 
 #if defined _WIN32
@@ -66,34 +68,31 @@ typedef struct Loadout_s {
 class LoadoutIcons {
 public:
 	LoadoutIcons();
-	~LoadoutIcons();
 
-	bool IsEnabled();
-
-	void InterceptMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel);
-
-	void Paint(vgui::VPANEL vguiPanel);
-	
-	void PreEntityUpdate();
-	void ProcessEntity(IClientEntity* entity);
-	void PostEntityUpdate();
+	void FrameHook(ClientFrameStage_t curStage);
 private:
 	Color filter_active_color;
-	Color filter_nonactive_color;
+	Color filter_inactive_color;
+	int frameHook;
 	std::map<int, std::string> itemIconTextures;
-	ItemSchema* itemSchema;
+	ItemSchema *itemSchema;
 	std::map<Player, Loadout_t> loadoutInfo;
-	std::map<std::string, Player> playerPanels;
+	std::map<vgui::HPanel, std::map<std::string, vgui::Panel *>> loadoutIconPanels;
 
-	void DrawSlotIcon(Player player, int weapon, int &width, int size);
+	void DisableHUD();
+	void DisplayIcon(vgui::ImagePanel *panel, int itemDefinitionIndex, bool active);
+	void DisplayIcons(vgui::VPANEL playerPanel);
+	void HideIcon(vgui::ImagePanel *panel);
+	void InitIcons(vgui::EditablePanel *panel);
 
-	ConVar* enabled;
-	ConCommand* filter_active;
-	ConCommand* filter_nonactive;
-	ConVar* nonloadout;
+	ConVar *enabled;
+	ConCommand *filter_active;
+	ConCommand *filter_inactive;
+	ConVar *nonloadout;
 	ConVar *only_active;
-	static int GetCurrentFilter(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]);
-	static void SetFilter(const CCommand &command);
+	int GetCurrentFilter(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]);
+	void SetFilter(const CCommand &command);
+	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
 
 extern LoadoutIcons *g_LoadoutIcons;

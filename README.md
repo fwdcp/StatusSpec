@@ -8,6 +8,22 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**0.21.0**
+* general
+  * optimized plugin
+* camera tools
+  * player selection now based on spec GUI position (independent of spec GUI order module)
+* custom materials
+  * readded module
+* custom textures
+  * fixed commands not working
+* loadout icons
+  * revamped to use VGUI system
+* status icons
+  * revamped to use VGUI system
+* team health comparison
+  * new module
+
 **0.20.1**
 * general
   * fix crashing due to invalid entities
@@ -199,7 +215,7 @@ To install, place the `StatusSpec` folder within the `custom` folder in the `tf`
 * `statusspec_antifreeze_display_reload_settings` - reload settings for the freeze info panel from the resource file
 
 #### UI Resource Files
-An example file for the freeze info box is included under `Resource/UI/FreezeInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_antifreeze_display_reload_settings` is provided as a replacement.
+The configuration file for the freeze info HUD is `Resource/UI/FreezeInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_antifreeze_display_reload_settings` is provided as a replacement.
 
 ### Camera Tools
 *allows more options for managing the camera*
@@ -208,6 +224,29 @@ An example file for the freeze info box is included under `Resource/UI/FreezeInf
 * `statusspec_cameratools_spec_player <team> <position>` - spec a certain player
 * `statusspec_cameratools_spec_player_alive` - prevent speccing dead players
 * `statusspec_cameratools_spec_pos <x> <y> <z> <yaw> <pitch>` - spec a certain camera position
+
+### Custom Materials
+*allows materials to be swapped out*
+
+#### Console Variables
+* `statusspec_custommaterials_enabled` - enable custom materials
+
+#### Console Commands
+* `statusspec_custommaterials_load_replacement_group <group>` - load a material replacement group
+* `statusspec_custommaterials_unload_replacement_group <group>` - unload a material replacement group
+
+#### Resource Files
+Player model configuration is loaded from the `Resource/CustomMaterials.res` file. Replacement groups should be configured as sections (whose names are used in the commands for this module). Material replacements should be specified by entries with the path of the old material from the `materials` folder as the key and the path of the new material from the `materials` folder as the value. An example of a configured file is given below:
+```
+"materials"
+{
+	"blank"
+	{
+		"signs/team_blue"	"signs/team_blue_blank"
+		"signs/team_red"	"signs/team_red_blank"
+	}
+}
+```
 
 ### Custom Textures
 *allows textures to be swapped out*
@@ -257,32 +296,32 @@ Player model configuration is loaded from the `Resource/CustomTextures.res` file
 
 #### Console Commands
 * `statusspec_loadouticons_filter_active <red> <green> <blue> <alpha>` - the RGBA filter applied to the icon for an active item
-* `statusspec_loadouticons_filter_nonactive <red> <green> <blue> <alpha>` - the RGBA filter applied to the icon for a nonactive item
+* `statusspec_loadouticons_filter_inactive <red> <green> <blue> <alpha>` - the RGBA filter applied to the icon for an inactive item
 
 #### UI Resource Files
-To properly support loadout icons, adjust `Resource/UI/SpectatorTournament.res` so that it includes something similar to the `loadouticons` section below contained within the `playerpanels_kv` section of the `specgui` section, as demonstrated below. You will also need to adjust the rest of the file as necessary, since this will act as a normal GUI panel. The icons will be entirely contained within this element as defined in this configuration, and each icon will be a square size of `tall`. The rendering of this panel only displays icons and will not adjust anything else, no matter whether this feature is enabled or disabled - thus, you will be required to manually adjust your HUD as appropriate when enabling or disabling this feature.
+The configuration file for the loadout icons is `Resource/UI/LoadoutIcons.res`. To properly support loadout icons, you will also have to adjust `Resource/UI/SpectatorTournament.res` so that it includes something similar to the `LoadoutIcons` section below contained within the `playerpanels_kv` section of the `specgui` section, as demonstrated below.
 ```
 "Resource/UI/SpectatorTournament.res"
 {
 	"specgui"
 	{
 		...
-	       
+		   
 		"playerpanels_kv"
 		{
 			...
 			
-			"loadouticons"
+			"LoadoutIcons"
 			{
-				"ControlName"	"Panel"
-				"fieldName"		"loadouticons"
-				"xpos"			"16"
-				"ypos"			"0"
-				"zpos"			"2"
-				"wide"			"60"
-				"tall"			"15"
-				"visible"		"1"
-				"enabled"		"1"
+				"ControlName"   "EditablePanel"
+				"fieldName"	 "LoadoutIcons"
+				"xpos"		  "160"
+				"ypos"		  "0"
+				"zpos"		  "2"
+				"wide"		  "45"
+				"tall"		  "15"
+				"visible"	   "1"
+				"enabled"	   "1"
 			}
 		}
 	}
@@ -296,7 +335,7 @@ To properly support loadout icons, adjust `Resource/UI/SpectatorTournament.res` 
 
 #### Console Variables
 * `statusspec_localplayer_enabled` - enable local player override
-* `statusspec_localplayer_player` - player to set as the local player
+* `statusspec_localplayer_player` - player index to set as the local player
 
 #### Console Commands
 * `statusspec_localplayer_set_current_target` - set the local player to the current spectator target
@@ -313,7 +352,7 @@ To properly support loadout icons, adjust `Resource/UI/SpectatorTournament.res` 
 * `statusspec_mediguninfo_reload_settings` - reload settings for the medigun info HUD from the resource file
 
 #### UI Resource Files
-An example file for the medigun info box is included under `Resource/UI/MedigunInfo.res`. In addition, the `Resource/UI/MedigunInfoDynamicMeters.res` file is used for the dynamic meters feature, and contains empty sections for each medigun within which you can add progress bar options that will be applied when the specified medigun is being used. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_mediguninfo_reload_settings` is provided as a replacement.
+The configuration file for the medigun info HUD is `Resource/UI/MedigunInfo.res`. In addition, the `Resource/UI/MedigunInfoDynamicMeters.res` file is used for the dynamic meters feature, and contains empty sections for each medigun within which you can add progress bar options that will be applied when the specified medigun is being used. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_mediguninfo_reload_settings` is provided as a replacement.
 
 In addition, the following HUD animations are triggered by this plugin and may be used to show events on the HUD:
 * `MedigunInfoBluChargeReady` - triggered when a BLU medigun charge is ready for use
@@ -427,33 +466,34 @@ Player model configuration is loaded from the `Resource/PlayerModels.res` file. 
 *displays icons representing special statuses of a player*
 
 #### Console Variables
+* `statusspec_statusicons_delta_x` - change in the x direction for each icon
+* `statusspec_statusicons_delta_y` - change in the y direction for each icon
 * `statusspec_statusicons_enabled` - enable status icons
-* `statusspec_statusicons_max_icons` - maximum number of icons to show
 
 #### UI Resource Files
-To properly support status icons, adjust `Resource/UI/SpectatorTournament.res` so that it includes something similar to the `statusicons` section below contained within the `playerpanels_kv` section of the `specgui` section, as demonstrated below. The icons will appear on the right of `xpos` with a square size of `tall`, and the player panel will also be expanded to accommodate these icons. The rendering of this panel assumes that this element is on the right edge of the player panel and will not appear if status icons are disabled.
+The configuration file for the status icons is `Resource/UI/StatusIcon.res`. A copy of the elements in that file will be created and configured for each icon. To properly support status icons, you will also have to adjust `Resource/UI/SpectatorTournament.res` so that it includes something similar to the `StatusIcons` section below contained within the `playerpanels_kv` section of the `specgui` section, as demonstrated below.
 ```
 "Resource/UI/SpectatorTournament.res"
 {
 	"specgui"
 	{
 		...
-	       
+		   
 		"playerpanels_kv"
 		{
 			...
 			
-			"statusicons"
+			"StatusIcons"
 			{
-				"ControlName"	"Panel"
-				"fieldName"		"statusicons"
-				"xpos"			"160"
-				"ypos"			"0"
-				"zpos"			"8"
-				"wide"			"0"
-				"tall"			"15"
-				"visible"		"1"
-				"enabled"		"1"
+				"ControlName"   "EditablePanel"
+				"fieldName"	 "StatusIcons"
+				"xpos"		  "160"
+				"ypos"		  "0"
+				"zpos"		  "8"
+				"wide"		  "45"
+				"tall"		  "15"
+				"visible"	   "1"
+				"enabled"	   "1"
 			}
 		}
 	}
@@ -461,6 +501,18 @@ To properly support status icons, adjust `Resource/UI/SpectatorTournament.res` s
 	...	
 }
 ```
+
+### Team Health Comparison
+*displays a comparison of total health between the two teams*
+
+#### Console Variables
+* `statusspec_teamhealthcomparison_enabled` - enable team health comparison
+
+#### Console Commands
+* `statusspec_teamhealthcomparison_reload_settings` - reload settings for the team health comparison HUD from the resource file
+
+#### UI Resource Files
+The configuration file for the team health comparison HUD is `Resource/UI/TeamHealthComparison.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_teamhealthcomparison_reload_settings` is provided as a replacement.
 
 ### Team Overrides
 *override team info in HUD*

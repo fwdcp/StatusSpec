@@ -1,12 +1,12 @@
 /*
-*  specguiorder.h
-*  StatusSpec project
-*
-*  Copyright (c) 2014 thesupremecommander
-*  BSD 2-Clause License
-*  http://opensource.org/licenses/BSD-2-Clause
-*
-*/
+ *  cameratools.h
+ *  StatusSpec project
+ *
+ *  Copyright (c) 2014 thesupremecommander
+ *  BSD 2-Clause License
+ *  http://opensource.org/licenses/BSD-2-Clause
+ *
+ */
 
 #pragma once
 
@@ -17,6 +17,8 @@
 #include <vector>
 
 #include "convar.h"
+#include "vgui/IScheme.h"
+#include "vgui_controls/EditablePanel.h"
 
 #include "../enums.h"
 #include "../funcs.h"
@@ -26,19 +28,14 @@
 class CameraTools {
 public:
 	CameraTools();
-
-	void PreEntityUpdate();
-	void ProcessEntity(IClientEntity *entity);
-	void PostEntityUpdate();
 private:
-	std::vector<Player> bluPlayers;
-	std::vector<Player> redPlayers;
+	KeyValues *specguiSettings;
 
 	ConCommand *spec_player;
 	ConVar *spec_player_alive;
 	ConCommand *spec_pos;
-	static void SpecPlayer(const CCommand &command);
-	static void SpecPosition(const CCommand &command);
+	void SpecPlayer(const CCommand &command);
+	void SpecPosition(const CCommand &command);
 };
 
 class HLTVCameraOverride : public C_HLTVCamera {

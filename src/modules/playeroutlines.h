@@ -34,13 +34,12 @@ class PlayerOutlines {
 public:
 	PlayerOutlines();
 
-	bool IsEnabled();
-
-	void PreGlowRender(const CViewSetup *pSetup);
-
-	void ProcessEntity(IClientEntity *entity);
+	bool DoPostScreenSpaceEffectsHook(const CViewSetup *pSetup);
+	void FrameHook(ClientFrameStage_t curStage);
 private:
 	std::map<std::string, ColorConCommand_t> colors;
+	int doPostScreenSpaceEffectsHook;
+	int frameHook;
 	std::map<EHANDLE, CGlowObject *> glows;
 
 	Color GetGlowColor(Player player);
@@ -51,8 +50,10 @@ private:
 	ConVar *fade_distance;
 	ConVar *health_adjusted_team_colors;
 	ConVar *team_colors;
-	static void ColorCommand(const CCommand &command);
-	static int GetCurrentColor(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]);
+	void ColorCommand(const CCommand &command);
+	int GetCurrentColor(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]);
+	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
+	void ToggleFade(IConVar *var, const char *pOldValue, float flOldValue);
 };
 
 extern PlayerOutlines *g_PlayerOutlines;

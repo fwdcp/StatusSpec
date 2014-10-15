@@ -67,7 +67,7 @@
 class bad_pointer : public std::exception {
 public:
 	bad_pointer(const char *type) noexcept;
-	virtual const char* what() const noexcept;
+	virtual const char *what() const noexcept;
 private:
 	const char *pointerType;
 };

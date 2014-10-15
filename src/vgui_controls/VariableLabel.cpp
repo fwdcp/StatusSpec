@@ -1,8 +1,8 @@
 /*
-*  VariableLabel.cpp
-*  StatusSpec project
-*
-*/
+ *  VariableLabel.cpp
+ *  StatusSpec project
+ *
+ */
 
 #include "VariableLabel.h"
 

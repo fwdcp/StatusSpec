@@ -1,12 +1,12 @@
 /*
-*  funcs.cpp
-*  StatusSpec project
-*
-*  Copyright (c) 2014 thesupremecommander
-*  BSD 2-Clause License
-*  http://opensource.org/licenses/BSD-2-Clause
-*
-*/
+ *  funcs.cpp
+ *  StatusSpec project
+ *
+ *  Copyright (c) 2014 thesupremecommander
+ *  BSD 2-Clause License
+ *  http://opensource.org/licenses/BSD-2-Clause
+ *
+ */
 
 #include "funcs.h"
 
@@ -25,9 +25,8 @@ SH_DECL_MANUALHOOK0(C_TFPlayer_GetObserverMode, OFFSET_GETOBSERVERMODE, 0, 0, in
 SH_DECL_MANUALHOOK0(C_TFPlayer_GetObserverTarget, OFFSET_GETOBSERVERTARGET, 0, 0, C_BaseEntity *);
 SH_DECL_HOOK1_void(IBaseClientDLL, FrameStageNotify, SH_NOATTRIB, 0, ClientFrameStage_t);
 SH_DECL_HOOK1(IClientMode, DoPostScreenSpaceEffects, SH_NOATTRIB, 0, bool, const CViewSetup *);
-SH_DECL_HOOK2(IGameEventManager2, FireEvent, SH_NOATTRIB, 0, bool, IGameEvent *, bool);
 SH_DECL_HOOK1(IGameEventManager2, FireEventClientSide, SH_NOATTRIB, 0, bool, IGameEvent *);
-SH_DECL_HOOK3_void(IPanel, PaintTraverse, SH_NOATTRIB, 0, VPANEL, bool, bool);
+SH_DECL_HOOK4(IMaterialSystem, FindMaterial, SH_NOATTRIB, 0, IMaterial *, char const *, const char *, bool, const char *);
 SH_DECL_HOOK3_void(IPanel, SendMessage, SH_NOATTRIB, 0, VPANEL, KeyValues *, VPANEL);
 SH_DECL_HOOK3_void(IPanel, SetPos, SH_NOATTRIB, 0, VPANEL, int, int);
 SH_DECL_HOOK2(IVEngineClient, GetPlayerInfo, SH_NOATTRIB, 0, bool, int, player_info_t *);
@@ -147,44 +146,36 @@ bool Funcs::AddDetour_C_BaseEntity_SetModelPointer(SMPH_t detour) {
 	return false;
 }
 
-int Funcs::AddHook_C_TFPlayer_GetFOV(C_TFPlayer *instance, float(*hook)()) {
-	return SH_ADD_MANUALHOOK(C_TFPlayer_GetFOV, instance, SH_STATIC(hook), false);
+int Funcs::AddGlobalHook_C_TFPlayer_GetFOV(C_TFPlayer *instance, fastdelegate::FastDelegate0<float> hook, bool post) {
+	return SH_ADD_MANUALHOOK(C_TFPlayer_GetFOV, instance, hook, post);
 }
 
-int Funcs::AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, void(*hook)(ClientFrameStage_t)) {
-	return SH_ADD_HOOK(IBaseClientDLL, FrameStageNotify, instance, SH_STATIC(hook), false);
+int Funcs::AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, fastdelegate::FastDelegate1<ClientFrameStage_t> hook, bool post) {
+	return SH_ADD_HOOK(IBaseClientDLL, FrameStageNotify, instance, hook, post);
 }
 
-int Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(IClientMode *instance, bool(*hook)(const CViewSetup *)) {
-	return SH_ADD_HOOK(IClientMode, DoPostScreenSpaceEffects, instance, SH_STATIC(hook), false);
+int Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(IClientMode *instance, fastdelegate::FastDelegate1<const CViewSetup *, bool> hook, bool post) {
+	return SH_ADD_HOOK(IClientMode, DoPostScreenSpaceEffects, instance, hook, post);
 }
 
-int Funcs::AddHook_IGameEventManager2_FireEvent(IGameEventManager2 *instance, bool(*hook)(IGameEvent *, bool)) {
-	return SH_ADD_HOOK(IGameEventManager2, FireEvent, instance, SH_STATIC(hook), false);
+int Funcs::AddHook_IGameEventManager2_FireEventClientSide(IGameEventManager2 *instance, fastdelegate::FastDelegate1<IGameEvent *, bool> hook, bool post) {
+	return SH_ADD_HOOK(IGameEventManager2, FireEventClientSide, instance, hook, post);
 }
 
-int Funcs::AddHook_IGameEventManager2_FireEventClientSide(IGameEventManager2 *instance, bool(*hook)(IGameEvent *)) {
-	return SH_ADD_HOOK(IGameEventManager2, FireEventClientSide, instance, SH_STATIC(hook), false);
+int Funcs::AddHook_IMaterialSystem_FindMaterial(IMaterialSystem *instance, fastdelegate::FastDelegate4<char const *, const char *, bool, const char *, IMaterial *> hook, bool post) {
+	return SH_ADD_HOOK(IMaterialSystem, FindMaterial, instance, hook, post);
 }
 
-int Funcs::AddHook_IPanel_PaintTraverse_Pre(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, bool, bool)) {
-	return SH_ADD_HOOK(IPanel, PaintTraverse, instance, SH_STATIC(hook), false);
+int Funcs::AddHook_IPanel_SendMessage(vgui::IPanel *instance, fastdelegate::FastDelegate3<vgui::VPANEL, KeyValues *, vgui::VPANEL> hook, bool post) {
+	return SH_ADD_HOOK(IPanel, SendMessage, instance, hook, post);
 }
 
-int Funcs::AddHook_IPanel_PaintTraverse_Post(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, bool, bool)) {
-	return SH_ADD_HOOK(IPanel, PaintTraverse, instance, SH_STATIC(hook), true);
+int Funcs::AddHook_IPanel_SetPos(vgui::IPanel *instance, fastdelegate::FastDelegate3<vgui::VPANEL, int, int> hook, bool post) {
+	return SH_ADD_HOOK(IPanel, SetPos, instance, hook, post);
 }
 
-int Funcs::AddHook_IPanel_SendMessage(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, KeyValues *, vgui::VPANEL)) {
-	return SH_ADD_HOOK(IPanel, SendMessage, instance, SH_STATIC(hook), false);
-}
-
-int Funcs::AddHook_IPanel_SetPos(vgui::IPanel *instance, void(*hook)(vgui::VPANEL, int, int)) {
-	return SH_ADD_HOOK(IPanel, SetPos, instance, SH_STATIC(hook), false);
-}
-
-int Funcs::AddHook_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, bool(*hook)(int, player_info_t *)) {
-	return SH_ADD_HOOK(IVEngineClient, GetPlayerInfo, instance, SH_STATIC(hook), false);
+int Funcs::AddHook_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, fastdelegate::FastDelegate2<int, player_info_t *, bool> hook, bool post) {
+	return SH_ADD_HOOK(IVEngineClient, GetPlayerInfo, instance, hook, post);
 }
 
 int Funcs::CallFunc_GetLocalPlayerIndex() {

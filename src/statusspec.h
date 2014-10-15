@@ -12,16 +12,13 @@
 
 #include "stdafx.h"
 
-#include "entities.h"
-#include "enums.h"
 #include "funcs.h"
 #include "glows.h"
 #include "ifaces.h"
-#include "itemschema.h"
-#include "paint.h"
 
 #include "modules/antifreeze.h"
 #include "modules/cameratools.h"
+#include "modules/custommaterials.h"
 #include "modules/customtextures.h"
 #include "modules/fovoverride.h"
 #include "modules/killstreaks.h"
@@ -35,24 +32,13 @@
 #include "modules/projectileoutlines.h"
 #include "modules/specguiorder.h"
 #include "modules/statusicons.h"
+#include "modules/teamhealthcomparison.h"
 #include "modules/teamoverrides.h"
 
-#define PLUGIN_DESC "StatusSpec v0.20.1"
+#define PLUGIN_DESC "StatusSpec v0.21.0"
 
-int Detour_GetLocalPlayerIndex();
-void __fastcall Detour_C_BaseEntity_SetModelIndex(C_BaseEntity *instance, void *, int index);
-void __fastcall Detour_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, void *, const model_t *pModel);
-
-float Hook_C_BasePlayer_GetFOV();
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage);
 bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup);
-bool Hook_IGameEventManager2_FireEvent(IGameEvent *event, bool bDontBroadcast = false);
-bool Hook_IGameEventManager2_FireEventClientSide(IGameEvent *event);
-void Hook_IPanel_PaintTraverse_Pre(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce);
-void Hook_IPanel_PaintTraverse_Post(vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce);
-void Hook_IPanel_SendMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel);
-void Hook_IPanel_SetPos(vgui::VPANEL vguiPanel, int x, int y);
-bool Hook_IVEngineClient_GetPlayerInfo(int ent_num, player_info_t *pinfo);
 
 class StatusSpecPlugin: public IServerPluginCallbacks
 {

@@ -1,12 +1,12 @@
 /*
-*  antifreeze.h
-*  StatusSpec project
-*
-*  Copyright (c) 2014 thesupremecommander
-*  BSD 2-Clause License
-*  http://opensource.org/licenses/BSD-2-Clause
-*
-*/
+ *  fovoverride.h
+ *  StatusSpec project
+ *
+ *  Copyright (c) 2014 thesupremecommander
+ *  BSD 2-Clause License
+ *  http://opensource.org/licenses/BSD-2-Clause
+ *
+ */
 
 #pragma once
 
@@ -22,13 +22,18 @@ class FOVOverride {
 public:
 	FOVOverride();
 
-	bool IsEnabled();
-
-	float GetFOVOverride(C_TFPlayer *instance);
+	void FrameHook(ClientFrameStage_t curStage);
+	float GetFOVOverride();
 private:
+	bool HookGetFOV();
+
+	int frameHook;
+	int getFOVHook;
+
 	ConVar *enabled;
 	ConVar *fov;
 	ConVar *zoomed;
+	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
 
 extern FOVOverride *g_FOVOverride;

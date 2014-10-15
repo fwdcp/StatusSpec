@@ -18,10 +18,11 @@
 
 #include "convar.h"
 #include "vgui/IPanel.h"
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/ImagePanel.h"
 
 #include "../enums.h"
 #include "../ifaces.h"
-#include "../paint.h"
 #include "../player.h"
 
 #define TEXTURE_NULL "vgui/replay/thumbnails/null"
@@ -52,18 +53,20 @@
 class StatusIcons {
 public:
 	StatusIcons();
-	
-	bool IsEnabled();
 
-	void InterceptMessage(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel);
-	
-	void NoPaint(vgui::VPANEL vguiPanel);
-	void Paint(vgui::VPANEL vguiPanel);
+	void FrameHook(ClientFrameStage_t curStage);
 private:
-	std::map<std::string, Player> playerPanels;
+	int frameHook;
 
-	ConVar* enabled;
-	ConVar* max_icons;
+	void ClearIcons(vgui::VPANEL statusIconsPanel);
+	void DisableHUD();
+	void DisplayIcon(vgui::EditablePanel *panel, const char *iconTexture);
+	void DisplayIcons(vgui::VPANEL playerPanel);
+
+	ConVar *delta_x;
+	ConVar *delta_y;
+	ConVar *enabled;
+	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
 
 extern StatusIcons *g_StatusIcons;

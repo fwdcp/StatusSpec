@@ -1,5 +1,5 @@
 /*
- *  customtextures.h
+ *  custommaterials.h
  *  StatusSpec project
  *
  *  Copyright (c) 2014 thesupremecommander
@@ -16,19 +16,23 @@
 #include <string>
 
 #include "../entities.h"
+#include "../funcs.h"
 #include "../ifaces.h"
 
-typedef struct TextureReplacement_s {
+typedef struct MaterialReplacement_s {
 	std::string group;
 	std::string replacement;
-} TextureReplacement_t;
+} MaterialReplacement_t;
 
-class CustomTextures {
+class CustomMaterials {
 public:
-	CustomTextures();
+	CustomMaterials();
+
+	IMaterial *FindMaterialOverride(char const *pMaterialName, const char *pTextureGroupName, bool complain = true, const char *pComplainPrefix = NULL);
 private:
-	KeyValues *textureConfig;
-	std::map<std::string, TextureReplacement_t> textureReplacements;
+	int findMaterialHook;
+	KeyValues *materialConfig;
+	std::map<std::string, MaterialReplacement_t> materialReplacements;
 
 	ConVar *enabled;
 	ConCommand *load_replacement_group;
@@ -38,4 +42,4 @@ private:
 	void UnloadReplacementGroup(const CCommand &command);
 };
 
-extern CustomTextures *g_CustomTextures;
+extern CustomMaterials *g_CustomMaterials;

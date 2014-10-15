@@ -1,12 +1,12 @@
 /*
-*  playermodels.h
-*  StatusSpec project
-*
-*  Copyright (c) 2014 thesupremecommander
-*  BSD 2-Clause License
-*  http://opensource.org/licenses/BSD-2-Clause
-*
-*/
+ *  playermodels.h
+ *  StatusSpec project
+ *
+ *  Copyright (c) 2014 thesupremecommander
+ *  BSD 2-Clause License
+ *  http://opensource.org/licenses/BSD-2-Clause
+ *
+ */
 
 #pragma once
 
@@ -28,13 +28,17 @@ class PlayerModels {
 public:
 	PlayerModels();
 
-	bool IsEnabled();
-
-	const model_t *SetModelOverride(C_BaseEntity *entity, const model_t *model);
+	void SetModelIndexOverride(C_BaseEntity *instance, int index);
+	void SetModelPointerOverride(C_BaseEntity *instance, const model_t *pModel);
 private:
 	KeyValues *modelConfig;
+	bool setModelIndexDetoured;
+	bool setModelPointerDetoured;
+
+	const model_t *GetModelOverride(C_BaseEntity *entity, const model_t *model);
 
 	ConVar *enabled;
+	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
 
 extern PlayerModels *g_PlayerModels;

@@ -1,12 +1,12 @@
 /*
-*  multipanel.h
-*  StatusSpec project
-*
-*  Copyright (c) 2014 thesupremecommander
-*  BSD 2-Clause License
-*  http://opensource.org/licenses/BSD-2-Clause
-*
-*/
+ *  multipanel.h
+ *  StatusSpec project
+ *
+ *  Copyright (c) 2014 thesupremecommander
+ *  BSD 2-Clause License
+ *  http://opensource.org/licenses/BSD-2-Clause
+ *
+ */
 
 #pragma once
 
@@ -32,8 +32,8 @@ private:
 
 	ConVar *console;
 	ConVar *scoreboard;
-	static void ToggleConsole(IConVar *var, const char *pOldValue, float flOldValue);
-	static void ToggleScoreboard(IConVar *var, const char *pOldValue, float flOldValue);
+	void ToggleConsole(IConVar *var, const char *pOldValue, float flOldValue);
+	void ToggleScoreboard(IConVar *var, const char *pOldValue, float flOldValue);
 };
 
 extern MultiPanel *g_MultiPanel;
