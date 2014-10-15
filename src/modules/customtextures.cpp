@@ -19,10 +19,6 @@ CustomTextures::CustomTextures() {
 	unload_replacement_group = new ConCommand("statusspec_customtextures_unload_replacement_group", [](const CCommand &command) { g_CustomTextures->UnloadReplacementGroup(command); }, "unload a texture replacement group", FCVAR_NONE);
 }
 
-bool CustomTextures::IsEnabled() {
-	return enabled->GetBool();
-}
-
 void CustomTextures::LoadReplacementGroup(const CCommand &command) {
 	if (command.ArgC() >= 2) {
 		Warning("Must specify a replacement group to load!\n");
@@ -38,7 +34,7 @@ void CustomTextures::LoadReplacementGroup(const CCommand &command) {
 			std::string original = textureReplacement->GetName();
 
 			if (textureReplacements.find(original) != textureReplacements.end()) {
-				if (IsEnabled()) {
+				if (enabled->GetBool()) {
 					g_pMaterialSystem->RemoveTextureAlias(original.c_str());
 				}
 
@@ -48,7 +44,7 @@ void CustomTextures::LoadReplacementGroup(const CCommand &command) {
 			textureReplacements[original].group = group;
 			textureReplacements[original].replacement = textureReplacement->GetString();
 
-			if (IsEnabled()) {
+			if (enabled->GetBool()) {
 				g_pMaterialSystem->AddTextureAlias(textureReplacement->GetName(), textureReplacement->GetString());
 			}
 		}
@@ -59,7 +55,7 @@ void CustomTextures::LoadReplacementGroup(const CCommand &command) {
 }
 
 void CustomTextures::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
-	if (IsEnabled()) {
+	if (enabled->GetBool()) {
 		for (auto iterator = textureReplacements.begin(); iterator != textureReplacements.end(); ++iterator) {
 			g_pMaterialSystem->AddTextureAlias(iterator->first.c_str(), iterator->second.replacement.c_str());
 		}
@@ -86,7 +82,7 @@ void CustomTextures::UnloadReplacementGroup(const CCommand &command) {
 
 		while (iterator != textureReplacements.end()) {
 			if (iterator->second.group.compare(group) == 0) {
-				if (IsEnabled()) {
+				if (enabled->GetBool()) {
 					g_pMaterialSystem->RemoveTextureAlias(iterator->first.c_str());
 				}
 

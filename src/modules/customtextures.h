@@ -26,8 +26,6 @@ typedef struct TextureReplacement_s {
 class CustomTextures {
 public:
 	CustomTextures();
-
-	bool IsEnabled();
 private:
 	KeyValues *textureConfig;
 	std::map<std::string, TextureReplacement_t> textureReplacements;
