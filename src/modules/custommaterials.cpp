@@ -57,7 +57,7 @@ void CustomMaterials::LoadReplacementGroup(const CCommand &command) {
 void CustomMaterials::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
 	if (enabled->GetBool()) {
 		if (!findMaterialHook) {
-			findMaterialHook = Funcs::AddHook_IMaterialSystem_FindMaterial(g_pMaterialSystem, SH_MEMBER(this, &CustomMaterials::FindMaterialOverride), true);
+			findMaterialHook = Funcs::AddHook_IMaterialSystem_FindMaterial(g_pMaterialSystem, SH_MEMBER(this, &CustomMaterials::FindMaterialOverride), false);
 		}
 	}
 	else {
