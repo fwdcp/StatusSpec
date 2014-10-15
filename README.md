@@ -13,10 +13,16 @@ Changelog
   * optimized plugin
 * camera tools
   * player selection now based on spec GUI position (independent of spec GUI order module)
+* custom materials
+  * readded module
+* custom textures
+  * fixed commands not working
 * loadout icons
   * revamped to use VGUI system
 * status icons
   * revamped to use VGUI system
+* team health comparison
+  * new module
 
 **0.20.1**
 * general
