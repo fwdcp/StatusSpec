@@ -30,7 +30,6 @@
 class Entities {
 public:
 	static int pCTFPlayer__m_iClass;
-	static int pCTFPlayer__m_iTeamNum;
 	static int pCTFPlayer__m_nPlayerCond;
 	static int pCTFPlayer___condition_bits;
 	static int pCTFPlayer__m_nPlayerCondEx;
@@ -43,9 +42,6 @@ public:
 	static int pCWeaponMedigun__m_bChargeRelease;
 	static int pCWeaponMedigun__m_nChargeResistType;
 	static int pCWeaponMedigun__m_flChargeLevel;
-	static int pCTFPlayerResource__m_iHealth[MAX_PLAYERS + 1];
-	static int pCTFPlayerResource__m_iMaxHealth[MAX_PLAYERS + 1];
-	static int pCTFPlayerResource__m_iMaxBuffedHealth[MAX_PLAYERS + 1];
 	static int pCTFPlayerResource__m_iKillstreak[MAX_PLAYERS + 1];
 	static int pCWeaponMedigun__m_bHealing;
 	static int pCWeaponMedigun__m_hHealingTarget;
