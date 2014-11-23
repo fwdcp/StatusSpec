@@ -34,7 +34,6 @@ int Entities::pCWeaponMedigun__m_bHealing = 0;
 int Entities::pCWeaponMedigun__m_hHealingTarget = 0;
 int Entities::pCTFPlayer__m_iKillStreak = 0;
 int Entities::pCTFGrenadePipebombProjectile__m_iType = 0;
-int Entities::pCBaseEntity__m_iTeamNum = 0;
 
 bool Entities::PrepareOffsets() {
 	RETRIEVE_OFFSET(pCTFPlayer__m_iClass, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_iClass, 1, "m_iClass"));
@@ -63,7 +62,6 @@ bool Entities::PrepareOffsets() {
 	RETRIEVE_OFFSET(pCWeaponMedigun__m_hHealingTarget, GetClassPropOffset("CWeaponMedigun", pCWeaponMedigun__m_hHealingTarget, 1, "m_hHealingTarget"));
 	RETRIEVE_OFFSET(pCTFPlayer__m_iKillStreak, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_iKillStreak, 1, "m_iKillStreak"));
 	RETRIEVE_OFFSET(pCTFGrenadePipebombProjectile__m_iType, GetClassPropOffset("CTFGrenadePipebombProjectile", pCTFGrenadePipebombProjectile__m_iType, 1, "m_iType"));
-	RETRIEVE_OFFSET(pCBaseEntity__m_iTeamNum, GetClassPropOffset("CBaseEntity", pCBaseEntity__m_iTeamNum, 1, "m_iTeamNum"));
 
 	return true;
 }
