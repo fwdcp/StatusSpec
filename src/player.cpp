@@ -323,21 +323,10 @@ CSteamID Player::GetSteamID() const {
 }
 
 TFTeam Player::GetTeam() const {
-	try {
-		if (IsValid()) {
-			int entindex = playerEntity->entindex();
-			IGameResources *gameResources = Interfaces::GetGameResources();
-			TFTeam team = (TFTeam)gameResources->GetTeam(entindex);
+	if (IsValid()) {
+		TFTeam team = (TFTeam)dynamic_cast<C_BaseEntity *>(playerEntity.Get())->GetTeamNumber();
 
-			return team;
-		}
-	}
-	catch (bad_pointer &e) {
-		Warning(e.what());
-
-		if (IsValid()) {
-			return (TFTeam)*MAKE_PTR(int*, playerEntity.Get(), Entities::pCTFPlayer__m_iTeamNum);
-		}
+		return team;
 	}
 
 	return TFTeam_Unassigned;

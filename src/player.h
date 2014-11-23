@@ -16,6 +16,9 @@
 #include <array>
 #include <cstdint>
 
+#define CLIENT_DLL
+#include "cbase.h"
+#include "c_baseentity.h"
 #include "icliententity.h"
 
 #include "entities.h"
