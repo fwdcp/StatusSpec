@@ -146,7 +146,7 @@ Color ProjectileOutlines::GetGlowColor(IClientEntity *entity) {
 	float blue = 255.0f;
 	float alpha = 255.0f;
 
-	TFTeam team = (TFTeam)*MAKE_PTR(int *, entity, Entities::pCBaseEntity__m_iTeamNum);
+	TFTeam team = (TFTeam)dynamic_cast<C_BaseEntity *>(entity)->GetTeamNumber();
 
 	if (team == TFTeam_Red) {
 		red = colors["red"].color.r();
