@@ -393,7 +393,7 @@ In addition, the following HUD animations are triggered by this plugin and may b
 * `statusspec_playermodels_enabled` - enable custom player models
 
 #### Resource Files
-Player model configuration is loaded from the `Resource/PlayerModels.res` file. Within the `players` section, players should be configured with an entry consisting of their Steam ID as the key and a group name from the `groups` section as the value. Within the `groups` section, each group should have a section (named with the group name specified in the `players` section above), and model replacements should be specified by entries with the path of the old model from the `models` folder as the key and the path of the new model from the `models` folder as the value. An example of a configured file is given below:
+Player model configuration is loaded from the `Resource/PlayerModels.res` file. Within the `players` section, players should be configured with an entry consisting of their Steam ID as the key and a group name from the `groups` section as the value. Within the `groups` section, each group should have a section (named with the group name specified in the `players` section above), and model replacements should be specified by entries with the path of the old model as the key and the path of the new model as the value. An example of a configured file is given below:
 ```
 "models"
 {
@@ -405,15 +405,15 @@ Player model configuration is loaded from the `Resource/PlayerModels.res` file. 
 	{
 		"demo-at-heart"
 		{
-			"player/scout.mdl"		"player/demo.mdl"
-			"player/soldier.mdl"	"player/demo.mdl"
-			"player/pyro.mdl"		"player/demo.mdl"
-			"player/demo.mdl"		"player/demo.mdl"
-			"player/heavy.mdl"		"player/demo.mdl"
-			"player/engineer.mdl"	"player/demo.mdl"
-			"player/medic.mdl"		"player/demo.mdl"
-			"player/sniper.mdl"		"player/demo.mdl"
-			"player/spy.mdl"		"player/demo.mdl"
+			"models/player/scout.mdl"		"models/player/demo.mdl"
+			"models/player/soldier.mdl"		"models/player/demo.mdl"
+			"models/player/pyro.mdl"		"models/player/demo.mdl"
+			"models/player/demo.mdl"		"models/player/demo.mdl"
+			"models/player/heavy.mdl"		"models/player/demo.mdl"
+			"models/player/engineer.mdl"	"models/player/demo.mdl"
+			"models/player/medic.mdl"		"models/player/demo.mdl"
+			"models/player/sniper.mdl"		"models/player/demo.mdl"
+			"models/player/spy.mdl"			"models/player/demo.mdl"
 		}
 	}
 }
