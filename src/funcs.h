@@ -12,6 +12,7 @@
 
 #include "stdafx.h"
 
+#include <functional>
 #include <map>
 
 #define CLIENT_DLL
@@ -28,6 +29,8 @@
 #include <sourcehook_impl.h>
 #include <sourcehook.h>
 #include <MinHook.h>
+
+#include "ifaces.h"
 
 using namespace vgui;
 
@@ -83,10 +86,9 @@ public:
 class Funcs {
 public:
 	static bool AddDetour_GetLocalPlayerIndex(GLPI_t detour);
-	static bool AddDetour_C_BaseEntity_SetModelIndex(SMIH_t detour);
-	static bool AddDetour_C_BaseEntity_SetModelPointer(SMPH_t detour);
 
 	static int AddGlobalHook_C_TFPlayer_GetFOV(C_TFPlayer *instance, fastdelegate::FastDelegate0<float> hook, bool post);
+	static int AddHook_C_BaseEntity_SetModel(std::function<void(C_BaseEntity *, const model_t *&)> hook);
 	static int AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, fastdelegate::FastDelegate1<ClientFrameStage_t> hook, bool post);
 	static int AddHook_IClientMode_DoPostScreenSpaceEffects(IClientMode *instance, fastdelegate::FastDelegate1<const CViewSetup *, bool> hook, bool post);
 	static int AddHook_IGameEventManager2_FireEventClientSide(IGameEventManager2 *instance, fastdelegate::FastDelegate1<IGameEvent *, bool> hook, bool post);
@@ -109,10 +111,9 @@ public:
 	static bool CallFunc_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, int ent_num, player_info_t *pinfo);
 
 	static bool RemoveDetour_GetLocalPlayerIndex();
-	static bool RemoveDetour_C_BaseEntity_SetModelIndex();
-	static bool RemoveDetour_C_BaseEntity_SetModelPointer();
 
 	static bool RemoveHook(int hookID);
+	static void RemoveHook_C_BaseEntity_SetModel(int hookID);
 
 	static bool Load();
 
@@ -122,11 +123,23 @@ public:
 
 	static bool Unpause();
 private:
+	static int setModelLastHookRegistered;
+	static std::map<int, std::function<void(C_BaseEntity *, const model_t *&)>> setModelHooks;
+
 	static GLPI_t getLocalPlayerIndexOriginal;
 	static SMI_t setModelIndexOriginal;
 	static SMP_t setModelPointerOriginal;
 
 	static bool AddDetour(void *target, void *detour, void *&original);
+
+	static bool AddDetour_C_BaseEntity_SetModelIndex(SMIH_t detour);
+	static bool AddDetour_C_BaseEntity_SetModelPointer(SMPH_t detour);
+
+	static void __fastcall Detour_C_BaseEntity_SetModelIndex(C_BaseEntity *, void *, int);
+	static void __fastcall Detour_C_BaseEntity_SetModelPointer(C_BaseEntity *, void *, const model_t *);
+
+	static bool RemoveDetour_C_BaseEntity_SetModelIndex();
+	static bool RemoveDetour_C_BaseEntity_SetModelPointer();
 
 	static bool RemoveDetour(void *target);
 };
