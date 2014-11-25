@@ -8,6 +8,12 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**0.22.0**
+* general
+  * fixed issues with outlines (hopefully)
+* custom models
+  * new module
+
 **0.21.0**
 * general
   * optimized plugin
