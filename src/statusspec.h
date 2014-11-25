@@ -36,7 +36,7 @@
 #include "modules/teamhealthcomparison.h"
 #include "modules/teamoverrides.h"
 
-#define PLUGIN_DESC "StatusSpec v0.21.0"
+#define PLUGIN_DESC "StatusSpec v0.22.0"
 
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage);
 bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup);
