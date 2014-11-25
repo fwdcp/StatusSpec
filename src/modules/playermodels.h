@@ -12,6 +12,7 @@
 
 #include "../stdafx.h"
 
+#include <functional>
 #include <map>
 #include <sstream>
 #include <string>
@@ -27,15 +28,11 @@
 class PlayerModels {
 public:
 	PlayerModels();
-
-	void SetModelIndexOverride(C_BaseEntity *instance, int index);
-	void SetModelPointerOverride(C_BaseEntity *instance, const model_t *pModel);
 private:
 	KeyValues *modelConfig;
-	bool setModelIndexDetoured;
-	bool setModelPointerDetoured;
+	int setModelHook;
 
-	const model_t *GetModelOverride(C_BaseEntity *entity, const model_t *model);
+	void SetModelOverride(C_BaseEntity *entity, const model_t *&model);
 
 	ConVar *enabled;
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);

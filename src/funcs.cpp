@@ -97,6 +97,9 @@ inline SPT_t GetSPTFunc() {
 #endif
 }
 
+int Funcs::setModelLastHookRegistered = 0;
+std::map<int, std::function<void(C_BaseEntity *, const model_t *&)>> Funcs::setModelHooks;
+
 GLPI_t Funcs::getLocalPlayerIndexOriginal = nullptr;
 SMI_t Funcs::setModelIndexOriginal = nullptr;
 SMP_t Funcs::setModelPointerOriginal = nullptr;
@@ -148,6 +151,17 @@ bool Funcs::AddDetour_C_BaseEntity_SetModelPointer(SMPH_t detour) {
 
 int Funcs::AddGlobalHook_C_TFPlayer_GetFOV(C_TFPlayer *instance, fastdelegate::FastDelegate0<float> hook, bool post) {
 	return SH_ADD_MANUALHOOK(C_TFPlayer_GetFOV, instance, hook, post);
+}
+
+int Funcs::AddHook_C_BaseEntity_SetModel(std::function<void(C_BaseEntity *, const model_t *&)> hook) {
+	setModelHooks[++setModelLastHookRegistered] = hook;
+
+	if (setModelHooks.size() > 0) {
+		AddDetour_C_BaseEntity_SetModelIndex(Detour_C_BaseEntity_SetModelIndex);
+		AddDetour_C_BaseEntity_SetModelPointer(Detour_C_BaseEntity_SetModelPointer);
+	}
+
+	return setModelLastHookRegistered;
 }
 
 int Funcs::AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, fastdelegate::FastDelegate1<ClientFrameStage_t> hook, bool post) {
@@ -237,6 +251,26 @@ bool Funcs::CallFunc_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, int 
 	return SH_CALL(instance, &IVEngineClient::GetPlayerInfo)(ent_num, pinfo);
 }
 
+void Funcs::Detour_C_BaseEntity_SetModelIndex(C_BaseEntity *instance, void *, int index) {
+	const model_t *model = Interfaces::pModelInfoClient->GetModel(index);
+
+	for (auto iterator = setModelHooks.begin(); iterator != setModelHooks.end(); ++iterator) {
+		iterator->second(instance, model);
+	}
+
+	int newIndex = Interfaces::pModelInfoClient->GetModelIndex(Interfaces::pModelInfoClient->GetModelName(model));
+
+	Funcs::CallFunc_C_BaseEntity_SetModelIndex(instance, newIndex);
+}
+
+void Funcs::Detour_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, void *, const model_t *pModel) {
+	for (auto iterator = setModelHooks.begin(); iterator != setModelHooks.end(); ++iterator) {
+		iterator->second(instance, pModel);
+	}
+
+	Funcs::CallFunc_C_BaseEntity_SetModelPointer(instance, pModel);
+}
+
 bool Funcs::RemoveDetour_GetLocalPlayerIndex() {
 	if (RemoveDetour(GetGLPIFunc())) {
 		getLocalPlayerIndexOriginal = nullptr;
@@ -278,6 +312,15 @@ bool Funcs::RemoveDetour(void *target) {
 
 bool Funcs::RemoveHook(int hookID) {
 	return SH_REMOVE_HOOK_ID(hookID);
+}
+
+void Funcs::RemoveHook_C_BaseEntity_SetModel(int hookID) {
+	setModelHooks.erase(hookID);
+
+	if (setModelHooks.size() == 0) {
+		RemoveDetour_C_BaseEntity_SetModelIndex();
+		RemoveDetour_C_BaseEntity_SetModelPointer();
+	}
 }
 
 bool Funcs::Load() {

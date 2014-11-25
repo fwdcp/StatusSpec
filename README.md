@@ -236,7 +236,7 @@ The configuration file for the freeze info HUD is `Resource/UI/FreezeInfo.res`. 
 * `statusspec_custommaterials_unload_replacement_group <group>` - unload a material replacement group
 
 #### Resource Files
-Player model configuration is loaded from the `Resource/CustomMaterials.res` file. Replacement groups should be configured as sections (whose names are used in the commands for this module). Material replacements should be specified by entries with the path of the old material from the `materials` folder as the key and the path of the new material from the `materials` folder as the value. An example of a configured file is given below:
+Custom material configuration is loaded from the `Resource/CustomMaterials.res` file. Replacement groups should be configured as sections (whose names are used in the commands for this module). Material replacements should be specified by entries with the path of the old material from the `materials` folder as the key and the path of the new material from the `materials` folder as the value. An example of a configured file is given below:
 ```
 "materials"
 {
@@ -244,6 +244,37 @@ Player model configuration is loaded from the `Resource/CustomMaterials.res` fil
 	{
 		"signs/team_blue"	"signs/team_blue_blank"
 		"signs/team_red"	"signs/team_red_blank"
+	}
+}
+```
+
+### Custom Models
+*allows models to be swapped out*
+
+#### Console Variables
+* `statusspec_custommodels_enabled` - enable custom models
+
+#### Console Commands
+* `statusspec_custommodels_load_replacement_group <group>` - load a model replacement group
+* `statusspec_custommodels_unload_replacement_group <group>` - unload a model replacement group
+
+#### Resource Files
+Custom model configuration is loaded from the `Resource/CustomModels.res` file. Replacement groups should be configured as sections (whose names are used in the commands for this module). Material replacements should be specified by entries with the path of the old model as the key and the path of the new model as the value. An example of a configured file is given below:
+
+```
+"models"
+{
+	"demo"
+	{
+		"models/player/scout.mdl"		"models/player/demo.mdl"
+		"models/player/soldier.mdl"		"models/player/demo.mdl"
+		"models/player/pyro.mdl"		"models/player/demo.mdl"
+		"models/player/demo.mdl"		"models/player/demo.mdl"
+		"models/player/heavy.mdl"		"models/player/demo.mdl"
+		"models/player/engineer.mdl"	"models/player/demo.mdl"
+		"models/player/medic.mdl"		"models/player/demo.mdl"
+		"models/player/sniper.mdl"		"models/player/demo.mdl"
+		"models/player/spy.mdl"			"models/player/demo.mdl"
 	}
 }
 ```
@@ -259,7 +290,7 @@ Player model configuration is loaded from the `Resource/CustomMaterials.res` fil
 * `statusspec_customtextures_unload_replacement_group <group>` - unload a texture replacement group
 
 #### Resource Files
-Player model configuration is loaded from the `Resource/CustomTextures.res` file. Replacement groups should be configured as sections (whose names are used in the commands for this module). Material replacements should be specified by entries with the path of the old texture from the `materials` folder as the key and the path of the new texture from the `materials` folder as the value. An example of a configured file is given below:
+Custom texture configuration is loaded from the `Resource/CustomTextures.res` file. Replacement groups should be configured as sections (whose names are used in the commands for this module). Texture replacements should be specified by entries with the path of the old texture from the `materials` folder as the key and the path of the new texture from the `materials` folder as the value. An example of a configured file is given below:
 ```
 "textures"
 {
