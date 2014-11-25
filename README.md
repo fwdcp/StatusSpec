@@ -8,6 +8,12 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**0.22.0**
+* general
+  * fixed issues with outlines (hopefully)
+* custom models
+  * new module
+
 **0.21.0**
 * general
   * optimized plugin
@@ -236,7 +242,7 @@ The configuration file for the freeze info HUD is `Resource/UI/FreezeInfo.res`. 
 * `statusspec_custommaterials_unload_replacement_group <group>` - unload a material replacement group
 
 #### Resource Files
-Player model configuration is loaded from the `Resource/CustomMaterials.res` file. Replacement groups should be configured as sections (whose names are used in the commands for this module). Material replacements should be specified by entries with the path of the old material from the `materials` folder as the key and the path of the new material from the `materials` folder as the value. An example of a configured file is given below:
+Custom material configuration is loaded from the `Resource/CustomMaterials.res` file. Replacement groups should be configured as sections (whose names are used in the commands for this module). Material replacements should be specified by entries with the path of the old material from the `materials` folder as the key and the path of the new material from the `materials` folder as the value. An example of a configured file is given below:
 ```
 "materials"
 {
@@ -244,6 +250,37 @@ Player model configuration is loaded from the `Resource/CustomMaterials.res` fil
 	{
 		"signs/team_blue"	"signs/team_blue_blank"
 		"signs/team_red"	"signs/team_red_blank"
+	}
+}
+```
+
+### Custom Models
+*allows models to be swapped out*
+
+#### Console Variables
+* `statusspec_custommodels_enabled` - enable custom models
+
+#### Console Commands
+* `statusspec_custommodels_load_replacement_group <group>` - load a model replacement group
+* `statusspec_custommodels_unload_replacement_group <group>` - unload a model replacement group
+
+#### Resource Files
+Custom model configuration is loaded from the `Resource/CustomModels.res` file. Replacement groups should be configured as sections (whose names are used in the commands for this module). Material replacements should be specified by entries with the path of the old model as the key and the path of the new model as the value. An example of a configured file is given below:
+
+```
+"models"
+{
+	"demo"
+	{
+		"models/player/scout.mdl"		"models/player/demo.mdl"
+		"models/player/soldier.mdl"		"models/player/demo.mdl"
+		"models/player/pyro.mdl"		"models/player/demo.mdl"
+		"models/player/demo.mdl"		"models/player/demo.mdl"
+		"models/player/heavy.mdl"		"models/player/demo.mdl"
+		"models/player/engineer.mdl"	"models/player/demo.mdl"
+		"models/player/medic.mdl"		"models/player/demo.mdl"
+		"models/player/sniper.mdl"		"models/player/demo.mdl"
+		"models/player/spy.mdl"			"models/player/demo.mdl"
 	}
 }
 ```
@@ -259,7 +296,7 @@ Player model configuration is loaded from the `Resource/CustomMaterials.res` fil
 * `statusspec_customtextures_unload_replacement_group <group>` - unload a texture replacement group
 
 #### Resource Files
-Player model configuration is loaded from the `Resource/CustomTextures.res` file. Replacement groups should be configured as sections (whose names are used in the commands for this module). Material replacements should be specified by entries with the path of the old texture from the `materials` folder as the key and the path of the new texture from the `materials` folder as the value. An example of a configured file is given below:
+Custom texture configuration is loaded from the `Resource/CustomTextures.res` file. Replacement groups should be configured as sections (whose names are used in the commands for this module). Texture replacements should be specified by entries with the path of the old texture from the `materials` folder as the key and the path of the new texture from the `materials` folder as the value. An example of a configured file is given below:
 ```
 "textures"
 {
@@ -393,7 +430,7 @@ In addition, the following HUD animations are triggered by this plugin and may b
 * `statusspec_playermodels_enabled` - enable custom player models
 
 #### Resource Files
-Player model configuration is loaded from the `Resource/PlayerModels.res` file. Within the `players` section, players should be configured with an entry consisting of their Steam ID as the key and a group name from the `groups` section as the value. Within the `groups` section, each group should have a section (named with the group name specified in the `players` section above), and model replacements should be specified by entries with the path of the old model from the `models` folder as the key and the path of the new model from the `models` folder as the value. An example of a configured file is given below:
+Player model configuration is loaded from the `Resource/PlayerModels.res` file. Within the `players` section, players should be configured with an entry consisting of their Steam ID as the key and a group name from the `groups` section as the value. Within the `groups` section, each group should have a section (named with the group name specified in the `players` section above), and model replacements should be specified by entries with the path of the old model as the key and the path of the new model as the value. An example of a configured file is given below:
 ```
 "models"
 {
@@ -405,15 +442,15 @@ Player model configuration is loaded from the `Resource/PlayerModels.res` file. 
 	{
 		"demo-at-heart"
 		{
-			"player/scout.mdl"		"player/demo.mdl"
-			"player/soldier.mdl"	"player/demo.mdl"
-			"player/pyro.mdl"		"player/demo.mdl"
-			"player/demo.mdl"		"player/demo.mdl"
-			"player/heavy.mdl"		"player/demo.mdl"
-			"player/engineer.mdl"	"player/demo.mdl"
-			"player/medic.mdl"		"player/demo.mdl"
-			"player/sniper.mdl"		"player/demo.mdl"
-			"player/spy.mdl"		"player/demo.mdl"
+			"models/player/scout.mdl"		"models/player/demo.mdl"
+			"models/player/soldier.mdl"		"models/player/demo.mdl"
+			"models/player/pyro.mdl"		"models/player/demo.mdl"
+			"models/player/demo.mdl"		"models/player/demo.mdl"
+			"models/player/heavy.mdl"		"models/player/demo.mdl"
+			"models/player/engineer.mdl"	"models/player/demo.mdl"
+			"models/player/medic.mdl"		"models/player/demo.mdl"
+			"models/player/sniper.mdl"		"models/player/demo.mdl"
+			"models/player/spy.mdl"			"models/player/demo.mdl"
 		}
 	}
 }

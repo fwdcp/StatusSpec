@@ -17,7 +17,6 @@
 	}
 
 int Entities::pCTFPlayer__m_iClass = 0;
-int Entities::pCTFPlayer__m_iTeamNum = 0;
 int Entities::pCTFPlayer__m_nPlayerCond = 0;
 int Entities::pCTFPlayer___condition_bits = 0;
 int Entities::pCTFPlayer__m_nPlayerCondEx = 0;
@@ -30,19 +29,14 @@ int Entities::pCEconEntity__m_iItemDefinitionIndex = 0;
 int Entities::pCWeaponMedigun__m_bChargeRelease = 0;
 int Entities::pCWeaponMedigun__m_nChargeResistType = 0;
 int Entities::pCWeaponMedigun__m_flChargeLevel = 0;
-int Entities::pCTFPlayerResource__m_iHealth[MAX_PLAYERS + 1] = { 0 };
-int Entities::pCTFPlayerResource__m_iMaxHealth[MAX_PLAYERS + 1] = { 0 };
-int Entities::pCTFPlayerResource__m_iMaxBuffedHealth[MAX_PLAYERS + 1] = { 0 };
 int Entities::pCTFPlayerResource__m_iKillstreak[MAX_PLAYERS + 1] = { 0 };
 int Entities::pCWeaponMedigun__m_bHealing = 0;
 int Entities::pCWeaponMedigun__m_hHealingTarget = 0;
 int Entities::pCTFPlayer__m_iKillStreak = 0;
 int Entities::pCTFGrenadePipebombProjectile__m_iType = 0;
-int Entities::pCBaseEntity__m_iTeamNum = 0;
 
 bool Entities::PrepareOffsets() {
 	RETRIEVE_OFFSET(pCTFPlayer__m_iClass, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_iClass, 1, "m_iClass"));
-	RETRIEVE_OFFSET(pCTFPlayer__m_iTeamNum, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_iTeamNum, 1, "m_iTeamNum"));
 	RETRIEVE_OFFSET(pCTFPlayer__m_nPlayerCond, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_nPlayerCond, 1, "m_nPlayerCond"));
 	RETRIEVE_OFFSET(pCTFPlayer___condition_bits, GetClassPropOffset("CTFPlayer", pCTFPlayer___condition_bits, 1, "_condition_bits"));
 	RETRIEVE_OFFSET(pCTFPlayer__m_nPlayerCondEx, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_nPlayerCondEx, 1, "m_nPlayerCondEx"));
@@ -62,28 +56,12 @@ bool Entities::PrepareOffsets() {
 	for (int i = 0; i <= MAX_PLAYERS; i++) {
 		char *elementName = new char[4];
 		sprintf(elementName, "%03i", i);
-		RETRIEVE_OFFSET(pCTFPlayerResource__m_iHealth[i], GetClassPropOffset("CTFPlayerResource", pCTFPlayerResource__m_iHealth[i], 2, "m_iHealth", elementName));
-	}
-	for (int i = 0; i <= MAX_PLAYERS; i++) {
-		char *elementName = new char[4];
-		sprintf(elementName, "%03i", i);
-		RETRIEVE_OFFSET(pCTFPlayerResource__m_iMaxHealth[i], GetClassPropOffset("CTFPlayerResource", pCTFPlayerResource__m_iMaxHealth[i], 2, "m_iMaxHealth", elementName));
-	}
-	for (int i = 0; i <= MAX_PLAYERS; i++) {
-		char *elementName = new char[4];
-		sprintf(elementName, "%03i", i);
-		RETRIEVE_OFFSET(pCTFPlayerResource__m_iMaxBuffedHealth[i], GetClassPropOffset("CTFPlayerResource", pCTFPlayerResource__m_iMaxBuffedHealth[i], 2, "m_iMaxBuffedHealth", elementName));
-	}
-	for (int i = 0; i <= MAX_PLAYERS; i++) {
-		char *elementName = new char[4];
-		sprintf(elementName, "%03i", i);
 		RETRIEVE_OFFSET(pCTFPlayerResource__m_iKillstreak[i], GetClassPropOffset("CTFPlayerResource", pCTFPlayerResource__m_iKillstreak[i], 2, "m_iKillstreak", elementName));
 	}
 	RETRIEVE_OFFSET(pCWeaponMedigun__m_bHealing, GetClassPropOffset("CWeaponMedigun", pCWeaponMedigun__m_bHealing, 1, "m_bHealing"));
 	RETRIEVE_OFFSET(pCWeaponMedigun__m_hHealingTarget, GetClassPropOffset("CWeaponMedigun", pCWeaponMedigun__m_hHealingTarget, 1, "m_hHealingTarget"));
 	RETRIEVE_OFFSET(pCTFPlayer__m_iKillStreak, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_iKillStreak, 1, "m_iKillStreak"));
 	RETRIEVE_OFFSET(pCTFGrenadePipebombProjectile__m_iType, GetClassPropOffset("CTFGrenadePipebombProjectile", pCTFGrenadePipebombProjectile__m_iType, 1, "m_iType"));
-	RETRIEVE_OFFSET(pCBaseEntity__m_iTeamNum, GetClassPropOffset("CBaseEntity", pCBaseEntity__m_iTeamNum, 1, "m_iTeamNum"));
 
 	return true;
 }

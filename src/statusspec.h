@@ -19,6 +19,7 @@
 #include "modules/antifreeze.h"
 #include "modules/cameratools.h"
 #include "modules/custommaterials.h"
+#include "modules/custommodels.h"
 #include "modules/customtextures.h"
 #include "modules/fovoverride.h"
 #include "modules/killstreaks.h"
@@ -35,7 +36,7 @@
 #include "modules/teamhealthcomparison.h"
 #include "modules/teamoverrides.h"
 
-#define PLUGIN_DESC "StatusSpec v0.21.0"
+#define PLUGIN_DESC "StatusSpec v0.22.0"
 
 void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage);
 bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup);
