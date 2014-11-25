@@ -13,6 +13,7 @@
 AntiFreeze *g_AntiFreeze = nullptr;
 CameraTools *g_CameraTools = nullptr;
 CustomMaterials *g_CustomMaterials = nullptr;
+CustomModels *g_CustomModels = nullptr;
 CustomTextures *g_CustomTextures = nullptr;
 FOVOverride *g_FOVOverride = nullptr;
 Killstreaks *g_Killstreaks = nullptr;
@@ -104,6 +105,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_AntiFreeze = new AntiFreeze();
 	g_CameraTools = new CameraTools();
 	g_CustomMaterials = new CustomMaterials();
+	g_CustomModels = new CustomModels();
 	g_CustomTextures = new CustomTextures();
 	g_FOVOverride = new FOVOverride();
 	g_Killstreaks = new Killstreaks();
@@ -129,6 +131,7 @@ void StatusSpecPlugin::Unload(void)
 	delete g_AntiFreeze;
 	delete g_CameraTools;
 	delete g_CustomMaterials;
+	delete g_CustomModels;
 	delete g_CustomTextures;
 	delete g_FOVOverride;
 	delete g_Killstreaks;
