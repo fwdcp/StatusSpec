@@ -8,7 +8,7 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
-**WIP**
+**0.22.1**
 * antifreeze
   * added feature to fix timer freezes
 
