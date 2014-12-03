@@ -15,9 +15,15 @@
 #include <map>
 #include <string>
 
+#define CLIENT_DLL
+#define TF_CLIENT_DLL
+#define TF_DLL
+
+#include "cbase.h"
 #include "convar.h"
 #include "icliententity.h"
 #include "KeyValues.h"
+#include "teamplay_round_timer.h"
 #include "vgui/IPanel.h"
 #include "vgui/IVGui.h"
 #include "vgui_controls/EditablePanel.h"
@@ -26,9 +32,9 @@
 #include "../ifaces.h"
 #include "../player.h"
 
-#define PERFORM_LAYOUT_COMMAND 
+#define REAL_TIME_NAME "RealTime"
+#define REGULAR_TIME_NAME "TimePanelValue"
 #define SPEC_GUI_NAME "specgui"
-#define TOP_PANEL_NAME "MatSystemTopPanel"
 
 typedef struct EntityInfo_s {
 	Vector origin;
@@ -41,23 +47,35 @@ public:
 
 	void FrameHook(ClientFrameStage_t curStage);
 private:
+	float bluTime;
+	vgui::HPanel bluTimerPanel;
 	bool entitiesUpdated;
 	int frameHook;
 	vgui::EditablePanel *freezeInfoPanel;
 	double lastEntityUpdate;
+	float mainTime;
+	vgui::HPanel mainTimerPanel;
 	KeyValues *performLayoutCommand;
+	float redTime;
+	vgui::HPanel redTimerPanel;
 	vgui::HPanel specguiPanel;
+	float stopwatchTime;
+	vgui::HPanel stopwatchTimerPanel;
 
 	void GetSpecGUI();
-	void InitHud();
+	void GetTimers();
+	void InitHUD();
+	void InitTimers(bool moduleTime);
 
 	ConVar *display;
 	ConCommand *display_reload_settings;
 	ConVar *display_threshold;
 	ConVar *enabled;
+	ConVar *timers;
 	void ReloadSettings();
 	void ToggleDisplay(IConVar *var, const char *pOldValue, float flOldValue);
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
+	void ToggleTimers(IConVar *var, const char *pOldValue, float flOldValue);
 };
 
 extern AntiFreeze *g_AntiFreeze;
