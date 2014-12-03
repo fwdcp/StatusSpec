@@ -8,6 +8,10 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**WIP**
+* antifreeze
+  * added feature to fix timer freezes
+
 **0.22.0**
 * general
   * fixed issues with outlines (hopefully)
@@ -216,12 +220,38 @@ To install, place the `StatusSpec` folder within the `custom` folder in the `tf`
 * `statusspec_antifreeze_display` - enables display of an info panel when a freeze is detected
 * `statusspec_antifreeze_display_threshold` - the time of a freeze (in seconds) before the info panel is displayed
 * `statusspec_antifreeze_enabled` - enable antifreeze (forces the spectator GUI to refresh)
+* `statusspec_antifreeze_timers` - enable forcing of timers to right values
 
 #### Console Commands
 * `statusspec_antifreeze_display_reload_settings` - reload settings for the freeze info panel from the resource file
 
 #### UI Resource Files
 The configuration file for the freeze info HUD is `Resource/UI/FreezeInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_antifreeze_display_reload_settings` is provided as a replacement.
+
+To properly support forced correct timer values, you will also have to adjust `Resource/UI/HudObjectiveTimePanel.res` so that it includes something similar to the `RealTime` section, as demonstrated below.
+```
+"Resource/UI/HudObjectiveTimePanel.res"
+{	
+	...
+	
+	"RealTime"
+	{
+		"ControlName"	"CExLabel"
+		"fieldName"		"RealTime"
+		"font"			"NotoBold22"
+		"fgcolor"		"220 220 220 255"
+		"xpos"			"0"
+		"ypos"			"0"
+		"zpos"			"3"
+		"wide"			"110"
+		"tall"			"19"
+		"visible"		"0"
+		"enabled"		"0"
+		"textAlignment"	"center"
+		"labelText"		""
+	}
+}
+```
 
 ### Camera Tools
 *allows more options for managing the camera*

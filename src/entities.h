@@ -47,6 +47,10 @@ public:
 	static int pCWeaponMedigun__m_hHealingTarget;
 	static int pCTFPlayer__m_iKillStreak;
 	static int pCTFGrenadePipebombProjectile__m_iType;
+	static int pCTFGameRulesProxy__m_hRedKothTimer;
+	static int pCTFGameRulesProxy__m_hBlueKothTimer;
+	static int pCTFObjectiveResource__m_iTimerToShowInHUD;
+	static int pCTFObjectiveResource__m_iStopWatchTimer;
 
 	static bool PrepareOffsets();
 	static bool GetClassPropOffset(const char *className, int &offset, int depth, ...);
