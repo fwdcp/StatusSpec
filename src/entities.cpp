@@ -38,6 +38,7 @@ int Entities::pCTFGameRulesProxy__m_hRedKothTimer = 0;
 int Entities::pCTFGameRulesProxy__m_hBlueKothTimer = 0;
 int Entities::pCTFObjectiveResource__m_iTimerToShowInHUD = 0;
 int Entities::pCTFObjectiveResource__m_iStopWatchTimer = 0;
+int Entities::pCTFRagdoll__m_iPlayerIndex = 0;
 
 bool Entities::PrepareOffsets() {
 	RETRIEVE_OFFSET(pCTFPlayer__m_iClass, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_iClass, 1, "m_iClass"));
@@ -70,6 +71,7 @@ bool Entities::PrepareOffsets() {
 	RETRIEVE_OFFSET(pCTFGameRulesProxy__m_hBlueKothTimer, GetClassPropOffset("CTFGameRulesProxy", pCTFGameRulesProxy__m_hBlueKothTimer, 1, "m_hBlueKothTimer"));
 	RETRIEVE_OFFSET(pCTFObjectiveResource__m_iTimerToShowInHUD, GetClassPropOffset("CTFObjectiveResource", pCTFObjectiveResource__m_iTimerToShowInHUD, 1, "m_iTimerToShowInHUD"));
 	RETRIEVE_OFFSET(pCTFObjectiveResource__m_iStopWatchTimer, GetClassPropOffset("CTFObjectiveResource", pCTFObjectiveResource__m_iStopWatchTimer, 1, "m_iStopWatchTimer"));
+	RETRIEVE_OFFSET(pCTFRagdoll__m_iPlayerIndex, GetClassPropOffset("CTFRagdoll", pCTFRagdoll__m_iPlayerIndex, 1, "m_iPlayerIndex"));
 
 	return true;
 }
