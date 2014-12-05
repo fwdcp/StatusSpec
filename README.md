@@ -8,6 +8,10 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**0.22.2**
+* player models
+  * add functionality to replace ragdolls
+
 **0.22.1**
 * antifreeze
   * added feature to fix timer freezes
