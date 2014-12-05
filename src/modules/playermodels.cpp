@@ -22,7 +22,12 @@ void PlayerModels::SetModelOverride(C_BaseEntity *entity, const model_t *&model)
 	Player player = entity;
 
 	if (!player) {
-		return;
+		if (Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFRagdoll")) {
+			player = *MAKE_PTR(int*, entity, Entities::pCTFRagdoll__m_iPlayerIndex);
+		}
+		else {
+			return;
+		}
 	}
 
 	CSteamID playerSteamID = player.GetSteamID();

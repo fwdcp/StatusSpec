@@ -51,6 +51,7 @@ public:
 	static int pCTFGameRulesProxy__m_hBlueKothTimer;
 	static int pCTFObjectiveResource__m_iTimerToShowInHUD;
 	static int pCTFObjectiveResource__m_iStopWatchTimer;
+	static int pCTFRagdoll__m_iPlayerIndex;
 
 	static bool PrepareOffsets();
 	static bool GetClassPropOffset(const char *className, int &offset, int depth, ...);
