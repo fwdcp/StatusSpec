@@ -16,6 +16,7 @@ PlayerModels::PlayerModels() {
 	setModelHook = 0;
 
 	enabled = new ConVar("statusspec_playermodels_enabled", "0", FCVAR_NONE, "enable custom player models", [](IConVar *var, const char *pOldValue, float flOldValue) { g_PlayerModels->ToggleEnabled(var, pOldValue, flOldValue); });
+	reload_settings = new ConCommand("statusspec_playermodels_reload_settings", []() { g_PlayerModels->ReloadSettings(); }, "reload settings for the player models from the resource file", FCVAR_NONE);
 }
 
 void PlayerModels::SetModelOverride(C_BaseEntity *entity, const model_t *&model) {
@@ -57,6 +58,10 @@ void PlayerModels::SetModelOverride(C_BaseEntity *entity, const model_t *&model)
 			model = Interfaces::pModelInfoClient->GetModel(Interfaces::pModelInfoClient->RegisterDynamicModel(replacementModelConfig->GetString(), true));
 		}
 	}
+}
+
+void PlayerModels::ReloadSettings() {
+	modelConfig->LoadFromFile(Interfaces::pFileSystem, "resource/playermodels.res", "mod");
 }
 
 void PlayerModels::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {

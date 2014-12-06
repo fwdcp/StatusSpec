@@ -35,6 +35,8 @@ private:
 	void SetModelOverride(C_BaseEntity *entity, const model_t *&model);
 
 	ConVar *enabled;
+	ConCommand *reload_settings;
+	void ReloadSettings();
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
 
