@@ -50,7 +50,9 @@ void AntiFreeze::FrameHook(ClientFrameStage_t curStage) {
 		}
 
 		if (timers->GetBool()) {
-			for (int i = 0; i < Interfaces::pClientEntityList->GetHighestEntityIndex(); i++) {
+			int maxEntity = Interfaces::pClientEntityList->GetHighestEntityIndex();
+
+			for (int i = 0; i < maxEntity; i++) {
 				IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
 
 				if (entity) {
