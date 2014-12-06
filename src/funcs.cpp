@@ -154,12 +154,12 @@ int Funcs::AddGlobalHook_C_TFPlayer_GetFOV(C_TFPlayer *instance, fastdelegate::F
 }
 
 int Funcs::AddHook_C_BaseEntity_SetModel(std::function<void(C_BaseEntity *, const model_t *&)> hook) {
-	setModelHooks[++setModelLastHookRegistered] = hook;
-
-	if (setModelHooks.size() > 0) {
+	if (setModelHooks.size() == 0) {
 		AddDetour_C_BaseEntity_SetModelIndex(Detour_C_BaseEntity_SetModelIndex);
 		AddDetour_C_BaseEntity_SetModelPointer(Detour_C_BaseEntity_SetModelPointer);
 	}
+
+	setModelHooks[++setModelLastHookRegistered] = hook;
 
 	return setModelLastHookRegistered;
 }
