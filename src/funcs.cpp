@@ -107,13 +107,13 @@ SMP_t Funcs::setModelPointerOriginal = nullptr;
 bool Funcs::AddDetour(void *target, void *detour, void *&original) {
 	MH_STATUS addHookResult = MH_CreateHook(target, detour, &original);
 
-	if (addHookResult != MH_OK && addHookResult != MH_ERROR_ALREADY_CREATED) {
+	if (addHookResult != MH_OK) {
 		return false;
 	}
 
 	MH_STATUS enableHookResult = MH_EnableHook(target);
 
-	return (enableHookResult == MH_OK || enableHookResult == MH_ERROR_ENABLED);
+	return (enableHookResult == MH_OK);
 }
 
 bool Funcs::AddDetour_GetLocalPlayerIndex(GLPI_t detour) {
@@ -301,13 +301,13 @@ bool Funcs::RemoveDetour_C_BaseEntity_SetModelPointer() {
 bool Funcs::RemoveDetour(void *target) {
 	MH_STATUS disableHookResult = MH_DisableHook(target);
 
-	if (disableHookResult != MH_OK && disableHookResult != MH_ERROR_DISABLED) {
+	if (disableHookResult != MH_OK) {
 		return false;
 	}
 
 	MH_STATUS removeHookResult = MH_RemoveHook(target);
 
-	return (removeHookResult == MH_OK || removeHookResult == MH_ERROR_NOT_CREATED);
+	return (removeHookResult == MH_OK);
 }
 
 bool Funcs::RemoveHook(int hookID) {
