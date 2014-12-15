@@ -12,6 +12,7 @@
 
 #include "stdafx.h"
 
+// DLL loading info
 #if defined _WIN32
 #define GetFuncAddress(pAddress, szFunction) ::GetProcAddress((HMODULE)pAddress, szFunction)
 #define GetHandleOfModule(szModuleName) GetModuleHandleA(szModuleName".dll")
@@ -20,6 +21,7 @@
 #define GetHandleOfModule(szModuleName) dlopen(szModuleName".so", RTLD_NOLOAD)
 #endif
 
+// client DLL info
 #if defined _WIN32
 #define CLIENT_MODULE_FILE "tf/bin/client.dll"
 #define CLIENT_MODULE_SIZE 0xC74EC0
@@ -29,21 +31,7 @@
 #define CLIENT_MODULE_FILE "tf/bin/client.so"
 #endif
 
-class C_TFPlayer;
-
-// C_TFPlayer offsets
-#if defined _WIN32
-#define OFFSET_GETHEALTH 106
-#define OFFSET_GETMAXHEALTH 107
-#define OFFSET_GETGLOWEFFECTCOLOR 224
-#define OFFSET_UPDATEGLOWEFFECT 225
-#define OFFSET_DESTROYGLOWEFFECT 226
-#define OFFSET_CALCVIEW 230
-#define OFFSET_GETOBSERVERMODE 241
-#define OFFSET_GETOBSERVERTARGET 242
-#define OFFSET_GETFOV 269
-#endif
-
+// signature search functions
 inline bool DataCompare(const BYTE* pData, const BYTE* bSig, const char* szMask) {
 	for (; *szMask; ++szMask, ++pData, ++bSig)
 	{
@@ -53,7 +41,6 @@ inline bool DataCompare(const BYTE* pData, const BYTE* bSig, const char* szMask)
 
 	return (*szMask) == NULL;
 }
-
 inline DWORD FindPattern(DWORD dwAddress, DWORD dwSize, BYTE* pbSig, const char* szMask) {
 	for (DWORD i = NULL; i < dwSize; i++)
 	{
@@ -86,9 +73,26 @@ inline DWORD FindPattern(DWORD dwAddress, DWORD dwSize, BYTE* pbSig, const char*
 #define SETPRIMARYTARGET_MASK "xxxxxxxx?xxxx"
 #endif
 
+class C_TFPlayer;
+
+// C_TFPlayer offsets
+#if defined _WIN32
+#define OFFSET_GETHEALTH 106
+#define OFFSET_GETMAXHEALTH 107
+#define OFFSET_GETGLOWEFFECTCOLOR 224
+#define OFFSET_UPDATEGLOWEFFECT 225
+#define OFFSET_DESTROYGLOWEFFECT 226
+#define OFFSET_CALCVIEW 230
+#define OFFSET_GETOBSERVERMODE 241
+#define OFFSET_GETOBSERVERTARGET 242
+#define OFFSET_GETFOV 269
+#endif
+
+// non-member function types
 typedef int(*GLPI_t)(void);
 typedef IGameResources *(*GGR_t)(void);
 
+// member function types
 #if defined _WIN32
 typedef void(__thiscall *SMI_t)(C_BaseEntity *, int);
 typedef void(__thiscall *SMP_t)(C_BaseEntity *, const model_t *);
