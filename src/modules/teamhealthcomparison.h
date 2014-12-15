@@ -30,10 +30,10 @@
 #include "../vgui_controls/VariableLabel.h"
 
 #include "../entities.h"
-#include "../enums.h"
 #include "../funcs.h"
 #include "../ifaces.h"
 #include "../player.h"
+#include "../tfdefs.h"
 
 class TeamHealthComparison {
 public:

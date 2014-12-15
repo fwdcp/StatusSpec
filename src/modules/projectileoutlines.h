@@ -19,12 +19,12 @@
 #include "convar.h"
 #include "ehandle.h"
 
-#include "../enums.h"
 #include "../entities.h"
 #include "../funcs.h"
 #include "../glows.h"
 #include "../ifaces.h"
 #include "../player.h"
+#include "../tfdefs.h"
 
 #if defined _WIN32
 #define strtoull _strtoui64

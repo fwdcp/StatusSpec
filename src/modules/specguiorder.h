@@ -22,9 +22,9 @@
 #include "vgui/IScheme.h"
 #include "vgui_controls/EditablePanel.h"
 
-#include "../enums.h"
 #include "../ifaces.h"
 #include "../player.h"
+#include "../tfdefs.h"
 
 class SpecGUIOrder {
 public:

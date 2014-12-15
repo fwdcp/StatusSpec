@@ -21,9 +21,9 @@
 #include "vgui_controls/EditablePanel.h"
 #include "vgui_controls/ImagePanel.h"
 
-#include "../enums.h"
 #include "../ifaces.h"
 #include "../player.h"
+#include "../tfdefs.h"
 
 #define TEXTURE_NULL "vgui/replay/thumbnails/null"
 #define TEXTURE_UBERCHARGE "vgui/replay/thumbnails/ubercharge"

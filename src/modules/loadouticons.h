@@ -25,10 +25,10 @@
 #include "vgui_controls/ImagePanel.h"
 
 #include "../entities.h"
-#include "../enums.h"
 #include "../ifaces.h"
 #include "../itemschema.h"
 #include "../player.h"
+#include "../tfdefs.h"
 
 #if defined _WIN32
 #define strtoull _strtoui64

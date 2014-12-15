@@ -22,9 +22,9 @@
 #include "icliententity.h"
 
 #include "entities.h"
-#include "enums.h"
 #include "funcs.h"
 #include "ifaces.h"
+#include "tfdefs.h"
 
 class Player {
 public:

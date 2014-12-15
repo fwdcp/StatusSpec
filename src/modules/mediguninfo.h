@@ -30,9 +30,9 @@
 #include "../vgui_controls/VariableLabel.h"
 
 #include "../entities.h"
-#include "../enums.h"
 #include "../ifaces.h"
 #include "../player.h"
+#include "../tfdefs.h"
 
 #define VGUI_TEXTURE_NULL "replay/thumbnails/null"
 #define VGUI_TEXTURE_UBERCHARGE "replay/thumbnails/ubercharge"

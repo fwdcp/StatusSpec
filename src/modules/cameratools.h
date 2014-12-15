@@ -20,10 +20,10 @@
 #include "vgui/IScheme.h"
 #include "vgui_controls/EditablePanel.h"
 
-#include "../enums.h"
 #include "../funcs.h"
 #include "../ifaces.h"
 #include "../player.h"
+#include "../tfdefs.h"
 
 class CameraTools {
 public:

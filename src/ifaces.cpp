@@ -29,28 +29,6 @@ CSteamAPIContext *Interfaces::pSteamAPIContext = nullptr;
 
 CBaseEntityList *g_pEntityList;
 
-inline bool DataCompare(const BYTE* pData, const BYTE* bSig, const char* szMask)
-{
-	for (; *szMask; ++szMask, ++pData, ++bSig)
-	{
-		if (*szMask == 'x' && *pData != *bSig)
-			return false;
-	}
-	
-	return (*szMask) == NULL;
-}
-
-inline DWORD FindPattern(DWORD dwAddress, DWORD dwSize, BYTE* pbSig, const char* szMask)
-{
-	for (DWORD i = NULL; i < dwSize; i++)
-	{
-		if (DataCompare((BYTE*) (dwAddress + i), pbSig, szMask))
-			return (DWORD) (dwAddress + i);
-	}
-	
-	return 0;
-}
-
 IClientMode *Interfaces::GetClientMode() {
 #if defined _WIN32
 	static DWORD pointer = NULL;
@@ -70,6 +48,8 @@ IClientMode *Interfaces::GetClientMode() {
 	return **(IClientMode***)(pointer);
 #else
 	throw bad_pointer("IClientMode");
+
+	return nullptr;
 #endif
 }
 
@@ -85,7 +65,6 @@ IGameResources *Interfaces::GetGameResources() {
 		}
 	}
 
-	typedef IGameResources *(*GGR_t)(void);
 	GGR_t GGR = (GGR_t) pointer;
 	IGameResources *gr = GGR();
 
@@ -96,6 +75,8 @@ IGameResources *Interfaces::GetGameResources() {
 	return gr;
 #else
 	throw bad_pointer("IGameResources");
+
+	return nullptr;
 #endif
 }
 
@@ -118,6 +99,8 @@ C_HLTVCamera *Interfaces::GetHLTVCamera() {
 	return *(C_HLTVCamera**)(pointer);
 #else
 	throw bad_pointer("C_HLTVCamera");
+
+	return nullptr;
 #endif
 }
 

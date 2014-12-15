@@ -16,9 +16,9 @@
 #include <string>
 
 #include "../entities.h"
-#include "../enums.h"
 #include "../ifaces.h"
 #include "../player.h"
+#include "../tfdefs.h"
 
 class Killstreaks {
 public:
