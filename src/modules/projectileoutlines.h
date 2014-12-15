@@ -19,6 +19,7 @@
 #include "convar.h"
 #include "ehandle.h"
 
+#include "../common.h"
 #include "../entities.h"
 #include "../funcs.h"
 #include "../glows.h"

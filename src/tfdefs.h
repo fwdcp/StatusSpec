@@ -15,8 +15,6 @@
 #include <array>
 #include <string>
 
-#include "Color.h"
-
 // taken from SourceMod
 
 enum TFClassType
@@ -257,8 +255,3 @@ enum TFGrenadePipebombType {
 	TFGrenadePipebombType_Grenade,
 	TFGrenadePipebombType_Stickybomb,
 };
-
-typedef struct ColorConCommand_s {
-	Color color;
-	ConCommand *command;
-} ColorConCommand_t;
