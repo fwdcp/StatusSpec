@@ -196,7 +196,7 @@ Player::operator bool() const {
 
 bool Player::IsValid() const {
 	try {
-		return playerEntity.IsValid() && playerEntity.Get() && playerEntity->entindex() >= 1 && playerEntity->entindex() <= MAX_PLAYERS && Entities::CheckClassBaseclass(playerEntity->GetClientClass(), "DT_TFPlayer") && Interfaces::GetGameResources()->IsConnected(playerEntity->entindex());
+		return playerEntity.IsValid() && playerEntity.Get() && playerEntity->entindex() >= 1 && playerEntity->entindex() <= MAX_PLAYERS && Entities::CheckEntityBaseclass(playerEntity, "TFPlayer");
 	}
 	catch (bad_pointer &e) {
 		Warning(e.what());
@@ -259,7 +259,7 @@ TFClassType Player::GetClass() const {
 
 int Player::GetHealth() const {
 	if (IsValid()) {
-		return Funcs::CallFunc_C_TFPlayer_GetHealth((C_TFPlayer *)playerEntity.Get());
+		return dynamic_cast<C_BaseEntity *>(playerEntity.Get())->GetHealth();
 	}
 
 	return 0;
@@ -267,20 +267,19 @@ int Player::GetHealth() const {
 
 int Player::GetMaxHealth() const {
 	if (IsValid()) {
-		return Funcs::CallFunc_C_TFPlayer_GetMaxHealth((C_TFPlayer *)playerEntity.Get());
+		return dynamic_cast<C_BaseEntity *>(playerEntity.Get())->GetMaxHealth();
 	}
 
 	return 0;
 }
 
 const char *Player::GetName() const {
-	try {
-		if (IsValid()) {
-			return Interfaces::GetGameResources()->GetPlayerName(playerEntity->entindex());
+	if (IsValid()) {
+		player_info_t playerInfo;
+
+		if (Funcs::CallFunc_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, playerEntity->entindex(), &playerInfo)) {
+			return playerInfo.name;
 		}
-	}
-	catch (bad_pointer &e) {
-		Warning(e.what());
 	}
 	
 	return "";
@@ -288,7 +287,7 @@ const char *Player::GetName() const {
 
 int Player::GetObserverMode() const {
 	if (IsValid()) {
-		return Funcs::CallFunc_C_TFPlayer_GetObserverMode((C_TFPlayer *)playerEntity.Get());
+		return dynamic_cast<C_BasePlayer *>(playerEntity.Get())->GetObserverMode();
 	}
 
 	return OBS_MODE_NONE;
@@ -296,7 +295,7 @@ int Player::GetObserverMode() const {
 
 C_BaseEntity *Player::GetObserverTarget() const {
 	if (IsValid()) {
-		return Funcs::CallFunc_C_TFPlayer_GetObserverTarget((C_TFPlayer *)playerEntity.Get());
+		return dynamic_cast<C_BasePlayer *>(playerEntity.Get())->GetObserverTarget();
 	}
 
 	return playerEntity->GetBaseEntity();
@@ -345,13 +344,8 @@ int Player::GetUserID() const {
 }
 
 bool Player::IsAlive() const {
-	try {
-		if (IsValid()) {
-			return Interfaces::GetGameResources()->IsAlive(playerEntity->entindex());
-		}
-	}
-	catch (bad_pointer &e) {
-		Warning(e.what());
+	if (IsValid()) {
+		return dynamic_cast<C_BaseEntity *>(playerEntity.Get())->IsAlive();
 	}
 
 	return false;
