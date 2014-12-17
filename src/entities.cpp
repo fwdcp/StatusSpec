@@ -10,87 +10,28 @@
 
 #include "entities.h"
 
-#define RETRIEVE_OFFSET(offset, retrieve) \
-	if (!retrieve) { \
-		Warning("[StatusSpec] Offset %s is invalid!\n", #offset); \
-		return false; \
+std::map<ClassPropDefinition, int> Entities::classPropOffsets;
+
+bool Entities::RetrieveClassPropOffset(std::string className, std::vector<std::string> propertyTree) {
+	ClassPropDefinition classPropDefinition;
+	classPropDefinition.className = className;
+	classPropDefinition.propertyTree = propertyTree;
+
+	if (classPropOffsets.find(classPropDefinition) != classPropOffsets.end()) {
+		return true;
 	}
 
-int Entities::pCTFPlayer__m_iClass = 0;
-int Entities::pCTFPlayer__m_nPlayerCond = 0;
-int Entities::pCTFPlayer___condition_bits = 0;
-int Entities::pCTFPlayer__m_nPlayerCondEx = 0;
-int Entities::pCTFPlayer__m_nPlayerCondEx2 = 0;
-int Entities::pCTFPlayer__m_hActiveWeapon = 0;
-int Entities::pCTFPlayer__m_hMyWeapons[MAX_WEAPONS] = { 0 };
-int Entities::pCTFPlayer__m_iHealth = 0;
-int Entities::pCEconEntity__m_hOwnerEntity = 0;
-int Entities::pCEconEntity__m_iItemDefinitionIndex = 0;
-int Entities::pCWeaponMedigun__m_bChargeRelease = 0;
-int Entities::pCWeaponMedigun__m_nChargeResistType = 0;
-int Entities::pCWeaponMedigun__m_flChargeLevel = 0;
-int Entities::pCTFPlayerResource__m_iKillstreak[MAX_PLAYERS + 1] = { 0 };
-int Entities::pCWeaponMedigun__m_bHealing = 0;
-int Entities::pCWeaponMedigun__m_hHealingTarget = 0;
-int Entities::pCTFPlayer__m_iKillStreak = 0;
-int Entities::pCTFGrenadePipebombProjectile__m_iType = 0;
-int Entities::pCTFGameRulesProxy__m_hRedKothTimer = 0;
-int Entities::pCTFGameRulesProxy__m_hBlueKothTimer = 0;
-int Entities::pCTFObjectiveResource__m_iTimerToShowInHUD = 0;
-int Entities::pCTFObjectiveResource__m_iStopWatchTimer = 0;
-int Entities::pCTFRagdoll__m_iPlayerIndex = 0;
-
-bool Entities::PrepareOffsets() {
-	RETRIEVE_OFFSET(pCTFPlayer__m_iClass, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_iClass, 1, "m_iClass"));
-	RETRIEVE_OFFSET(pCTFPlayer__m_nPlayerCond, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_nPlayerCond, 1, "m_nPlayerCond"));
-	RETRIEVE_OFFSET(pCTFPlayer___condition_bits, GetClassPropOffset("CTFPlayer", pCTFPlayer___condition_bits, 1, "_condition_bits"));
-	RETRIEVE_OFFSET(pCTFPlayer__m_nPlayerCondEx, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_nPlayerCondEx, 1, "m_nPlayerCondEx"));
-	RETRIEVE_OFFSET(pCTFPlayer__m_nPlayerCondEx2, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_nPlayerCondEx2, 1, "m_nPlayerCondEx2"));
-	RETRIEVE_OFFSET(pCTFPlayer__m_hActiveWeapon, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_hActiveWeapon, 1, "m_hActiveWeapon"));
-	for (int i = 0; i < MAX_WEAPONS; i++) {
-		char *elementName = new char[4];
-		sprintf(elementName, "%03i", i);
-		RETRIEVE_OFFSET(pCTFPlayer__m_hMyWeapons[i], GetClassPropOffset("CTFPlayer", pCTFPlayer__m_hMyWeapons[i], 2, "m_hMyWeapons", elementName));
-	}
-	RETRIEVE_OFFSET(pCTFPlayer__m_iHealth, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_iHealth, 1, "m_iHealth"));
-	RETRIEVE_OFFSET(pCEconEntity__m_hOwnerEntity, GetClassPropOffset("CEconEntity", pCEconEntity__m_hOwnerEntity, 1, "m_hOwnerEntity"));
-	RETRIEVE_OFFSET(pCEconEntity__m_iItemDefinitionIndex, GetClassPropOffset("CEconEntity", pCEconEntity__m_iItemDefinitionIndex, 1, "m_iItemDefinitionIndex"));
-	RETRIEVE_OFFSET(pCWeaponMedigun__m_bChargeRelease, GetClassPropOffset("CWeaponMedigun", pCWeaponMedigun__m_bChargeRelease, 1, "m_bChargeRelease"));
-	RETRIEVE_OFFSET(pCWeaponMedigun__m_nChargeResistType, GetClassPropOffset("CWeaponMedigun", pCWeaponMedigun__m_nChargeResistType, 1, "m_nChargeResistType"));
-	RETRIEVE_OFFSET(pCWeaponMedigun__m_flChargeLevel, GetClassPropOffset("CWeaponMedigun", pCWeaponMedigun__m_flChargeLevel, 1, "m_flChargeLevel"));
-	for (int i = 0; i <= MAX_PLAYERS; i++) {
-		char *elementName = new char[4];
-		sprintf(elementName, "%03i", i);
-		RETRIEVE_OFFSET(pCTFPlayerResource__m_iKillstreak[i], GetClassPropOffset("CTFPlayerResource", pCTFPlayerResource__m_iKillstreak[i], 2, "m_iKillstreak", elementName));
-	}
-	RETRIEVE_OFFSET(pCWeaponMedigun__m_bHealing, GetClassPropOffset("CWeaponMedigun", pCWeaponMedigun__m_bHealing, 1, "m_bHealing"));
-	RETRIEVE_OFFSET(pCWeaponMedigun__m_hHealingTarget, GetClassPropOffset("CWeaponMedigun", pCWeaponMedigun__m_hHealingTarget, 1, "m_hHealingTarget"));
-	RETRIEVE_OFFSET(pCTFPlayer__m_iKillStreak, GetClassPropOffset("CTFPlayer", pCTFPlayer__m_iKillStreak, 1, "m_iKillStreak"));
-	RETRIEVE_OFFSET(pCTFGrenadePipebombProjectile__m_iType, GetClassPropOffset("CTFGrenadePipebombProjectile", pCTFGrenadePipebombProjectile__m_iType, 1, "m_iType"));
-	RETRIEVE_OFFSET(pCTFGameRulesProxy__m_hRedKothTimer, GetClassPropOffset("CTFGameRulesProxy", pCTFGameRulesProxy__m_hRedKothTimer, 1, "m_hRedKothTimer"));
-	RETRIEVE_OFFSET(pCTFGameRulesProxy__m_hBlueKothTimer, GetClassPropOffset("CTFGameRulesProxy", pCTFGameRulesProxy__m_hBlueKothTimer, 1, "m_hBlueKothTimer"));
-	RETRIEVE_OFFSET(pCTFObjectiveResource__m_iTimerToShowInHUD, GetClassPropOffset("CTFObjectiveResource", pCTFObjectiveResource__m_iTimerToShowInHUD, 1, "m_iTimerToShowInHUD"));
-	RETRIEVE_OFFSET(pCTFObjectiveResource__m_iStopWatchTimer, GetClassPropOffset("CTFObjectiveResource", pCTFObjectiveResource__m_iStopWatchTimer, 1, "m_iStopWatchTimer"));
-	RETRIEVE_OFFSET(pCTFRagdoll__m_iPlayerIndex, GetClassPropOffset("CTFRagdoll", pCTFRagdoll__m_iPlayerIndex, 1, "m_iPlayerIndex"));
-
-	return true;
-}
-
-bool Entities::GetClassPropOffset(const char *className, int &offset, int depth, ...) {
 	ClientClass *cc = Interfaces::pClientDLL->GetAllClasses();
 
 	while (cc) {
-		if (Q_strcmp(cc->GetName(), className) == 0) {
+		if (className.compare(cc->GetName()) == 0) {
 			RecvTable *table = cc->m_pRecvTable;
 
-			offset = 0;
+			int offset = 0;
 			RecvProp *prop = nullptr;
 
 			if (table) {
-				va_list args;
-				va_start(args, depth);
-
-				for (int i = 0; i < depth; i++) {
+				for (auto iterator = propertyTree.begin(); iterator != propertyTree.end(); ++iterator) {
 					int subOffset = 0;
 
 					if (prop && prop->GetType() == DPT_DataTable) {
@@ -101,7 +42,7 @@ bool Entities::GetClassPropOffset(const char *className, int &offset, int depth,
 						return false;
 					}
 
-					if (GetSubProp(table, va_arg(args, const char *), prop, subOffset)) {
+					if (GetSubProp(table, iterator->c_str(), prop, subOffset)) {
 						offset += subOffset;
 					}
 					else {
@@ -111,7 +52,7 @@ bool Entities::GetClassPropOffset(const char *className, int &offset, int depth,
 					table = nullptr;
 				}
 
-				va_end(args);
+				classPropOffsets[classPropDefinition] = offset;
 
 				return true;
 			}
@@ -120,6 +61,20 @@ bool Entities::GetClassPropOffset(const char *className, int &offset, int depth,
 	}
 
 	return false;
+}
+
+void *Entities::GetEntityProp(IClientEntity *entity, std::vector<std::string> propertyTree) {
+	std::string className = entity->GetClientClass()->GetName();
+
+	if (!RetrieveClassPropOffset(className, propertyTree)) {
+		throw invalid_class_prop(className.c_str());
+	}
+
+	ClassPropDefinition classPropDefinition;
+	classPropDefinition.className = className;
+	classPropDefinition.propertyTree = propertyTree;
+
+	return (void *)((unsigned long)(entity)+(unsigned long)(classPropOffsets[classPropDefinition]));
 }
 
 bool Entities::GetSubProp(RecvTable *table, const char *propName, RecvProp *&prop, int &offset) {
@@ -145,33 +100,44 @@ bool Entities::GetSubProp(RecvTable *table, const char *propName, RecvProp *&pro
 	return false;
 }
 
-inline bool CheckBaseclass(RecvTable *sTable, const char *baseclassDataTableName) {
-	if (strcmp(sTable->GetName(), baseclassDataTableName) == 0) {
+bool Entities::CheckEntityBaseclass(IClientEntity *entity, std::string baseclass) {
+	ClientClass *clientClass = entity->GetClientClass();
+
+	if (clientClass) {
+		return CheckClassBaseclass(clientClass, baseclass);
+	}
+
+	return false;
+}
+
+bool Entities::CheckClassBaseclass(ClientClass *clientClass, std::string baseclass) {
+	RecvTable *sTable = clientClass->m_pRecvTable;
+
+	if (sTable) {
+		return CheckTableBaseclass(sTable, baseclass);
+	}
+
+	return false;
+}
+
+bool Entities::CheckTableBaseclass(RecvTable *sTable, std::string baseclass) {
+	std::string name = sTable->GetName();
+	if (name.find(baseclass) != name.npos) {
 		return true;
 	}
-	
+
 	for (int i = 0; i < sTable->GetNumProps(); i++) {
 		RecvProp *sProp = sTable->GetProp(i);
-		
+
 		if (strcmp(sProp->GetName(), "baseclass") != 0) {
 			continue;
 		}
 
 		RecvTable *sChildTable = sProp->GetDataTable();
 		if (sChildTable) {
-			return CheckBaseclass(sChildTable, baseclassDataTableName);
+			return CheckTableBaseclass(sChildTable, baseclass);
 		}
 	}
-	
-	return false;
-}
 
-bool Entities::CheckClassBaseclass(ClientClass *clientClass, const char *baseclassDataTableName) {
-	RecvTable *sTable = clientClass->m_pRecvTable;
-	
-	if (sTable) {
-		return CheckBaseclass(sTable, baseclassDataTableName);
-	}
-	
 	return false;
 }

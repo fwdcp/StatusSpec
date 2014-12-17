@@ -13,6 +13,8 @@
 #include "stdafx.h"
 
 #include <cstdarg>
+#include <map>
+#include <vector>
 
 #include "cdll_client_int.h"
 #include "client_class.h"
@@ -20,45 +22,37 @@
 #include "icliententity.h"
 #include "shareddefs.h"
 
+#include "exceptions.h"
 #include "ifaces.h"
 
-#define MAX_WEAPONS 48
+typedef struct ClassPropDefinition {
+	bool operator<(const ClassPropDefinition &other) const {
+		if (className.compare(other.className) != 0) {
+			return className.compare(other.className) < 0;
+		}
 
-#define MAKE_PTR(cast, ptr, addValue) (cast)((unsigned long) (ptr) + (unsigned long) (addValue))
-#define ENTITY_INDEX_FROM_ENTITY_OFFSET(entity, offset) reinterpret_cast<CHandle<C_BaseEntity>*>(MAKE_PTR(char*, entity, offset))->GetEntryIndex()
+		return propertyTree < other.propertyTree;
+	}
+
+	std::string className;
+	std::vector<std::string> propertyTree;
+} ClassPropDefinition;
 
 class Entities {
 public:
-	static int pCTFPlayer__m_iClass;
-	static int pCTFPlayer__m_nPlayerCond;
-	static int pCTFPlayer___condition_bits;
-	static int pCTFPlayer__m_nPlayerCondEx;
-	static int pCTFPlayer__m_nPlayerCondEx2;
-	static int pCTFPlayer__m_hActiveWeapon;
-	static int pCTFPlayer__m_hMyWeapons[MAX_WEAPONS];
-	static int pCTFPlayer__m_iHealth;
-	static int pCEconEntity__m_hOwnerEntity;
-	static int pCEconEntity__m_iItemDefinitionIndex;
-	static int pCWeaponMedigun__m_bChargeRelease;
-	static int pCWeaponMedigun__m_nChargeResistType;
-	static int pCWeaponMedigun__m_flChargeLevel;
-	static int pCTFPlayerResource__m_iKillstreak[MAX_PLAYERS + 1];
-	static int pCWeaponMedigun__m_bHealing;
-	static int pCWeaponMedigun__m_hHealingTarget;
-	static int pCTFPlayer__m_iKillStreak;
-	static int pCTFGrenadePipebombProjectile__m_iType;
-	static int pCTFGameRulesProxy__m_hRedKothTimer;
-	static int pCTFGameRulesProxy__m_hBlueKothTimer;
-	static int pCTFObjectiveResource__m_iTimerToShowInHUD;
-	static int pCTFObjectiveResource__m_iStopWatchTimer;
-	static int pCTFRagdoll__m_iPlayerIndex;
+	static bool RetrieveClassPropOffset(std::string className, std::vector<std::string> propertyTree);
+	template <typename T> static T GetEntityProp(IClientEntity *entity, std::vector<std::string> propertyTree) {
+		return reinterpret_cast<T>(GetEntityProp(entity, propertyTree));
+	};
 
-	static bool PrepareOffsets();
-	static bool GetClassPropOffset(const char *className, int &offset, int depth, ...);
-	static bool GetSubProp(RecvTable *table, const char *propName, RecvProp *&prop, int &offset);
-	static bool CheckClassBaseclass(ClientClass *clientClass, const char *baseclassDataTableName);
+	static bool CheckEntityBaseclass(IClientEntity *entity, std::string baseclass);
 
 private:
-	static bool CrawlForPropOffset(RecvTable *sTable, const char *propName, int &offset);
-	static bool CrawlForArrayEnt(RecvTable *sTable, const char *propName, int element, int &offset);
+	static bool GetSubProp(RecvTable *table, const char *propName, RecvProp *&prop, int &offset);
+	static void *GetEntityProp(IClientEntity *entity, std::vector<std::string> propertyTree);
+
+	static bool CheckClassBaseclass(ClientClass *clientClass, std::string baseclass);
+	static bool CheckTableBaseclass(RecvTable *sTable, std::string baseclass);
+
+	static std::map<ClassPropDefinition, int> classPropOffsets;
 };
