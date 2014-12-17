@@ -16,6 +16,7 @@
 #include <string>
 
 #include "Color.h"
+#include "convar.h"
 #include "steam/steamclientpublic.h"
 
 typedef struct ColorConCommand_s {
