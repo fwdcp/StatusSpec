@@ -10,29 +10,6 @@
 
 #include "playeroutlines.h"
 
-inline float ChangeScale(float currentValue, float currentMin, float currentMax, float newMin, float newMax) {
-	float deltaScaler = ((newMax - newMin) / (currentMax - currentMin));
-	float newDelta = ((currentValue - currentMin) * deltaScaler);
-	float newValue = newMin + newDelta;
-
-	return newValue;
-}
-
-inline int ColorRangeRestrict(int color) {
-	if (color < 0) return 0;
-	else if (color > 255) return 255;
-	else return color;
-}
-
-inline bool IsInteger(const std::string &s) {
-   if (s.empty() || !isdigit(s[0])) return false;
-
-   char *p;
-   strtoull(s.c_str(), &p, 10);
-
-   return (*p == 0);
-}
-
 PlayerOutlines::PlayerOutlines() {
 	colors["blu_low"].color = Color(88, 133, 162, 255);
 	colors["blu_low"].command = new ConCommand("statusspec_playeroutlines_color_blu_low", [](const CCommand &command) { g_PlayerOutlines->ColorCommand(command); }, "the color used for outlines for BLU team players at low health", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_PlayerOutlines->GetCurrentColor(partial, commands); });

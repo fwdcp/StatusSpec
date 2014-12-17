@@ -10,15 +10,6 @@
 
 #include "cameratools.h"
 
-inline bool IsInteger(const std::string &s) {
-	if (s.empty() || !isdigit(s[0])) return false;
-
-	char *p;
-	strtoull(s.c_str(), &p, 10);
-
-	return (*p == 0);
-}
-
 CameraTools::CameraTools() {
 	specguiSettings = new KeyValues("Resource/UI/SpectatorTournament.res");
 	specguiSettings->LoadFromFile(Interfaces::pFileSystem, "resource/ui/spectatortournament.res", "mod");

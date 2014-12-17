@@ -31,26 +31,6 @@
 #define CLIENT_MODULE_FILE "tf/bin/client.so"
 #endif
 
-// signature search functions
-inline bool DataCompare(const BYTE* pData, const BYTE* bSig, const char* szMask) {
-	for (; *szMask; ++szMask, ++pData, ++bSig)
-	{
-		if (*szMask == 'x' && *pData != *bSig)
-			return false;
-	}
-
-	return (*szMask) == NULL;
-}
-inline DWORD FindPattern(DWORD dwAddress, DWORD dwSize, BYTE* pbSig, const char* szMask) {
-	for (DWORD i = NULL; i < dwSize; i++)
-	{
-		if (DataCompare((BYTE*)(dwAddress + i), pbSig, szMask))
-			return (DWORD)(dwAddress + i);
-	}
-
-	return 0;
-}
-
 // signatures
 #if defined _WIN32
 #define GAMERESOURCES_SIG "\xA1\x00\x00\x00\x00\x85\xC0\x74\x06\x05"

@@ -22,6 +22,7 @@
 #undef null
 #include "json/json.h"
 
+#include "../common.h"
 #include "../entities.h"
 #include "../funcs.h"
 #include "../ifaces.h"

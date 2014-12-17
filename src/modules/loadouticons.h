@@ -24,6 +24,7 @@
 #include "vgui_controls/EditablePanel.h"
 #include "vgui_controls/ImagePanel.h"
 
+#include "../common.h"
 #include "../entities.h"
 #include "../ifaces.h"
 #include "../itemschema.h"

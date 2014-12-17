@@ -10,29 +10,6 @@
 
 #include "projectileoutlines.h"
 
-inline float ChangeScale(float currentValue, float currentMin, float currentMax, float newMin, float newMax) {
-	float deltaScaler = ((newMax - newMin) / (currentMax - currentMin));
-	float newDelta = ((currentValue - currentMin) * deltaScaler);
-	float newValue = newMin + newDelta;
-
-	return newValue;
-}
-
-inline int ColorRangeRestrict(int color) {
-	if (color < 0) return 0;
-	else if (color > 255) return 255;
-	else return color;
-}
-
-inline bool IsInteger(const std::string &s) {
-	if (s.empty() || !isdigit(s[0])) return false;
-
-	char *p;
-	strtoull(s.c_str(), &p, 10);
-
-	return (*p == 0);
-}
-
 ProjectileOutlines::ProjectileOutlines() {
 	colors["blu"].color = Color(88, 133, 162, 255);
 	colors["blu"].command = new ConCommand("statusspec_projectileoutlines_color_blu", [](const CCommand &command) { g_ProjectileOutlines->ColorCommand(command); }, "the color used for outlines for BLU projectiles", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ProjectileOutlines->GetCurrentColor(partial, commands); });

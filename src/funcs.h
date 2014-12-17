@@ -30,6 +30,7 @@
 #include <sourcehook.h>
 #include <MinHook.h>
 
+#include "common.h"
 #include "exceptions.h"
 #include "gamedata.h"
 #include "ifaces.h"

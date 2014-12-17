@@ -16,6 +16,7 @@
 
 #include "dbg.h"
 
+#include "common.h"
 #include "exceptions.h"
 
 class Module {
@@ -40,13 +41,13 @@ template <typename ModuleType> inline bool ModuleManager::LoadModule(std::string
 	if (ModuleType::CheckDependencies()) {
 		modules[moduleName] = new ModuleType();
 
-		ConColorMsg(Color(0, 255, 255), "[StatusSpec] ");
-		ConColorMsg(Color(0, 255, 0), "[StatusSpec] Module %s loaded successfully!\n", moduleName.c_str());
+		PRINT_TAG();
+		ConColorMsg(Color(0, 255, 0), "Module %s loaded successfully!\n", moduleName.c_str());
 
 		return true;
 	}
 	else {
-		ConColorMsg(Color(0, 255, 255), "[StatusSpec] ");
+		PRINT_TAG();
 		ConColorMsg(Color(255, 0, 0), "Module %s failed to load!\n", moduleName.c_str());
 
 		return false;

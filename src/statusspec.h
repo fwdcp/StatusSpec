@@ -12,6 +12,7 @@
 
 #include "stdafx.h"
 
+#include "common.h"
 #include "funcs.h"
 #include "glows.h"
 #include "ifaces.h"

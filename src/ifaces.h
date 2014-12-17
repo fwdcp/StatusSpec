@@ -33,6 +33,7 @@
 #include "filesystem_init.h"
 #include "vgui_controls/Controls.h"
 
+#include "common.h"
 #include "exceptions.h"
 #include "gamedata.h"
 

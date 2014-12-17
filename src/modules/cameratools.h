@@ -20,6 +20,7 @@
 #include "vgui/IScheme.h"
 #include "vgui_controls/EditablePanel.h"
 
+#include "../common.h"
 #include "../funcs.h"
 #include "../ifaces.h"
 #include "../player.h"

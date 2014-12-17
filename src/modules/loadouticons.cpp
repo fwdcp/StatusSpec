@@ -10,21 +10,6 @@
 
 #include "loadouticons.h"
 
-inline int ColorRangeRestrict(int color) {
-	if (color < 0) return 0;
-	else if (color > 255) return 255;
-	else return color;
-}
-
-inline bool IsInteger(const std::string &s) {
-	if (s.empty() || !isdigit(s[0])) return false;
-
-	char *p;
-	strtoull(s.c_str(), &p, 10);
-
-	return (*p == 0);
-}
-
 LoadoutIcons::LoadoutIcons() {
 	filter_active_color = Color(255, 255, 255, 255);
 	filter_inactive_color = Color(127, 127, 127, 255);

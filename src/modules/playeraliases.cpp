@@ -10,37 +10,6 @@
 
 #include "playeraliases.h"
 
-inline void FindAndReplaceInString(std::string &str, const std::string &find, const std::string &replace) {
-	if (find.empty())
-		return;
-
-	size_t start_pos = 0;
-
-	while ((start_pos = str.find(find, start_pos)) != std::string::npos) {
-		str.replace(start_pos, find.length(), replace);
-		start_pos += replace.length();
-	}
-}
-
-inline bool IsInteger(const std::string &s) {
-   if (s.empty() || !isdigit(s[0])) return false;
-
-   char *p;
-   strtoull(s.c_str(), &p, 10);
-
-   return (*p == 0);
-}
-
-inline CSteamID ConvertTextToSteamID(std::string textID) {
-	if (IsInteger(textID)) {
-		uint64_t steamID = strtoull(textID.c_str(), nullptr, 10);
-
-		return CSteamID(steamID);
-	}
-
-	return CSteamID();
-}
-
 PlayerAliases::PlayerAliases() {
 	getPlayerInfoHook = 0;
 
