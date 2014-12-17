@@ -63,16 +63,11 @@ bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup) {
 StatusSpecPlugin g_StatusSpecPlugin;
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(StatusSpecPlugin, IServerPluginCallbacks, INTERFACEVERSION_ISERVERPLUGINCALLBACKS, g_StatusSpecPlugin);
 
-StatusSpecPlugin::StatusSpecPlugin()
-{
-}
+StatusSpecPlugin::StatusSpecPlugin() {}
+StatusSpecPlugin::~StatusSpecPlugin() {}
 
-StatusSpecPlugin::~StatusSpecPlugin()
-{
-}
+bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory) {
 
-bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory)
-{
 	if (!Interfaces::Load(interfaceFactory, gameServerFactory)) {
 		Warning("[%s] Unable to load required libraries!\n", PLUGIN_DESC);
 		return false;
@@ -128,8 +123,6 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	return true;
 }
 
-void StatusSpecPlugin::Unload(void)
-{
 	delete g_AntiFreeze;
 	delete g_CameraTools;
 	delete g_CustomMaterials;
@@ -149,6 +142,7 @@ void StatusSpecPlugin::Unload(void)
 	delete g_StatusIcons;
 	delete g_TeamHealthComparison;
 	delete g_TeamOverrides;
+void StatusSpecPlugin::Unload(void) {
 	g_ModuleManager->UnloadAllModules();
 
 	Funcs::Unload();
