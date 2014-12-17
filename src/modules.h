@@ -23,9 +23,11 @@ class Module {
 public:
 	virtual ~Module() = default;
 
-	static bool CheckDependencies();
+	static bool CheckDependencies(std::string name) { return true; };
 protected:
-	Module() = default;
+	Module(std::string name) : name(name) {};
+
+	std::string name;
 };
 
 class ModuleManager {
@@ -38,8 +40,8 @@ private:
 };
 
 template <typename ModuleType> inline bool ModuleManager::LoadModule(std::string moduleName) {
-	if (ModuleType::CheckDependencies()) {
-		modules[moduleName] = new ModuleType();
+	if (ModuleType::CheckDependencies(moduleName)) {
+		modules[moduleName] = new ModuleType(moduleName);
 
 		PRINT_TAG();
 		ConColorMsg(Color(0, 255, 0), "Module %s loaded successfully!\n", moduleName.c_str());
