@@ -15,6 +15,7 @@
 #include "funcs.h"
 #include "glows.h"
 #include "ifaces.h"
+#include "modules.h"
 
 #include "modules/antifreeze.h"
 #include "modules/cameratools.h"

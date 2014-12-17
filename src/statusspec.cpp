@@ -29,6 +29,7 @@ SpecGUIOrder *g_SpecGUIOrder = nullptr;
 StatusIcons *g_StatusIcons = nullptr;
 TeamHealthComparison *g_TeamHealthComparison = nullptr;
 TeamOverrides *g_TeamOverrides = nullptr;
+ModuleManager *g_ModuleManager = nullptr;
 
 static int doPostScreenSpaceEffectsHook = 0;
 static int frameHook = 0;
@@ -86,6 +87,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 		Warning("[%s] Unable to initialize hooking!", PLUGIN_DESC);
 		return false;
 	}
+	g_ModuleManager = new ModuleManager();
 
 	if (!doPostScreenSpaceEffectsHook) {
 		try {
@@ -147,6 +149,7 @@ void StatusSpecPlugin::Unload(void)
 	delete g_StatusIcons;
 	delete g_TeamHealthComparison;
 	delete g_TeamOverrides;
+	g_ModuleManager->UnloadAllModules();
 
 	Funcs::Unload();
 
