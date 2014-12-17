@@ -44,13 +44,13 @@ template <typename ModuleType> inline bool ModuleManager::LoadModule(std::string
 		modules[moduleName] = new ModuleType(moduleName);
 
 		PRINT_TAG();
-		ConColorMsg(Color(0, 255, 0), "Module %s loaded successfully!\n", moduleName.c_str());
+		ConColorMsg(Color(0, 255, 0, 255), "Module %s loaded successfully!\n", moduleName.c_str());
 
 		return true;
 	}
 	else {
 		PRINT_TAG();
-		ConColorMsg(Color(255, 0, 0), "Module %s failed to load!\n", moduleName.c_str());
+		ConColorMsg(Color(255, 0, 0, 255), "Module %s failed to load!\n", moduleName.c_str());
 
 		return false;
 	}
