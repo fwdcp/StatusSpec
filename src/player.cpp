@@ -219,10 +219,10 @@ IClientEntity *Player::GetEntity() const {
 
 bool Player::CheckCondition(TFCond condition) const {
 	if (IsValid()) {
-		uint32_t playerCond = *MAKE_PTR(uint32_t*, playerEntity.Get(), Entities::pCTFPlayer__m_nPlayerCond);
-		uint32_t condBits = *MAKE_PTR(uint32_t*, playerEntity.Get(), Entities::pCTFPlayer___condition_bits);
-		uint32_t playerCondEx = *MAKE_PTR(uint32_t*, playerEntity.Get(), Entities::pCTFPlayer__m_nPlayerCondEx);
-		uint32_t playerCondEx2 = *MAKE_PTR(uint32_t*, playerEntity.Get(), Entities::pCTFPlayer__m_nPlayerCondEx2);
+		uint32_t playerCond = *Entities::GetEntityProp<uint32_t *>(playerEntity.Get(), { "m_nPlayerCond" });
+		uint32_t condBits = *Entities::GetEntityProp<uint32_t *>(playerEntity.Get(), { "_condition_bits" });
+		uint32_t playerCondEx = *Entities::GetEntityProp<uint32_t *>(playerEntity.Get(), { "m_nPlayerCondEx" });
+		uint32_t playerCondEx2 = *Entities::GetEntityProp<uint32_t *>(playerEntity.Get(), { "m_nPlayerCondEx2" });
 
 		uint32_t conditions[3];
 		conditions[0] = playerCond | condBits;
@@ -251,7 +251,7 @@ bool Player::CheckCondition(TFCond condition) const {
 
 TFClassType Player::GetClass() const {
 	if (IsValid()) {
-		return (TFClassType)*MAKE_PTR(int*, playerEntity.Get(), Entities::pCTFPlayer__m_iClass);
+		return (TFClassType)*Entities::GetEntityProp<int *>(playerEntity.Get(), { "m_iClass" });
 	}
 
 	return TFClass_Unknown;
