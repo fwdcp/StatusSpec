@@ -19,6 +19,28 @@
 #define noexcept _NOEXCEPT
 #endif
 
+class invalid_class_prop : public std::exception {
+public:
+	invalid_class_prop(const char *name) noexcept;
+	virtual const char *what() const noexcept;
+private:
+	const char *className;
+};
+
+inline invalid_class_prop::invalid_class_prop(const char *name) noexcept{
+	className = name;
+}
+
+inline const char *invalid_class_prop::what() const noexcept{
+	std::string s;
+	std::stringstream ss;
+
+	ss << "Attempted to access invalid property in entity class " << className << "!\n";
+	ss >> s;
+
+	return s.c_str();
+}
+
 class module_not_loaded : public std::exception {
 public:
 	module_not_loaded(const char *name) noexcept;
