@@ -237,6 +237,8 @@ static std::array<std::string, 9> itemSlots = {"primary", "secondary", "melee", 
 
 // self-generated
 
+#define MAX_WEAPONS 48
+
 enum TFMedigun {
 	TFMedigun_Unknown,
 	TFMedigun_MediGun,
