@@ -136,6 +136,9 @@ bool Player::IsLessThan(const Player &player) const {
 	if (GetTeam() < player.GetTeam()) {
 		return true;
 	}
+	else if (GetTeam() > player.GetTeam()) {
+		return false;
+	}
 
 	int firstClass = std::distance(TFDefinitions::defaultClassOrder.begin(), std::find(TFDefinitions::defaultClassOrder.begin(), TFDefinitions::defaultClassOrder.end(), GetClass()));
 	int secondClass = std::distance(TFDefinitions::defaultClassOrder.begin(), std::find(TFDefinitions::defaultClassOrder.begin(), TFDefinitions::defaultClassOrder.end(), player.GetClass()));
@@ -143,9 +146,15 @@ bool Player::IsLessThan(const Player &player) const {
 	if (firstClass < secondClass) {
 		return true;
 	}
+	else if (firstClass > secondClass) {
+		return false;
+	}
 
 	if (this->GetEntity()->entindex() < player.GetEntity()->entindex()) {
 		return true;
+	}
+	else if (this->GetEntity()->entindex() > player.GetEntity()->entindex()) {
+		return false;
 	}
 
 	return false;
@@ -165,6 +174,9 @@ bool Player::IsGreaterThan(const Player &player) const {
 	}
 
 	if (GetTeam() > player.GetTeam()) {
+		return true;
+	}
+	else if (GetTeam() < player.GetTeam()) {
 		return false;
 	}
 
@@ -174,9 +186,15 @@ bool Player::IsGreaterThan(const Player &player) const {
 	if (firstClass > secondClass) {
 		return true;
 	}
+	else if (firstClass < secondClass) {
+		return false;
+	}
 
 	if (this->GetEntity()->entindex() > player.GetEntity()->entindex()) {
 		return true;
+	}
+	else if (this->GetEntity()->entindex() < player.GetEntity()->entindex()) {
+		return false;
 	}
 
 	return false;
