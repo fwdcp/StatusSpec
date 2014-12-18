@@ -64,7 +64,17 @@ bool CameraTools::CheckDependencies(std::string name) {
 	}
 	catch (bad_pointer &e) {
 		PRINT_TAG();
-		Warning("Required interface CGlobalVarsBase for player helper class not available!\n");
+		Warning("Required interface CGlobalVarsBase for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	try {
+		Funcs::GetFunc_C_HLTVCamera_SetPrimaryTarget();
+	}
+	catch (bad_pointer &e) {
+		PRINT_TAG();
+		Warning("Required function C_HLTVCamera::SetPrimaryTarget for module %s not available!\n", name.c_str());
 
 		ready = false;
 	}
