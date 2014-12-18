@@ -59,6 +59,8 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 
 	g_ModuleManager = new ModuleManager();
 
+	g_ModuleManager->LoadModule<AntiFreeze>("AntiFreeze");
+
 	if (!doPostScreenSpaceEffectsHook) {
 		try {
 			doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), SH_STATIC(Hook_IClientMode_DoPostScreenSpaceEffects), false);
