@@ -53,6 +53,13 @@ bool Killstreaks::CheckDependencies(std::string name) {
 		ready = false;
 	}
 
+	if (!Player::CheckDependencies()) {
+		PRINT_TAG();
+		Warning("Required player helper class for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
 	for (int i = 0; i < MAX_WEAPONS; i++) {
 		std::stringstream ss;
 		std::string arrayIndex;
@@ -270,12 +277,8 @@ void Killstreaks::FrameHook(ClientFrameStage_t curStage) {
 			}
 		}
 
-		for (int i = 1; i <= MAX_PLAYERS; i++) {
-			Player player = i;
-
-			if (!player) {
-				continue;
-			}
+		for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
+			Player player = *iterator;
 
 			int *killstreakPrimary = Entities::GetEntityProp<int *>(player.GetEntity(), { "m_nStreaks", "000" });
 			int *killstreakSecondary = Entities::GetEntityProp<int *>(player.GetEntity(), { "m_nStreaks", "001" });
@@ -291,7 +294,7 @@ void Killstreaks::FrameHook(ClientFrameStage_t curStage) {
 				if (gameResourcesEntity.IsValid() && gameResourcesEntity.Get()) {
 					std::stringstream ss;
 					std::string arrayIndex;
-					ss << std::setfill('0') << std::setw(3) << i;
+					ss << std::setfill('0') << std::setw(3) << player->entindex();
 					ss >> arrayIndex;
 
 					int *killstreakGlobal = Entities::GetEntityProp<int *>(gameResourcesEntity.Get(), { "m_iStreaks", arrayIndex });
@@ -306,7 +309,7 @@ void Killstreaks::FrameHook(ClientFrameStage_t curStage) {
 				if (gameResourcesEntity.IsValid() && gameResourcesEntity.Get()) {
 					std::stringstream ss;
 					std::string arrayIndex;
-					ss << std::setfill('0') << std::setw(3) << i;
+					ss << std::setfill('0') << std::setw(3) << player->entindex();
 					ss >> arrayIndex;
 
 					int *killstreakGlobal = Entities::GetEntityProp<int *>(gameResourcesEntity.Get(), { "m_iStreaks", arrayIndex });
@@ -410,13 +413,7 @@ void Killstreaks::ToggleEnabled(IConVar *var, const char *pOldValue, float flOld
 			if (Entities::CheckEntityBaseclass(entity, "TFPlayerResource")) {
 				gameResourcesEntity = dynamic_cast<C_BaseEntity *>(entity);
 
-				for (int i = 0; i <= MAX_PLAYERS; i++) {
-					Player player = i;
-
-					if (!player) {
-						continue;
-					}
-
+				for (int i = 1; i <= MAX_PLAYERS; i++) {
 					std::stringstream ss;
 					std::string arrayIndex;
 					ss << std::setfill('0') << std::setw(3) << i;
@@ -430,12 +427,8 @@ void Killstreaks::ToggleEnabled(IConVar *var, const char *pOldValue, float flOld
 			}
 		}
 
-		for (int i = 0; i <= MAX_PLAYERS; i++) {
-			Player player = i;
-
-			if (!player) {
-				continue;
-			}
+		for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
+			Player player = *iterator;
 
 			int *killstreakPrimary = Entities::GetEntityProp<int *>(player.GetEntity(), { "m_nStreaks", "000" });
 			int *killstreakSecondary = Entities::GetEntityProp<int *>(player.GetEntity(), { "m_nStreaks", "001" });
