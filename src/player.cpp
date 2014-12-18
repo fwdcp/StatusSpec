@@ -494,16 +494,19 @@ bool Player::userIDRetrievalAvailable = false;
 bool Player::CheckDependencies() {
 	bool ready = true;
 
-	if (!Interfaces::GetGlobalVars()) {
+	if (!Interfaces::pClientEntityList) {
 		PRINT_TAG();
-		Warning("Required interface CGlobalVarsBase for player helper class not available!\n");
+		Warning("Required interface IClientEntityList for player helper class not available!\n");
 
 		ready = false;
 	}
 
-	if (!Interfaces::pClientEntityList) {
+	try {
+		Interfaces::GetGlobalVars();
+	}
+	catch (bad_pointer &e) {
 		PRINT_TAG();
-		Warning("Required interface IClientEntityList for player helper class not available!\n");
+		Warning("Required interface CGlobalVarsBase for player helper class not available!\n");
 
 		ready = false;
 	}
