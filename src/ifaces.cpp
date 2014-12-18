@@ -10,12 +10,6 @@
 
 #include "ifaces.h"
 
-#define CheckPointerAndWarn(pPointer, className) \
-	if (pPointer == nullptr) { \
-		Warning("[StatusSpec] %s is not initialized!\n", #className); \
-		return false; \
-	}
-
 IBaseClientDLL *Interfaces::pClientDLL = nullptr;
 IClientEntityList *Interfaces::pClientEntityList = nullptr;
 CDllDemandLoader *Interfaces::pClientModule = nullptr;
@@ -128,15 +122,12 @@ C_HLTVCamera *Interfaces::GetHLTVCamera() {
 #endif
 }
 
-bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory) {
+void Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory) {
 	ConnectTier1Libraries(&interfaceFactory, 1);
 	ConnectTier2Libraries(&interfaceFactory, 1);
 	ConnectTier3Libraries(&interfaceFactory, 1);
 	
-	if (!vgui::VGui_InitInterfacesList("statusspec", &interfaceFactory, 1)) {
-		Warning("[StatusSpec] Could not initialize VGUI interfaces!\n");
-		return false;
-	}
+	vgui::VGui_InitInterfacesList("statusspec", &interfaceFactory, 1);
 	
 	pEngineClient = (IVEngineClient *)interfaceFactory(VENGINE_CLIENT_INTERFACE_VERSION, nullptr);
 	pGameEventManager = (IGameEventManager2 *)interfaceFactory(INTERFACEVERSION_GAMEEVENTSMANAGER2, nullptr);
@@ -152,25 +143,7 @@ bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 	pClientEntityList = (IClientEntityList*)gameClientFactory(VCLIENTENTITYLIST_INTERFACE_VERSION, nullptr);
 
 	pSteamAPIContext = new CSteamAPIContext();
-	if (!SteamAPI_InitSafe() || !pSteamAPIContext->Init()) {
-		Warning("[StatusSpec] Could not initialize Steam API!\n");
-		return false;
-	}
-	
-	CheckPointerAndWarn(pClientDLL, IBaseClientDLL);
-	CheckPointerAndWarn(pClientEntityList, IClientEntityList);
-	CheckPointerAndWarn(pEngineClient, IVEngineClient);
-	CheckPointerAndWarn(pGameEventManager, IGameEventManager2);
-	CheckPointerAndWarn(pModelInfoClient, IVModelInfoClient);
-	CheckPointerAndWarn(pRenderView, IVRenderView);
-	CheckPointerAndWarn(g_pFullFileSystem, IFileSystem);
-	CheckPointerAndWarn(g_pMaterialSystem, IMaterialSystem);
-	CheckPointerAndWarn(g_pMaterialSystemHardwareConfig, IMaterialSystemHardwareConfig);
-	CheckPointerAndWarn(g_pStudioRender, IStudioRender);
-	CheckPointerAndWarn(g_pVGuiSurface, vgui::ISurface);
-	CheckPointerAndWarn(g_pVGui, vgui::IVGui);
-	CheckPointerAndWarn(g_pVGuiPanel, vgui::IPanel);
-	CheckPointerAndWarn(g_pVGuiSchemeManager, vgui::ISchemeManager);
+	steamLibrariesAvailable = SteamAPI_InitSafe() && pSteamAPIContext->Init();
 
 	g_pEntityList = dynamic_cast<CBaseEntityList *>(Interfaces::pClientEntityList);
 
@@ -195,16 +168,10 @@ bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 
 				if (FileSystem_LoadSearchPaths(fsSearchPathsInit) == FS_OK) {
 					Interfaces::pFileSystem = fsLoadModuleInfo.m_pFileSystem;
-
-					CheckPointerAndWarn(Interfaces::pFileSystem, IFileSystem);
-
-					return true;
 				}
 			}
 		}
 	}
-
-	return false;
 }
 
 void Interfaces::Unload() {

@@ -39,8 +39,9 @@
 
 class Interfaces {
 	public:
-		static bool Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory);
+		static void Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory);
 		static void Unload();
+
 		static IBaseClientDLL *pClientDLL;
 		static IClientEntityList *pClientEntityList;
 		static IVEngineClient *pEngineClient;
@@ -50,6 +51,9 @@ class Interfaces {
 		static IPlayerInfoManager *pPlayerInfoManager;
 		static IVRenderView *pRenderView;
 		static CSteamAPIContext *pSteamAPIContext;
+
+		static bool steamLibrariesAvailable;
+
 		static IClientMode *GetClientMode();
 		static IGameResources *GetGameResources();
 		static CGlobalVarsBase *GetGlobalVars();

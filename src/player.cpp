@@ -299,7 +299,17 @@ CSteamID Player::GetSteamID() const {
 				static EUniverse universe = k_EUniverseInvalid;
 
 				if (universe == k_EUniverseInvalid) {
-					universe = Interfaces::pSteamAPIContext->SteamUtils()->GetConnectedUniverse();
+					if (Interfaces::pSteamAPIContext->SteamUtils()) {
+						universe = Interfaces::pSteamAPIContext->SteamUtils()->GetConnectedUniverse();
+					}
+					else {
+						// let's just assume that it's public - what are the chances that there's a Valve employee testing this on another universe without Steam?
+
+						PRINT_TAG();
+						Warning("Steam libraries not available - assuming public universe for user Steam IDs!\n");
+
+						universe = k_EUniversePublic;
+					}
 				}
 
 				return CSteamID(playerInfo.friendsID, 1, universe, k_EAccountTypeIndividual);
