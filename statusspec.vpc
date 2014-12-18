@@ -76,6 +76,7 @@ $Project "StatusSpec"
 		$File	"src\itemschema.cpp"
 		$File	"src\modules.cpp"
 		$File	"src\player.cpp"
+		$File	"src\tfdefs.cpp"
 		$File	"$MMSOURCE_DEV\core\sourcehook\sourcehook.cpp"
 		$File	"$MMSOURCE_DEV\core\sourcehook\sourcehook_hookmangen.cpp"
 		$File	"$MMSOURCE_DEV\core\sourcehook\sourcehook_impl_chookidman.cpp"
@@ -89,7 +90,7 @@ $Project "StatusSpec"
 		$File	"src\vgui_controls\ImageProgressBar.cpp"
 		$File	"src\vgui_controls\VariableLabel.cpp"
 	}
-	
+
 	$Folder	"Header Files"
 	{
 		$File	"src\statusspec.h"
@@ -124,7 +125,7 @@ $Project "StatusSpec"
 		$File	"src\player.h"
 		$File	"src\tfdefs.h"
 	}
-	
+
 	$Folder	"Link Libraries"
 	{
 		$Lib steam_api

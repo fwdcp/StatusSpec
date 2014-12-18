@@ -13,12 +13,13 @@
 #include "stdafx.h"
 
 #include <array>
+#include <map>
 #include <string>
+#include <vector>
 
 // taken from SourceMod
 
-enum TFClassType
-{
+typedef enum {
 	TFClass_Unknown = 0,
 	TFClass_Scout,
 	TFClass_Sniper,
@@ -29,18 +30,16 @@ enum TFClassType
 	TFClass_Pyro,
 	TFClass_Spy,
 	TFClass_Engineer
-};
+} TFClassType;
 
-enum TFTeam
-{
+typedef enum {
 	TFTeam_Unassigned = 0,
 	TFTeam_Spectator = 1,
 	TFTeam_Red = 2,
 	TFTeam_Blue = 3	
-};
+} TFTeam;
 
-enum TFCond
-{
+typedef enum {
 	TFCond_Slowed,
 	TFCond_Zoomed,
 	TFCond_Disguising,
@@ -123,7 +122,7 @@ enum TFCond
 	TFCond_DodgeChance = 79,
 	TFCond_Parachute,
 	TFCond_BlastJumping,
-};
+} TFCond;
 
 enum {
 	TF_WEAPON_NONE = 0,
@@ -229,31 +228,31 @@ enum {
 	TF_WEAPON_PARACHUTE,
 };
 
-static std::array<std::string, 10> tfclassNames = {"", "scout", "sniper", "soldier", "demoman", "medic", "heavy", "pyro", "spy", "engineer"};
-
-// taken from the item schema
-
-static std::array<std::string, 9> itemSlots = {"primary", "secondary", "melee", "pda", "pda2", "building", "head", "misc", "action"};
-
 // self-generated
 
-#define MAX_WEAPONS 48
-
-enum TFMedigun {
+typedef enum {
 	TFMedigun_Unknown,
 	TFMedigun_MediGun,
 	TFMedigun_Kritzkrieg,
 	TFMedigun_QuickFix,
 	TFMedigun_Vaccinator
-};
+} TFMedigun;
 
-enum TFResistType {
+typedef enum {
 	TFResistType_Bullet,
 	TFResistType_Explosive,
 	TFResistType_Fire
-};
+} TFResistType;
 
-enum TFGrenadePipebombType {
+typedef enum {
 	TFGrenadePipebombType_Grenade,
 	TFGrenadePipebombType_Stickybomb,
+} TFGrenadePipebombType;
+
+class TFDefinitions {
+public:
+	static const std::map<TFClassType, std::string> classNames;
+	static const std::array<std::string, 9> itemSlots;
+	static const std::array<TFClassType, 10> defaultClassOrder;
+	static const std::map<int, std::vector<std::string>> slotKillIcons;
 };

@@ -137,10 +137,8 @@ bool Player::IsLessThan(const Player &player) const {
 		return true;
 	}
 
-	static std::array<TFClassType, 10> classes = { TFClass_Unknown, TFClass_Scout, TFClass_Soldier, TFClass_Pyro, TFClass_DemoMan, TFClass_Heavy, TFClass_Engineer, TFClass_Medic, TFClass_Sniper, TFClass_Spy };
-
-	int firstClass = std::distance(classes.begin(), std::find(classes.begin(), classes.end(), GetClass()));
-	int secondClass = std::distance(classes.begin(), std::find(classes.begin(), classes.end(), player.GetClass()));
+	int firstClass = std::distance(TFDefinitions::defaultClassOrder.begin(), std::find(TFDefinitions::defaultClassOrder.begin(), TFDefinitions::defaultClassOrder.end(), GetClass()));
+	int secondClass = std::distance(TFDefinitions::defaultClassOrder.begin(), std::find(TFDefinitions::defaultClassOrder.begin(), TFDefinitions::defaultClassOrder.end(), player.GetClass()));
 
 	if (firstClass < secondClass) {
 		return true;
@@ -170,10 +168,8 @@ bool Player::IsGreaterThan(const Player &player) const {
 		return false;
 	}
 
-	static std::array<TFClassType, 10> classes = { TFClass_Unknown, TFClass_Scout, TFClass_Soldier, TFClass_Pyro, TFClass_DemoMan, TFClass_Heavy, TFClass_Engineer, TFClass_Medic, TFClass_Sniper, TFClass_Spy };
-
-	int firstClass = std::distance(classes.begin(), std::find(classes.begin(), classes.end(), GetClass()));
-	int secondClass = std::distance(classes.begin(), std::find(classes.begin(), classes.end(), player.GetClass()));
+	int firstClass = std::distance(TFDefinitions::defaultClassOrder.begin(), std::find(TFDefinitions::defaultClassOrder.begin(), TFDefinitions::defaultClassOrder.end(), GetClass()));
+	int secondClass = std::distance(TFDefinitions::defaultClassOrder.begin(), std::find(TFDefinitions::defaultClassOrder.begin(), TFDefinitions::defaultClassOrder.end(), player.GetClass()));
 
 	if (firstClass > secondClass) {
 		return true;
