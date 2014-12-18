@@ -21,6 +21,8 @@ IPlayerInfoManager *Interfaces::pPlayerInfoManager = nullptr;
 IVRenderView *Interfaces::pRenderView = nullptr;
 CSteamAPIContext *Interfaces::pSteamAPIContext = nullptr;
 
+bool Interfaces::steamLibrariesAvailable = false;
+
 CBaseEntityList *g_pEntityList;
 
 IClientMode *Interfaces::GetClientMode() {
