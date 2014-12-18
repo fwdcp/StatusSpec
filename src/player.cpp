@@ -191,14 +191,7 @@ Player::operator bool() const {
 }
 
 bool Player::IsValid() const {
-	try {
-		return playerEntity.IsValid() && playerEntity.Get() && playerEntity->entindex() >= 1 && playerEntity->entindex() <= MAX_PLAYERS && Entities::CheckEntityBaseclass(playerEntity, "TFPlayer");
-	}
-	catch (bad_pointer &e) {
-		Warning(e.what());
-	}
-
-	return false;
+	return playerEntity.IsValid() && playerEntity.Get() && playerEntity->entindex() >= 1 && playerEntity->entindex() <= MAX_PLAYERS && Entities::CheckEntityBaseclass(playerEntity, "TFPlayer");
 }
 
 Player::operator IClientEntity *() const {
