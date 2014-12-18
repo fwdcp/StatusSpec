@@ -191,7 +191,7 @@ Player::operator bool() const {
 }
 
 bool Player::IsValid() const {
-	return playerEntity.IsValid() && playerEntity.Get() && playerEntity->entindex() >= 1 && playerEntity->entindex() <= MAX_PLAYERS && Entities::CheckEntityBaseclass(playerEntity, "TFPlayer");
+	return playerEntity.IsValid() && playerEntity.Get() && playerEntity->entindex() >= 1 && playerEntity->entindex() <= Interfaces::GetGlobalVars()->maxClients && Entities::CheckEntityBaseclass(playerEntity, "TFPlayer");
 }
 
 Player::operator IClientEntity *() const {
@@ -348,4 +348,121 @@ bool Player::IsAlive() const {
 	}
 
 	return false;
+}
+
+Player::Iterator::Iterator(const Player::Iterator& old) {
+	index = old.index;
+}
+
+Player::Iterator& Player::Iterator::operator=(const Player::Iterator& old) {
+	index = old.index;
+
+	return  *this;
+};
+
+Player::Iterator& Player::Iterator::operator++() {
+	for (int i = index + 1; i <= Interfaces::GetGlobalVars()->maxClients; i++) {
+		if (Player(i)) {
+			index = i;
+
+			return *this;
+		}
+	}
+
+	index = Interfaces::GetGlobalVars()->maxClients + 1;
+
+	return *this;
+};
+
+Player& Player::Iterator::operator*() const {
+	return Player(index);
+}
+
+void swap(Player::Iterator& lhs, Player::Iterator& rhs) {
+	using std::swap;
+	swap(lhs.index, rhs.index);
+}
+
+Player::Iterator Player::Iterator::operator++(int) {
+	Player::Iterator current(*this);
+
+	for (int i = index + 1; i <= Interfaces::GetGlobalVars()->maxClients; i++) {
+		if (Player(i)) {
+			index = i;
+
+			return current;
+		}
+	}
+
+	index = Interfaces::GetGlobalVars()->maxClients + 1;
+
+	return current;
+}
+
+Player *Player::Iterator::operator->() const {
+	return new Player(index);
+}
+
+bool operator==(const Player::Iterator& lhs, const Player::Iterator& rhs) {
+	return lhs.index == rhs.index;
+}
+
+bool operator!=(const Player::Iterator& lhs, const Player::Iterator& rhs) {
+	return lhs.index != rhs.index;
+}
+
+Player::Iterator::Iterator() {
+	for (int i = 1; i <= Interfaces::GetGlobalVars()->maxClients; i++) {
+		if (Player(i)) {
+			index = i;
+
+			return;
+		}
+	}
+
+	index = Interfaces::GetGlobalVars()->maxClients + 1;
+
+	return;
+}
+
+Player::Iterator& Player::Iterator::operator--() {
+	for (int i = index - 1; i >= 1; i++) {
+		if (Player(i)) {
+			index = i;
+
+			return *this;
+		}
+	}
+
+	index = 0;
+
+	return *this;
+}
+
+Player::Iterator Player::Iterator::operator--(int) {
+	Player::Iterator current(*this);
+
+	for (int i = index - 1; i >= 1; i++) {
+		if (Player(i)) {
+			index = i;
+
+			return current;
+		}
+	}
+
+	index = 0;
+
+	return current;
+}
+
+Player::Iterator::Iterator(int startIndex) {
+	index = startIndex;
+}
+
+Player::Iterator Player::begin() {
+	return Player::Iterator();
+}
+
+Player::Iterator Player::end() {
+	return Player::Iterator(Interfaces::GetGlobalVars()->maxClients + 1);
 }

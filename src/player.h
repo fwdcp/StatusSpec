@@ -78,6 +78,32 @@ public:
 	TFTeam GetTeam() const;
 	int GetUserID() const;
 	bool IsAlive() const;
+
+	class Iterator {
+		friend class Player;
+
+	public:
+		Iterator(const Iterator&);
+		~Iterator() = default;
+		Iterator& operator=(const Iterator&);
+		Iterator& operator++();
+		Player& operator*() const;
+		friend void swap(Iterator& lhs, Iterator& rhs);
+		Iterator operator++(int);
+		Player *operator->() const;
+		friend bool operator==(const Iterator&, const Iterator&);
+		friend bool operator!=(const Iterator&, const Iterator&);
+		Iterator();
+		Iterator& operator--();
+		Iterator operator--(int);
+
+	private:
+		Iterator(int index);
+		int index;
+	};
+
+	static Iterator begin();
+	static Iterator end();
 private:
 	CHandle<IClientEntity> playerEntity;
 
