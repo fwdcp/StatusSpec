@@ -486,6 +486,7 @@ Player::Iterator Player::end() {
 }
 
 bool Player::classRetrievalAvailable = false;
+bool Player::comparisonAvailable = false;
 bool Player::conditionsRetrievalAvailable = false;
 bool Player::nameRetrievalAvailable = false;
 bool Player::steamIDRetrievalAvailable = false;
