@@ -210,7 +210,7 @@ GLPI_t Funcs::GetFunc_GetLocalPlayerIndex() {
 	static DWORD pointer = NULL;
 
 	if (!pointer) {
-		pointer = FindPattern((DWORD)GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE)GETLOCALPLAYERINDEX_SIG, GETLOCALPLAYERINDEX_MASK);
+		pointer = SignatureScan("client", GETLOCALPLAYERINDEX_SIG, GETLOCALPLAYERINDEX_MASK);
 
 		if (!pointer) {
 			throw bad_pointer("GetLocalPlayerIndex");
@@ -230,7 +230,7 @@ SMI_t Funcs::GetFunc_C_BaseEntity_SetModelIndex() {
 	static DWORD pointer = NULL;
 
 	if (!pointer) {
-		pointer = FindPattern((DWORD)GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE)SETMODELINDEX_SIG, SETMODELINDEX_MASK);
+		pointer = SignatureScan("client", SETMODELINDEX_SIG, SETMODELINDEX_MASK);
 
 		if (!pointer) {
 			throw bad_pointer("C_BaseEntity::SetModelIndex");
@@ -250,7 +250,7 @@ SMP_t Funcs::GetFunc_C_BaseEntity_SetModelPointer() {
 	static DWORD pointer = NULL;
 
 	if (!pointer) {
-		pointer = FindPattern((DWORD)GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE)SETMODELPOINTER_SIG, SETMODELPOINTER_MASK);
+		pointer = SignatureScan("client", SETMODELPOINTER_SIG, SETMODELPOINTER_MASK);
 
 		if (!pointer) {
 			throw bad_pointer("C_BaseEntity::SetModelPointer");
@@ -270,7 +270,7 @@ SPT_t Funcs::GetFunc_C_HLTVCamera_SetPrimaryTarget() {
 	static DWORD pointer = NULL;
 
 	if (!pointer) {
-		pointer = FindPattern((DWORD)GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE)SETPRIMARYTARGET_SIG, SETPRIMARYTARGET_MASK);
+		pointer = SignatureScan("client", SETPRIMARYTARGET_SIG, SETPRIMARYTARGET_MASK);
 
 		if (!pointer) {
 			throw bad_pointer("C_HLTVCamera::SetPrimaryTarget");

@@ -19,6 +19,8 @@
 #include "convar.h"
 #include "steam/steamclientpublic.h"
 
+#include "gamedata.h"
+
 typedef struct ColorConCommand_s {
 	Color color;
 	ConCommand *command;
@@ -33,6 +35,7 @@ inline bool DataCompare(const BYTE* pData, const BYTE* bSig, const char* szMask)
 
 	return (*szMask) == NULL;
 }
+
 inline DWORD FindPattern(DWORD dwAddress, DWORD dwSize, BYTE* pbSig, const char* szMask) {
 	for (DWORD i = NULL; i < dwSize; i++)
 	{
@@ -41,6 +44,16 @@ inline DWORD FindPattern(DWORD dwAddress, DWORD dwSize, BYTE* pbSig, const char*
 	}
 
 	return 0;
+}
+
+inline DWORD SignatureScan(const char *moduleName, const char *signature, const char *mask) {
+#if defined _WIN32
+	MODULEINFO clientModInfo;
+	const HMODULE clientModule = GetHandleOfModule(moduleName);
+	GetModuleInformation(GetCurrentProcess(), clientModule, &clientModInfo, sizeof(MODULEINFO));
+	
+	return FindPattern((DWORD)clientModule, clientModInfo.SizeOfImage, (PBYTE)signature, mask);
+#endif
 }
 
 inline void FindAndReplaceInString(std::string &str, const std::string &find, const std::string &replace) {

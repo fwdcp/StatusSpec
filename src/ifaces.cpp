@@ -34,7 +34,7 @@ IClientMode *Interfaces::GetClientMode() {
 	static DWORD pointer = NULL;
 
 	if (!pointer) {
-		pointer = FindPattern((DWORD)GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE)CLIENTMODE_SIG, CLIENTMODE_MASK) + CLIENTMODE_OFFSET;
+		pointer = SignatureScan("client", CLIENTMODE_SIG, CLIENTMODE_MASK) + CLIENTMODE_OFFSET;
 
 		if (!pointer) {
 			throw bad_pointer("IClientMode");
@@ -58,7 +58,7 @@ IGameResources *Interfaces::GetGameResources() {
 	static DWORD pointer = NULL;
 
 	if (!pointer) {
-		pointer = FindPattern((DWORD)GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE)GAMERESOURCES_SIG, GAMERESOURCES_MASK);
+		pointer = SignatureScan("client", GAMERESOURCES_SIG, GAMERESOURCES_MASK);
 
 		if (!pointer) {
 			throw bad_pointer("IGameResources");
@@ -85,7 +85,7 @@ C_HLTVCamera *Interfaces::GetHLTVCamera() {
 	static DWORD pointer = NULL;
 
 	if (!pointer) {
-		pointer = FindPattern((DWORD)GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE)HLTVCAMERA_SIG, HLTVCAMERA_MASK) + HLTVCAMERA_OFFSET;
+		pointer = SignatureScan("client", HLTVCAMERA_SIG, HLTVCAMERA_MASK) + HLTVCAMERA_OFFSET;
 
 		if (!pointer) {
 			throw bad_pointer("C_HLTVCamera");

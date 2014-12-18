@@ -12,19 +12,25 @@
 
 #include "stdafx.h"
 
+#include <string>
+
+#if defined _WIN32
+#include <Windows.h>
+#include <Psapi.h>
+#endif
+
 // DLL loading info
 #if defined _WIN32
 #define GetFuncAddress(pAddress, szFunction) ::GetProcAddress((HMODULE)pAddress, szFunction)
-#define GetHandleOfModule(szModuleName) GetModuleHandleA(szModuleName".dll")
+#define GetHandleOfModule(szModuleName) GetModuleHandle((std::string(szModuleName) + ".dll").c_str())
 #elif defined __linux__
 #define GetFuncAddress(pAddress, szFunction) dlsym(pAddress, szFunction)
-#define GetHandleOfModule(szModuleName) dlopen(szModuleName".so", RTLD_NOLOAD)
+#define GetHandleOfModule(szModuleName) dlopen((std::string(szModuleName) + ".so").c_str(), RTLD_NOLOAD)
 #endif
 
 // client DLL info
 #if defined _WIN32
 #define CLIENT_MODULE_FILE "tf/bin/client.dll"
-#define CLIENT_MODULE_SIZE 0xC74EC0
 #elif defined __APPLE__
 #define CLIENT_MODULE_FILE "tf/bin/client.dylib"
 #elif defined __linux__
@@ -53,7 +59,11 @@
 #define SETPRIMARYTARGET_MASK "xxxxxxxx?xxxx"
 #endif
 
+class C_BaseEntity;
+class C_HLTVCamera;
 class C_TFPlayer;
+class IGameResources;
+struct model_t;
 
 // C_TFPlayer offsets
 #if defined _WIN32
