@@ -61,6 +61,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 
 	g_ModuleManager->LoadModule<AntiFreeze>("AntiFreeze");
 	g_ModuleManager->LoadModule<CameraTools>("Camera Tools");
+	g_ModuleManager->LoadModule<CustomMaterials>("Custom Materials");
 	g_ModuleManager->LoadModule<Killstreaks>("Killstreaks");
 
 	if (!doPostScreenSpaceEffectsHook) {
