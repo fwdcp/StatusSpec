@@ -531,35 +531,35 @@ bool Player::CheckDependencies() {
 
 	if (!Entities::RetrieveClassPropOffset("CTFPlayer", { "m_nPlayerCond" })) {
 		PRINT_TAG();
-		Warning("Required property m_nPlayerCond for CTFPlayer for module %s not available!\n", name.c_str());
+		Warning("Required property m_nPlayerCond for CTFPlayer for player helper class not available!\n");
 
 		conditionsRetrievalAvailable = false;
 	}
 		
 	if (!Entities::RetrieveClassPropOffset("CTFPlayer", { "_condition_bits" })) {
 		PRINT_TAG();
-		Warning("Required property _condition_bits for CTFPlayer for module %s not available!\n", name.c_str());
+		Warning("Required property _condition_bits for CTFPlayer for player helper class not available!\n");
 
 		conditionsRetrievalAvailable = false;
 	}
 		
 	if (!Entities::RetrieveClassPropOffset("CTFPlayer", { "m_nPlayerCondEx" })) {
 		PRINT_TAG();
-		Warning("Required property m_nPlayerCondEx for CTFPlayer for module %s not available!\n", name.c_str());
+		Warning("Required property m_nPlayerCondEx for CTFPlayer for player helper class not available!\n");
 
 		conditionsRetrievalAvailable = false;
 	}
 			
 	if (!Entities::RetrieveClassPropOffset("CTFPlayer", { "m_nPlayerCondEx2" })) {
 		PRINT_TAG();
-		Warning("Required property m_nPlayerCondEx2 for CTFPlayer for module %s not available!\n", name.c_str());
+		Warning("Required property m_nPlayerCondEx2 for CTFPlayer for player helper class not available!\n");
 
 		conditionsRetrievalAvailable = false;
 	}
 
 	if (!Entities::RetrieveClassPropOffset("CTFPlayer", { "m_iClass" })) {
 		PRINT_TAG();
-		Warning("Required property m_iClass for CTFPlayer for module %s not available!\n", name.c_str());
+		Warning("Required property m_iClass for CTFPlayer for player helper class not available!\n");
 
 		classRetrievalAvailable = false;
 		comparisonAvailable = false;
