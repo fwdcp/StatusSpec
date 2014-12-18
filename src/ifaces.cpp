@@ -80,6 +80,30 @@ IGameResources *Interfaces::GetGameResources() {
 #endif
 }
 
+CGlobalVarsBase *Interfaces::GetGlobalVars() {
+#if defined _WIN32
+	static DWORD pointer = NULL;
+
+	if (!pointer) {
+		pointer = SignatureScan("client", GPGLOBALS_SIG, GPGLOBALS_MASK) + GPGLOBALS_OFFSET;
+
+		if (!pointer) {
+			throw bad_pointer("CGlobalVarsBase");
+		}
+	}
+
+	if (!**(CGlobalVarsBase***)pointer) {
+		throw bad_pointer("CGlobalVarsBase");
+	}
+
+	return **(CGlobalVarsBase***)(pointer);
+#else
+	throw bad_pointer("CGlobalVarsBase");
+
+	return nullptr;
+#endif
+}
+
 C_HLTVCamera *Interfaces::GetHLTVCamera() {
 #if defined _WIN32
 	static DWORD pointer = NULL;

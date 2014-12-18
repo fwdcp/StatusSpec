@@ -52,6 +52,7 @@ class Interfaces {
 		static CSteamAPIContext *pSteamAPIContext;
 		static IClientMode *GetClientMode();
 		static IGameResources *GetGameResources();
+		static CGlobalVarsBase *GetGlobalVars();
 		static C_HLTVCamera *GetHLTVCamera();
 	private:
 		static CDllDemandLoader *pClientModule;
