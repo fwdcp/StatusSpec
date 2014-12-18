@@ -466,3 +466,86 @@ Player::Iterator Player::begin() {
 Player::Iterator Player::end() {
 	return Player::Iterator(Interfaces::GetGlobalVars()->maxClients + 1);
 }
+
+bool Player::classRetrievalAvailable = false;
+bool Player::conditionsRetrievalAvailable = false;
+bool Player::nameRetrievalAvailable = false;
+bool Player::steamIDRetrievalAvailable = false;
+bool Player::userIDRetrievalAvailable = false;
+
+bool Player::CheckDependencies() {
+	bool ready = true;
+
+	if (!Interfaces::GetGlobalVars()) {
+		PRINT_TAG();
+		Warning("Required interface CGlobalVarsBase for player helper class not available!\n");
+
+		ready = false;
+	}
+
+	if (!Interfaces::pClientEntityList) {
+		PRINT_TAG();
+		Warning("Required interface IClientEntityList for player helper class not available!\n");
+
+		ready = false;
+	}
+
+	classRetrievalAvailable = true;
+	comparisonAvailable = true;
+	conditionsRetrievalAvailable = true;
+	nameRetrievalAvailable = true;
+	steamIDRetrievalAvailable = true;
+	userIDRetrievalAvailable = true;
+
+	if (!Interfaces::pEngineClient) {
+		PRINT_TAG();
+		Warning("Interface IVEngineClient for player helper class not available (required for retrieving certain info)!\n");
+
+		nameRetrievalAvailable = false;
+		steamIDRetrievalAvailable = false;
+		userIDRetrievalAvailable = false;
+	}
+
+	if (!Interfaces::steamLibrariesAvailable) {
+		PRINT_TAG();
+		Warning("Steam libraries for player helper class not available (required for accuracy in retrieving Steam IDs)!\n");
+	}
+
+	if (!Entities::RetrieveClassPropOffset("CTFPlayer", { "m_nPlayerCond" })) {
+		PRINT_TAG();
+		Warning("Required property m_nPlayerCond for CTFPlayer for module %s not available!\n", name.c_str());
+
+		conditionsRetrievalAvailable = false;
+	}
+		
+	if (!Entities::RetrieveClassPropOffset("CTFPlayer", { "_condition_bits" })) {
+		PRINT_TAG();
+		Warning("Required property _condition_bits for CTFPlayer for module %s not available!\n", name.c_str());
+
+		conditionsRetrievalAvailable = false;
+	}
+		
+	if (!Entities::RetrieveClassPropOffset("CTFPlayer", { "m_nPlayerCondEx" })) {
+		PRINT_TAG();
+		Warning("Required property m_nPlayerCondEx for CTFPlayer for module %s not available!\n", name.c_str());
+
+		conditionsRetrievalAvailable = false;
+	}
+			
+	if (!Entities::RetrieveClassPropOffset("CTFPlayer", { "m_nPlayerCondEx2" })) {
+		PRINT_TAG();
+		Warning("Required property m_nPlayerCondEx2 for CTFPlayer for module %s not available!\n", name.c_str());
+
+		conditionsRetrievalAvailable = false;
+	}
+
+	if (!Entities::RetrieveClassPropOffset("CTFPlayer", { "m_iClass" })) {
+		PRINT_TAG();
+		Warning("Required property m_iClass for CTFPlayer for module %s not available!\n", name.c_str());
+
+		classRetrievalAvailable = false;
+		comparisonAvailable = false;
+	}
+
+	return ready;
+}

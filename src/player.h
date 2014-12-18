@@ -104,6 +104,14 @@ public:
 
 	static Iterator begin();
 	static Iterator end();
+
+	static bool CheckDependencies();
+	static bool classRetrievalAvailable;
+	static bool comparisonAvailable;
+	static bool conditionsRetrievalAvailable;
+	static bool nameRetrievalAvailable;
+	static bool steamIDRetrievalAvailable;
+	static bool userIDRetrievalAvailable;
 private:
 	CHandle<IClientEntity> playerEntity;
 
