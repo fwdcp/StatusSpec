@@ -50,6 +50,13 @@ bool AntiFreeze::CheckDependencies(std::string name) {
 		ready = false;
 	}
 
+	if (!Interfaces::pEngineClient) {
+		PRINT_TAG();
+		Warning("Required interface IVEngineClient for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
 	if (!g_pVGui) {
 		PRINT_TAG();
 		Warning("Required interface vgui::IVGui for module %s not available!\n", name.c_str());
@@ -85,7 +92,7 @@ bool AntiFreeze::CheckDependencies(std::string name) {
 		ready = false;
 	}
 
-	if (!Entities::RetrieveClassPropOffset("CTFObjectiveResource", { "m_hBlueKothTimer" })) {
+	if (!Entities::RetrieveClassPropOffset("CTFGameRulesProxy", { "m_hBlueKothTimer" })) {
 		PRINT_TAG();
 		Warning("Required property m_hBlueKothTimer for CTFGameRulesProxy for module %s not available!\n", name.c_str());
 
