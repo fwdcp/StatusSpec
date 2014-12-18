@@ -122,7 +122,7 @@ bool Entities::CheckClassBaseclass(ClientClass *clientClass, std::string basecla
 
 bool Entities::CheckTableBaseclass(RecvTable *sTable, std::string baseclass) {
 	std::string name = sTable->GetName();
-	if (name.find(baseclass) != name.npos) {
+	if (std::string(baseclass).compare("DT_" + baseclass) == 0) {
 		return true;
 	}
 
