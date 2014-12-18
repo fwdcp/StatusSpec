@@ -21,6 +21,11 @@
 
 #include "gamedata.h"
 
+typedef struct Replacement {
+	std::string group;
+	std::string replacement;
+} Replacement;
+
 typedef struct ColorConCommand_s {
 	Color color;
 	ConCommand *command;
