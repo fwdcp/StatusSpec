@@ -93,6 +93,13 @@ bool CameraTools::CheckDependencies(std::string name) {
 		ready = false;
 	}
 
+	if (!Player::CheckDependencies()) {
+		PRINT_TAG();
+		Warning("Required player helper class for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
 	try {
 		Interfaces::GetClientMode();
 	}
