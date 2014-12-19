@@ -20,16 +20,16 @@ class C_BaseEntity;
 class CViewSetup;
 class CMatRenderContextPtr;
 
-class CGlowObjectManager {
+class GlowManager {
 public:
-	class CGlowObject {
+	class GlowObject {
 	public:
-		CGlowObject(CGlowObjectManager *manager, C_BaseEntity *pEntity, const Vector &vGlowColor = Vector(1.0f, 1.0f, 1.0f), float flGlowAlpha = 1.0f, bool bRenderWhenOccluded = false, bool bRenderWhenUnoccluded = false) {
+		GlowObject(GlowManager *manager, C_BaseEntity *pEntity, const Vector &vGlowColor = Vector(1.0f, 1.0f, 1.0f), float flGlowAlpha = 1.0f, bool bRenderWhenOccluded = false, bool bRenderWhenUnoccluded = false) {
 			m_hManager = manager;
 			m_nGlowObjectHandle = m_hManager->RegisterGlowObject(pEntity, vGlowColor, flGlowAlpha, bRenderWhenOccluded, bRenderWhenUnoccluded);
 		}
 
-		~CGlowObject() {
+		~GlowObject() {
 			m_hManager->UnregisterGlowObject(m_nGlowObjectHandle);
 		}
 
@@ -62,13 +62,16 @@ public:
 		}
 
 	private:
-		CGlowObjectManager *m_hManager;
+		GlowManager *m_hManager;
 		int m_nGlowObjectHandle;
 
-		CGlowObject(const CGlowObject &other);
-		CGlowObject& operator=(const CGlowObject &other);
+		GlowObject(const GlowObject &other);
+		GlowObject& operator=(const GlowObject &other);
 	};
 
+	void RenderGlowEffects(const CViewSetup *pSetup);
+
+private:
 	int RegisterGlowObject(C_BaseEntity *pEntity, const Vector &vGlowColor, float flGlowAlpha, bool bRenderWhenOccluded, bool bRenderWhenUnoccluded) {
 		int index = m_nNextIndex++;
 
@@ -143,14 +146,11 @@ public:
 		return (m_GlowObjectDefinitions.find(nGlowObjectHandle) != m_GlowObjectDefinitions.end());
 	}
 
-	void RenderGlowEffects(const CViewSetup *pSetup);
-
-private:
 	void RenderGlowModels(const CViewSetup *pSetup, CMatRenderContextPtr &pRenderContext);
 	void ApplyEntityGlowEffects(const CViewSetup *pSetup, CMatRenderContextPtr &pRenderContext, float flBloomScale, int x, int y, int w, int h);
 
 	struct GlowObjectDefinition_t {
-		CGlowObjectManager *m_hManager;
+		GlowManager *m_hManager;
 
 		bool ShouldDraw() const {
 			return m_hEntity.Get() &&

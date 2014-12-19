@@ -49,7 +49,7 @@ struct ShaderStencilState_t {
 	}
 };
 
-void CGlowObjectManager::RenderGlowEffects(const CViewSetup *pSetup) {
+void GlowManager::RenderGlowEffects(const CViewSetup *pSetup) {
 	if (g_pMaterialSystemHardwareConfig->SupportsPixelShaders_2_0()) {
 		CMatRenderContextPtr pRenderContext(g_pMaterialSystem);
 
@@ -67,7 +67,7 @@ static void SetRenderTargetAndViewPort(ITexture *rt, int w, int h) {
 	pRenderContext->Viewport(0, 0, w, h);
 }
 
-void CGlowObjectManager::RenderGlowModels(const CViewSetup *pSetup, CMatRenderContextPtr &pRenderContext) {
+void GlowManager::RenderGlowModels(const CViewSetup *pSetup, CMatRenderContextPtr &pRenderContext) {
 	pRenderContext->PushRenderTargetAndViewport();
 
 	Vector vOrigColor;
@@ -121,7 +121,7 @@ void CGlowObjectManager::RenderGlowModels(const CViewSetup *pSetup, CMatRenderCo
 	pRenderContext->PopRenderTargetAndViewport();
 }
 
-void CGlowObjectManager::ApplyEntityGlowEffects(const CViewSetup *pSetup, CMatRenderContextPtr &pRenderContext, float flBloomScale, int x, int y, int w, int h)
+void GlowManager::ApplyEntityGlowEffects(const CViewSetup *pSetup, CMatRenderContextPtr &pRenderContext, float flBloomScale, int x, int y, int w, int h)
 {
 	IMaterial *pMatGlowColor = g_pMaterialSystem->FindMaterial("dev/glow_color", TEXTURE_GROUP_OTHER, true);
 	g_pStudioRender->ForcedMaterialOverride(pMatGlowColor);
@@ -249,7 +249,7 @@ void CGlowObjectManager::ApplyEntityGlowEffects(const CViewSetup *pSetup, CMatRe
 	stencilStateDisable.SetStencilState(pRenderContext);
 }
 
-void CGlowObjectManager::GlowObjectDefinition_t::DrawModel() {
+void GlowManager::GlowObjectDefinition_t::DrawModel() {
 	if (m_hEntity.Get()) {
 		m_hEntity->DrawModel(STUDIO_RENDER);
 		C_BaseEntity *pAttachment = m_hEntity->FirstMoveChild();
