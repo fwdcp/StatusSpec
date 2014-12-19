@@ -24,6 +24,7 @@
 #include "../funcs.h"
 #include "../glows.h"
 #include "../ifaces.h"
+#include "../modules.h"
 #include "../player.h"
 #include "../tfdefs.h"
 
@@ -31,9 +32,11 @@
 #define strtoull _strtoui64
 #endif
 
-class ProjectileOutlines {
+class ProjectileOutlines : public Module {
 public:
-	ProjectileOutlines();
+	ProjectileOutlines(std::string name);
+
+	static bool CheckDependencies(std::string name);
 
 	bool DoPostScreenSpaceEffectsHook(const CViewSetup *pSetup);
 	void FrameHook(ClientFrameStage_t curStage);
@@ -41,7 +44,8 @@ private:
 	std::map<std::string, ColorConCommand_t> colors;
 	int doPostScreenSpaceEffectsHook;
 	int frameHook;
-	std::map<EHANDLE, CGlowObject *> glows;
+	std::map<EHANDLE, GlowManager::GlowObject *> glows;
+	GlowManager glowManager;
 
 	Color GetGlowColor(IClientEntity *entity);
 	void SetGlowEffect(IClientEntity *entity, bool enabled, Vector color = Vector(1.0f, 1.0f, 1.0f), float alpha = 1.0f);
@@ -57,5 +61,3 @@ private:
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 	void ToggleFade(IConVar *var, const char *pOldValue, float flOldValue);
 };
-
-extern ProjectileOutlines *g_ProjectileOutlines;
