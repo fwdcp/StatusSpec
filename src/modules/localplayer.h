@@ -14,11 +14,14 @@
 
 #include "../funcs.h"
 #include "../ifaces.h"
+#include "../modules.h"
 #include "../player.h"
 
-class LocalPlayer {
+class LocalPlayer : public Module {
 public:
-	LocalPlayer();
+	LocalPlayer(std::string name);
+
+	static bool CheckDependencies(std::string name);
 
 	void FrameHook(ClientFrameStage_t curStage);
 	int GetLocalPlayerIndexOverride();
@@ -34,5 +37,3 @@ private:
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 	void ToggleTrackSpecTarget(IConVar *var, const char *pOldValue, float flOldValue);
 };
-
-extern LocalPlayer *g_LocalPlayer;
