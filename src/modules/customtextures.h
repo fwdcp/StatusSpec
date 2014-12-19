@@ -15,20 +15,24 @@
 #include <map>
 #include <string>
 
+#include "../common.h"
 #include "../entities.h"
 #include "../ifaces.h"
+#include "../modules.h"
 
 typedef struct TextureReplacement_s {
 	std::string group;
 	std::string replacement;
 } TextureReplacement_t;
 
-class CustomTextures {
+class CustomTextures : public Module {
 public:
-	CustomTextures();
+	CustomTextures(std::string name);
+
+	static bool CheckDependencies(std::string name);
 private:
 	KeyValues *textureConfig;
-	std::map<std::string, TextureReplacement_t> textureReplacements;
+	std::map<std::string, Replacement> textureReplacements;
 
 	ConVar *enabled;
 	ConCommand *load_replacement_group;
@@ -37,5 +41,3 @@ private:
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 	void UnloadReplacementGroup(const CCommand &command);
 };
-
-extern CustomTextures *g_CustomTextures;
