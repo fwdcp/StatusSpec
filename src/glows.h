@@ -69,6 +69,8 @@ public:
 		GlowObject& operator=(const GlowObject &other);
 	};
 
+	static bool CheckDependencies();
+
 	void RenderGlowEffects(const CViewSetup *pSetup);
 
 private:

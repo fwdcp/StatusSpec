@@ -49,6 +49,40 @@ struct ShaderStencilState_t {
 	}
 };
 
+bool GlowManager::CheckDependencies() {
+	bool ready = true;
+
+	if (!g_pMaterialSystemHardwareConfig) {
+		PRINT_TAG();
+		Warning("Required interface IMaterialSystemHardwareConfig for glow manager not available!\n");
+
+		ready = false;
+	}
+
+	if (!g_pMaterialSystem) {
+		PRINT_TAG();
+		Warning("Required interface IMaterialSystem for glow manager not available!\n");
+
+		ready = false;
+	}
+
+	if (!g_pStudioRender) {
+		PRINT_TAG();
+		Warning("Required interface IStudioRender for glow manager not available!\n");
+
+		ready = false;
+	}
+
+	if (!Interfaces::pRenderView) {
+		PRINT_TAG();
+		Warning("Required interface IVRenderView for glow manager not available!\n");
+
+		ready = false;
+	}
+
+	return ready;
+}
+
 void GlowManager::RenderGlowEffects(const CViewSetup *pSetup) {
 	if (g_pMaterialSystemHardwareConfig->SupportsPixelShaders_2_0()) {
 		CMatRenderContextPtr pRenderContext(g_pMaterialSystem);
