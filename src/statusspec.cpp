@@ -64,6 +64,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_ModuleManager->LoadModule<CustomMaterials>("Custom Materials");
 	g_ModuleManager->LoadModule<CustomModels>("Custom Models");
 	g_ModuleManager->LoadModule<CustomTextures>("Custom Textures");
+	g_ModuleManager->LoadModule<FOVOverride>("FOV Override");
 	g_ModuleManager->LoadModule<Killstreaks>("Killstreaks");
 
 	if (!doPostScreenSpaceEffectsHook) {

@@ -16,11 +16,14 @@
 
 #include "../funcs.h"
 #include "../ifaces.h"
+#include "../modules.h"
 #include "../player.h"
 
-class FOVOverride {
+class FOVOverride : public Module {
 public:
-	FOVOverride();
+	FOVOverride(std::string name);
+
+	static bool CheckDependencies(std::string name);
 
 	void FrameHook(ClientFrameStage_t curStage);
 	float GetFOVOverride();
@@ -35,5 +38,3 @@ private:
 	ConVar *zoomed;
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
-
-extern FOVOverride *g_FOVOverride;
