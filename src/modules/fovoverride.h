@@ -14,6 +14,7 @@
 
 #include "convar.h"
 
+#include "../common.h"
 #include "../funcs.h"
 #include "../ifaces.h"
 #include "../modules.h"

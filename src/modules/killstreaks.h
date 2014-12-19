@@ -16,6 +16,7 @@
 #include <iomanip>
 #include <string>
 
+#include "../common.h"
 #include "../entities.h"
 #include "../ifaces.h"
 #include "../modules.h"
