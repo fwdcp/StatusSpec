@@ -57,6 +57,13 @@ bool AntiFreeze::CheckDependencies(std::string name) {
 		ready = false;
 	}
 
+	if (!Interfaces::vguiLibrariesAvailable) {
+		PRINT_TAG();
+		Warning("Required VGUI library for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
 	if (!g_pVGui) {
 		PRINT_TAG();
 		Warning("Required interface vgui::IVGui for module %s not available!\n", name.c_str());

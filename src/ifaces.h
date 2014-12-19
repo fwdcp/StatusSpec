@@ -53,6 +53,7 @@ class Interfaces {
 		static CSteamAPIContext *pSteamAPIContext;
 
 		static bool steamLibrariesAvailable;
+		static bool vguiLibrariesAvailable;
 
 		static IClientMode *GetClientMode();
 		static IGameResources *GetGameResources();
