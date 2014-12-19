@@ -12,34 +12,6 @@
 
 ModuleManager *g_ModuleManager = nullptr;
 
-static int doPostScreenSpaceEffectsHook = 0;
-static int frameHook = 0;
-
-void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage) {
-	if (!doPostScreenSpaceEffectsHook) {
-		try {
-			doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), SH_STATIC(Hook_IClientMode_DoPostScreenSpaceEffects), false);
-		}
-		catch (bad_pointer &e) {
-			Warning(e.what());
-		}
-	}
-
-	if (doPostScreenSpaceEffectsHook) {
-		if (Funcs::RemoveHook(frameHook)) {
-			frameHook = 0;
-		}
-	}
-
-	RETURN_META(MRES_IGNORED);
-}
-
-bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup) {
-	g_GlowObjectManager.RenderGlowEffects(pSetup);
-
-	RETURN_META_VALUE(MRES_OVERRIDE, true);
-}
-
 // The plugin is a static singleton that is exported as an interface
 StatusSpecPlugin g_StatusSpecPlugin;
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(StatusSpecPlugin, IServerPluginCallbacks, INTERFACEVERSION_ISERVERPLUGINCALLBACKS, g_StatusSpecPlugin);
@@ -68,19 +40,6 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_ModuleManager->LoadModule<Killstreaks>("Killstreaks");
 	g_ModuleManager->LoadModule<LocalPlayer>("Local Player");
 	g_ModuleManager->LoadModule<MedigunInfo>("Medigun Info");
-
-	if (!doPostScreenSpaceEffectsHook) {
-		try {
-			doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), SH_STATIC(Hook_IClientMode_DoPostScreenSpaceEffects), false);
-		}
-		catch (bad_pointer &e) {
-			Warning(e.what());
-		}
-
-		if (!doPostScreenSpaceEffectsHook && !frameHook) {
-			frameHook = Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, SH_STATIC(Hook_IBaseClientDLL_FrameStageNotify), true);
-		}
-	}
 	
 	ConVar_Register();
 

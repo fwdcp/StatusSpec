@@ -22,9 +22,57 @@ class CMatRenderContextPtr;
 
 class CGlowObjectManager {
 public:
+	class CGlowObject {
+	public:
+		CGlowObject(CGlowObjectManager *manager, C_BaseEntity *pEntity, const Vector &vGlowColor = Vector(1.0f, 1.0f, 1.0f), float flGlowAlpha = 1.0f, bool bRenderWhenOccluded = false, bool bRenderWhenUnoccluded = false) {
+			m_hManager = manager;
+			m_nGlowObjectHandle = m_hManager->RegisterGlowObject(pEntity, vGlowColor, flGlowAlpha, bRenderWhenOccluded, bRenderWhenUnoccluded);
+		}
+
+		~CGlowObject() {
+			m_hManager->UnregisterGlowObject(m_nGlowObjectHandle);
+		}
+
+		void SetEntity(C_BaseEntity *pEntity) {
+			m_hManager->SetEntity(m_nGlowObjectHandle, pEntity);
+		}
+
+		void SetColor(const Vector &vGlowColor) {
+			m_hManager->SetColor(m_nGlowObjectHandle, vGlowColor);
+		}
+
+		void SetAlpha(float flAlpha) {
+			m_hManager->SetAlpha(m_nGlowObjectHandle, flAlpha);
+		}
+
+		void SetRenderFlags(bool bRenderWhenOccluded, bool bRenderWhenUnoccluded) {
+			m_hManager->SetRenderFlags(m_nGlowObjectHandle, bRenderWhenOccluded, bRenderWhenUnoccluded);
+		}
+
+		bool IsRenderingWhenOccluded() const {
+			return m_hManager->IsRenderingWhenOccluded(m_nGlowObjectHandle);
+		}
+
+		bool IsRenderingWhenUnoccluded() const {
+			return m_hManager->IsRenderingWhenUnoccluded(m_nGlowObjectHandle);
+		}
+
+		bool IsRendering() const {
+			return IsRenderingWhenOccluded() || IsRenderingWhenUnoccluded();
+		}
+
+	private:
+		CGlowObjectManager *m_hManager;
+		int m_nGlowObjectHandle;
+
+		CGlowObject(const CGlowObject &other);
+		CGlowObject& operator=(const CGlowObject &other);
+	};
+
 	int RegisterGlowObject(C_BaseEntity *pEntity, const Vector &vGlowColor, float flGlowAlpha, bool bRenderWhenOccluded, bool bRenderWhenUnoccluded) {
 		int index = m_nNextIndex++;
 
+		m_GlowObjectDefinitions[index].m_hManager = this;
 		m_GlowObjectDefinitions[index].m_hEntity = pEntity;
 		m_GlowObjectDefinitions[index].m_vGlowColor = vGlowColor;
 		m_GlowObjectDefinitions[index].m_flGlowAlpha = flGlowAlpha;
@@ -102,6 +150,8 @@ private:
 	void ApplyEntityGlowEffects(const CViewSetup *pSetup, CMatRenderContextPtr &pRenderContext, float flBloomScale, int x, int y, int w, int h);
 
 	struct GlowObjectDefinition_t {
+		CGlowObjectManager *m_hManager;
+
 		bool ShouldDraw() const {
 			return m_hEntity.Get() &&
 				(m_bRenderWhenOccluded || m_bRenderWhenUnoccluded) &&
@@ -121,51 +171,4 @@ private:
 
 	int m_nNextIndex;
 	std::map<int, GlowObjectDefinition_t> m_GlowObjectDefinitions;
-};
-
-extern CGlowObjectManager g_GlowObjectManager;
-
-class CGlowObject {
-public:
-	CGlowObject(C_BaseEntity *pEntity, const Vector &vGlowColor = Vector(1.0f, 1.0f, 1.0f), float flGlowAlpha = 1.0f, bool bRenderWhenOccluded = false, bool bRenderWhenUnoccluded = false) {
-		m_nGlowObjectHandle = g_GlowObjectManager.RegisterGlowObject(pEntity, vGlowColor, flGlowAlpha, bRenderWhenOccluded, bRenderWhenUnoccluded);
-	}
-
-	~CGlowObject() {
-		g_GlowObjectManager.UnregisterGlowObject(m_nGlowObjectHandle);
-	}
-
-	void SetEntity(C_BaseEntity *pEntity) {
-		g_GlowObjectManager.SetEntity(m_nGlowObjectHandle, pEntity);
-	}
-
-	void SetColor(const Vector &vGlowColor) {
-		g_GlowObjectManager.SetColor(m_nGlowObjectHandle, vGlowColor);
-	}
-
-	void SetAlpha(float flAlpha) {
-		g_GlowObjectManager.SetAlpha(m_nGlowObjectHandle, flAlpha);
-	}
-
-	void SetRenderFlags(bool bRenderWhenOccluded, bool bRenderWhenUnoccluded) {
-		g_GlowObjectManager.SetRenderFlags(m_nGlowObjectHandle, bRenderWhenOccluded, bRenderWhenUnoccluded);
-	}
-
-	bool IsRenderingWhenOccluded() const {
-		return g_GlowObjectManager.IsRenderingWhenOccluded(m_nGlowObjectHandle);
-	}
-
-	bool IsRenderingWhenUnoccluded() const {
-		return g_GlowObjectManager.IsRenderingWhenUnoccluded(m_nGlowObjectHandle);
-	}
-
-	bool IsRendering() const {
-		return IsRenderingWhenOccluded() || IsRenderingWhenUnoccluded();
-	}
-
-private:
-	int m_nGlowObjectHandle;
-
-	CGlowObject(const CGlowObject &other);
-	CGlowObject& operator=(const CGlowObject &other);
 };

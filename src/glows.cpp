@@ -19,8 +19,6 @@
 
 #define FULL_FRAME_TEXTURE "_rt_FullFrameFB"
 
-CGlowObjectManager g_GlowObjectManager;
-
 struct ShaderStencilState_t {
 	bool m_bEnable;
 	StencilOperation_t m_FailOp;
@@ -257,7 +255,7 @@ void CGlowObjectManager::GlowObjectDefinition_t::DrawModel() {
 		C_BaseEntity *pAttachment = m_hEntity->FirstMoveChild();
 
 		while (pAttachment != NULL) {
-			if (!g_GlowObjectManager.HasGlowEffect(pAttachment) && pAttachment->ShouldDraw()) {
+			if (!m_hManager->HasGlowEffect(pAttachment) && pAttachment->ShouldDraw()) {
 				pAttachment->DrawModel(STUDIO_RENDER);
 			}
 

@@ -38,9 +38,6 @@
 #include "modules/teamhealthcomparison.h"
 #include "modules/teamoverrides.h"
 
-void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage);
-bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup);
-
 class StatusSpecPlugin: public IServerPluginCallbacks
 {
 public:
