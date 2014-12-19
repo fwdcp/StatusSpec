@@ -67,6 +67,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_ModuleManager->LoadModule<FOVOverride>("FOV Override");
 	g_ModuleManager->LoadModule<Killstreaks>("Killstreaks");
 	g_ModuleManager->LoadModule<LocalPlayer>("Local Player");
+	g_ModuleManager->LoadModule<MedigunInfo>("Medigun Info");
 
 	if (!doPostScreenSpaceEffectsHook) {
 		try {

@@ -13,6 +13,7 @@
 #include "../stdafx.h"
 
 #include <map>
+#include <iomanip>
 #include <string>
 
 #include "convar.h"
@@ -29,8 +30,10 @@
 #include "vgui_controls/ScalableImagePanel.h"
 #include "../vgui_controls/VariableLabel.h"
 
+#include "../common.h"
 #include "../entities.h"
 #include "../ifaces.h"
+#include "../modules.h"
 #include "../player.h"
 #include "../tfdefs.h"
 
@@ -53,9 +56,11 @@ typedef struct Medigun_s {
 	bool chargeRelease;
 } Medigun_t;
 
-class MedigunInfo {
+class MedigunInfo : public Module {
 public:
-	MedigunInfo();
+	MedigunInfo(std::string name);
+
+	static bool CheckDependencies(std::string name);
 
 	void FrameHook(ClientFrameStage_t curStage);
 private:
@@ -74,5 +79,3 @@ private:
 	void ReloadSettings();
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
-
-extern MedigunInfo *g_MedigunInfo;

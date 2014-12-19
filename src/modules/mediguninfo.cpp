@@ -10,31 +10,102 @@
 
 #include "mediguninfo.h"
 
-inline void StartAnimationSequence(const char *sequenceName) {
-	Interfaces::GetClientMode()->GetViewportAnimationController()->StartAnimationSequence(sequenceName);
-}
-
-MedigunInfo::MedigunInfo() {
+MedigunInfo::MedigunInfo(std::string name) : Module(name) {
 	dynamicMeterSettings = new KeyValues("MedigunInfoDynamicMeters");
 	dynamicMeterSettings->LoadFromFile(Interfaces::pFileSystem, "resource/ui/mediguninfodynamicmeters.res", "mod");
 	frameHook = 0;
 
 	dynamic_meters = new ConVar("statusspec_mediguninfo_dynamic_meters", "0", FCVAR_NONE, "enable charge meters to change based on medigun");
-	enabled = new ConVar("statusspec_mediguninfo_enabled", "0", FCVAR_NONE, "enable medigun info", [](IConVar *var, const char *pOldValue, float flOldValue) { g_MedigunInfo->ToggleEnabled(var, pOldValue, flOldValue); });
+	enabled = new ConVar("statusspec_mediguninfo_enabled", "0", FCVAR_NONE, "enable medigun info", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<MedigunInfo>("Medigun Info")->ToggleEnabled(var, pOldValue, flOldValue); });
 	individual_charge_meters = new ConVar("statusspec_mediguninfo_individual_charge_meters", "1", FCVAR_NONE, "enable individual charge meters (for Vaccinator)");
-	reload_settings = new ConCommand("statusspec_mediguninfo_reload_settings", []() { g_MedigunInfo->ReloadSettings(); }, "reload settings for the medigun info HUD from the resource file", FCVAR_NONE);
+	reload_settings = new ConCommand("statusspec_mediguninfo_reload_settings", []() { g_ModuleManager->GetModule<MedigunInfo>("Medigun Info")->ReloadSettings(); }, "reload settings for the medigun info HUD from the resource file", FCVAR_NONE);
+}
+
+bool MedigunInfo::CheckDependencies(std::string name) {
+	bool ready = true;
+
+	if (!Interfaces::pClientDLL) {
+		PRINT_TAG();
+		Warning("Required interface IBaseClientDLL for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Interfaces::pFileSystem) {
+		PRINT_TAG();
+		Warning("Required interface IFileSystem for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Interfaces::vguiLibrariesAvailable) {
+		PRINT_TAG();
+		Warning("Required VGUI library for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Entities::RetrieveClassPropOffset("CWeaponMedigun", { "m_iItemDefinitionIndex" })) {
+		PRINT_TAG();
+		Warning("Required property m_iItemDefinitionIndex for CWeaponMedigun for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Entities::RetrieveClassPropOffset("CWeaponMedigun", { "m_bChargeRelease" })) {
+		PRINT_TAG();
+		Warning("Required property m_bChargeRelease for CWeaponMedigun for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Entities::RetrieveClassPropOffset("CWeaponMedigun", { "m_nChargeResistType" })) {
+		PRINT_TAG();
+		Warning("Required property m_nChargeResistType for CWeaponMedigun for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Entities::RetrieveClassPropOffset("CWeaponMedigun", { "m_flChargeLevel" })) {
+		PRINT_TAG();
+		Warning("Required property m_flChargeLevel for CWeaponMedigun for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	for (int i = 0; i < MAX_WEAPONS; i++) {
+		std::stringstream ss;
+		std::string arrayIndex;
+		ss << std::setfill('0') << std::setw(3) << i;
+		ss >> arrayIndex;
+
+		if (!Entities::RetrieveClassPropOffset("CTFPlayer", { "m_hMyWeapons", arrayIndex })) {
+			PRINT_TAG();
+			Warning("Required property table m_hMyWeapons for CTFPlayer for module %s not available!\n", name.c_str());
+
+			ready = false;
+
+			break;
+		}
+	}
+
+	try {
+		Interfaces::GetClientMode();
+	}
+	catch (bad_pointer &e) {
+		PRINT_TAG();
+		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", name.c_str());
+	}
+
+	return ready;
 }
 
 void MedigunInfo::FrameHook(ClientFrameStage_t curStage) {
 	if (curStage == FRAME_NET_UPDATE_END) {
 		medigunInfo.clear();
 
-		for (int i = 1; i <= MAX_PLAYERS; i++) {
-			Player player = i;
-
-			if (!player) {
-				continue;
-			}
+		for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
+			Player player = *iterator;
 
 			TFTeam team = player.GetTeam();
 
@@ -47,16 +118,20 @@ void MedigunInfo::FrameHook(ClientFrameStage_t curStage) {
 			}
 
 			for (int i = 0; i < MAX_WEAPONS; i++) {
-				int weapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(player.GetEntity(), Entities::pCTFPlayer__m_hMyWeapons[i]);
-				IClientEntity *weaponEntity = Interfaces::pClientEntityList->GetClientEntity(weapon);
+				std::stringstream ss;
+				std::string arrayIndex;
+				ss << std::setfill('0') << std::setw(3) << i;
+				ss >> arrayIndex;
 
-				if (!weaponEntity || !Entities::CheckClassBaseclass(weaponEntity->GetClientClass(), "DT_WeaponMedigun")) {
+				IClientEntity *weapon = Entities::GetEntityProp<EHANDLE *>(player.GetEntity(), { "m_hMyWeapons", arrayIndex })->Get();
+
+				if (!weapon || !Entities::CheckEntityBaseclass(weapon, "WeaponMedigun")) {
 					continue;
 				}
 
 				Medigun_t medigun;
 
-				int itemDefinitionIndex = *MAKE_PTR(int*, weaponEntity, Entities::pCEconEntity__m_iItemDefinitionIndex);
+				int itemDefinitionIndex = *Entities::GetEntityProp<int *>(weapon, { "m_iItemDefinitionIndex" });
 
 				switch (itemDefinitionIndex) {
 				case 29:
@@ -96,9 +171,9 @@ void MedigunInfo::FrameHook(ClientFrameStage_t curStage) {
 				}
 				}
 
-				medigun.chargeRelease = *MAKE_PTR(bool*, weaponEntity, Entities::pCWeaponMedigun__m_bChargeRelease);
-				medigun.chargeResistType = (TFResistType)*MAKE_PTR(int*, weaponEntity, Entities::pCWeaponMedigun__m_nChargeResistType);
-				medigun.chargeLevel = *MAKE_PTR(float*, weaponEntity, Entities::pCWeaponMedigun__m_flChargeLevel);
+				medigun.chargeRelease = *Entities::GetEntityProp<bool *>(weapon, { "m_bChargeRelease" });
+				medigun.chargeResistType = (TFResistType)*Entities::GetEntityProp<int *>(weapon, { "m_nChargeResistType" });
+				medigun.chargeLevel = *Entities::GetEntityProp<float *>(weapon, { "m_flChargeLevel" });
 
 				if (medigunInfo.find(team) == medigunInfo.end() || medigunInfo[team].chargeLevel <= 0.0f && medigun.chargeLevel >= 0.0f) {
 					medigunInfo[team] = medigun;
@@ -254,7 +329,7 @@ void MedigunInfo::Paint() {
 
 			if (medigunInfo[TFTeam_Red].chargeRelease) {
 				if (!redChargeReleased) {
-					StartAnimationSequence("MedigunInfoRedChargeReleased");
+					Interfaces::GetClientMode()->GetViewportAnimationController()->StartAnimationSequence("MedigunInfoRedChargeReleased");
 				}
 
 				redChargeReleased = true;
@@ -262,7 +337,7 @@ void MedigunInfo::Paint() {
 			}
 			else if (medigunInfo[TFTeam_Red].chargeLevel >= 0.25f) {
 				if (!redChargeReady) {
-					StartAnimationSequence("MedigunInfoRedChargeReady");
+					Interfaces::GetClientMode()->GetViewportAnimationController()->StartAnimationSequence("MedigunInfoRedChargeReady");
 				}
 
 				redChargeReleased = false;
@@ -270,7 +345,7 @@ void MedigunInfo::Paint() {
 			}
 			else {
 				if (redChargeReleased || redChargeReady) {
-					StartAnimationSequence("MedigunInfoRedChargeStop");
+					Interfaces::GetClientMode()->GetViewportAnimationController()->StartAnimationSequence("MedigunInfoRedChargeStop");
 				}
 
 				redChargeReleased = false;
@@ -319,7 +394,7 @@ void MedigunInfo::Paint() {
 
 			if (medigunInfo[TFTeam_Red].chargeRelease) {
 				if (!redChargeReleased) {
-					StartAnimationSequence("MedigunInfoRedChargeReleased");
+					Interfaces::GetClientMode()->GetViewportAnimationController()->StartAnimationSequence("MedigunInfoRedChargeReleased");
 				}
 
 				redChargeReleased = true;
@@ -327,7 +402,7 @@ void MedigunInfo::Paint() {
 			}
 			else if (medigunInfo[TFTeam_Red].chargeLevel >= 1.0f) {
 				if (!redChargeReady) {
-					StartAnimationSequence("MedigunInfoRedChargeReady");
+					Interfaces::GetClientMode()->GetViewportAnimationController()->StartAnimationSequence("MedigunInfoRedChargeReady");
 				}
 
 				redChargeReleased = false;
@@ -335,7 +410,7 @@ void MedigunInfo::Paint() {
 			}
 			else {
 				if (redChargeReleased || redChargeReady) {
-					StartAnimationSequence("MedigunInfoRedChargeStop");
+					Interfaces::GetClientMode()->GetViewportAnimationController()->StartAnimationSequence("MedigunInfoRedChargeStop");
 				}
 
 				redChargeReleased = false;
@@ -447,7 +522,7 @@ void MedigunInfo::Paint() {
 			redChargeReady = false;
 			redChargeReleased = false;
 
-			StartAnimationSequence("MedigunInfoRedChargeNormal");
+			Interfaces::GetClientMode()->GetViewportAnimationController()->StartAnimationSequence("MedigunInfoRedChargeNormal");
 		}
 	}
 
@@ -554,7 +629,7 @@ void MedigunInfo::Paint() {
 
 			if (medigunInfo[TFTeam_Blue].chargeRelease) {
 				if (!bluChargeReleased) {
-					StartAnimationSequence("MedigunInfoBluChargeReleased");
+					Interfaces::GetClientMode()->GetViewportAnimationController()->StartAnimationSequence("MedigunInfoBluChargeReleased");
 				}
 
 				bluChargeReleased = true;
@@ -562,7 +637,7 @@ void MedigunInfo::Paint() {
 			}
 			else if (medigunInfo[TFTeam_Blue].chargeLevel >= 0.25f) {
 				if (!bluChargeReady) {
-					StartAnimationSequence("MedigunInfoBluChargeReady");
+					Interfaces::GetClientMode()->GetViewportAnimationController()->StartAnimationSequence("MedigunInfoBluChargeReady");
 				}
 
 				bluChargeReleased = false;
@@ -570,7 +645,7 @@ void MedigunInfo::Paint() {
 			}
 			else {
 				if (bluChargeReleased || bluChargeReady) {
-					StartAnimationSequence("MedigunInfoBluChargeStop");
+					Interfaces::GetClientMode()->GetViewportAnimationController()->StartAnimationSequence("MedigunInfoBluChargeStop");
 				}
 
 				bluChargeReleased = false;
@@ -619,7 +694,7 @@ void MedigunInfo::Paint() {
 
 			if (medigunInfo[TFTeam_Blue].chargeRelease) {
 				if (!bluChargeReleased) {
-					StartAnimationSequence("MedigunInfoBluChargeReleased");
+					Interfaces::GetClientMode()->GetViewportAnimationController()->StartAnimationSequence("MedigunInfoBluChargeReleased");
 				}
 
 				bluChargeReleased = true;
@@ -627,7 +702,7 @@ void MedigunInfo::Paint() {
 			}
 			else if (medigunInfo[TFTeam_Blue].chargeLevel >= 1.0f) {
 				if (!bluChargeReady) {
-					StartAnimationSequence("MedigunInfoBluChargeReady");
+					Interfaces::GetClientMode()->GetViewportAnimationController()->StartAnimationSequence("MedigunInfoBluChargeReady");
 				}
 
 				bluChargeReleased = false;
@@ -635,7 +710,7 @@ void MedigunInfo::Paint() {
 			}
 			else {
 				if (bluChargeReleased || bluChargeReady) {
-					StartAnimationSequence("MedigunInfoBluChargeStop");
+					Interfaces::GetClientMode()->GetViewportAnimationController()->StartAnimationSequence("MedigunInfoBluChargeStop");
 				}
 
 				bluChargeReleased = false;
@@ -747,7 +822,7 @@ void MedigunInfo::Paint() {
 			bluChargeReady = false;
 			bluChargeReleased = false;
 
-			StartAnimationSequence("MedigunInfoBluChargeNormal");
+			Interfaces::GetClientMode()->GetViewportAnimationController()->StartAnimationSequence("MedigunInfoBluChargeNormal");
 		}
 	}
 }
