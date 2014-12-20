@@ -13,6 +13,7 @@
 #include "../stdafx.h"
 
 #include <map>
+#include <iomanip>
 #include <sstream>
 #include <string>
 
@@ -28,6 +29,7 @@
 #include "../entities.h"
 #include "../ifaces.h"
 #include "../itemschema.h"
+#include "../modules.h"
 #include "../player.h"
 #include "../tfdefs.h"
 
@@ -66,9 +68,11 @@ typedef struct Loadout_s {
 	int activeWeaponSlot;
 } Loadout_t;
 
-class LoadoutIcons {
+class LoadoutIcons : public Module {
 public:
-	LoadoutIcons();
+	LoadoutIcons(std::string name);
+
+	static bool CheckDependencies(std::string name);
 
 	void FrameHook(ClientFrameStage_t curStage);
 private:
@@ -95,5 +99,3 @@ private:
 	void SetFilter(const CCommand &command);
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
-
-extern LoadoutIcons *g_LoadoutIcons;

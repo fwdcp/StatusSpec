@@ -10,17 +10,124 @@
 
 #include "loadouticons.h"
 
-LoadoutIcons::LoadoutIcons() {
+LoadoutIcons::LoadoutIcons(std::string name) : Module(name) {
 	filter_active_color = Color(255, 255, 255, 255);
 	filter_inactive_color = Color(127, 127, 127, 255);
 	frameHook = 0;
 	itemSchema = new ItemSchema();
 
-	enabled = new ConVar("statusspec_loadouticons_enabled", "0", FCVAR_NONE, "enable loadout icons", [](IConVar *var, const char *pOldValue, float flOldValue) { g_LoadoutIcons->ToggleEnabled(var, pOldValue, flOldValue); });
-	filter_active = new ConCommand("statusspec_loadouticons_filter_active", [](const CCommand &command) { g_LoadoutIcons->SetFilter(command); }, "the RGBA filter applied to the icon for an active item", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_LoadoutIcons->GetCurrentFilter(partial, commands); });
-	filter_inactive = new ConCommand("statusspec_loadouticons_filter_inactive", [](const CCommand &command) { g_LoadoutIcons->SetFilter(command); }, "the RGBA filter applied to the icon for an inactive item", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_LoadoutIcons->GetCurrentFilter(partial, commands); });
+	enabled = new ConVar("statusspec_loadouticons_enabled", "0", FCVAR_NONE, "enable loadout icons", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<LoadoutIcons>("Loadout Icons")->ToggleEnabled(var, pOldValue, flOldValue); });
+	filter_active = new ConCommand("statusspec_loadouticons_filter_active", [](const CCommand &command) { g_ModuleManager->GetModule<LoadoutIcons>("Loadout Icons")->SetFilter(command); }, "the RGBA filter applied to the icon for an active item", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<LoadoutIcons>("Loadout Icons")->GetCurrentFilter(partial, commands); });
+	filter_inactive = new ConCommand("statusspec_loadouticons_filter_inactive", [](const CCommand &command) { g_ModuleManager->GetModule<LoadoutIcons>("Loadout Icons")->SetFilter(command); }, "the RGBA filter applied to the icon for an inactive item", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<LoadoutIcons>("Loadout Icons")->GetCurrentFilter(partial, commands); });
 	nonloadout = new ConVar("statusspec_loadouticons_nonloadout", "0", FCVAR_NONE, "enable loadout icons for nonloadout items");
 	only_active = new ConVar("statusspec_loadouticons_only_active", "0", FCVAR_NONE, "only display loadout icons for the active weapon");
+}
+
+bool LoadoutIcons::CheckDependencies(std::string name) {
+	bool ready = true;
+
+	if (!Interfaces::pClientDLL) {
+		PRINT_TAG();
+		Warning("Required interface IBaseClientDLL for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Interfaces::pClientEntityList) {
+		PRINT_TAG();
+		Warning("Required interface IClientEntityList for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Interfaces::vguiLibrariesAvailable) {
+		PRINT_TAG();
+		Warning("Required VGUI library for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!g_pVGui) {
+		PRINT_TAG();
+		Warning("Required interface vgui::IVGui for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!g_pVGuiPanel) {
+		PRINT_TAG();
+		Warning("Required interface vgui::IPanel for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Entities::RetrieveClassPropOffset("CEconEntity", { "m_hOwnerEntity" })) {
+		PRINT_TAG();
+		Warning("Required property m_hOwnerEntity for CEconEntity for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Entities::RetrieveClassPropOffset("CEconEntity", { "m_iItemDefinitionIndex" })) {
+		PRINT_TAG();
+		Warning("Required property m_hOwnerEntity for CEconEntity for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Entities::RetrieveClassPropOffset("CTFPlayer", { "m_hActiveWeapon" })) {
+		PRINT_TAG();
+		Warning("Required property m_hActiveWeapon for CTFPlayer for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	for (int i = 0; i < MAX_WEAPONS; i++) {
+		std::stringstream ss;
+		std::string arrayIndex;
+		ss << std::setfill('0') << std::setw(3) << i;
+		ss >> arrayIndex;
+
+		if (!Entities::RetrieveClassPropOffset("CTFPlayer", { "m_hMyWeapons", arrayIndex })) {
+			PRINT_TAG();
+			Warning("Required property table m_hMyWeapons for CTFPlayer for module %s not available!\n", name.c_str());
+
+			ready = false;
+
+			break;
+		}
+	}
+
+	if (!Player::CheckDependencies()) {
+		PRINT_TAG();
+		Warning("Required player helper class for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Player::classRetrievalAvailable) {
+		PRINT_TAG();
+		Warning("Required player class retrieval for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Player::nameRetrievalAvailable) {
+		PRINT_TAG();
+		Warning("Required player name retrieval for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	try {
+		Interfaces::GetClientMode();
+	}
+	catch (bad_pointer &e) {
+		PRINT_TAG();
+		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", name.c_str());
+	}
+
+	return ready;
 }
 
 void LoadoutIcons::FrameHook(ClientFrameStage_t curStage) {
@@ -32,22 +139,20 @@ void LoadoutIcons::FrameHook(ClientFrameStage_t curStage) {
 		for (int i = 0; i < maxEntity; i++) {
 			IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
 
-			if (!entity || !Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_EconEntity")) {
+			if (!entity || !Entities::CheckEntityBaseclass(entity, "EconEntity")) {
 				continue;
 			}
 
-			Player player = ENTITY_INDEX_FROM_ENTITY_OFFSET(entity, Entities::pCEconEntity__m_hOwnerEntity);
+			Player player = Entities::GetEntityProp<EHANDLE *>(entity, { "m_hOwnerEntity" })->GetEntryIndex();
 			
 			if (!player) {
 				continue;
 			}
 
-			int itemDefinitionIndex = *MAKE_PTR(int*, entity, Entities::pCEconEntity__m_iItemDefinitionIndex);
+			int itemDefinitionIndex = *Entities::GetEntityProp<int *>(entity, { "m_iItemDefinitionIndex" });
 
 			if (itemIconTextures.find(itemDefinitionIndex) == itemIconTextures.end()) {
-				std::string itemIcon = "../";
-				itemIcon += itemSchema->GetItemKeyData(itemDefinitionIndex, "image_inventory");
-				itemIconTextures[itemDefinitionIndex] = itemIcon;
+				itemIconTextures[itemDefinitionIndex] = std::string("../") + itemSchema->GetItemKeyData(itemDefinitionIndex, "image_inventory");
 			}
 
 			const char *itemSlot = itemSchema->GetItemKeyData(itemDefinitionIndex, "item_slot");
@@ -55,9 +160,9 @@ void LoadoutIcons::FrameHook(ClientFrameStage_t curStage) {
 			TFClassType tfclass = player.GetClass();
 			KeyValues *classUses = itemSchema->GetItemKey(itemDefinitionIndex, "used_by_classes");
 			if (classUses) {
-				const char *classUse = classUses->GetString(tfclassNames[tfclass].c_str(), "");
+				const char *classUse = classUses->GetString(TFDefinitions::classNames.find(tfclass)->second.c_str(), "");
 
-				if (std::find(std::begin(itemSlots), std::end(itemSlots), classUse) != std::end(itemSlots)) {
+				if (std::find(std::begin(TFDefinitions::itemSlots), std::end(TFDefinitions::itemSlots), classUse) != std::end(TFDefinitions::itemSlots)) {
 					itemSlot = classUse;
 				}
 			}
@@ -100,46 +205,46 @@ void LoadoutIcons::FrameHook(ClientFrameStage_t curStage) {
 				loadoutInfo[player].action = itemDefinitionIndex;
 			}
 
-			int activeWeapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(player.GetEntity(), Entities::pCTFPlayer__m_hActiveWeapon);
+			int activeWeapon = Entities::GetEntityProp<EHANDLE *>(player.GetEntity(), { "m_hActiveWeapon" })->GetEntryIndex();
 			if (activeWeapon == entity->entindex()) {
 				loadoutInfo[player].activeWeaponSlot = itemDefinitionIndex;
 			}
 		}
 
-		for (int i = 1; i <= MAX_PLAYERS; i++) {
-			Player player = i;
-
-			if (!player) {
-				continue;
-			}
+		for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
+			Player player = *iterator;
 
 			TFClassType tfclass = player.GetClass();
-			int activeWeapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(player.GetEntity(), Entities::pCTFPlayer__m_hActiveWeapon);
+			int activeWeapon = Entities::GetEntityProp<EHANDLE *>(player.GetEntity(), { "m_hActiveWeapon" })->GetEntryIndex();
 
 			loadoutInfo[player].tfclass = tfclass;
 
 			for (int i = 0; i < MAX_WEAPONS; i++) {
-				int weapon = ENTITY_INDEX_FROM_ENTITY_OFFSET(player.GetEntity(), Entities::pCTFPlayer__m_hMyWeapons[i]);
-				IClientEntity *weaponEntity = Interfaces::pClientEntityList->GetClientEntity(weapon);
+				std::stringstream ss;
+				std::string arrayIndex;
+				ss << std::setfill('0') << std::setw(3) << i;
+				ss >> arrayIndex;
 
-				if (!weaponEntity || !Entities::CheckClassBaseclass(weaponEntity->GetClientClass(), "DT_EconEntity")) {
+				IClientEntity *weapon = Entities::GetEntityProp<EHANDLE *>(player.GetEntity(), { "m_hMyWeapons", arrayIndex })->Get();
+
+				if (!weapon || !Entities::CheckEntityBaseclass(weapon, "EconEntity")) {
 					continue;
 				}
 
-				int itemDefinitionIndex = *MAKE_PTR(int*, weaponEntity, Entities::pCEconEntity__m_iItemDefinitionIndex);
+				int itemDefinitionIndex = *Entities::GetEntityProp<int *>(weapon, { "m_iItemDefinitionIndex" });
 
 				const char *itemSlot = itemSchema->GetItemKeyData(itemDefinitionIndex, "item_slot");
 
 				KeyValues *classUses = itemSchema->GetItemKey(itemDefinitionIndex, "used_by_classes");
 				if (classUses) {
-					const char *classUse = classUses->GetString(tfclassNames[tfclass].c_str(), "");
+					const char *classUse = classUses->GetString(TFDefinitions::classNames.find(tfclass)->second.c_str(), "");
 
-					if (std::find(std::begin(itemSlots), std::end(itemSlots), classUse) != std::end(itemSlots)) {
+					if (std::find(std::begin(TFDefinitions::itemSlots), std::end(TFDefinitions::itemSlots), classUse) != std::end(TFDefinitions::itemSlots)) {
 						itemSlot = classUse;
 					}
 				}
 
-				if (activeWeapon == weapon) {
+				if (activeWeapon == weapon->entindex()) {
 					loadoutInfo[player].activeWeaponSlot = itemDefinitionIndex;
 				}
 
@@ -207,8 +312,9 @@ void LoadoutIcons::FrameHook(ClientFrameStage_t curStage) {
 										if (loadoutIcons->GetChildCount() == 0) {
 											InitIcons(loadoutIcons);
 										}
-
-										DisplayIcons(playerPanel);
+										else {
+											DisplayIcons(playerPanel);
+										}
 									}
 
 									break;
@@ -287,10 +393,10 @@ void LoadoutIcons::DisplayIcons(vgui::VPANEL playerPanel) {
 			if (dialogVariables) {
 				const char *name = dialogVariables->GetString("playername");
 
-				for (int i = 1; i <= MAX_PLAYERS; i++) {
-					Player player = i;
+				for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
+					Player player = *iterator;
 
-					if (player && strcmp(player.GetName(), name) == 0) {
+					if (strcmp(player.GetName(), name) == 0) {
 						if (only_active->GetBool()) {
 							DisplayIcon(dynamic_cast<vgui::ImagePanel *>(loadoutIconPanels[panelHandle]["LoadoutIconsItem1"]), loadoutInfo[player].activeWeaponSlot, true);
 						}
@@ -359,14 +465,33 @@ void LoadoutIcons::HideIcon(vgui::ImagePanel *panel) {
 void LoadoutIcons::InitIcons(vgui::EditablePanel *panel) {
 	panel->LoadControlSettings("Resource/UI/LoadoutIcons.res");
 
-	vgui::HPanel panelHandle = g_pVGui->PanelToHandle(panel->GetVParent());
+	if (panel->GetChildCount() == 0) {
+		vgui::EditablePanel *editablePanel = new vgui::EditablePanel(panel, "LoadoutIcons");
+		editablePanel->LoadControlSettings("Resource/UI/LoadoutIcons.res");
 
-	for (int i = 0; i < g_pVGuiPanel->GetChildCount(panel->GetVPanel()); i++) {
-		vgui::VPANEL vpanel = g_pVGuiPanel->GetChild(panel->GetVPanel(), i);
-		const char *name = g_pVGuiPanel->GetName(vpanel);
-		vgui::Panel *panel = g_pVGuiPanel->GetPanel(vpanel, "ClientDLL");
+		vgui::HPanel panelHandle = g_pVGui->PanelToHandle(panel->GetVParent());
 
-		loadoutIconPanels[panelHandle][name] = panel;
+		while (editablePanel->GetChildCount() > 0) {
+			vgui::Panel *childPanel = editablePanel->GetChild(0);
+			loadoutIconPanels[panelHandle][childPanel->GetName()] = childPanel;
+
+			childPanel->SetParent(panel);
+		}
+
+		delete editablePanel;
+
+		panel->LoadControlSettings("Resource/UI/LoadoutIcons.res");
+	}
+	else {
+		vgui::HPanel panelHandle = g_pVGui->PanelToHandle(panel->GetVParent());
+
+		for (int i = 0; i < g_pVGuiPanel->GetChildCount(panel->GetVPanel()); i++) {
+			vgui::VPANEL vpanel = g_pVGuiPanel->GetChild(panel->GetVPanel(), i);
+			const char *name = g_pVGuiPanel->GetName(vpanel);
+			vgui::Panel *panel = g_pVGuiPanel->GetPanel(vpanel, "ClientDLL");
+
+			loadoutIconPanels[panelHandle][name] = panel;
+		}
 	}
 }
 
