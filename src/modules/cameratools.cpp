@@ -100,6 +100,13 @@ bool CameraTools::CheckDependencies(std::string name) {
 		ready = false;
 	}
 
+	if (!Player::nameRetrievalAvailable) {
+		PRINT_TAG();
+		Warning("Required player name retrieval for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
 	try {
 		Interfaces::GetClientMode();
 	}
