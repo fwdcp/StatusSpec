@@ -42,6 +42,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_ModuleManager->LoadModule<LocalPlayer>("Local Player");
 	g_ModuleManager->LoadModule<MedigunInfo>("Medigun Info");
 	g_ModuleManager->LoadModule<PlayerOutlines>("Player Outlines");
+	g_ModuleManager->LoadModule<ProjectileOutlines>("Projectile Outlines");
 	
 	ConVar_Register();
 
