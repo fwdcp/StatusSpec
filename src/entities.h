@@ -12,8 +12,10 @@
 
 #include "stdafx.h"
 
-#include <cstdarg>
-#include <map>
+#include <functional>
+#include <unordered_map>
+#include <string>
+#include <sstream>
 #include <vector>
 
 #include "cdll_client_int.h"
@@ -24,19 +26,6 @@
 
 #include "exceptions.h"
 #include "ifaces.h"
-
-typedef struct ClassPropDefinition {
-	bool operator<(const ClassPropDefinition &other) const {
-		if (className.compare(other.className) != 0) {
-			return className.compare(other.className) < 0;
-		}
-
-		return propertyTree < other.propertyTree;
-	}
-
-	std::string className;
-	std::vector<std::string> propertyTree;
-} ClassPropDefinition;
 
 class Entities {
 public:
@@ -54,5 +43,5 @@ private:
 	static bool CheckClassBaseclass(ClientClass *clientClass, std::string baseclass);
 	static bool CheckTableBaseclass(RecvTable *sTable, std::string baseclass);
 
-	static std::map<ClassPropDefinition, int> classPropOffsets;
+	static std::unordered_map<std::string, std::unordered_map<std::string, int>> classPropOffsets;
 };

@@ -13,7 +13,9 @@
 #include "stdafx.h"
 
 #include <cstdint>
+#include <sstream>
 #include <string>
+#include <vector>
 
 #include "Color.h"
 #include "convar.h"
@@ -104,6 +106,20 @@ inline CSteamID ConvertTextToSteamID(std::string textID) {
 	}
 
 	return CSteamID();
+}
+
+inline std::string ConvertTreeToString(std::vector<std::string> tree) {
+	std::stringstream ss;
+	std::string string;
+
+	for (auto iterator = tree.begin(); iterator != tree.end(); ++iterator) {
+		ss << ">";
+		ss << *iterator;
+	}
+
+	ss >> string;
+
+	return string;
 }
 
 #define PLUGIN_VERSION "0.22.3"

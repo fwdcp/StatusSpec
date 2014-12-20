@@ -10,14 +10,12 @@
 
 #include "entities.h"
 
-std::map<ClassPropDefinition, int> Entities::classPropOffsets;
+std::unordered_map<std::string, std::unordered_map<std::string, int>> Entities::classPropOffsets;
 
 bool Entities::RetrieveClassPropOffset(std::string className, std::vector<std::string> propertyTree) {
-	ClassPropDefinition classPropDefinition;
-	classPropDefinition.className = className;
-	classPropDefinition.propertyTree = propertyTree;
+	std::string propertyString = ConvertTreeToString(propertyTree);
 
-	if (classPropOffsets.find(classPropDefinition) != classPropOffsets.end()) {
+	if (classPropOffsets[className].find(propertyString) != classPropOffsets[className].end()) {
 		return true;
 	}
 
@@ -52,7 +50,7 @@ bool Entities::RetrieveClassPropOffset(std::string className, std::vector<std::s
 					table = nullptr;
 				}
 
-				classPropOffsets[classPropDefinition] = offset;
+				classPropOffsets[className][propertyString] = offset;
 
 				return true;
 			}
@@ -70,11 +68,9 @@ void *Entities::GetEntityProp(IClientEntity *entity, std::vector<std::string> pr
 		throw invalid_class_prop(className.c_str());
 	}
 
-	ClassPropDefinition classPropDefinition;
-	classPropDefinition.className = className;
-	classPropDefinition.propertyTree = propertyTree;
+	std::string propertyString = ConvertTreeToString(propertyTree);
 
-	return (void *)((unsigned long)(entity)+(unsigned long)(classPropOffsets[classPropDefinition]));
+	return (void *)((unsigned long)(entity)+(unsigned long)(classPropOffsets[className][propertyString]));
 }
 
 bool Entities::GetSubProp(RecvTable *table, const char *propName, RecvProp *&prop, int &offset) {
@@ -121,8 +117,7 @@ bool Entities::CheckClassBaseclass(ClientClass *clientClass, std::string basecla
 }
 
 bool Entities::CheckTableBaseclass(RecvTable *sTable, std::string baseclass) {
-	std::string name = sTable->GetName();
-	if (std::string(baseclass).compare("DT_" + baseclass) == 0) {
+	if (std::string(sTable->GetName()).compare("DT_" + baseclass) == 0) {
 		return true;
 	}
 
