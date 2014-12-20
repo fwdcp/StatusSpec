@@ -392,7 +392,7 @@ Player::Iterator& Player::Iterator::operator++() {
 	return *this;
 };
 
-Player& Player::Iterator::operator*() const {
+Player Player::Iterator::operator*() const {
 	return Player(index);
 }
 

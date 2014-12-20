@@ -87,7 +87,7 @@ public:
 		~Iterator() = default;
 		Iterator& operator=(const Iterator&);
 		Iterator& operator++();
-		Player& operator*() const;
+		Player operator*() const;
 		friend void swap(Iterator& lhs, Iterator& rhs);
 		Iterator operator++(int);
 		Player *operator->() const;
