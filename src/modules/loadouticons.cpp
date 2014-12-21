@@ -403,7 +403,7 @@ void LoadoutIcons::DisplayIcons(vgui::VPANEL playerPanel) {
 				for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
 					Player player = *iterator;
 
-					if (strcmp(player.GetName(), name) == 0) {
+					if (player.GetName().compare(name) == 0) {
 						if (only_active->GetBool()) {
 							DisplayIcon(dynamic_cast<vgui::ImagePanel *>(loadoutIconPanels[panelHandle]["LoadoutIconsItem1"]), loadoutInfo[player].activeWeaponSlot, true);
 						}

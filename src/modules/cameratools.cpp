@@ -151,7 +151,7 @@ void CameraTools::SpecPlayer(const CCommand &command) {
 										for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
 											Player player = *iterator;
 
-											if (strcmp(player.GetName(), name) == 0) {
+											if (player.GetName().compare(name) == 0) {
 												int baseX = 0;
 												int baseY = 0;
 												int deltaX = 0;

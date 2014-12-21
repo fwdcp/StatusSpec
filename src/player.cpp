@@ -274,7 +274,7 @@ int Player::GetMaxHealth() const {
 	return 0;
 }
 
-const char *Player::GetName() const {
+std::string Player::GetName() const {
 	if (IsValid()) {
 		player_info_t playerInfo;
 

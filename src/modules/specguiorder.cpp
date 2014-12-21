@@ -111,7 +111,7 @@ void SpecGUIOrder::SetPosOverride(vgui::VPANEL vguiPanel, int x, int y) {
 				for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
 					Player player = *iterator;
 
-					if (strcmp(player.GetName(), name) == 0) {
+					if (player.GetName().compare(name) == 0) {
 						TFTeam team = player.GetTeam();
 
 						if (team == TFTeam_Red) {

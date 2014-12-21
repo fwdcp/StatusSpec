@@ -71,7 +71,7 @@ public:
 	TFClassType GetClass() const;
 	int GetHealth() const;
 	int GetMaxHealth() const;
-	const char *GetName() const;
+	std::string GetName() const;
 	int GetObserverMode() const;
 	C_BaseEntity *GetObserverTarget() const;
 	CSteamID GetSteamID() const;

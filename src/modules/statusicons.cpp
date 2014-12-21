@@ -204,7 +204,7 @@ void StatusIcons::DisplayIcons(vgui::VPANEL playerPanel) {
 				for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
 					Player player = *iterator;
 
-					if (strcmp(player.GetName(), name) == 0) {
+					if (player.GetName().compare(name) == 0) {
 						for (int i = 0; i < g_pVGuiPanel->GetChildCount(playerPanel); i++) {
 							vgui::VPANEL statusIconsVPanel = g_pVGuiPanel->GetChild(playerPanel, i);
 
