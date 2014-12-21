@@ -19,11 +19,15 @@
 #include "KeyValues.h"
 #include "vgui/VGUI.h"
 
+#include "../common.h"
 #include "../funcs.h"
+#include "../modules.h"
 
-class TeamOverrides {
+class TeamOverrides : public Module {
 public:
-	TeamOverrides();
+	TeamOverrides(std::string name);
+
+	static bool CheckDependencies(std::string name);
 
 	void SendMessageOverride(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel);
 private:
@@ -40,5 +44,3 @@ private:
 	void SwitchTeams();
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
-
-extern TeamOverrides *g_TeamOverrides;

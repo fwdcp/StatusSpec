@@ -31,72 +31,6 @@ SH_DECL_HOOK3_void(IPanel, SendMessage, SH_NOATTRIB, 0, VPANEL, KeyValues *, VPA
 SH_DECL_HOOK3_void(IPanel, SetPos, SH_NOATTRIB, 0, VPANEL, int, int);
 SH_DECL_HOOK2(IVEngineClient, GetPlayerInfo, SH_NOATTRIB, 0, bool, int, player_info_t *);
 
-inline bool DataCompare(const BYTE* pData, const BYTE* bSig, const char* szMask)
-{
-	for (; *szMask; ++szMask, ++pData, ++bSig)
-	{
-		if (*szMask == 'x' && *pData != *bSig)
-			return false;
-	}
-
-	return (*szMask) == NULL;
-}
-
-inline DWORD FindPattern(DWORD dwAddress, DWORD dwSize, BYTE* pbSig, const char* szMask)
-{
-	for (DWORD i = NULL; i < dwSize; i++)
-	{
-		if (DataCompare((BYTE*)(dwAddress + i), pbSig, szMask))
-			return (DWORD)(dwAddress + i);
-	}
-
-	return 0;
-}
-
-inline GLPI_t GetGLPIFunc() {
-#if defined _WIN32
-	static DWORD pointer = NULL;
-	if (!pointer)
-		pointer = FindPattern((DWORD)GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE)GETLOCALPLAYERINDEX_SIG, GETLOCALPLAYERINDEX_MASK);
-	return (GLPI_t)(pointer);
-#else
-	return nullptr;
-#endif
-}
-
-inline SMI_t GetSMIFunc() {
-#if defined _WIN32
-	static DWORD pointer = NULL;
-	if (!pointer)
-		pointer = FindPattern((DWORD)GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE)SETMODELINDEX_SIG, SETMODELINDEX_MASK);
-	return (SMI_t)(pointer);
-#else
-	return nullptr;
-#endif
-}
-
-inline SMP_t GetSMPFunc() {
-#if defined _WIN32
-	static DWORD pointer = NULL;
-	if (!pointer)
-		pointer = FindPattern((DWORD)GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE)SETMODELPOINTER_SIG, SETMODELPOINTER_MASK);
-	return (SMP_t)(pointer);
-#else
-	return nullptr;
-#endif
-}
-
-inline SPT_t GetSPTFunc() {
-#if defined _WIN32
-	static DWORD pointer = NULL;
-	if (!pointer)
-		pointer = FindPattern((DWORD)GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE)SETPRIMARYTARGET_SIG, SETPRIMARYTARGET_MASK);
-	return (SPT_t)(pointer);
-#else
-	return nullptr;
-#endif
-}
-
 int Funcs::setModelLastHookRegistered = 0;
 std::map<int, std::function<void(C_BaseEntity *, const model_t *&)>> Funcs::setModelHooks;
 
@@ -119,7 +53,7 @@ bool Funcs::AddDetour(void *target, void *detour, void *&original) {
 bool Funcs::AddDetour_GetLocalPlayerIndex(GLPI_t detour) {
 	void *original;
 
-	if (AddDetour(GetGLPIFunc(), detour, original)) {
+	if (AddDetour(GetFunc_GetLocalPlayerIndex(), detour, original)) {
 		getLocalPlayerIndexOriginal = reinterpret_cast<GLPI_t>(original);
 		return true;
 	}
@@ -130,7 +64,7 @@ bool Funcs::AddDetour_GetLocalPlayerIndex(GLPI_t detour) {
 bool Funcs::AddDetour_C_BaseEntity_SetModelIndex(SMIH_t detour) {
 	void *original;
 
-	if (AddDetour(GetSMIFunc(), detour, original)) {
+	if (AddDetour(GetFunc_C_BaseEntity_SetModelIndex(), detour, original)) {
 		setModelIndexOriginal = reinterpret_cast<SMI_t>(original);
 		return true;
 	}
@@ -141,7 +75,7 @@ bool Funcs::AddDetour_C_BaseEntity_SetModelIndex(SMIH_t detour) {
 bool Funcs::AddDetour_C_BaseEntity_SetModelPointer(SMPH_t detour) {
 	void *original;
 
-	if (AddDetour(GetSMPFunc(), detour, original)) {
+	if (AddDetour(GetFunc_C_BaseEntity_SetModelPointer(), detour, original)) {
 		setModelPointerOriginal = reinterpret_cast<SMP_t>(original);
 		return true;
 	}
@@ -197,7 +131,7 @@ int Funcs::CallFunc_GetLocalPlayerIndex() {
 		return getLocalPlayerIndexOriginal();
 	}
 	else {
-		return GetGLPIFunc()();
+		return GetFunc_GetLocalPlayerIndex()();
 	}
 }
 
@@ -206,7 +140,7 @@ void Funcs::CallFunc_C_BaseEntity_SetModelIndex(C_BaseEntity *instance, int inde
 		setModelIndexOriginal(instance, index);
 	}
 	else {
-		GetSMIFunc()(instance, index);
+		GetFunc_C_BaseEntity_SetModelIndex()(instance, index);
 	}
 }
 
@@ -215,12 +149,12 @@ void Funcs::CallFunc_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, const 
 		setModelPointerOriginal(instance, pModel);
 	}
 	else {
-		GetSMPFunc()(instance, pModel);
+		GetFunc_C_BaseEntity_SetModelPointer()(instance, pModel);
 	}
 }
 
 void Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(C_HLTVCamera *instance, int nEntity) {
-	GetSPTFunc()(instance, nEntity);
+	GetFunc_C_HLTVCamera_SetPrimaryTarget()(instance, nEntity);
 }
 
 float Funcs::CallFunc_C_TFPlayer_GetFOV(C_TFPlayer *instance) {
@@ -271,8 +205,88 @@ void Funcs::Detour_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, void *, 
 	Funcs::CallFunc_C_BaseEntity_SetModelPointer(instance, pModel);
 }
 
+GLPI_t Funcs::GetFunc_GetLocalPlayerIndex() {
+#if defined _WIN32
+	static DWORD pointer = NULL;
+
+	if (!pointer) {
+		pointer = SignatureScan("client", GETLOCALPLAYERINDEX_SIG, GETLOCALPLAYERINDEX_MASK);
+
+		if (!pointer) {
+			throw bad_pointer("GetLocalPlayerIndex");
+		}
+	}
+
+	return (GLPI_t)(pointer);
+#else
+	throw bad_pointer("GetLocalPlayerIndex");
+
+	return nullptr;
+#endif
+}
+
+SMI_t Funcs::GetFunc_C_BaseEntity_SetModelIndex() {
+#if defined _WIN32
+	static DWORD pointer = NULL;
+
+	if (!pointer) {
+		pointer = SignatureScan("client", SETMODELINDEX_SIG, SETMODELINDEX_MASK);
+
+		if (!pointer) {
+			throw bad_pointer("C_BaseEntity::SetModelIndex");
+		}
+	}
+
+	return (SMI_t)(pointer);
+#else
+	throw bad_pointer("C_BaseEntity::SetModelIndex");
+
+	return nullptr;
+#endif
+}
+
+SMP_t Funcs::GetFunc_C_BaseEntity_SetModelPointer() {
+#if defined _WIN32
+	static DWORD pointer = NULL;
+
+	if (!pointer) {
+		pointer = SignatureScan("client", SETMODELPOINTER_SIG, SETMODELPOINTER_MASK);
+
+		if (!pointer) {
+			throw bad_pointer("C_BaseEntity::SetModelPointer");
+		}
+	}
+
+	return (SMP_t)(pointer);
+#else
+	throw bad_pointer("C_BaseEntity::SetModelPointer");
+
+	return nullptr;
+#endif
+}
+
+SPT_t Funcs::GetFunc_C_HLTVCamera_SetPrimaryTarget() {
+#if defined _WIN32
+	static DWORD pointer = NULL;
+
+	if (!pointer) {
+		pointer = SignatureScan("client", SETPRIMARYTARGET_SIG, SETPRIMARYTARGET_MASK);
+
+		if (!pointer) {
+			throw bad_pointer("C_HLTVCamera::SetPrimaryTarget");
+		}
+	}
+
+	return (SPT_t)(pointer);
+#else
+	throw bad_pointer("C_HLTVCamera::SetPrimaryTarget");
+
+	return nullptr;
+#endif
+}
+
 bool Funcs::RemoveDetour_GetLocalPlayerIndex() {
-	if (RemoveDetour(GetGLPIFunc())) {
+	if (RemoveDetour(GetFunc_GetLocalPlayerIndex())) {
 		getLocalPlayerIndexOriginal = nullptr;
 		return true;
 	}
@@ -281,7 +295,7 @@ bool Funcs::RemoveDetour_GetLocalPlayerIndex() {
 }
 
 bool Funcs::RemoveDetour_C_BaseEntity_SetModelIndex() {
-	if (RemoveDetour(GetSMIFunc())) {
+	if (RemoveDetour(GetFunc_C_BaseEntity_SetModelIndex())) {
 		setModelIndexOriginal = nullptr;
 		return true;
 	}
@@ -290,7 +304,7 @@ bool Funcs::RemoveDetour_C_BaseEntity_SetModelIndex() {
 }
 
 bool Funcs::RemoveDetour_C_BaseEntity_SetModelPointer() {
-	if (RemoveDetour(GetSMPFunc())) {
+	if (RemoveDetour(GetFunc_C_BaseEntity_SetModelPointer())) {
 		setModelPointerOriginal = nullptr;
 		return true;
 	}

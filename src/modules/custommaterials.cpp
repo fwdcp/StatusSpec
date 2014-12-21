@@ -10,14 +10,34 @@
 
 #include "custommaterials.h"
 
-CustomMaterials::CustomMaterials() {
+CustomMaterials::CustomMaterials(std::string name) : Module(name) {
 	findMaterialHook = 0;
 	materialConfig = new KeyValues("materials");
 	materialConfig->LoadFromFile(Interfaces::pFileSystem, "resource/custommaterials.res", "mod");
 
-	enabled = new ConVar("statusspec_custommaterials_enabled", "0", FCVAR_NONE, "enable custom materials", [](IConVar *var, const char *pOldValue, float flOldValue) { g_CustomMaterials->ToggleEnabled(var, pOldValue, flOldValue); });
-	load_replacement_group = new ConCommand("statusspec_custommaterials_load_replacement_group", [](const CCommand &command) { g_CustomMaterials->LoadReplacementGroup(command); }, "load a material replacement group", FCVAR_NONE);
-	unload_replacement_group = new ConCommand("statusspec_custommaterials_unload_replacement_group", [](const CCommand &command) { g_CustomMaterials->UnloadReplacementGroup(command); }, "unload a material replacement group", FCVAR_NONE);
+	enabled = new ConVar("statusspec_custommaterials_enabled", "0", FCVAR_NONE, "enable custom materials", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CustomMaterials>("Custom Materials")->ToggleEnabled(var, pOldValue, flOldValue); });
+	load_replacement_group = new ConCommand("statusspec_custommaterials_load_replacement_group", [](const CCommand &command) { g_ModuleManager->GetModule<CustomMaterials>("Custom Materials")->LoadReplacementGroup(command); }, "load a material replacement group", FCVAR_NONE);
+	unload_replacement_group = new ConCommand("statusspec_custommaterials_unload_replacement_group", [](const CCommand &command) { g_ModuleManager->GetModule<CustomMaterials>("Custom Materials")->UnloadReplacementGroup(command); }, "unload a material replacement group", FCVAR_NONE);
+}
+
+bool CustomMaterials::CheckDependencies(std::string name) {
+	bool ready = true;
+
+	if (!Interfaces::pFileSystem) {
+		PRINT_TAG();
+		Warning("Required interface IFileSystem for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!g_pMaterialSystem) {
+		PRINT_TAG();
+		Warning("Required interface IMaterialSystem for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	return ready;
 }
 
 IMaterial *CustomMaterials::FindMaterialOverride(char const *pMaterialName, const char *pTextureGroupName, bool complain, const char *pComplainPrefix) {

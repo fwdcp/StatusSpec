@@ -10,12 +10,6 @@
 
 #include "ifaces.h"
 
-#define CheckPointerAndWarn(pPointer, className) \
-	if (pPointer == nullptr) { \
-		Warning("[StatusSpec] %s is not initialized!\n", #className); \
-		return false; \
-	}
-
 IBaseClientDLL *Interfaces::pClientDLL = nullptr;
 IClientEntityList *Interfaces::pClientEntityList = nullptr;
 CDllDemandLoader *Interfaces::pClientModule = nullptr;
@@ -27,36 +21,17 @@ IPlayerInfoManager *Interfaces::pPlayerInfoManager = nullptr;
 IVRenderView *Interfaces::pRenderView = nullptr;
 CSteamAPIContext *Interfaces::pSteamAPIContext = nullptr;
 
+bool Interfaces::steamLibrariesAvailable = false;
+bool Interfaces::vguiLibrariesAvailable = false;
+
 CBaseEntityList *g_pEntityList;
-
-inline bool DataCompare(const BYTE* pData, const BYTE* bSig, const char* szMask)
-{
-	for (; *szMask; ++szMask, ++pData, ++bSig)
-	{
-		if (*szMask == 'x' && *pData != *bSig)
-			return false;
-	}
-	
-	return (*szMask) == NULL;
-}
-
-inline DWORD FindPattern(DWORD dwAddress, DWORD dwSize, BYTE* pbSig, const char* szMask)
-{
-	for (DWORD i = NULL; i < dwSize; i++)
-	{
-		if (DataCompare((BYTE*) (dwAddress + i), pbSig, szMask))
-			return (DWORD) (dwAddress + i);
-	}
-	
-	return 0;
-}
 
 IClientMode *Interfaces::GetClientMode() {
 #if defined _WIN32
 	static DWORD pointer = NULL;
 
 	if (!pointer) {
-		pointer = FindPattern((DWORD)GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE)CLIENTMODE_SIG, CLIENTMODE_MASK) + CLIENTMODE_OFFSET;
+		pointer = SignatureScan("client", CLIENTMODE_SIG, CLIENTMODE_MASK) + CLIENTMODE_OFFSET;
 
 		if (!pointer) {
 			throw bad_pointer("IClientMode");
@@ -70,6 +45,8 @@ IClientMode *Interfaces::GetClientMode() {
 	return **(IClientMode***)(pointer);
 #else
 	throw bad_pointer("IClientMode");
+
+	return nullptr;
 #endif
 }
 
@@ -78,14 +55,13 @@ IGameResources *Interfaces::GetGameResources() {
 	static DWORD pointer = NULL;
 
 	if (!pointer) {
-		pointer = FindPattern((DWORD)GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE)GAMERESOURCES_SIG, GAMERESOURCES_MASK);
+		pointer = SignatureScan("client", GAMERESOURCES_SIG, GAMERESOURCES_MASK);
 
 		if (!pointer) {
 			throw bad_pointer("IGameResources");
 		}
 	}
 
-	typedef IGameResources *(*GGR_t)(void);
 	GGR_t GGR = (GGR_t) pointer;
 	IGameResources *gr = GGR();
 
@@ -96,6 +72,32 @@ IGameResources *Interfaces::GetGameResources() {
 	return gr;
 #else
 	throw bad_pointer("IGameResources");
+
+	return nullptr;
+#endif
+}
+
+CGlobalVarsBase *Interfaces::GetGlobalVars() {
+#if defined _WIN32
+	static DWORD pointer = NULL;
+
+	if (!pointer) {
+		pointer = SignatureScan("client", GPGLOBALS_SIG, GPGLOBALS_MASK) + GPGLOBALS_OFFSET;
+
+		if (!pointer) {
+			throw bad_pointer("CGlobalVarsBase");
+		}
+	}
+
+	if (!**(CGlobalVarsBase***)pointer) {
+		throw bad_pointer("CGlobalVarsBase");
+	}
+
+	return **(CGlobalVarsBase***)(pointer);
+#else
+	throw bad_pointer("CGlobalVarsBase");
+
+	return nullptr;
 #endif
 }
 
@@ -104,7 +106,7 @@ C_HLTVCamera *Interfaces::GetHLTVCamera() {
 	static DWORD pointer = NULL;
 
 	if (!pointer) {
-		pointer = FindPattern((DWORD)GetHandleOfModule(_T("client")), CLIENT_MODULE_SIZE, (PBYTE)HLTVCAMERA_SIG, HLTVCAMERA_MASK) + HLTVCAMERA_OFFSET;
+		pointer = SignatureScan("client", HLTVCAMERA_SIG, HLTVCAMERA_MASK) + HLTVCAMERA_OFFSET;
 
 		if (!pointer) {
 			throw bad_pointer("C_HLTVCamera");
@@ -118,18 +120,17 @@ C_HLTVCamera *Interfaces::GetHLTVCamera() {
 	return *(C_HLTVCamera**)(pointer);
 #else
 	throw bad_pointer("C_HLTVCamera");
+
+	return nullptr;
 #endif
 }
 
-bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory) {
+void Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory) {
 	ConnectTier1Libraries(&interfaceFactory, 1);
 	ConnectTier2Libraries(&interfaceFactory, 1);
 	ConnectTier3Libraries(&interfaceFactory, 1);
 	
-	if (!vgui::VGui_InitInterfacesList("statusspec", &interfaceFactory, 1)) {
-		Warning("[StatusSpec] Could not initialize VGUI interfaces!\n");
-		return false;
-	}
+	vguiLibrariesAvailable = vgui::VGui_InitInterfacesList("statusspec", &interfaceFactory, 1);
 	
 	pEngineClient = (IVEngineClient *)interfaceFactory(VENGINE_CLIENT_INTERFACE_VERSION, nullptr);
 	pGameEventManager = (IGameEventManager2 *)interfaceFactory(INTERFACEVERSION_GAMEEVENTSMANAGER2, nullptr);
@@ -145,25 +146,7 @@ bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 	pClientEntityList = (IClientEntityList*)gameClientFactory(VCLIENTENTITYLIST_INTERFACE_VERSION, nullptr);
 
 	pSteamAPIContext = new CSteamAPIContext();
-	if (!SteamAPI_InitSafe() || !pSteamAPIContext->Init()) {
-		Warning("[StatusSpec] Could not initialize Steam API!\n");
-		return false;
-	}
-	
-	CheckPointerAndWarn(pClientDLL, IBaseClientDLL);
-	CheckPointerAndWarn(pClientEntityList, IClientEntityList);
-	CheckPointerAndWarn(pEngineClient, IVEngineClient);
-	CheckPointerAndWarn(pGameEventManager, IGameEventManager2);
-	CheckPointerAndWarn(pModelInfoClient, IVModelInfoClient);
-	CheckPointerAndWarn(pRenderView, IVRenderView);
-	CheckPointerAndWarn(g_pFullFileSystem, IFileSystem);
-	CheckPointerAndWarn(g_pMaterialSystem, IMaterialSystem);
-	CheckPointerAndWarn(g_pMaterialSystemHardwareConfig, IMaterialSystemHardwareConfig);
-	CheckPointerAndWarn(g_pStudioRender, IStudioRender);
-	CheckPointerAndWarn(g_pVGuiSurface, vgui::ISurface);
-	CheckPointerAndWarn(g_pVGui, vgui::IVGui);
-	CheckPointerAndWarn(g_pVGuiPanel, vgui::IPanel);
-	CheckPointerAndWarn(g_pVGuiSchemeManager, vgui::ISchemeManager);
+	steamLibrariesAvailable = SteamAPI_InitSafe() && pSteamAPIContext->Init();
 
 	g_pEntityList = dynamic_cast<CBaseEntityList *>(Interfaces::pClientEntityList);
 
@@ -188,16 +171,10 @@ bool Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 
 				if (FileSystem_LoadSearchPaths(fsSearchPathsInit) == FS_OK) {
 					Interfaces::pFileSystem = fsLoadModuleInfo.m_pFileSystem;
-
-					CheckPointerAndWarn(Interfaces::pFileSystem, IFileSystem);
-
-					return true;
 				}
 			}
 		}
 	}
-
-	return false;
 }
 
 void Interfaces::Unload() {

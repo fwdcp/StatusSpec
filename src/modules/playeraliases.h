@@ -22,11 +22,13 @@
 #undef null
 #include "json/json.h"
 
+#include "../common.h"
 #include "../entities.h"
-#include "../enums.h"
 #include "../funcs.h"
 #include "../ifaces.h"
+#include "../modules.h"
 #include "../player.h"
+#include "../tfdefs.h"
 
 #if defined _WIN32
 #define strtoull _strtoui64
@@ -55,9 +57,11 @@ typedef struct APIAlias_s {
 	CCallResult<PlayerAliases, HTTPRequestCompleted_t> call;
 } APIAlias_t;
 
-class PlayerAliases {
+class PlayerAliases : public Module {
 public:
-	PlayerAliases();
+	PlayerAliases(std::string name);
+
+	static bool CheckDependencies(std::string name);
 
 	bool GetPlayerInfoOverride(int ent_num, player_info_t *pinfo);
 
@@ -94,5 +98,3 @@ private:
 	void SwitchTeams();
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
-
-extern PlayerAliases *g_PlayerAliases;

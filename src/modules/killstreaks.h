@@ -13,34 +13,40 @@
 #include "../stdafx.h"
 
 #include <map>
+#include <iomanip>
 #include <string>
 
+#include "../common.h"
 #include "../entities.h"
-#include "../enums.h"
 #include "../ifaces.h"
+#include "../modules.h"
 #include "../player.h"
+#include "../tfdefs.h"
 
-class Killstreaks {
+class Killstreaks : public Module {
 public:
-	Killstreaks();
+	Killstreaks(std::string name);
+
+	static bool CheckDependencies(std::string name);
 
 	bool FireEventClientSideOverride(IGameEvent *event);
 	void FrameHook(ClientFrameStage_t curStage);
 private:
 	int bluTopKillstreak;
 	int bluTopKillstreakPlayer;
-	std::map<int, std::map<int, int>> currentKillstreaks;
+	std::map<int, std::map<std::string, int>> currentKillstreaks;
 	int fireEventClientSideHook;
 	int frameHook;
 	EHANDLE gameResourcesEntity;
 	int redTopKillstreak;
 	int redTopKillstreakPlayer;
 
-	int GetCurrentKillstreak(int userid);
+	int GetCurrentSlotKillstreak(int userid, int slot);
+	int GetCurrentPlayerKillstreak(int userid);
+	int GetKillTypeSlot(std::string killType);
+	bool IsAttributableKill(std::string killType);
 
 	ConVar *enabled;
 	ConVar *total_killfeed;
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
-
-extern Killstreaks *g_Killstreaks;

@@ -21,9 +21,11 @@
 #include "vgui_controls/EditablePanel.h"
 #include "vgui_controls/ImagePanel.h"
 
-#include "../enums.h"
+#include "../common.h"
 #include "../ifaces.h"
+#include "../modules.h"
 #include "../player.h"
+#include "../tfdefs.h"
 
 #define TEXTURE_NULL "vgui/replay/thumbnails/null"
 #define TEXTURE_UBERCHARGE "vgui/replay/thumbnails/ubercharge"
@@ -50,9 +52,11 @@
 #define TEXTURE_BLEEDING "vgui/bleed_drop"
 #define TEXTURE_FIRE "hud/leaderboard_class_pyro"
 
-class StatusIcons {
+class StatusIcons : public Module {
 public:
-	StatusIcons();
+	StatusIcons(std::string name);
+
+	static bool CheckDependencies(std::string name);
 
 	void FrameHook(ClientFrameStage_t curStage);
 private:
@@ -68,5 +72,3 @@ private:
 	ConVar *enabled;
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
-
-extern StatusIcons *g_StatusIcons;

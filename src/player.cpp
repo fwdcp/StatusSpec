@@ -136,18 +136,22 @@ bool Player::IsLessThan(const Player &player) const {
 	if (GetTeam() < player.GetTeam()) {
 		return true;
 	}
+	else if (GetTeam() > player.GetTeam()) {
+		return false;
+	}
 
-	static std::array<TFClassType, 10> classes = { TFClass_Unknown, TFClass_Scout, TFClass_Soldier, TFClass_Pyro, TFClass_DemoMan, TFClass_Heavy, TFClass_Engineer, TFClass_Medic, TFClass_Sniper, TFClass_Spy };
-
-	int firstClass = std::distance(classes.begin(), std::find(classes.begin(), classes.end(), GetClass()));
-	int secondClass = std::distance(classes.begin(), std::find(classes.begin(), classes.end(), player.GetClass()));
-
-	if (firstClass < secondClass) {
+	if (TFDefinitions::normalClassOrdinal.find(GetClass())->second < TFDefinitions::normalClassOrdinal.find(player.GetClass())->second) {
 		return true;
+	}
+	else if (TFDefinitions::normalClassOrdinal.find(GetClass())->second > TFDefinitions::normalClassOrdinal.find(player.GetClass())->second) {
+		return false;
 	}
 
 	if (this->GetEntity()->entindex() < player.GetEntity()->entindex()) {
 		return true;
+	}
+	else if (this->GetEntity()->entindex() > player.GetEntity()->entindex()) {
+		return false;
 	}
 
 	return false;
@@ -167,20 +171,24 @@ bool Player::IsGreaterThan(const Player &player) const {
 	}
 
 	if (GetTeam() > player.GetTeam()) {
+		return true;
+	}
+	else if (GetTeam() < player.GetTeam()) {
 		return false;
 	}
 
-	static std::array<TFClassType, 10> classes = { TFClass_Unknown, TFClass_Scout, TFClass_Soldier, TFClass_Pyro, TFClass_DemoMan, TFClass_Heavy, TFClass_Engineer, TFClass_Medic, TFClass_Sniper, TFClass_Spy };
-
-	int firstClass = std::distance(classes.begin(), std::find(classes.begin(), classes.end(), GetClass()));
-	int secondClass = std::distance(classes.begin(), std::find(classes.begin(), classes.end(), player.GetClass()));
-
-	if (firstClass > secondClass) {
+	if (TFDefinitions::normalClassOrdinal.find(GetClass())->second > TFDefinitions::normalClassOrdinal.find(player.GetClass())->second) {
 		return true;
+	}
+	else if (TFDefinitions::normalClassOrdinal.find(GetClass())->second < TFDefinitions::normalClassOrdinal.find(player.GetClass())->second) {
+		return false;
 	}
 
 	if (this->GetEntity()->entindex() > player.GetEntity()->entindex()) {
 		return true;
+	}
+	else if (this->GetEntity()->entindex() < player.GetEntity()->entindex()) {
+		return false;
 	}
 
 	return false;
@@ -195,14 +203,7 @@ Player::operator bool() const {
 }
 
 bool Player::IsValid() const {
-	try {
-		return playerEntity.IsValid() && playerEntity.Get() && playerEntity->entindex() >= 1 && playerEntity->entindex() <= MAX_PLAYERS && Entities::CheckClassBaseclass(playerEntity->GetClientClass(), "DT_TFPlayer") && Interfaces::GetGameResources()->IsConnected(playerEntity->entindex());
-	}
-	catch (bad_pointer &e) {
-		Warning(e.what());
-	}
-
-	return false;
+	return playerEntity.IsValid() && playerEntity.Get() && playerEntity->entindex() >= 1 && playerEntity->entindex() <= Interfaces::GetGlobalVars()->maxClients && Entities::CheckEntityBaseclass(playerEntity, "TFPlayer");
 }
 
 Player::operator IClientEntity *() const {
@@ -219,10 +220,10 @@ IClientEntity *Player::GetEntity() const {
 
 bool Player::CheckCondition(TFCond condition) const {
 	if (IsValid()) {
-		uint32_t playerCond = *MAKE_PTR(uint32_t*, playerEntity.Get(), Entities::pCTFPlayer__m_nPlayerCond);
-		uint32_t condBits = *MAKE_PTR(uint32_t*, playerEntity.Get(), Entities::pCTFPlayer___condition_bits);
-		uint32_t playerCondEx = *MAKE_PTR(uint32_t*, playerEntity.Get(), Entities::pCTFPlayer__m_nPlayerCondEx);
-		uint32_t playerCondEx2 = *MAKE_PTR(uint32_t*, playerEntity.Get(), Entities::pCTFPlayer__m_nPlayerCondEx2);
+		uint32_t playerCond = *Entities::GetEntityProp<uint32_t *>(playerEntity.Get(), { "m_nPlayerCond" });
+		uint32_t condBits = *Entities::GetEntityProp<uint32_t *>(playerEntity.Get(), { "_condition_bits" });
+		uint32_t playerCondEx = *Entities::GetEntityProp<uint32_t *>(playerEntity.Get(), { "m_nPlayerCondEx" });
+		uint32_t playerCondEx2 = *Entities::GetEntityProp<uint32_t *>(playerEntity.Get(), { "m_nPlayerCondEx2" });
 
 		uint32_t conditions[3];
 		conditions[0] = playerCond | condBits;
@@ -251,7 +252,7 @@ bool Player::CheckCondition(TFCond condition) const {
 
 TFClassType Player::GetClass() const {
 	if (IsValid()) {
-		return (TFClassType)*MAKE_PTR(int*, playerEntity.Get(), Entities::pCTFPlayer__m_iClass);
+		return (TFClassType)*Entities::GetEntityProp<int *>(playerEntity.Get(), { "m_iClass" });
 	}
 
 	return TFClass_Unknown;
@@ -259,7 +260,7 @@ TFClassType Player::GetClass() const {
 
 int Player::GetHealth() const {
 	if (IsValid()) {
-		return Funcs::CallFunc_C_TFPlayer_GetHealth((C_TFPlayer *)playerEntity.Get());
+		return dynamic_cast<C_BaseEntity *>(playerEntity.Get())->GetHealth();
 	}
 
 	return 0;
@@ -267,20 +268,19 @@ int Player::GetHealth() const {
 
 int Player::GetMaxHealth() const {
 	if (IsValid()) {
-		return Funcs::CallFunc_C_TFPlayer_GetMaxHealth((C_TFPlayer *)playerEntity.Get());
+		return dynamic_cast<C_BaseEntity *>(playerEntity.Get())->GetMaxHealth();
 	}
 
 	return 0;
 }
 
-const char *Player::GetName() const {
-	try {
-		if (IsValid()) {
-			return Interfaces::GetGameResources()->GetPlayerName(playerEntity->entindex());
+std::string Player::GetName() const {
+	if (IsValid()) {
+		player_info_t playerInfo;
+
+		if (Interfaces::pEngineClient->GetPlayerInfo(playerEntity->entindex(), &playerInfo)) {
+			return playerInfo.name;
 		}
-	}
-	catch (bad_pointer &e) {
-		Warning(e.what());
 	}
 	
 	return "";
@@ -288,7 +288,7 @@ const char *Player::GetName() const {
 
 int Player::GetObserverMode() const {
 	if (IsValid()) {
-		return Funcs::CallFunc_C_TFPlayer_GetObserverMode((C_TFPlayer *)playerEntity.Get());
+		return dynamic_cast<C_BasePlayer *>(playerEntity.Get())->GetObserverMode();
 	}
 
 	return OBS_MODE_NONE;
@@ -296,7 +296,7 @@ int Player::GetObserverMode() const {
 
 C_BaseEntity *Player::GetObserverTarget() const {
 	if (IsValid()) {
-		return Funcs::CallFunc_C_TFPlayer_GetObserverTarget((C_TFPlayer *)playerEntity.Get());
+		return dynamic_cast<C_BasePlayer *>(playerEntity.Get())->GetObserverTarget();
 	}
 
 	return playerEntity->GetBaseEntity();
@@ -306,12 +306,22 @@ CSteamID Player::GetSteamID() const {
 	if (IsValid()) {
 		player_info_t playerInfo;
 
-		if (Funcs::CallFunc_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, playerEntity->entindex(), &playerInfo)) {
+		if (Interfaces::pEngineClient->GetPlayerInfo(playerEntity->entindex(), &playerInfo)) {
 			if (playerInfo.friendsID) {
 				static EUniverse universe = k_EUniverseInvalid;
 
 				if (universe == k_EUniverseInvalid) {
-					universe = Interfaces::pSteamAPIContext->SteamUtils()->GetConnectedUniverse();
+					if (Interfaces::pSteamAPIContext->SteamUtils()) {
+						universe = Interfaces::pSteamAPIContext->SteamUtils()->GetConnectedUniverse();
+					}
+					else {
+						// let's just assume that it's public - what are the chances that there's a Valve employee testing this on another universe without Steam?
+
+						PRINT_TAG();
+						Warning("Steam libraries not available - assuming public universe for user Steam IDs!\n");
+
+						universe = k_EUniversePublic;
+					}
 				}
 
 				return CSteamID(playerInfo.friendsID, 1, universe, k_EAccountTypeIndividual);
@@ -336,7 +346,7 @@ int Player::GetUserID() const {
 	if (IsValid()) {
 		player_info_t playerInfo;
 
-		if (Funcs::CallFunc_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, playerEntity->entindex(), &playerInfo)) {
+		if (Interfaces::pEngineClient->GetPlayerInfo(playerEntity->entindex(), &playerInfo)) {
 			return playerInfo.userID;
 		}
 	}
@@ -345,14 +355,213 @@ int Player::GetUserID() const {
 }
 
 bool Player::IsAlive() const {
-	try {
-		if (IsValid()) {
-			return Interfaces::GetGameResources()->IsAlive(playerEntity->entindex());
-		}
-	}
-	catch (bad_pointer &e) {
-		Warning(e.what());
+	if (IsValid()) {
+		return dynamic_cast<C_BaseEntity *>(playerEntity.Get())->IsAlive();
 	}
 
 	return false;
+}
+
+Player::Iterator::Iterator(const Player::Iterator& old) {
+	index = old.index;
+}
+
+Player::Iterator& Player::Iterator::operator=(const Player::Iterator& old) {
+	index = old.index;
+
+	return  *this;
+};
+
+Player::Iterator& Player::Iterator::operator++() {
+	for (int i = index + 1; i <= Interfaces::GetGlobalVars()->maxClients; i++) {
+		if (Player(i)) {
+			index = i;
+
+			return *this;
+		}
+	}
+
+	index = Interfaces::GetGlobalVars()->maxClients + 1;
+
+	return *this;
+};
+
+Player Player::Iterator::operator*() const {
+	return Player(index);
+}
+
+void swap(Player::Iterator& lhs, Player::Iterator& rhs) {
+	using std::swap;
+	swap(lhs.index, rhs.index);
+}
+
+Player::Iterator Player::Iterator::operator++(int) {
+	Player::Iterator current(*this);
+
+	for (int i = index + 1; i <= Interfaces::GetGlobalVars()->maxClients; i++) {
+		if (Player(i)) {
+			index = i;
+
+			return current;
+		}
+	}
+
+	index = Interfaces::GetGlobalVars()->maxClients + 1;
+
+	return current;
+}
+
+Player *Player::Iterator::operator->() const {
+	return new Player(index);
+}
+
+bool operator==(const Player::Iterator& lhs, const Player::Iterator& rhs) {
+	return lhs.index == rhs.index;
+}
+
+bool operator!=(const Player::Iterator& lhs, const Player::Iterator& rhs) {
+	return lhs.index != rhs.index;
+}
+
+Player::Iterator::Iterator() {
+	for (int i = 1; i <= Interfaces::GetGlobalVars()->maxClients; i++) {
+		if (Player(i)) {
+			index = i;
+
+			return;
+		}
+	}
+
+	index = Interfaces::GetGlobalVars()->maxClients + 1;
+
+	return;
+}
+
+Player::Iterator& Player::Iterator::operator--() {
+	for (int i = index - 1; i >= 1; i++) {
+		if (Player(i)) {
+			index = i;
+
+			return *this;
+		}
+	}
+
+	index = 0;
+
+	return *this;
+}
+
+Player::Iterator Player::Iterator::operator--(int) {
+	Player::Iterator current(*this);
+
+	for (int i = index - 1; i >= 1; i++) {
+		if (Player(i)) {
+			index = i;
+
+			return current;
+		}
+	}
+
+	index = 0;
+
+	return current;
+}
+
+Player::Iterator::Iterator(int startIndex) {
+	index = startIndex;
+}
+
+Player::Iterator Player::begin() {
+	return Player::Iterator();
+}
+
+Player::Iterator Player::end() {
+	return Player::Iterator(Interfaces::GetGlobalVars()->maxClients + 1);
+}
+
+bool Player::classRetrievalAvailable = false;
+bool Player::comparisonAvailable = false;
+bool Player::conditionsRetrievalAvailable = false;
+bool Player::nameRetrievalAvailable = false;
+bool Player::steamIDRetrievalAvailable = false;
+bool Player::userIDRetrievalAvailable = false;
+
+bool Player::CheckDependencies() {
+	bool ready = true;
+
+	if (!Interfaces::pClientEntityList) {
+		PRINT_TAG();
+		Warning("Required interface IClientEntityList for player helper class not available!\n");
+
+		ready = false;
+	}
+
+	try {
+		Interfaces::GetGlobalVars();
+	}
+	catch (bad_pointer &e) {
+		PRINT_TAG();
+		Warning("Required interface CGlobalVarsBase for player helper class not available!\n");
+
+		ready = false;
+	}
+
+	classRetrievalAvailable = true;
+	comparisonAvailable = true;
+	conditionsRetrievalAvailable = true;
+	nameRetrievalAvailable = true;
+	steamIDRetrievalAvailable = true;
+	userIDRetrievalAvailable = true;
+
+	if (!Interfaces::pEngineClient) {
+		PRINT_TAG();
+		Warning("Interface IVEngineClient for player helper class not available (required for retrieving certain info)!\n");
+
+		nameRetrievalAvailable = false;
+		steamIDRetrievalAvailable = false;
+		userIDRetrievalAvailable = false;
+	}
+
+	if (!Interfaces::steamLibrariesAvailable) {
+		PRINT_TAG();
+		Warning("Steam libraries for player helper class not available (required for accuracy in retrieving Steam IDs)!\n");
+	}
+
+	if (!Entities::RetrieveClassPropOffset("CTFPlayer", { "m_nPlayerCond" })) {
+		PRINT_TAG();
+		Warning("Required property m_nPlayerCond for CTFPlayer for player helper class not available!\n");
+
+		conditionsRetrievalAvailable = false;
+	}
+		
+	if (!Entities::RetrieveClassPropOffset("CTFPlayer", { "_condition_bits" })) {
+		PRINT_TAG();
+		Warning("Required property _condition_bits for CTFPlayer for player helper class not available!\n");
+
+		conditionsRetrievalAvailable = false;
+	}
+		
+	if (!Entities::RetrieveClassPropOffset("CTFPlayer", { "m_nPlayerCondEx" })) {
+		PRINT_TAG();
+		Warning("Required property m_nPlayerCondEx for CTFPlayer for player helper class not available!\n");
+
+		conditionsRetrievalAvailable = false;
+	}
+			
+	if (!Entities::RetrieveClassPropOffset("CTFPlayer", { "m_nPlayerCondEx2" })) {
+		PRINT_TAG();
+		Warning("Required property m_nPlayerCondEx2 for CTFPlayer for player helper class not available!\n");
+
+		conditionsRetrievalAvailable = false;
+	}
+
+	if (!Entities::RetrieveClassPropOffset("CTFPlayer", { "m_iClass" })) {
+		PRINT_TAG();
+		Warning("Required property m_iClass for CTFPlayer for player helper class not available!\n");
+
+		classRetrievalAvailable = false;
+		comparisonAvailable = false;
+	}
+
+	return ready;
 }

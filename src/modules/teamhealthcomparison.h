@@ -29,15 +29,19 @@
 #include "vgui_controls/ScalableImagePanel.h"
 #include "../vgui_controls/VariableLabel.h"
 
+#include "../common.h"
 #include "../entities.h"
-#include "../enums.h"
 #include "../funcs.h"
 #include "../ifaces.h"
+#include "../modules.h"
 #include "../player.h"
+#include "../tfdefs.h"
 
-class TeamHealthComparison {
+class TeamHealthComparison : public Module {
 public:
-	TeamHealthComparison();
+	TeamHealthComparison(std::string name);
+
+	static bool CheckDependencies(std::string name);
 
 	void FrameHook(ClientFrameStage_t curStage);
 private:
@@ -53,5 +57,3 @@ private:
 	void ReloadSettings();
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
-
-extern TeamHealthComparison *g_TeamHealthComparison;

@@ -28,8 +28,10 @@
 #include "vgui/IVGui.h"
 #include "vgui_controls/EditablePanel.h"
 
+#include "../common.h"
 #include "../entities.h"
 #include "../ifaces.h"
+#include "../modules.h"
 #include "../player.h"
 
 #define REAL_TIME_NAME "RealTime"
@@ -41,9 +43,11 @@ typedef struct EntityInfo_s {
 	QAngle angles;
 } EntityInfo_t;
 
-class AntiFreeze {
+class AntiFreeze : public Module {
 public:
-	AntiFreeze();
+	AntiFreeze(std::string name);
+
+	static bool CheckDependencies(std::string name);
 
 	void FrameHook(ClientFrameStage_t curStage);
 private:
@@ -77,5 +81,3 @@ private:
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 	void ToggleTimers(IConVar *var, const char *pOldValue, float flOldValue);
 };
-
-extern AntiFreeze *g_AntiFreeze;

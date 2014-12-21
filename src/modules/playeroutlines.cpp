@@ -10,54 +10,66 @@
 
 #include "playeroutlines.h"
 
-inline float ChangeScale(float currentValue, float currentMin, float currentMax, float newMin, float newMax) {
-	float deltaScaler = ((newMax - newMin) / (currentMax - currentMin));
-	float newDelta = ((currentValue - currentMin) * deltaScaler);
-	float newValue = newMin + newDelta;
-
-	return newValue;
-}
-
-inline int ColorRangeRestrict(int color) {
-	if (color < 0) return 0;
-	else if (color > 255) return 255;
-	else return color;
-}
-
-inline bool IsInteger(const std::string &s) {
-   if (s.empty() || !isdigit(s[0])) return false;
-
-   char *p;
-   strtoull(s.c_str(), &p, 10);
-
-   return (*p == 0);
-}
-
-PlayerOutlines::PlayerOutlines() {
+PlayerOutlines::PlayerOutlines(std::string name) : Module(name) {
 	colors["blu_low"].color = Color(88, 133, 162, 255);
-	colors["blu_low"].command = new ConCommand("statusspec_playeroutlines_color_blu_low", [](const CCommand &command) { g_PlayerOutlines->ColorCommand(command); }, "the color used for outlines for BLU team players at low health", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_PlayerOutlines->GetCurrentColor(partial, commands); });
+	colors["blu_low"].command = new ConCommand("statusspec_playeroutlines_color_blu_low", [](const CCommand &command) { g_ModuleManager->GetModule<PlayerOutlines>("Player Outlines")->ColorCommand(command); }, "the color used for outlines for BLU team players at low health", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<PlayerOutlines>("Player Outlines")->GetCurrentColor(partial, commands); });
 	colors["blu_medium"].color = Color(88, 133, 162, 255);
-	colors["blu_medium"].command = new ConCommand("statusspec_playeroutlines_color_blu_medium", [](const CCommand &command) { g_PlayerOutlines->ColorCommand(command); }, "the color used for outlines for BLU team players at medium health", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_PlayerOutlines->GetCurrentColor(partial, commands); });
+	colors["blu_medium"].command = new ConCommand("statusspec_playeroutlines_color_blu_medium", [](const CCommand &command) { g_ModuleManager->GetModule<PlayerOutlines>("Player Outlines")->ColorCommand(command); }, "the color used for outlines for BLU team players at medium health", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<PlayerOutlines>("Player Outlines")->GetCurrentColor(partial, commands); });
 	colors["blu_full"].color = Color(88, 133, 162, 255);
-	colors["blu_full"].command = new ConCommand("statusspec_playeroutlines_color_blu_full", [](const CCommand &command) { g_PlayerOutlines->ColorCommand(command); }, "the color used for outlines for BLU team players at full health", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_PlayerOutlines->GetCurrentColor(partial, commands); });
+	colors["blu_full"].command = new ConCommand("statusspec_playeroutlines_color_blu_full", [](const CCommand &command) { g_ModuleManager->GetModule<PlayerOutlines>("Player Outlines")->ColorCommand(command); }, "the color used for outlines for BLU team players at full health", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<PlayerOutlines>("Player Outlines")->GetCurrentColor(partial, commands); });
 	colors["blu_buff"].color = Color(88, 133, 162, 255);
-	colors["blu_buff"].command = new ConCommand("statusspec_playeroutlines_color_blu_buff", [](const CCommand &command) { g_PlayerOutlines->ColorCommand(command); }, "the color used for outlines for BLU team players at max buffed health", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_PlayerOutlines->GetCurrentColor(partial, commands); });
+	colors["blu_buff"].command = new ConCommand("statusspec_playeroutlines_color_blu_buff", [](const CCommand &command) { g_ModuleManager->GetModule<PlayerOutlines>("Player Outlines")->ColorCommand(command); }, "the color used for outlines for BLU team players at max buffed health", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<PlayerOutlines>("Player Outlines")->GetCurrentColor(partial, commands); });
 	colors["red_low"].color = Color(184, 56, 59, 255);
-	colors["red_low"].command = new ConCommand("statusspec_playeroutlines_color_red_low", [](const CCommand &command) { g_PlayerOutlines->ColorCommand(command); }, "the color used for outlines for RED team players at low health", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_PlayerOutlines->GetCurrentColor(partial, commands); });
+	colors["red_low"].command = new ConCommand("statusspec_playeroutlines_color_red_low", [](const CCommand &command) { g_ModuleManager->GetModule<PlayerOutlines>("Player Outlines")->ColorCommand(command); }, "the color used for outlines for RED team players at low health", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<PlayerOutlines>("Player Outlines")->GetCurrentColor(partial, commands); });
 	colors["red_medium"].color = Color(184, 56, 59, 255);
-	colors["red_medium"].command = new ConCommand("statusspec_playeroutlines_color_red_medium", [](const CCommand &command) { g_PlayerOutlines->ColorCommand(command); }, "the color used for outlines for RED team players at medium health", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_PlayerOutlines->GetCurrentColor(partial, commands); });
+	colors["red_medium"].command = new ConCommand("statusspec_playeroutlines_color_red_medium", [](const CCommand &command) { g_ModuleManager->GetModule<PlayerOutlines>("Player Outlines")->ColorCommand(command); }, "the color used for outlines for RED team players at medium health", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<PlayerOutlines>("Player Outlines")->GetCurrentColor(partial, commands); });
 	colors["red_full"].color = Color(184, 56, 59, 255);
-	colors["red_full"].command = new ConCommand("statusspec_playeroutlines_color_red_full", [](const CCommand &command) { g_PlayerOutlines->ColorCommand(command); }, "the color used for outlines for RED team players at full health", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_PlayerOutlines->GetCurrentColor(partial, commands); });
+	colors["red_full"].command = new ConCommand("statusspec_playeroutlines_color_red_full", [](const CCommand &command) { g_ModuleManager->GetModule<PlayerOutlines>("Player Outlines")->ColorCommand(command); }, "the color used for outlines for RED team players at full health", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<PlayerOutlines>("Player Outlines")->GetCurrentColor(partial, commands); });
 	colors["red_buff"].color = Color(184, 56, 59, 255);
-	colors["red_buff"].command = new ConCommand("statusspec_playeroutlines_color_red_buff", [](const CCommand &command) { g_PlayerOutlines->ColorCommand(command); }, "the color used for outlines for RED team players at max buffed health", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_PlayerOutlines->GetCurrentColor(partial, commands); });
+	colors["red_buff"].command = new ConCommand("statusspec_playeroutlines_color_red_buff", [](const CCommand &command) { g_ModuleManager->GetModule<PlayerOutlines>("Player Outlines")->ColorCommand(command); }, "the color used for outlines for RED team players at max buffed health", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<PlayerOutlines>("Player Outlines")->GetCurrentColor(partial, commands); });
 	doPostScreenSpaceEffectsHook = 0;
 	frameHook = 0;
 	
-	enabled = new ConVar("statusspec_playeroutlines_enabled", "0", FCVAR_NONE, "enable player outlines", [](IConVar *var, const char *pOldValue, float flOldValue) { g_PlayerOutlines->ToggleEnabled(var, pOldValue, flOldValue); });
-	fade = new ConVar("statusspec_playeroutlines_fade", "0", FCVAR_NONE, "make outlines fade with distance", [](IConVar *var, const char *pOldValue, float flOldValue) { g_PlayerOutlines->ToggleFade(var, pOldValue, flOldValue); });
+	enabled = new ConVar("statusspec_playeroutlines_enabled", "0", FCVAR_NONE, "enable player outlines", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<PlayerOutlines>("Player Outlines")->ToggleEnabled(var, pOldValue, flOldValue); });
+	fade = new ConVar("statusspec_playeroutlines_fade", "0", FCVAR_NONE, "make outlines fade with distance");
 	fade_distance = new ConVar("statusspec_playeroutlines_fade_distance", "3200", FCVAR_NONE, "the distance (in Hammer units) at which outlines will fade");
 	health_adjusted_team_colors = new ConVar("statusspec_playeroutlines_health_adjusted_team_colors", "0", FCVAR_NONE, "adjusts team colors depending on health of players");
 	team_colors = new ConVar("statusspec_playeroutlines_team_colors", "0", FCVAR_NONE, "override default health-based outline colors with team colors");
+}
+
+bool PlayerOutlines::CheckDependencies(std::string name) {
+	bool ready = true;
+
+	if (!Interfaces::pClientDLL) {
+		PRINT_TAG();
+		Warning("Required interface IBaseClientDLL for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Player::CheckDependencies()) {
+		PRINT_TAG();
+		Warning("Required player helper class for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!GlowManager::CheckDependencies()) {
+		PRINT_TAG();
+		Warning("Required glow manager for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	try {
+		Interfaces::GetClientMode();
+	}
+	catch (bad_pointer &e) {
+		PRINT_TAG();
+		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", name.c_str());
+	}
+
+	return ready;
 }
 
 bool PlayerOutlines::DoPostScreenSpaceEffectsHook(const CViewSetup *pSetup) {
@@ -78,17 +90,15 @@ bool PlayerOutlines::DoPostScreenSpaceEffectsHook(const CViewSetup *pSetup) {
 		}
 	}
 
+	glowManager.RenderGlowEffects(pSetup);
+
 	RETURN_META_VALUE(MRES_IGNORED, false);
 }
 
 void PlayerOutlines::FrameHook(ClientFrameStage_t curStage) {
 	if (curStage == FRAME_NET_UPDATE_END) {
-		for (int i = 1; i <= MAX_PLAYERS; i++) {
-			Player player = i;
-
-			if (!player) {
-				return;
-			}
+		for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
+			Player player = *iterator;
 
 			if (enabled->GetBool()) {
 				Color glowColor = GetGlowColor(player);
@@ -106,7 +116,7 @@ void PlayerOutlines::FrameHook(ClientFrameStage_t curStage) {
 		}
 	}
 	else if (curStage == FRAME_START) {
-		if (fade->GetBool() && !doPostScreenSpaceEffectsHook) {
+		if (!doPostScreenSpaceEffectsHook) {
 			try {
 				doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), SH_MEMBER(this, &PlayerOutlines::DoPostScreenSpaceEffectsHook), false);
 			}
@@ -256,7 +266,7 @@ void PlayerOutlines::SetGlowEffect(IClientEntity *entity, bool enabled, Vector c
 
 	if (enabled) {
 		if (glows.find(entityHandle) == glows.end()) {
-			glows[entityHandle] = new CGlowObject(entityHandle.Get(), color, alpha, true, true);
+			glows[entityHandle] = new GlowManager::GlowObject(&glowManager, entityHandle.Get(), color, alpha, true, true);
 		}
 		else {
 			glows[entityHandle]->SetColor(color);
@@ -326,21 +336,6 @@ int PlayerOutlines::GetCurrentColor(const char *partial, char commands[COMMAND_C
 
 void PlayerOutlines::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
 	if (enabled->GetBool()) {
-		if (!frameHook) {
-			frameHook = Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, SH_MEMBER(this, &PlayerOutlines::FrameHook), true);
-		}
-	}
-	else {
-		if (frameHook) {
-			if (Funcs::RemoveHook(frameHook)) {
-				frameHook = 0;
-			}
-		}
-	}
-}
-
-void PlayerOutlines::ToggleFade(IConVar *var, const char *pOldValue, float flOldValue) {
-	if (fade->GetBool()) {
 		if (!doPostScreenSpaceEffectsHook) {
 			try {
 				doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), SH_MEMBER(this, &PlayerOutlines::DoPostScreenSpaceEffectsHook), false);
@@ -349,11 +344,25 @@ void PlayerOutlines::ToggleFade(IConVar *var, const char *pOldValue, float flOld
 				Warning(e.what());
 			}
 		}
+		if (!frameHook) {
+			frameHook = Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, SH_MEMBER(this, &PlayerOutlines::FrameHook), true);
+		}
 	}
 	else {
+		for (auto iterator = glows.begin(); iterator != glows.end(); ++iterator) {
+			delete iterator->second;
+		}
+
+		glows.clear();
+
 		if (doPostScreenSpaceEffectsHook) {
 			if (Funcs::RemoveHook(doPostScreenSpaceEffectsHook)) {
 				doPostScreenSpaceEffectsHook = 0;
+			}
+		}
+		if (frameHook) {
+			if (Funcs::RemoveHook(frameHook)) {
+				frameHook = 0;
 			}
 		}
 	}

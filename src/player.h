@@ -22,9 +22,9 @@
 #include "icliententity.h"
 
 #include "entities.h"
-#include "enums.h"
 #include "funcs.h"
 #include "ifaces.h"
+#include "tfdefs.h"
 
 class Player {
 public:
@@ -71,13 +71,47 @@ public:
 	TFClassType GetClass() const;
 	int GetHealth() const;
 	int GetMaxHealth() const;
-	const char *GetName() const;
+	std::string GetName() const;
 	int GetObserverMode() const;
 	C_BaseEntity *GetObserverTarget() const;
 	CSteamID GetSteamID() const;
 	TFTeam GetTeam() const;
 	int GetUserID() const;
 	bool IsAlive() const;
+
+	class Iterator {
+		friend class Player;
+
+	public:
+		Iterator(const Iterator&);
+		~Iterator() = default;
+		Iterator& operator=(const Iterator&);
+		Iterator& operator++();
+		Player operator*() const;
+		friend void swap(Iterator& lhs, Iterator& rhs);
+		Iterator operator++(int);
+		Player *operator->() const;
+		friend bool operator==(const Iterator&, const Iterator&);
+		friend bool operator!=(const Iterator&, const Iterator&);
+		Iterator();
+		Iterator& operator--();
+		Iterator operator--(int);
+
+	private:
+		Iterator(int index);
+		int index;
+	};
+
+	static Iterator begin();
+	static Iterator end();
+
+	static bool CheckDependencies();
+	static bool classRetrievalAvailable;
+	static bool comparisonAvailable;
+	static bool conditionsRetrievalAvailable;
+	static bool nameRetrievalAvailable;
+	static bool steamIDRetrievalAvailable;
+	static bool userIDRetrievalAvailable;
 private:
 	CHandle<IClientEntity> playerEntity;
 

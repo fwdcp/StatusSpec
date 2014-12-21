@@ -10,7 +10,7 @@
 
 #include "antifreeze.h"
 
-AntiFreeze::AntiFreeze() {
+AntiFreeze::AntiFreeze(std::string name) : Module(name) {
 	bluTime = 0;
 	bluTimerPanel = vgui::INVALID_PANEL;
 	entitiesUpdated = false;
@@ -26,11 +26,95 @@ AntiFreeze::AntiFreeze() {
 	stopwatchTime = 0;
 	stopwatchTimerPanel = vgui::INVALID_PANEL;
 
-	display = new ConVar("statusspec_antifreeze_display", "0", FCVAR_NONE, "enables display of an info panel when a freeze is detected", [](IConVar *var, const char *pOldValue, float flOldValue) { g_AntiFreeze->ToggleDisplay(var, pOldValue, flOldValue); });
-	display_reload_settings = new ConCommand("statusspec_antifreeze_display_reload_settings", []() { g_AntiFreeze->ReloadSettings(); }, "reload settings for the freeze info panel from the resource file", FCVAR_NONE);
+	display = new ConVar("statusspec_antifreeze_display", "0", FCVAR_NONE, "enables display of an info panel when a freeze is detected", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<AntiFreeze>("AntiFreeze")->ToggleDisplay(var, pOldValue, flOldValue); });
+	display_reload_settings = new ConCommand("statusspec_antifreeze_display_reload_settings", []() { g_ModuleManager->GetModule<AntiFreeze>("AntiFreeze")->ReloadSettings(); }, "reload settings for the freeze info panel from the resource file", FCVAR_NONE);
 	display_threshold = new ConVar("statusspec_antifreeze_display_threshold", "1", FCVAR_NONE, "the time of a freeze (in seconds) before the info panel is displayed");
-	enabled = new ConVar("statusspec_antifreeze_enabled", "0", FCVAR_NONE, "enable antifreeze (forces the spectator GUI to refresh)", [](IConVar *var, const char *pOldValue, float flOldValue) { g_AntiFreeze->ToggleEnabled(var, pOldValue, flOldValue); });
-	timers = new ConVar("statusspec_antifreeze_timers", "0", FCVAR_NONE, "enable forcing of timers to right values", [](IConVar *var, const char *pOldValue, float flOldValue) { g_AntiFreeze->ToggleTimers(var, pOldValue, flOldValue); });
+	enabled = new ConVar("statusspec_antifreeze_enabled", "0", FCVAR_NONE, "enable antifreeze (forces the spectator GUI to refresh)", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<AntiFreeze>("AntiFreeze")->ToggleEnabled(var, pOldValue, flOldValue); });
+	timers = new ConVar("statusspec_antifreeze_timers", "0", FCVAR_NONE, "enable forcing of timers to right values", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<AntiFreeze>("AntiFreeze")->ToggleTimers(var, pOldValue, flOldValue); });
+}
+
+bool AntiFreeze::CheckDependencies(std::string name) {
+	bool ready = true;
+
+	if (!Interfaces::pClientEntityList) {
+		PRINT_TAG();
+		Warning("Required interface IClientEntityList for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Interfaces::pClientDLL) {
+		PRINT_TAG();
+		Warning("Required interface IBaseClientDLL for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Interfaces::pEngineClient) {
+		PRINT_TAG();
+		Warning("Required interface IVEngineClient for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Interfaces::vguiLibrariesAvailable) {
+		PRINT_TAG();
+		Warning("Required VGUI library for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!g_pVGui) {
+		PRINT_TAG();
+		Warning("Required interface vgui::IVGui for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!g_pVGuiPanel) {
+		PRINT_TAG();
+		Warning("Required interface vgui::IPanel for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Entities::RetrieveClassPropOffset("CTFObjectiveResource", { "m_iTimerToShowInHUD" })) {
+		PRINT_TAG();
+		Warning("Required property m_iTimerToShowInHUD for CTFObjectiveResource for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Entities::RetrieveClassPropOffset("CTFObjectiveResource", { "m_iStopWatchTimer" })) {
+		PRINT_TAG();
+		Warning("Required property m_iStopWatchTimer for CTFObjectiveResource for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Entities::RetrieveClassPropOffset("CTFGameRulesProxy", { "m_hRedKothTimer" })) {
+		PRINT_TAG();
+		Warning("Required property m_hRedKothTimer for CTFGameRulesProxy for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Entities::RetrieveClassPropOffset("CTFGameRulesProxy", { "m_hBlueKothTimer" })) {
+		PRINT_TAG();
+		Warning("Required property m_hBlueKothTimer for CTFGameRulesProxy for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	try {
+		Interfaces::GetClientMode();
+	}
+	catch (bad_pointer &e) {
+		PRINT_TAG();
+		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", name.c_str());
+	}
+
+	return ready;
 }
 
 void AntiFreeze::FrameHook(ClientFrameStage_t curStage) {
@@ -56,10 +140,10 @@ void AntiFreeze::FrameHook(ClientFrameStage_t curStage) {
 				IClientEntity *entity = Interfaces::pClientEntityList->GetClientEntity(i);
 
 				if (entity) {
-					if (Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFObjectiveResource")) {
-						IClientEntity *mainEntity = Interfaces::pClientEntityList->GetClientEntity(*MAKE_PTR(int *, entity, Entities::pCTFObjectiveResource__m_iTimerToShowInHUD));
+					if (Entities::CheckEntityBaseclass(entity, "TFObjectiveResource")) {
+						IClientEntity *mainEntity = Interfaces::pClientEntityList->GetClientEntity(*Entities::GetEntityProp<int *>(entity, { "m_iTimerToShowInHUD" }));
 
-						if (mainEntity && Entities::CheckClassBaseclass(mainEntity->GetClientClass(), "DT_TeamRoundTimer")) {
+						if (mainEntity && Entities::CheckEntityBaseclass(mainEntity, "TeamRoundTimer")) {
 							C_TeamRoundTimer *mainTimer = dynamic_cast<C_TeamRoundTimer *>(mainEntity);
 
 							if (mainTimer) {
@@ -67,9 +151,9 @@ void AntiFreeze::FrameHook(ClientFrameStage_t curStage) {
 							}
 						}
 
-						IClientEntity *stopwatchEntity = Interfaces::pClientEntityList->GetClientEntity(*MAKE_PTR(int *, entity, Entities::pCTFObjectiveResource__m_iStopWatchTimer));
+						IClientEntity *stopwatchEntity = Interfaces::pClientEntityList->GetClientEntity(*Entities::GetEntityProp<int *>(entity, { "m_iStopWatchTimer" }));
 
-						if (stopwatchEntity && Entities::CheckClassBaseclass(stopwatchEntity->GetClientClass(), "DT_TeamRoundTimer")) {
+						if (stopwatchEntity && Entities::CheckEntityBaseclass(stopwatchEntity, "TeamRoundTimer")) {
 							C_TeamRoundTimer *stopwatchTimer = dynamic_cast<C_TeamRoundTimer *>(stopwatchEntity);
 
 							if (stopwatchTimer) {
@@ -77,10 +161,10 @@ void AntiFreeze::FrameHook(ClientFrameStage_t curStage) {
 							}
 						}
 					}
-					else if (Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFGameRulesProxy")) {
-						IClientEntity *redEntity = Interfaces::pClientEntityList->GetClientEntity(ENTITY_INDEX_FROM_ENTITY_OFFSET(entity, Entities::pCTFGameRulesProxy__m_hRedKothTimer));
+					else if (Entities::CheckEntityBaseclass(entity, "TFGameRulesProxy")) {
+						IClientEntity *redEntity = Entities::GetEntityProp<EHANDLE *>(entity, { "m_hRedKothTimer" })->Get();
 
-						if (redEntity && Entities::CheckClassBaseclass(redEntity->GetClientClass(), "DT_TeamRoundTimer")) {
+						if (redEntity && Entities::CheckEntityBaseclass(redEntity, "TeamRoundTimer")) {
 							C_TeamRoundTimer *redTimer = dynamic_cast<C_TeamRoundTimer *>(redEntity);
 
 							if (redTimer) {
@@ -88,9 +172,9 @@ void AntiFreeze::FrameHook(ClientFrameStage_t curStage) {
 							}
 						}
 
-						IClientEntity *bluEntity = Interfaces::pClientEntityList->GetClientEntity(ENTITY_INDEX_FROM_ENTITY_OFFSET(entity, Entities::pCTFGameRulesProxy__m_hBlueKothTimer));
+						IClientEntity *bluEntity = Entities::GetEntityProp<EHANDLE *>(entity, { "m_hBlueKothTimer" })->Get();
 
-						if (bluEntity && Entities::CheckClassBaseclass(bluEntity->GetClientClass(), "DT_TeamRoundTimer")) {
+						if (bluEntity && Entities::CheckEntityBaseclass(bluEntity, "TeamRoundTimer")) {
 							C_TeamRoundTimer *bluTimer = dynamic_cast<C_TeamRoundTimer *>(bluEntity);
 
 							if (bluTimer) {

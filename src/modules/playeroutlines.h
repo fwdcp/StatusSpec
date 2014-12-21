@@ -19,20 +19,24 @@
 #include "convar.h"
 #include "ehandle.h"
 
-#include "../enums.h"
+#include "../common.h"
 #include "../entities.h"
 #include "../funcs.h"
 #include "../glows.h"
 #include "../ifaces.h"
+#include "../modules.h"
 #include "../player.h"
+#include "../tfdefs.h"
 
 #if defined _WIN32
 #define strtoull _strtoui64
 #endif
 
-class PlayerOutlines {
+class PlayerOutlines : public Module {
 public:
-	PlayerOutlines();
+	PlayerOutlines(std::string name);
+
+	static bool CheckDependencies(std::string name);
 
 	bool DoPostScreenSpaceEffectsHook(const CViewSetup *pSetup);
 	void FrameHook(ClientFrameStage_t curStage);
@@ -40,7 +44,8 @@ private:
 	std::map<std::string, ColorConCommand_t> colors;
 	int doPostScreenSpaceEffectsHook;
 	int frameHook;
-	std::map<EHANDLE, CGlowObject *> glows;
+	std::map<EHANDLE, GlowManager::GlowObject *> glows;
+	GlowManager glowManager;
 
 	Color GetGlowColor(Player player);
 	void SetGlowEffect(IClientEntity *entity, bool enabled, Vector color = Vector(1.0f, 1.0f, 1.0f), float alpha = 1.0f);
@@ -55,5 +60,3 @@ private:
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 	void ToggleFade(IConVar *var, const char *pOldValue, float flOldValue);
 };
-
-extern PlayerOutlines *g_PlayerOutlines;

@@ -20,9 +20,11 @@
 #include "convar.h"
 #include "ehandle.h"
 
+#include "../common.h"
 #include "../entities.h"
 #include "../funcs.h"
 #include "../ifaces.h"
+#include "../modules.h"
 #include "../player.h"
 
 typedef struct ModelReplacement_s {
@@ -30,12 +32,14 @@ typedef struct ModelReplacement_s {
 	std::string replacement;
 } ModelReplacement_t;
 
-class CustomModels {
+class CustomModels : public Module {
 public:
-	CustomModels();
+	CustomModels(std::string name);
+
+	static bool CheckDependencies(std::string name);
 private:
 	KeyValues *modelConfig;
-	std::map<std::string, ModelReplacement_t> modelReplacements;
+	std::map<std::string, Replacement> modelReplacements;
 	int setModelHook;
 
 	void SetModelOverride(C_BaseEntity *entity, const model_t *&model);
@@ -47,5 +51,3 @@ private:
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 	void UnloadReplacementGroup(const CCommand &command);
 };
-
-extern CustomModels *g_CustomModels;

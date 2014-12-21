@@ -10,22 +10,120 @@
 
 #include "cameratools.h"
 
-inline bool IsInteger(const std::string &s) {
-	if (s.empty() || !isdigit(s[0])) return false;
+class HLTVCameraOverride : public C_HLTVCamera {
+public:
+	using C_HLTVCamera::m_nCameraMode;
+	using C_HLTVCamera::m_iCameraMan;
+	using C_HLTVCamera::m_vCamOrigin;
+	using C_HLTVCamera::m_aCamAngle;
+	using C_HLTVCamera::m_iTraget1;
+	using C_HLTVCamera::m_iTraget2;
+	using C_HLTVCamera::m_flFOV;
+	using C_HLTVCamera::m_flOffset;
+	using C_HLTVCamera::m_flDistance;
+	using C_HLTVCamera::m_flLastDistance;
+	using C_HLTVCamera::m_flTheta;
+	using C_HLTVCamera::m_flPhi;
+	using C_HLTVCamera::m_flInertia;
+	using C_HLTVCamera::m_flLastAngleUpdateTime;
+	using C_HLTVCamera::m_bEntityPacketReceived;
+	using C_HLTVCamera::m_nNumSpectators;
+	using C_HLTVCamera::m_szTitleText;
+	using C_HLTVCamera::m_LastCmd;
+	using C_HLTVCamera::m_vecVelocity;
+};
 
-	char *p;
-	strtoull(s.c_str(), &p, 10);
-
-	return (*p == 0);
-}
-
-CameraTools::CameraTools() {
+CameraTools::CameraTools(std::string name) : Module(name) {
 	specguiSettings = new KeyValues("Resource/UI/SpectatorTournament.res");
 	specguiSettings->LoadFromFile(Interfaces::pFileSystem, "resource/ui/spectatortournament.res", "mod");
 
-	spec_player = new ConCommand("statusspec_cameratools_spec_player", [](const CCommand &command) { g_CameraTools->SpecPlayer(command); }, "spec a certain player", FCVAR_NONE);
+	spec_player = new ConCommand("statusspec_cameratools_spec_player", [](const CCommand &command) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->SpecPlayer(command); }, "spec a certain player", FCVAR_NONE);
 	spec_player_alive = new ConVar("statusspec_cameratools_spec_player_alive", "1", FCVAR_NONE, "prevent speccing dead players");
-	spec_pos = new ConCommand("statusspec_cameratools_spec_pos", [](const CCommand &command) { g_CameraTools->SpecPosition(command); }, "spec a certain camera position", FCVAR_NONE);
+	spec_pos = new ConCommand("statusspec_cameratools_spec_pos", [](const CCommand &command) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->SpecPosition(command); }, "spec a certain camera position", FCVAR_NONE);
+}
+
+bool CameraTools::CheckDependencies(std::string name) {
+	bool ready = true;
+
+	if (!Interfaces::pFileSystem) {
+		PRINT_TAG();
+		Warning("Required interface IFileSystem for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Interfaces::pEngineClient) {
+		PRINT_TAG();
+		Warning("Required interface IVEngineClient for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	try {
+		Interfaces::GetGlobalVars();
+	}
+	catch (bad_pointer &e) {
+		PRINT_TAG();
+		Warning("Required interface CGlobalVarsBase for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	try {
+		Funcs::GetFunc_C_HLTVCamera_SetPrimaryTarget();
+	}
+	catch (bad_pointer &e) {
+		PRINT_TAG();
+		Warning("Required function C_HLTVCamera::SetPrimaryTarget for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!g_pVGuiPanel) {
+		PRINT_TAG();
+		Warning("Required interface vgui::IPanel for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!g_pVGuiSchemeManager) {
+		PRINT_TAG();
+		Warning("Required interface vgui::ISchemeManager for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Player::CheckDependencies()) {
+		PRINT_TAG();
+		Warning("Required player helper class for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Player::nameRetrievalAvailable) {
+		PRINT_TAG();
+		Warning("Required player name retrieval for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	try {
+		Interfaces::GetClientMode();
+	}
+	catch (bad_pointer &e) {
+		PRINT_TAG();
+		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", name.c_str());
+	}
+
+	try {
+		Interfaces::GetHLTVCamera();
+	}
+	catch (bad_pointer &e) {
+		PRINT_TAG();
+		Warning("Module %s requires C_HLTVCamera, which cannot be verified at this time!\n", name.c_str());
+	}
+
+	return ready;
 }
 
 void CameraTools::SpecPlayer(const CCommand &command) {
@@ -50,10 +148,10 @@ void CameraTools::SpecPlayer(const CCommand &command) {
 									if (dialogVariables) {
 										const char *name = dialogVariables->GetString("playername");
 
-										for (int i = 1; i <= MAX_PLAYERS; i++) {
-											Player player = i;
+										for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
+											Player player = *iterator;
 
-											if (player && strcmp(player.GetName(), name) == 0) {
+											if (player.GetName().compare(name) == 0) {
 												int baseX = 0;
 												int baseY = 0;
 												int deltaX = 0;
@@ -146,7 +244,7 @@ void CameraTools::SpecPosition(const CCommand &command) {
 			hltvcamera->m_aCamAngle.y = atoi(command.Arg(5));
 			hltvcamera->m_iTraget1 = 0;
 			hltvcamera->m_iTraget2 = 0;
-			hltvcamera->m_flLastAngleUpdateTime = Interfaces::pPlayerInfoManager->GetGlobalVars()->realtime;
+			hltvcamera->m_flLastAngleUpdateTime = Interfaces::GetGlobalVars()->realtime;
 
 			Interfaces::pEngineClient->SetViewAngles(hltvcamera->m_aCamAngle);
 		}
