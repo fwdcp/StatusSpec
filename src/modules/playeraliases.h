@@ -26,6 +26,7 @@
 #include "../entities.h"
 #include "../funcs.h"
 #include "../ifaces.h"
+#include "../modules.h"
 #include "../player.h"
 #include "../tfdefs.h"
 
@@ -56,9 +57,11 @@ typedef struct APIAlias_s {
 	CCallResult<PlayerAliases, HTTPRequestCompleted_t> call;
 } APIAlias_t;
 
-class PlayerAliases {
+class PlayerAliases : public Module {
 public:
-	PlayerAliases();
+	PlayerAliases(std::string name);
+
+	static bool CheckDependencies(std::string name);
 
 	bool GetPlayerInfoOverride(int ent_num, player_info_t *pinfo);
 
@@ -95,5 +98,3 @@ private:
 	void SwitchTeams();
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
-
-extern PlayerAliases *g_PlayerAliases;
