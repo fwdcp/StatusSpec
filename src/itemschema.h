@@ -32,6 +32,8 @@ class ItemSchema {
 		const char *GetItemKeyData(const char *itemDefinitionIndex, const char *keyName);
 		const char *GetPrefabKeyData(const char *prefabName, const char *keyName);
 		void ForEachItem(void (*f)(const char *));
+
+		static bool CheckDependencies();
 	private:
 		KeyValues *itemSchema;
 		KeyValues *itemInfo;

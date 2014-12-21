@@ -98,6 +98,13 @@ bool LoadoutIcons::CheckDependencies(std::string name) {
 		}
 	}
 
+	if (!ItemSchema::CheckDependencies()) {
+		PRINT_TAG();
+		Warning("Required item schema helper class for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
 	if (!Player::CheckDependencies()) {
 		PRINT_TAG();
 		Warning("Required player helper class for module %s not available!\n", name.c_str());
