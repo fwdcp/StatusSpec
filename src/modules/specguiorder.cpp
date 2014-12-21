@@ -10,15 +10,70 @@
 
 #include "specguiorder.h"
 
-SpecGUIOrder::SpecGUIOrder() {
+SpecGUIOrder::SpecGUIOrder(std::string name) : Module(name) {
 	frameHook = 0;
 	setPosHook = 0;
 	specguiSettings = new KeyValues("Resource/UI/SpectatorTournament.res");
 	specguiSettings->LoadFromFile(Interfaces::pFileSystem, "resource/ui/spectatortournament.res", "mod");
 
-	enabled = new ConVar("statusspec_specguiorder_enabled", "0", FCVAR_NONE, "enable ordering of spec GUI", [](IConVar *var, const char *pOldValue, float flOldValue) { g_SpecGUIOrder->ToggleEnabled(var, pOldValue, flOldValue); });
+	enabled = new ConVar("statusspec_specguiorder_enabled", "0", FCVAR_NONE, "enable ordering of spec GUI", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<SpecGUIOrder>("Spec GUI Order")->ToggleEnabled(var, pOldValue, flOldValue); });
 	reverse_blu = new ConVar("statusspec_specguiorder_reverse_blu", "0", FCVAR_NONE, "reverse order for BLU players");
 	reverse_red = new ConVar("statusspec_specguiorder_reverse_red", "0", FCVAR_NONE, "reverse order for RED players");
+}
+
+bool SpecGUIOrder::CheckDependencies(std::string name) {
+	bool ready = true;
+
+	if (!Interfaces::pClientDLL) {
+		PRINT_TAG();
+		Warning("Required interface IBaseClientDLL for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Interfaces::pFileSystem) {
+		PRINT_TAG();
+		Warning("Required interface IFileSystem for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!g_pVGuiPanel) {
+		PRINT_TAG();
+		Warning("Required interface vgui::IPanel for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!g_pVGuiSchemeManager) {
+		PRINT_TAG();
+		Warning("Required interface vgui::ISchemeManager for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Player::CheckDependencies()) {
+		PRINT_TAG();
+		Warning("Required player helper class for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Player::comparisonAvailable) {
+		PRINT_TAG();
+		Warning("Required player comparison for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Player::nameRetrievalAvailable) {
+		PRINT_TAG();
+		Warning("Required player name retrieval for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	return ready;
 }
 
 void SpecGUIOrder::FrameHook(ClientFrameStage_t curStage) {
@@ -26,12 +81,8 @@ void SpecGUIOrder::FrameHook(ClientFrameStage_t curStage) {
 		bluPlayers.clear();
 		redPlayers.clear();
 
-		for (int i = 1; i <= MAX_PLAYERS; i++) {
-			Player player = i;
-
-			if (!player) {
-				continue;
-			}
+		for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
+			Player player = *iterator;
 
 			TFTeam team = player.GetTeam();
 
@@ -60,10 +111,10 @@ void SpecGUIOrder::SetPosOverride(vgui::VPANEL vguiPanel, int x, int y) {
 			if (dialogVariables) {
 				const char *name = dialogVariables->GetString("playername");
 
-				for (int i = 1; i <= MAX_PLAYERS; i++) {
-					Player player = i;
+				for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
+					Player player = *iterator;
 
-					if (player && strcmp(player.GetName(), name) == 0) {
+					if (strcmp(player.GetName(), name) == 0) {
 						TFTeam team = player.GetTeam();
 
 						if (team == TFTeam_Red) {

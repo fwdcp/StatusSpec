@@ -46,6 +46,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_ModuleManager->LoadModule<PlayerModels>("Player Models");
 	g_ModuleManager->LoadModule<PlayerOutlines>("Player Outlines");
 	g_ModuleManager->LoadModule<ProjectileOutlines>("Projectile Outlines");
+	g_ModuleManager->LoadModule<SpecGUIOrder>("Spec GUI Order");
 	
 	ConVar_Register();
 

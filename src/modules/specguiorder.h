@@ -22,13 +22,17 @@
 #include "vgui/IScheme.h"
 #include "vgui_controls/EditablePanel.h"
 
+#include "../common.h"
 #include "../ifaces.h"
+#include "../modules.h"
 #include "../player.h"
 #include "../tfdefs.h"
 
-class SpecGUIOrder {
+class SpecGUIOrder : public Module {
 public:
-	SpecGUIOrder();
+	SpecGUIOrder(std::string name);
+
+	static bool CheckDependencies(std::string name);
 
 	void FrameHook(ClientFrameStage_t curStage);
 	void SetPosOverride(vgui::VPANEL vguiPanel, int x, int y);
@@ -44,5 +48,3 @@ private:
 	ConVar *reverse_red;
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
-
-extern SpecGUIOrder *g_SpecGUIOrder;
