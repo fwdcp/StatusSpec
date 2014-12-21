@@ -10,12 +10,82 @@
 
 #include "statusicons.h"
 
-StatusIcons::StatusIcons() {
+StatusIcons::StatusIcons(std::string name) : Module(name) {
 	frameHook = 0;
 
 	delta_x = new ConVar("statusspec_statusicons_delta_x", "15", FCVAR_NONE, "change in the x direction for each icon");
 	delta_y = new ConVar("statusspec_statusicons_delta_y", "0", FCVAR_NONE, "change in the y direction for each icon");
-	enabled = new ConVar("statusspec_statusicons_enabled", "0", FCVAR_NONE, "enable status icons", [](IConVar *var, const char *pOldValue, float flOldValue) { g_StatusIcons->ToggleEnabled(var, pOldValue, flOldValue); });
+	enabled = new ConVar("statusspec_statusicons_enabled", "0", FCVAR_NONE, "enable status icons", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<StatusIcons>("Status Icons")->ToggleEnabled(var, pOldValue, flOldValue); });
+}
+
+bool StatusIcons::CheckDependencies(std::string name) {
+	bool ready = true;
+
+	if (!Interfaces::pClientDLL) {
+		PRINT_TAG();
+		Warning("Required interface IBaseClientDLL for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Interfaces::vguiLibrariesAvailable) {
+		PRINT_TAG();
+		Warning("Required VGUI library for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!g_pVGui) {
+		PRINT_TAG();
+		Warning("Required interface vgui::IVGui for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!g_pVGuiPanel) {
+		PRINT_TAG();
+		Warning("Required interface vgui::IPanel for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!g_pVGuiSchemeManager) {
+		PRINT_TAG();
+		Warning("Required interface vgui::ISchemeManager for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Player::CheckDependencies()) {
+		PRINT_TAG();
+		Warning("Required player helper class for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Player::conditionsRetrievalAvailable) {
+		PRINT_TAG();
+		Warning("Required player condition retrieval for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Player::nameRetrievalAvailable) {
+		PRINT_TAG();
+		Warning("Required player name retrieval for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	try {
+		Interfaces::GetClientMode();
+	}
+	catch (bad_pointer &e) {
+		PRINT_TAG();
+		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", name.c_str());
+	}
+
+	return ready;
 }
 
 void StatusIcons::FrameHook(ClientFrameStage_t curStage) {
@@ -131,10 +201,10 @@ void StatusIcons::DisplayIcons(vgui::VPANEL playerPanel) {
 			if (dialogVariables) {
 				const char *name = dialogVariables->GetString("playername");
 
-				for (int i = 1; i <= MAX_PLAYERS; i++) {
-					Player player = i;
+				for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
+					Player player = *iterator;
 
-					if (player && strcmp(player.GetName(), name) == 0) {
+					if (strcmp(player.GetName(), name) == 0) {
 						for (int i = 0; i < g_pVGuiPanel->GetChildCount(playerPanel); i++) {
 							vgui::VPANEL statusIconsVPanel = g_pVGuiPanel->GetChild(playerPanel, i);
 
