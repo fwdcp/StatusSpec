@@ -20,14 +20,18 @@
 #include "convar.h"
 #include "ehandle.h"
 
+#include "../common.h"
 #include "../entities.h"
 #include "../funcs.h"
 #include "../ifaces.h"
+#include "../modules.h"
 #include "../player.h"
 
-class PlayerModels {
+class PlayerModels : public Module {
 public:
-	PlayerModels();
+	PlayerModels(std::string name);
+
+	static bool CheckDependencies(std::string name);
 private:
 	KeyValues *modelConfig;
 	int setModelHook;
@@ -39,5 +43,3 @@ private:
 	void ReloadSettings();
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
-
-extern PlayerModels *g_PlayerModels;
