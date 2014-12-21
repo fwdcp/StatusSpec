@@ -89,6 +89,13 @@ bool MedigunInfo::CheckDependencies(std::string name) {
 		}
 	}
 
+	if (!Player::CheckDependencies()) {
+		PRINT_TAG();
+		Warning("Required player helper class for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
 	try {
 		Interfaces::GetClientMode();
 	}
