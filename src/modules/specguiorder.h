@@ -13,8 +13,8 @@
 #include "../stdafx.h"
 
 #include <array>
-#include <list>
 #include <map>
+#include <set>
 #include <string>
 
 #include "convar.h"
@@ -37,11 +37,11 @@ public:
 	void FrameHook(ClientFrameStage_t curStage);
 	void SetPosOverride(vgui::VPANEL vguiPanel, int x, int y);
 private:
-	std::list<Player> bluPlayers;
+	std::set<Player> bluPlayers;
 	int frameHook;
 	int setPosHook;
 	KeyValues *specguiSettings;
-	std::list<Player> redPlayers;
+	std::set<Player> redPlayers;
 
 	ConVar *enabled;
 	ConVar *reverse_blu;

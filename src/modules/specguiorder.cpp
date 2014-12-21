@@ -87,15 +87,12 @@ void SpecGUIOrder::FrameHook(ClientFrameStage_t curStage) {
 			TFTeam team = player.GetTeam();
 
 			if (team == TFTeam_Red) {
-				redPlayers.push_back(player);
+				redPlayers.insert(player);
 			}
 			else if (team == TFTeam_Blue) {
-				bluPlayers.push_back(player);
+				bluPlayers.insert(player);
 			}
 		}
-
-		bluPlayers.sort();
-		redPlayers.sort();
 	}
 
 	RETURN_META(MRES_IGNORED);
