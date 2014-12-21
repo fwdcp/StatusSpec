@@ -48,6 +48,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_ModuleManager->LoadModule<ProjectileOutlines>("Projectile Outlines");
 	g_ModuleManager->LoadModule<SpecGUIOrder>("Spec GUI Order");
 	g_ModuleManager->LoadModule<StatusIcons>("Status Icons");
+	g_ModuleManager->LoadModule<TeamHealthComparison>("Team Health Comparison");
 	
 	ConVar_Register();
 
