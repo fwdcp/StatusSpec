@@ -278,7 +278,7 @@ const char *Player::GetName() const {
 	if (IsValid()) {
 		player_info_t playerInfo;
 
-		if (Funcs::CallFunc_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, playerEntity->entindex(), &playerInfo)) {
+		if (Interfaces::pEngineClient->GetPlayerInfo(playerEntity->entindex(), &playerInfo)) {
 			return playerInfo.name;
 		}
 	}
@@ -306,7 +306,7 @@ CSteamID Player::GetSteamID() const {
 	if (IsValid()) {
 		player_info_t playerInfo;
 
-		if (Funcs::CallFunc_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, playerEntity->entindex(), &playerInfo)) {
+		if (Interfaces::pEngineClient->GetPlayerInfo(playerEntity->entindex(), &playerInfo)) {
 			if (playerInfo.friendsID) {
 				static EUniverse universe = k_EUniverseInvalid;
 
@@ -346,7 +346,7 @@ int Player::GetUserID() const {
 	if (IsValid()) {
 		player_info_t playerInfo;
 
-		if (Funcs::CallFunc_IVEngineClient_GetPlayerInfo(Interfaces::pEngineClient, playerEntity->entindex(), &playerInfo)) {
+		if (Interfaces::pEngineClient->GetPlayerInfo(playerEntity->entindex(), &playerInfo)) {
 			return playerInfo.userID;
 		}
 	}
