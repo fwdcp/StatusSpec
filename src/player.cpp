@@ -140,13 +140,10 @@ bool Player::IsLessThan(const Player &player) const {
 		return false;
 	}
 
-	int firstClass = std::distance(TFDefinitions::defaultClassOrder.begin(), std::find(TFDefinitions::defaultClassOrder.begin(), TFDefinitions::defaultClassOrder.end(), GetClass()));
-	int secondClass = std::distance(TFDefinitions::defaultClassOrder.begin(), std::find(TFDefinitions::defaultClassOrder.begin(), TFDefinitions::defaultClassOrder.end(), player.GetClass()));
-
-	if (firstClass < secondClass) {
+	if (TFDefinitions::normalClassOrdinal.find(GetClass())->second < TFDefinitions::normalClassOrdinal.find(player.GetClass())->second) {
 		return true;
 	}
-	else if (firstClass > secondClass) {
+	else if (TFDefinitions::normalClassOrdinal.find(GetClass())->second > TFDefinitions::normalClassOrdinal.find(player.GetClass())->second) {
 		return false;
 	}
 
@@ -180,13 +177,10 @@ bool Player::IsGreaterThan(const Player &player) const {
 		return false;
 	}
 
-	int firstClass = std::distance(TFDefinitions::defaultClassOrder.begin(), std::find(TFDefinitions::defaultClassOrder.begin(), TFDefinitions::defaultClassOrder.end(), GetClass()));
-	int secondClass = std::distance(TFDefinitions::defaultClassOrder.begin(), std::find(TFDefinitions::defaultClassOrder.begin(), TFDefinitions::defaultClassOrder.end(), player.GetClass()));
-
-	if (firstClass > secondClass) {
+	if (TFDefinitions::normalClassOrdinal.find(GetClass())->second > TFDefinitions::normalClassOrdinal.find(player.GetClass())->second) {
 		return true;
 	}
-	else if (firstClass < secondClass) {
+	else if (TFDefinitions::normalClassOrdinal.find(GetClass())->second < TFDefinitions::normalClassOrdinal.find(player.GetClass())->second) {
 		return false;
 	}
 

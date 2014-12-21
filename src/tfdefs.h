@@ -19,7 +19,7 @@
 
 // taken from SourceMod
 
-typedef enum {
+enum TFClassType {
 	TFClass_Unknown = 0,
 	TFClass_Scout,
 	TFClass_Sniper,
@@ -30,7 +30,7 @@ typedef enum {
 	TFClass_Pyro,
 	TFClass_Spy,
 	TFClass_Engineer
-} TFClassType;
+};
 
 typedef enum {
 	TFTeam_Unassigned = 0,
@@ -253,6 +253,6 @@ class TFDefinitions {
 public:
 	static const std::map<TFClassType, std::string> classNames;
 	static const std::array<std::string, 9> itemSlots;
-	static const std::array<TFClassType, 10> defaultClassOrder;
+	static const std::map<TFClassType, int> normalClassOrdinal;
 	static const std::map<int, std::vector<std::string>> slotKillIcons;
 };
