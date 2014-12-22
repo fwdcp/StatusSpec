@@ -10,43 +10,62 @@
 
 #include "projectileoutlines.h"
 
-inline float ChangeScale(float currentValue, float currentMin, float currentMax, float newMin, float newMax) {
-	float deltaScaler = ((newMax - newMin) / (currentMax - currentMin));
-	float newDelta = ((currentValue - currentMin) * deltaScaler);
-	float newValue = newMin + newDelta;
-
-	return newValue;
-}
-
-inline int ColorRangeRestrict(int color) {
-	if (color < 0) return 0;
-	else if (color > 255) return 255;
-	else return color;
-}
-
-inline bool IsInteger(const std::string &s) {
-	if (s.empty() || !isdigit(s[0])) return false;
-
-	char *p;
-	strtoull(s.c_str(), &p, 10);
-
-	return (*p == 0);
-}
-
-ProjectileOutlines::ProjectileOutlines() {
+ProjectileOutlines::ProjectileOutlines(std::string name) : Module(name) {
 	colors["blu"].color = Color(88, 133, 162, 255);
-	colors["blu"].command = new ConCommand("statusspec_projectileoutlines_color_blu", [](const CCommand &command) { g_ProjectileOutlines->ColorCommand(command); }, "the color used for outlines for BLU projectiles", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ProjectileOutlines->GetCurrentColor(partial, commands); });
+	colors["blu"].command = new ConCommand("statusspec_projectileoutlines_color_blu", [](const CCommand &command) { g_ModuleManager->GetModule<ProjectileOutlines>("Projectile Outlines")->ColorCommand(command); }, "the color used for outlines for BLU projectiles", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<ProjectileOutlines>("Projectile Outlines")->GetCurrentColor(partial, commands); });
 	colors["red"].color = Color(184, 56, 59, 255);
-	colors["red"].command = new ConCommand("statusspec_projectileoutlines_color_red", [](const CCommand &command) { g_ProjectileOutlines->ColorCommand(command); }, "the color used for outlines for RED projectiles", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ProjectileOutlines->GetCurrentColor(partial, commands); });
+	colors["red"].command = new ConCommand("statusspec_projectileoutlines_color_red", [](const CCommand &command) { g_ModuleManager->GetModule<ProjectileOutlines>("Projectile Outlines")->ColorCommand(command); }, "the color used for outlines for RED projectiles", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<ProjectileOutlines>("Projectile Outlines")->GetCurrentColor(partial, commands); });
 	doPostScreenSpaceEffectsHook = 0;
 	frameHook = 0;
 
-	enabled = new ConVar("statusspec_projectileoutlines_enabled", "0", FCVAR_NONE, "enable projectile outlines", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ProjectileOutlines->ToggleEnabled(var, pOldValue, flOldValue); });
-	fade = new ConVar("statusspec_projectileoutlines_fade", "0", FCVAR_NONE, "make outlines fade with distance", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ProjectileOutlines->ToggleFade(var, pOldValue, flOldValue); });
+	enabled = new ConVar("statusspec_projectileoutlines_enabled", "0", FCVAR_NONE, "enable projectile outlines", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<ProjectileOutlines>("Projectile Outlines")->ToggleEnabled(var, pOldValue, flOldValue); });
+	fade = new ConVar("statusspec_projectileoutlines_fade", "0", FCVAR_NONE, "make outlines fade with distance");
 	fade_distance = new ConVar("statusspec_projectileoutlines_fade_distance", "1600", FCVAR_NONE, "the distance (in Hammer units) at which outlines will fade");
 	grenades = new ConVar("statusspec_projectileoutlines_grenades", "0", FCVAR_NONE, "enable outlines for grenades");
 	rockets = new ConVar("statusspec_projectileoutlines_rockets", "0", FCVAR_NONE, "enable outlines for rockets");
 	stickybombs = new ConVar("statusspec_projectileoutlines_stickybombs", "0", FCVAR_NONE, "enable outlines for stickybombs");
+}
+
+bool ProjectileOutlines::CheckDependencies(std::string name) {
+	bool ready = true;
+
+	if (!Interfaces::pClientDLL) {
+		PRINT_TAG();
+		Warning("Required interface IBaseClientDLL for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Interfaces::pClientEntityList) {
+		PRINT_TAG();
+		Warning("Required interface IClientEntityList for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Entities::RetrieveClassPropOffset("CTFGrenadePipebombProjectile", { "m_iType" })) {
+		PRINT_TAG();
+		Warning("Required property m_iType for CTFGrenadePipebombProjectile for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!GlowManager::CheckDependencies()) {
+		PRINT_TAG();
+		Warning("Required glow manager for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	try {
+		Interfaces::GetClientMode();
+	}
+	catch (bad_pointer &e) {
+		PRINT_TAG();
+		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", name.c_str());
+	}
+
+	return ready;
 }
 
 bool ProjectileOutlines::DoPostScreenSpaceEffectsHook(const CViewSetup *pSetup) {
@@ -67,6 +86,8 @@ bool ProjectileOutlines::DoPostScreenSpaceEffectsHook(const CViewSetup *pSetup) 
 		}
 	}
 
+	glowManager.RenderGlowEffects(pSetup);
+
 	RETURN_META_VALUE(MRES_IGNORED, false);
 }
 
@@ -81,7 +102,7 @@ void ProjectileOutlines::FrameHook(ClientFrameStage_t curStage) {
 				continue;
 			}
 
-			if (rockets->GetBool() && Entities::CheckClassBaseclass(entity->GetClientClass(), "DT_TFProjectile_Rocket")) {
+			if (rockets->GetBool() && Entities::CheckEntityBaseclass(entity, "TFProjectile_Rocket")) {
 				Color glowColor = GetGlowColor(entity);
 
 				float red = glowColor.r() / 255.0f;
@@ -94,8 +115,8 @@ void ProjectileOutlines::FrameHook(ClientFrameStage_t curStage) {
 				continue;
 			}
 
-			if (strcmp(entity->GetClientClass()->GetName(), "CTFGrenadePipebombProjectile") == 0) {
-				int type = *MAKE_PTR(int*, entity, Entities::pCTFGrenadePipebombProjectile__m_iType);
+			if (Entities::CheckEntityBaseclass(entity, "TFGrenadePipebombProjectile")) {
+				int type = *Entities::GetEntityProp<int *>(entity, { "m_iType" });
 
 				if (type == TFGrenadePipebombType_Grenade && grenades->GetBool()) {
 					Color glowColor = GetGlowColor(entity);
@@ -127,7 +148,7 @@ void ProjectileOutlines::FrameHook(ClientFrameStage_t curStage) {
 		}
 	}
 	else if (curStage == FRAME_START) {
-		if (fade->GetBool() && !doPostScreenSpaceEffectsHook) {
+		if (!doPostScreenSpaceEffectsHook) {
 			try {
 				doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), SH_MEMBER(this, &ProjectileOutlines::DoPostScreenSpaceEffectsHook), false);
 			}
@@ -169,7 +190,7 @@ void ProjectileOutlines::SetGlowEffect(IClientEntity *entity, bool enabled, Vect
 
 	if (enabled) {
 		if (glows.find(entityHandle) == glows.end()) {
-			glows[entityHandle] = new CGlowObject(entityHandle.Get(), color, alpha, true, true);
+			glows[entityHandle] = new GlowManager::GlowObject(&glowManager, entityHandle.Get(), color, alpha, true, true);
 		}
 		else {
 			glows[entityHandle]->SetColor(color);
@@ -239,21 +260,6 @@ int ProjectileOutlines::GetCurrentColor(const char *partial, char commands[COMMA
 
 void ProjectileOutlines::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
 	if (enabled->GetBool()) {
-		if (!frameHook) {
-			frameHook = Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, SH_MEMBER(this, &ProjectileOutlines::FrameHook), true);
-		}
-	}
-	else {
-		if (frameHook) {
-			if (Funcs::RemoveHook(frameHook)) {
-				frameHook = 0;
-			}
-		}
-	}
-}
-
-void ProjectileOutlines::ToggleFade(IConVar *var, const char *pOldValue, float flOldValue) {
-	if (fade->GetBool()) {
 		if (!doPostScreenSpaceEffectsHook) {
 			try {
 				doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), SH_MEMBER(this, &ProjectileOutlines::DoPostScreenSpaceEffectsHook), false);
@@ -262,11 +268,19 @@ void ProjectileOutlines::ToggleFade(IConVar *var, const char *pOldValue, float f
 				Warning(e.what());
 			}
 		}
+		if (!frameHook) {
+			frameHook = Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, SH_MEMBER(this, &ProjectileOutlines::FrameHook), true);
+		}
 	}
 	else {
 		if (doPostScreenSpaceEffectsHook) {
 			if (Funcs::RemoveHook(doPostScreenSpaceEffectsHook)) {
 				doPostScreenSpaceEffectsHook = 0;
+			}
+		}
+		if (frameHook) {
+			if (Funcs::RemoveHook(frameHook)) {
+				frameHook = 0;
 			}
 		}
 	}

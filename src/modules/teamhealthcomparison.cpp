@@ -10,23 +10,54 @@
 
 #include "teamhealthcomparison.h"
 
-TeamHealthComparison::TeamHealthComparison() {
+TeamHealthComparison::TeamHealthComparison(std::string name) : Module(name) {
 	frameHook = 0;
 
-	enabled = new ConVar("statusspec_teamhealthcomparison_enabled", "0", FCVAR_NONE, "enable team health comparison", [](IConVar *var, const char *pOldValue, float flOldValue) { g_TeamHealthComparison->ToggleEnabled(var, pOldValue, flOldValue); });
-	reload_settings = new ConCommand("statusspec_teamhealthcomparison_reload_settings", []() { g_TeamHealthComparison->ReloadSettings(); }, "reload settings for the team health comparison HUD from the resource file", FCVAR_NONE);
+	enabled = new ConVar("statusspec_teamhealthcomparison_enabled", "0", FCVAR_NONE, "enable team health comparison", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<TeamHealthComparison>("Team Health Comparison")->ToggleEnabled(var, pOldValue, flOldValue); });
+	reload_settings = new ConCommand("statusspec_teamhealthcomparison_reload_settings", []() { g_ModuleManager->GetModule<TeamHealthComparison>("Team Health Comparison")->ReloadSettings(); }, "reload settings for the team health comparison HUD from the resource file", FCVAR_NONE);
+}
+
+bool TeamHealthComparison::CheckDependencies(std::string name) {
+	bool ready = true;
+
+	if (!Interfaces::pClientDLL) {
+		PRINT_TAG();
+		Warning("Required interface IBaseClientDLL for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Interfaces::vguiLibrariesAvailable) {
+		PRINT_TAG();
+		Warning("Required VGUI library for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Player::CheckDependencies()) {
+		PRINT_TAG();
+		Warning("Required player helper class for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	try {
+		Interfaces::GetClientMode();
+	}
+	catch (bad_pointer &e) {
+		PRINT_TAG();
+		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", name.c_str());
+	}
+
+	return ready;
 }
 
 void TeamHealthComparison::FrameHook(ClientFrameStage_t curStage) {
 	if (curStage == FRAME_NET_UPDATE_END) {
 		teamHealthAggregate.clear();
 
-		for (int i = 1; i <= MAX_PLAYERS; i++) {
-			Player player = i;
-
-			if (!player) {
-				continue;
-			}
+		for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
+			Player player = *iterator;
 
 			if (!player.IsAlive()) {
 				continue;

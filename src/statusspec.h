@@ -12,9 +12,11 @@
 
 #include "stdafx.h"
 
+#include "common.h"
 #include "funcs.h"
 #include "glows.h"
 #include "ifaces.h"
+#include "modules.h"
 
 #include "modules/antifreeze.h"
 #include "modules/cameratools.h"
@@ -35,11 +37,6 @@
 #include "modules/statusicons.h"
 #include "modules/teamhealthcomparison.h"
 #include "modules/teamoverrides.h"
-
-#define PLUGIN_DESC "StatusSpec v0.22.3"
-
-void Hook_IBaseClientDLL_FrameStageNotify(ClientFrameStage_t curStage);
-bool Hook_IClientMode_DoPostScreenSpaceEffects(const CViewSetup *pSetup);
 
 class StatusSpecPlugin: public IServerPluginCallbacks
 {

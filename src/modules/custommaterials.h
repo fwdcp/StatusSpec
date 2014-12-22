@@ -15,24 +15,23 @@
 #include <map>
 #include <string>
 
+#include "../common.h"
 #include "../entities.h"
 #include "../funcs.h"
+#include "../modules.h"
 #include "../ifaces.h"
 
-typedef struct MaterialReplacement_s {
-	std::string group;
-	std::string replacement;
-} MaterialReplacement_t;
-
-class CustomMaterials {
+class CustomMaterials : public Module {
 public:
-	CustomMaterials();
+	CustomMaterials(std::string name);
+
+	static bool CheckDependencies(std::string name);
 
 	IMaterial *FindMaterialOverride(char const *pMaterialName, const char *pTextureGroupName, bool complain = true, const char *pComplainPrefix = NULL);
 private:
 	int findMaterialHook;
 	KeyValues *materialConfig;
-	std::map<std::string, MaterialReplacement_t> materialReplacements;
+	std::map<std::string, Replacement> materialReplacements;
 
 	ConVar *enabled;
 	ConCommand *load_replacement_group;
@@ -41,5 +40,3 @@ private:
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 	void UnloadReplacementGroup(const CCommand &command);
 };
-
-extern CustomMaterials *g_CustomMaterials;

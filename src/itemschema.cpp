@@ -295,3 +295,20 @@ void ItemSchema::ForEachItem(void (*f)(const char *)) {
 		f(item->GetName());
 	}
 }
+
+bool ItemSchema::CheckDependencies() {
+	KeyValues *itemSchema = new KeyValues("items_game");
+
+	if (Interfaces::pFileSystem && itemSchema->LoadFromFile(Interfaces::pFileSystem, "scripts/items/items_game.txt", "mod")) {
+		itemSchema->deleteThis();
+		return true;
+	}
+	else {
+		PRINT_TAG();
+		Warning("Unable to load item schema from filesystem!\n");
+
+		itemSchema->deleteThis();
+
+		return false;
+	}
+}

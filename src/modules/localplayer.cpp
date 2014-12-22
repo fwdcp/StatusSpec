@@ -10,14 +10,51 @@
 
 #include "localplayer.h"
 
-LocalPlayer::LocalPlayer() {
+LocalPlayer::LocalPlayer(std::string name) : Module(name) {
 	frameHook = 0;
 	getLocalPlayerIndexDetoured = false;
 
-	enabled = new ConVar("statusspec_localplayer_enabled", "0", FCVAR_NONE, "enable local player override", [](IConVar *var, const char *pOldValue, float flOldValue) { g_LocalPlayer->ToggleEnabled(var, pOldValue, flOldValue); });
+	enabled = new ConVar("statusspec_localplayer_enabled", "0", FCVAR_NONE, "enable local player override", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<LocalPlayer>("Local Player")->ToggleEnabled(var, pOldValue, flOldValue); });
 	player = new ConVar("statusspec_localplayer_player", "0", FCVAR_NONE, "player index to set as the local player");
-	track_spec_target = new ConVar("statusspec_localplayer_track_spec_target", "0", FCVAR_NONE, "have the local player value track the spectator target", [](IConVar *var, const char *pOldValue, float flOldValue) { g_LocalPlayer->ToggleTrackSpecTarget(var, pOldValue, flOldValue); });
-	set_current_target = new ConCommand("statusspec_localplayer_set_current_target", []() { g_LocalPlayer->SetToCurrentTarget(); }, "set the local player to the current spectator target", FCVAR_NONE);
+	track_spec_target = new ConVar("statusspec_localplayer_track_spec_target", "0", FCVAR_NONE, "have the local player value track the spectator target", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<LocalPlayer>("Local Player")->ToggleTrackSpecTarget(var, pOldValue, flOldValue); });
+	set_current_target = new ConCommand("statusspec_localplayer_set_current_target", []() { g_ModuleManager->GetModule<LocalPlayer>("Local Player")->SetToCurrentTarget(); }, "set the local player to the current spectator target", FCVAR_NONE);
+}
+
+bool LocalPlayer::CheckDependencies(std::string name) {
+	bool ready = true;
+
+	if (!Interfaces::pClientDLL) {
+		PRINT_TAG();
+		Warning("Required interface IBaseClientDLL for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Interfaces::pEngineClient) {
+		PRINT_TAG();
+		Warning("Required interface IVEngineClient for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	if (!Player::conditionsRetrievalAvailable) {
+		PRINT_TAG();
+		Warning("Required player condition retrieval for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	try {
+		Funcs::GetFunc_GetLocalPlayerIndex();
+	}
+	catch (bad_pointer &e) {
+		PRINT_TAG();
+		Warning("Required function GetLocalPlayerIndex for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	return ready;
 }
 
 void LocalPlayer::FrameHook(ClientFrameStage_t curStage) {
@@ -61,7 +98,7 @@ void LocalPlayer::SetToCurrentTarget() {
 void LocalPlayer::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
 	if (enabled->GetBool()) {
 		if (!getLocalPlayerIndexDetoured) {
-			getLocalPlayerIndexDetoured = Funcs::AddDetour_GetLocalPlayerIndex([]()->int { return g_LocalPlayer->GetLocalPlayerIndexOverride(); });
+			getLocalPlayerIndexDetoured = Funcs::AddDetour_GetLocalPlayerIndex([]()->int { return g_ModuleManager->GetModule<LocalPlayer>("Local Player")->GetLocalPlayerIndexOverride(); });
 		}
 	}
 	else {
