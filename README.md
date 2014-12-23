@@ -8,6 +8,10 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**0.23.1**
+* player aliases
+  * fix infinite recursion
+
 **0.23.0**
 * general
   * major modularization - modules check dependencies and fail separately
