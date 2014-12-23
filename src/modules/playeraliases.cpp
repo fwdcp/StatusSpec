@@ -68,7 +68,21 @@ bool PlayerAliases::GetPlayerInfoOverride(int ent_num, player_info_t *pinfo) {
 		RETURN_META_VALUE(MRES_IGNORED, false);
 	}
 
-	CSteamID playerSteamID = player.GetSteamID();
+	static EUniverse universe = k_EUniverseInvalid;
+
+	if (universe == k_EUniverseInvalid) {
+		if (Interfaces::pSteamAPIContext->SteamUtils()) {
+			universe = Interfaces::pSteamAPIContext->SteamUtils()->GetConnectedUniverse();
+		}
+		else {
+			PRINT_TAG();
+			Warning("Steam libraries not available - assuming public universe for user Steam IDs!\n");
+
+			universe = k_EUniversePublic;
+		}
+	}
+
+	CSteamID playerSteamID = CSteamID(pinfo->friendsID, 1, universe, k_EAccountTypeIndividual);
 	TFTeam team = player.GetTeam();
 
 	std::string playerAlias = GetAlias(playerSteamID, pinfo->name);
