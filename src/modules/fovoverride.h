@@ -10,15 +10,12 @@
 
 #pragma once
 
-#include "../stdafx.h"
-
-#include "convar.h"
-
-#include "../common.h"
-#include "../funcs.h"
-#include "../ifaces.h"
 #include "../modules.h"
-#include "../player.h"
+
+#include "cdll_int.h"
+
+class ConVar;
+class IConVar;
 
 class FOVOverride : public Module {
 public:

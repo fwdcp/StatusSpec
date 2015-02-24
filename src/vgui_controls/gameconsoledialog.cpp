@@ -7,6 +7,8 @@
 
 #include "GameConsoleDialog.h"
 
+#include "cdll_int.h"
+
 #include "../ifaces.h"
 
 using namespace vgui;

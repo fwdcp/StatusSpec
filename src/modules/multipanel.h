@@ -10,18 +10,13 @@
 
 #pragma once
 
-#include "../stdafx.h"
+#include "vgui/VGUI.h"
 
-#include "game/client/iviewport.h"
-#include "vgui/IVGui.h"
-#include "../vgui_controls/gameconsoledialog.h"
-#include "vgui_controls/animationcontroller.h"
-
-#include "../common.h"
-#include "../ifaces.h"
 #include "../modules.h"
 
-#define SCOREBOARD_PANEL_NAME "scores"
+class CGameConsoleDialog;
+class ConVar;
+class IConVar;
 
 class MultiPanel : public Module {
 public:

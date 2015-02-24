@@ -10,6 +10,18 @@
 
 #include "localplayer.h"
 
+#include <string>
+
+#include "cbase.h"
+#include "c_baseplayer.h"
+#include "convar.h"
+#include "shareddefs.h"
+
+#include "../common.h"
+#include "../funcs.h"
+#include "../ifaces.h"
+#include "../player.h"
+
 LocalPlayer::LocalPlayer(std::string name) : Module(name) {
 	frameHook = 0;
 	getLocalPlayerIndexDetoured = false;
@@ -82,7 +94,7 @@ void LocalPlayer::SetToCurrentTarget() {
 
 	if (localPlayer) {
 		if (localPlayer.GetObserverMode() == OBS_MODE_FIXED || localPlayer.GetObserverMode() == OBS_MODE_IN_EYE || localPlayer.GetObserverMode() == OBS_MODE_CHASE) {
-			Player targetPlayer = localPlayer.GetObserverTarget();
+			Player targetPlayer = dynamic_cast<C_BasePlayer *>(localPlayer.GetObserverTarget());
 
 			if (targetPlayer) {
 				player->SetValue(targetPlayer->entindex());

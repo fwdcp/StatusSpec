@@ -10,22 +10,14 @@
 
 #pragma once
 
-#include "../stdafx.h"
-
-#include <functional>
-#include <map>
-#include <sstream>
-#include <string>
-
-#include "convar.h"
-#include "ehandle.h"
-
-#include "../common.h"
-#include "../entities.h"
-#include "../funcs.h"
-#include "../ifaces.h"
 #include "../modules.h"
-#include "../player.h"
+
+class C_BaseEntity;
+class ConCommand;
+class ConVar;
+class KeyValues;
+class IConVar;
+struct model_t;
 
 class PlayerModels : public Module {
 public:

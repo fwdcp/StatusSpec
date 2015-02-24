@@ -10,44 +10,18 @@
 
 #pragma once
 
-#include "../stdafx.h"
+class ConCommand;
+class ConVar;
+class KeyValues;
 
-#include <map>
-#include <iomanip>
-#include <string>
+namespace vgui {
+	class Panel;
+};
 
-#include "convar.h"
-#include "vgui/IPanel.h"
-#include "vgui/IVGui.h"
-#include "vgui_controls/Controls.h"
-#include "iclientmode.h"
-#include "vgui_controls/AnimationController.h"
-#include "vgui_controls/EditablePanel.h"
-#include "vgui_controls/Label.h"
-#include "vgui_controls/ImagePanel.h"
-#include "../vgui_controls/ImageProgressBar.h"
-#include "vgui_controls/ProgressBar.h"
-#include "vgui_controls/ScalableImagePanel.h"
-#include "../vgui_controls/VariableLabel.h"
+#include "cdll_int.h"
 
-#include "../common.h"
-#include "../entities.h"
-#include "../ifaces.h"
 #include "../modules.h"
-#include "../player.h"
 #include "../tfdefs.h"
-
-#define VGUI_TEXTURE_NULL "replay/thumbnails/null"
-#define VGUI_TEXTURE_UBERCHARGE "replay/thumbnails/ubercharge"
-#define VGUI_TEXTURE_CRITBOOST "replay/thumbnails/critboost"
-#define VGUI_TEXTURE_MEGAHEALRED "replay/thumbnails/megaheal_red"
-#define VGUI_TEXTURE_MEGAHEALBLU "replay/thumbnails/megaheal_blue"
-#define VGUI_TEXTURE_BULLETRESISTRED "replay/thumbnails/defense_buff_bullet_red"
-#define VGUI_TEXTURE_BLASTRESISTRED "replay/thumbnails/defense_buff_explosion_red"
-#define VGUI_TEXTURE_FIRERESISTRED "replay/thumbnails/defense_buff_fire_red"
-#define VGUI_TEXTURE_BULLETRESISTBLU "replay/thumbnails/defense_buff_bullet_blue"
-#define VGUI_TEXTURE_BLASTRESISTBLU "replay/thumbnails/defense_buff_explosion_blue"
-#define VGUI_TEXTURE_FIRERESISTBLU "replay/thumbnails/defense_buff_fire_blue"
 
 typedef struct Medigun_s {
 	TFMedigun type;

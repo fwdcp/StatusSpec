@@ -10,13 +10,9 @@
 
 #pragma once
 
-#include "stdafx.h"
-
 #include <map>
+#include <string>
 
-#include "dbg.h"
-
-#include "common.h"
 #include "exceptions.h"
 
 class Module {

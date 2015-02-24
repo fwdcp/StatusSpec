@@ -10,6 +10,20 @@
 
 #include "statusicons.h"
 
+#include "convar.h"
+#include "iclientmode.h"
+#include "KeyValues.h"
+#include "tier3/tier3.h"
+#include "vgui/IPanel.h"
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/ImagePanel.h"
+#include "vgui_controls/Panel.h"
+
+#include "../common.h"
+#include "../funcs.h"
+#include "../ifaces.h"
+#include "../player.h"
+
 StatusIcons::StatusIcons(std::string name) : Module(name) {
 	frameHook = 0;
 
@@ -184,10 +198,7 @@ void StatusIcons::DisplayIcon(vgui::EditablePanel *panel, const char *iconTextur
 		icon->SetEnabled(true);
 		icon->SetVisible(true);
 
-		std::string iconPath = "../";
-		iconPath += iconTexture;
-
-		icon->SetImage(iconPath.c_str());
+		icon->SetImage(GetVGUITexturePath(iconTexture));
 	}
 }
 

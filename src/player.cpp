@@ -10,6 +10,21 @@
 
 #include "player.h"
 
+#include <cstdint>
+
+#include "cbase.h"
+#include "c_baseentity.h"
+#include "cdll_int.h"
+#include "globalvars_base.h"
+#include "icliententity.h"
+#include "icliententitylist.h"
+#include "steam/steam_api.h"
+
+#include "common.h"
+#include "entities.h"
+#include "exceptions.h"
+#include "ifaces.h"
+
 Player::Player(int entindex) {
 	playerEntity = Interfaces::pClientEntityList->GetClientEntity(entindex);
 }

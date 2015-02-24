@@ -10,6 +10,29 @@
 
 #include "loadouticons.h"
 
+#include <iomanip>
+#include <map>
+
+#include "cbase.h"
+#include "c_baseentity.h"
+#include "convar.h"
+#include "icliententitylist.h"
+#include "iclientmode.h"
+#include "KeyValues.h"
+#include "shareddefs.h"
+#include "tier3/tier3.h"
+#include "vgui/IVGui.h"
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/ImagePanel.h"
+#include "vgui_controls/Panel.h"
+
+#include "../common.h"
+#include "../entities.h"
+#include "../funcs.h"
+#include "../ifaces.h"
+#include "../itemschema.h"
+#include "../modules.h"
+
 LoadoutIcons::LoadoutIcons(std::string name) : Module(name) {
 	filter_active_color = Color(255, 255, 255, 255);
 	filter_inactive_color = Color(127, 127, 127, 255);

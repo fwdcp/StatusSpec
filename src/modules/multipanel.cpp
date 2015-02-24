@@ -10,6 +10,18 @@
 
 #include "multipanel.h"
 
+#include "cbase.h"
+#include "convar.h"
+#include "game/client/iviewport.h"
+#include "iclientmode.h"
+#include "vgui/IVGui.h"
+#include "../vgui_controls/gameconsoledialog.h"
+
+#include "../common.h"
+#include "../ifaces.h"
+
+#define SCOREBOARD_PANEL_NAME "scores"
+
 MultiPanel::MultiPanel(std::string name) : Module(name) {
 	consoleDialog = nullptr;
 	scoreboardPanel = vgui::INVALID_PANEL;

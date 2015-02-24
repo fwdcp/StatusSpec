@@ -10,6 +10,20 @@
 
 #include "killstreaks.h"
 
+#include <iomanip>
+
+#include "cbase.h"
+#include "c_baseentity.h"
+#include "convar.h"
+#include "igameevents.h"
+#include "shareddefs.h"
+
+#include "../common.h"
+#include "../entities.h"
+#include "../funcs.h"
+#include "../ifaces.h"
+#include "../player.h"
+
 Killstreaks::Killstreaks(std::string name) : Module(name) {
 	bluTopKillstreak = 0;
 	bluTopKillstreakPlayer = 0;

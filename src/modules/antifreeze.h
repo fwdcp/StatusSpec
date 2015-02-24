@@ -10,38 +10,19 @@
 
 #pragma once
 
-#include "../stdafx.h"
+#include "cdll_int.h"
+#include "vgui/VGUI.h"
 
-#include <map>
-#include <string>
-
-#define CLIENT_DLL
-#define TF_CLIENT_DLL
-#define TF_DLL
-
-#include "cbase.h"
-#include "convar.h"
-#include "icliententity.h"
-#include "KeyValues.h"
-#include "teamplay_round_timer.h"
-#include "vgui/IPanel.h"
-#include "vgui/IVGui.h"
-#include "vgui_controls/EditablePanel.h"
-
-#include "../common.h"
-#include "../entities.h"
-#include "../ifaces.h"
 #include "../modules.h"
-#include "../player.h"
 
-#define REAL_TIME_NAME "RealTime"
-#define REGULAR_TIME_NAME "TimePanelValue"
-#define SPEC_GUI_NAME "specgui"
+class ConCommand;
+class ConVar;
+class IConVar;
+class KeyValues;
 
-typedef struct EntityInfo_s {
-	Vector origin;
-	QAngle angles;
-} EntityInfo_t;
+namespace vgui {
+	class EditablePanel;
+};
 
 class AntiFreeze : public Module {
 public:

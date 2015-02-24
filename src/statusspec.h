@@ -10,33 +10,7 @@
 
 #pragma once
 
-#include "stdafx.h"
-
-#include "common.h"
-#include "funcs.h"
-#include "glows.h"
-#include "ifaces.h"
-#include "modules.h"
-
-#include "modules/antifreeze.h"
-#include "modules/cameratools.h"
-#include "modules/custommaterials.h"
-#include "modules/custommodels.h"
-#include "modules/customtextures.h"
-#include "modules/fovoverride.h"
-#include "modules/killstreaks.h"
-#include "modules/loadouticons.h"
-#include "modules/localplayer.h"
-#include "modules/mediguninfo.h"
-#include "modules/multipanel.h"
-#include "modules/playeraliases.h"
-#include "modules/playermodels.h"
-#include "modules/playeroutlines.h"
-#include "modules/projectileoutlines.h"
-#include "modules/specguiorder.h"
-#include "modules/statusicons.h"
-#include "modules/teamhealthcomparison.h"
-#include "modules/teamoverrides.h"
+#include "engine/iserverplugin.h"
 
 class StatusSpecPlugin: public IServerPluginCallbacks
 {

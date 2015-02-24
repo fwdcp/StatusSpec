@@ -10,6 +10,26 @@
 
 #include "cameratools.h"
 
+class C_BaseEntity;
+#include "cbase.h"
+#include "convar.h"
+#include "filesystem.h"
+#include "globalvars_base.h"
+#include "usercmd.h"
+#include "hltvcamera.h"
+#include "icliententity.h"
+#include "iclientmode.h"
+#include "KeyValues.h"
+#include "shareddefs.h"
+#include "tier3/tier3.h"
+#include "vgui_controls/EditablePanel.h"
+
+#include "../common.h"
+#include "../exceptions.h"
+#include "../funcs.h"
+#include "../ifaces.h"
+#include "../player.h"
+
 class HLTVCameraOverride : public C_HLTVCamera {
 public:
 	using C_HLTVCamera::m_nCameraMode;

@@ -10,6 +10,17 @@
 
 #include "playermodels.h"
 
+#include "cbase.h"
+#include "convar.h"
+#include "filesystem.h"
+#include "KeyValues.h"
+
+#include "../common.h"
+#include "../entities.h"
+#include "../funcs.h"
+#include "../ifaces.h"
+#include "../player.h"
+
 PlayerModels::PlayerModels(std::string name) : Module(name) {
 	modelConfig = new KeyValues("models");
 	modelConfig->LoadFromFile(Interfaces::pFileSystem, "resource/playermodels.res", "mod");

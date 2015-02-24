@@ -10,8 +10,6 @@
 
 #pragma once
 
-#include "stdafx.h"
-
 #include <array>
 #include <map>
 #include <string>
@@ -248,6 +246,9 @@ typedef enum {
 	TFGrenadePipebombType_Grenade,
 	TFGrenadePipebombType_Stickybomb,
 } TFGrenadePipebombType;
+
+#define MAX_COSMETIC_SLOTS 3
+#define MAX_TAUNT_SLOTS 8
 
 class TFDefinitions {
 public:

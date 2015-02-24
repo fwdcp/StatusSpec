@@ -10,27 +10,10 @@
 
 #pragma once
 
-#include "../stdafx.h"
-
-#include <map>
-#include <sstream>
-#include <string>
-
-#include "convar.h"
-#include "ehandle.h"
-
 #include "../common.h"
-#include "../entities.h"
-#include "../funcs.h"
 #include "../glows.h"
-#include "../ifaces.h"
 #include "../modules.h"
 #include "../player.h"
-#include "../tfdefs.h"
-
-#if defined _WIN32
-#define strtoull _strtoui64
-#endif
 
 class PlayerOutlines : public Module {
 public:
@@ -41,7 +24,7 @@ public:
 	bool DoPostScreenSpaceEffectsHook(const CViewSetup *pSetup);
 	void FrameHook(ClientFrameStage_t curStage);
 private:
-	std::map<std::string, ColorConCommand_t> colors;
+	std::map<std::string, ColorConCommand> colors;
 	int doPostScreenSpaceEffectsHook;
 	int frameHook;
 	std::map<EHANDLE, GlowManager::GlowObject *> glows;

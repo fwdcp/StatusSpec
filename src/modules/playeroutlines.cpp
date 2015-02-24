@@ -10,6 +10,12 @@
 
 #include "playeroutlines.h"
 
+#include "../funcs.h"
+#include "../ifaces.h"
+#include "../player.h"
+
+#include "view_shared.h"
+
 PlayerOutlines::PlayerOutlines(std::string name) : Module(name) {
 	colors["blu_low"].color = Color(88, 133, 162, 255);
 	colors["blu_low"].command = new ConCommand("statusspec_playeroutlines_color_blu_low", [](const CCommand &command) { g_ModuleManager->GetModule<PlayerOutlines>("Player Outlines")->ColorCommand(command); }, "the color used for outlines for BLU team players at low health", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<PlayerOutlines>("Player Outlines")->GetCurrentColor(partial, commands); });

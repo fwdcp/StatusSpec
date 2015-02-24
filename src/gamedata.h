@@ -10,13 +10,13 @@
 
 #pragma once
 
-#include "stdafx.h"
-
 #include <string>
 
-#if defined _WIN32
+#ifdef _WIN32
 #include <Windows.h>
 #include <Psapi.h>
+#undef GetClassName
+#undef SendMessage
 #endif
 
 // DLL loading info
@@ -94,3 +94,33 @@ typedef void(__thiscall *SPT_t)(C_HLTVCamera *, int);
 typedef void(__fastcall *SMIH_t)(C_BaseEntity *, void *, int);
 typedef void(__fastcall *SMPH_t)(C_BaseEntity *, void *, const model_t *);
 #endif
+
+inline bool DataCompare(const BYTE* pData, const BYTE* bSig, const char* szMask) {
+	for (; *szMask; ++szMask, ++pData, ++bSig)
+	{
+		if (*szMask == 'x' && *pData != *bSig)
+			return false;
+	}
+
+	return (*szMask) == NULL;
+}
+
+inline DWORD FindPattern(DWORD dwAddress, DWORD dwSize, BYTE* pbSig, const char* szMask) {
+	for (DWORD i = NULL; i < dwSize; i++)
+	{
+		if (DataCompare((BYTE*)(dwAddress + i), pbSig, szMask))
+			return (DWORD)(dwAddress + i);
+	}
+
+	return 0;
+}
+
+inline DWORD SignatureScan(const char *moduleName, const char *signature, const char *mask) {
+#if defined _WIN32
+	MODULEINFO clientModInfo;
+	const HMODULE clientModule = GetHandleOfModule(moduleName);
+	GetModuleInformation(GetCurrentProcess(), clientModule, &clientModInfo, sizeof(MODULEINFO));
+
+	return FindPattern((DWORD)clientModule, clientModInfo.SizeOfImage, (PBYTE)signature, mask);
+#endif
+}

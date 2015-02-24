@@ -10,35 +10,23 @@
 
 #pragma once
 
-#include "../stdafx.h"
-
 #include <map>
-#include <iomanip>
-#include <sstream>
-#include <string>
 
+namespace vgui {
+	class EditablePanel;
+	class ImagePanel;
+	class Panel;
+};
+
+#include "cdll_int.h"
 #include "Color.h"
 #include "convar.h"
-#include "KeyValues.h"
-#include "vgui/IPanel.h"
-#include "vgui/IVGui.h"
-#include "vgui_controls/EditablePanel.h"
-#include "vgui_controls/ImagePanel.h"
+#include "vgui/VGUI.h"
 
-#include "../common.h"
-#include "../entities.h"
-#include "../ifaces.h"
 #include "../itemschema.h"
 #include "../modules.h"
 #include "../player.h"
 #include "../tfdefs.h"
-
-#if defined _WIN32
-#define strtoull _strtoui64
-#endif
-
-#define MAX_COSMETIC_SLOTS 3
-#define MAX_TAUNT_SLOTS 8
 
 typedef struct Loadout_s {
 	Loadout_s() {

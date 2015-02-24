@@ -10,6 +10,15 @@
 
 #include "custommodels.h"
 
+#include "convar.h"
+#include "engine/ivmodelinfo.h"
+#include "filesystem.h"
+#include "KeyValues.h"
+
+#include "../exceptions.h"
+#include "../funcs.h"
+#include "../ifaces.h"
+
 CustomModels::CustomModels(std::string name) : Module(name) {
 	modelConfig = new KeyValues("models");
 	modelConfig->LoadFromFile(Interfaces::pFileSystem, "resource/custommodels.res", "mod");

@@ -10,6 +10,26 @@
 
 #include "funcs.h"
 
+#include "MinHook.h"
+
+#include "sourcehook_impl.h"
+
+#include "engine/ivmodelinfo.h"
+#include "iclientmode.h"
+#include "igameevents.h"
+#include "vgui/IPanel.h"
+
+#include "exceptions.h"
+#include "ifaces.h"
+
+using namespace vgui;
+
+class StatusSpecUnloader : public SourceHook::Impl::UnloadListener
+{
+public:
+	virtual void ReadyToUnload(SourceHook::Plugin plug);
+};
+
 void StatusSpecUnloader::ReadyToUnload(SourceHook::Plugin plug) {};
 
 SourceHook::Impl::CSourceHookImpl g_SourceHook;

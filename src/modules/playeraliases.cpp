@@ -10,6 +10,20 @@
 
 #include "playeraliases.h"
 
+#include "json/json.h"
+
+#include "../common.h"
+#include "../funcs.h"
+#include "../ifaces.h"
+#include "../player.h"
+
+#define MAX_URL_LENGTH 2048
+
+#define ESEA_PLAYER_API_URL "http://play.esea.net/index.php"
+#define ETF2L_PLAYER_API_URL "http://api.etf2l.org/player/%llu.json"
+#define TWITCH_USER_API_URL "http://api.twitch.tv/api/steam/%llu"
+#define STEAM_USER_ID_FORMAT "[U:%i:%lu]"
+
 PlayerAliases::PlayerAliases(std::string name) : Module(name) {
 	getPlayerInfoHook = 0;
 

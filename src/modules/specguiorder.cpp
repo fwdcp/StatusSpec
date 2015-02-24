@@ -10,6 +10,17 @@
 
 #include "specguiorder.h"
 
+#include "convar.h"
+#include "filesystem.h"
+#include "KeyValues.h"
+#include "tier3/tier3.h"
+#include "vgui/IPanel.h"
+#include "vgui_controls/EditablePanel.h"
+
+#include "../common.h"
+#include "../funcs.h"
+#include "../ifaces.h"
+
 SpecGUIOrder::SpecGUIOrder(std::string name) : Module(name) {
 	frameHook = 0;
 	setPosHook = 0;
@@ -132,7 +143,7 @@ void SpecGUIOrder::SetPosOverride(vgui::VPANEL vguiPanel, int x, int y) {
 							int newX = baseX + (position * deltaX);
 							int newY = baseY + (position * deltaY);
 
-							RETURN_META_NEWPARAMS(MRES_HANDLED, &IPanel::SetPos, (vguiPanel, newX, newY));
+							RETURN_META_NEWPARAMS(MRES_HANDLED, &vgui::IPanel::SetPos, (vguiPanel, newX, newY));
 						}
 						else if (team == TFTeam_Blue) {
 							int position;
@@ -152,7 +163,7 @@ void SpecGUIOrder::SetPosOverride(vgui::VPANEL vguiPanel, int x, int y) {
 							int newX = baseX + (position * deltaX);
 							int newY = baseY + (position * deltaY);
 
-							RETURN_META_NEWPARAMS(MRES_HANDLED, &IPanel::SetPos, (vguiPanel, newX, newY));
+							RETURN_META_NEWPARAMS(MRES_HANDLED, &vgui::IPanel::SetPos, (vguiPanel, newX, newY));
 						}
 
 						break;

@@ -10,6 +10,14 @@
 
 #include "custommaterials.h"
 
+#include "convar.h"
+#include "filesystem.h"
+#include "KeyValues.h"
+#include "materialsystem/imaterialsystem.h"
+
+#include "../funcs.h"
+#include "../ifaces.h"
+
 CustomMaterials::CustomMaterials(std::string name) : Module(name) {
 	findMaterialHook = 0;
 	materialConfig = new KeyValues("materials");

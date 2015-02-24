@@ -5,17 +5,17 @@
  *
  */
 
-#define CLIENT_DLL
-
 #include "glows.h"
 
-#include "cbase.h"
 #include "model_types.h"
 #include "shaderapi/ishaderapi.h"
 #include "materialsystem/imaterialvar.h"
 #include "materialsystem/itexture.h"
 #include "view_shared.h"
 #include "viewpostprocess.h"
+
+#include "common.h"
+#include "ifaces.h"
 
 #define FULL_FRAME_TEXTURE "_rt_FullFrameFB"
 

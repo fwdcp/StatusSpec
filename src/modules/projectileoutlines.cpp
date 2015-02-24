@@ -10,6 +10,16 @@
 
 #include "projectileoutlines.h"
 
+#include "../common.h"
+#include "../entities.h"
+#include "../funcs.h"
+#include "../ifaces.h"
+#include "../tfdefs.h"
+
+#include "cbase.h"
+#include "c_baseentity.h"
+#include "view_shared.h"
+
 ProjectileOutlines::ProjectileOutlines(std::string name) : Module(name) {
 	colors["blu"].color = Color(88, 133, 162, 255);
 	colors["blu"].command = new ConCommand("statusspec_projectileoutlines_color_blu", [](const CCommand &command) { g_ModuleManager->GetModule<ProjectileOutlines>("Projectile Outlines")->ColorCommand(command); }, "the color used for outlines for BLU projectiles", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<ProjectileOutlines>("Projectile Outlines")->GetCurrentColor(partial, commands); });

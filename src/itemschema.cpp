@@ -10,6 +10,15 @@
 
 #include "itemschema.h"
 
+#include <sstream>
+#include <string>
+
+#include "filesystem.h"
+#include "KeyValues.h"
+
+#include "common.h"
+#include "ifaces.h"
+
 ItemSchema::ItemSchema() {
 	itemSchema = new KeyValues("items_game");
 	itemSchema->LoadFromFile(Interfaces::pFileSystem, "scripts/items/items_game.txt", "mod");

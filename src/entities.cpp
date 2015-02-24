@@ -10,6 +10,14 @@
 
 #include "entities.h"
 
+#include "cdll_int.h"
+#include "client_class.h"
+#include "icliententity.h"
+
+#include "common.h"
+#include "exceptions.h"
+#include "ifaces.h"
+
 std::unordered_map<std::string, std::unordered_map<std::string, int>> Entities::classPropOffsets;
 
 bool Entities::RetrieveClassPropOffset(std::string className, std::vector<std::string> propertyTree) {

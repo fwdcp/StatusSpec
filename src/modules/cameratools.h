@@ -10,22 +10,12 @@
 
 #pragma once
 
-#include "../stdafx.h"
-
-#include <algorithm>
-#include <array>
-#include <vector>
-
-#include "convar.h"
-#include "vgui/IScheme.h"
-#include "vgui_controls/EditablePanel.h"
-
-#include "../common.h"
-#include "../funcs.h"
-#include "../ifaces.h"
 #include "../modules.h"
-#include "../player.h"
-#include "../tfdefs.h"
+
+class CCommand;
+class ConCommand;
+class ConVar;
+class KeyValues;
 
 class CameraTools : public Module {
 public:
