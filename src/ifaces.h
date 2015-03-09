@@ -13,6 +13,7 @@
 #include "interface.h"
 
 class C_HLTVCamera;
+class C_TeamplayRoundBasedRules;
 class CGlobalVarsBase;
 class CSteamAPIContext;
 class IBaseClientDLL;
@@ -46,6 +47,7 @@ class Interfaces {
 		static IGameResources *GetGameResources();
 		static CGlobalVarsBase *GetGlobalVars();
 		static C_HLTVCamera *GetHLTVCamera();
+		static C_TeamplayRoundBasedRules *GetTeamplayRoundBasedRules();
 	private:
 		static CDllDemandLoader *pClientModule;
 };

@@ -10,6 +10,7 @@
 
 #include "ifaces.h"
 
+#include "cbase.h"
 #include "cdll_int.h"
 #include "engine/ivmodelinfo.h"
 #include "entitylist_base.h"
@@ -18,6 +19,7 @@
 #include "igameevents.h"
 #include "ivrenderview.h"
 #include "steam/steam_api.h"
+#include "teamplayroundbased_gamerules.h"
 #include "tier3/tier3.h"
 #include "vgui_controls/Controls.h"
 
@@ -133,6 +135,30 @@ C_HLTVCamera *Interfaces::GetHLTVCamera() {
 	return *(C_HLTVCamera**)(pointer);
 #else
 	throw bad_pointer("C_HLTVCamera");
+
+	return nullptr;
+#endif
+}
+
+C_TeamplayRoundBasedRules *Interfaces::GetTeamplayRoundBasedRules() {
+#if defined _WIN32
+	static DWORD pointer = NULL;
+
+	if (!pointer) {
+		pointer = SignatureScan("client", TEAMPLAYROUNDBASEDRULES_SIG, TEAMPLAYROUNDBASEDRULES_MASK) + TEAMPLAYROUNDBASEDRULES_OFFSET;
+
+		if (!pointer) {
+			throw bad_pointer("C_TeamplayRoundBasedRules");
+		}
+	}
+
+	if (!**(C_TeamplayRoundBasedRules***)pointer) {
+		throw bad_pointer("C_TeamplayRoundBasedRules");
+	}
+
+	return **(C_TeamplayRoundBasedRules***)(pointer);
+#else
+	throw bad_pointer("C_TeamplayRoundBasedRules");
 
 	return nullptr;
 #endif
