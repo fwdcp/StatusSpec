@@ -207,14 +207,19 @@ bool Funcs::CallFunc_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, int 
 
 void Funcs::Detour_C_BaseEntity_SetModelIndex(C_BaseEntity *instance, void *, int index) {
 	const model_t *model = Interfaces::pModelInfoClient->GetModel(index);
+	const char *oldModelName = Interfaces::pModelInfoClient->GetModelName(model);
 
 	for (auto iterator = setModelHooks.begin(); iterator != setModelHooks.end(); ++iterator) {
 		iterator->second(instance, model);
 	}
 
-	int newIndex = Interfaces::pModelInfoClient->GetModelIndex(Interfaces::pModelInfoClient->GetModelName(model));
-
-	Funcs::CallFunc_C_BaseEntity_SetModelIndex(instance, newIndex);
+	if (strcmp(oldModelName, Interfaces::pModelInfoClient->GetModelName(model)) == 0) {
+		Funcs::CallFunc_C_BaseEntity_SetModelIndex(instance, index);
+	}
+	else {
+		int newIndex = Interfaces::pModelInfoClient->GetModelIndex(Interfaces::pModelInfoClient->GetModelName(model));
+		Funcs::CallFunc_C_BaseEntity_SetModelIndex(instance, newIndex);
+	}
 }
 
 void Funcs::Detour_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, void *, const model_t *pModel) {
