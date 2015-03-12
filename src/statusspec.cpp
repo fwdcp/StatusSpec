@@ -36,6 +36,7 @@
 #include "modules/statusicons.h"
 #include "modules/teamhealthcomparison.h"
 #include "modules/teamoverrides.h"
+#include "modules/timelefttools.h"
 
 ModuleManager *g_ModuleManager = nullptr;
 
@@ -77,6 +78,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_ModuleManager->LoadModule<StatusIcons>("Status Icons");
 	g_ModuleManager->LoadModule<TeamHealthComparison>("Team Health Comparison");
 	g_ModuleManager->LoadModule<TeamOverrides>("Team Overrides");
+	g_ModuleManager->LoadModule<TimeleftTools>("Timeleft Tools");
 	
 	ConVar_Register();
 

@@ -618,6 +618,14 @@ The configuration file for the team health comparison HUD is `Resource/UI/TeamHe
 #### Console Commands
 * `statusspec_teamoverrides_switch_teams` - switch names and scores for both teams
 
+### Timeleft Tools
+*add more options to viewing timeleft*
+
+#### Console Variables
+* `statusspec_timelefttools_count_up` - count up instead of down
+* `statusspec_timelefttools_enabled` - enable timeleft tools
+* `statusspec_timelefttools_timelimit` - timelimit to use
+
 Thanks
 ------
 **bluee (MattMcNam)** - for the inspiration to do this project and for a lot of code reused from his [AdvSpec project](https://github.com/MattMcNam/advspec)
