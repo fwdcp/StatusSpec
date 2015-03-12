@@ -30,7 +30,7 @@ class C_BaseEntity;
 #include "../ifaces.h"
 #include "../player.h"
 
-class HLTVCameraOverride : public C_HLTVCamera {
+class CameraTools::HLTVCameraOverride : public C_HLTVCamera {
 public:
 	using C_HLTVCamera::m_nCameraMode;
 	using C_HLTVCamera::m_iCameraMan;

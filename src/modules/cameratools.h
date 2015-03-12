@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "convar.h"
+
 #include "../modules.h"
 
 class CCommand;
@@ -24,6 +26,8 @@ public:
 	static bool CheckDependencies(std::string name);
 private:
 	KeyValues *specguiSettings;
+
+	class HLTVCameraOverride;
 
 	ConCommand *spec_player;
 	ConVar *spec_player_alive;
