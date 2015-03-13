@@ -94,7 +94,7 @@ void LocalPlayer::SetToCurrentTarget() {
 
 	if (localPlayer) {
 		if (localPlayer.GetObserverMode() == OBS_MODE_FIXED || localPlayer.GetObserverMode() == OBS_MODE_IN_EYE || localPlayer.GetObserverMode() == OBS_MODE_CHASE) {
-			Player targetPlayer = dynamic_cast<C_BasePlayer *>(localPlayer.GetObserverTarget());
+			Player targetPlayer = localPlayer.GetObserverTarget();
 
 			if (targetPlayer) {
 				player->SetValue(targetPlayer->entindex());
