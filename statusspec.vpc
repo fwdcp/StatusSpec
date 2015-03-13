@@ -19,7 +19,7 @@ $Configuration
 	$Compiler
 	{
 		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\game\client;$SRCDIR\game\shared;$SRCDIR\public;$MMSOURCE_DEV\core\sourcehook;$MINHOOK\include;$JSONCPP"
-		$PreprocessorDefinitions			"$BASE;statusspecONLY;_MBCS;CLIENT_DLL;TF_CLIENT_DLL;TF_DLL;VERSION_SAFE_STEAM_API_INTERFACES"
+		$PreprocessorDefinitions			"$BASE;statusspecONLY;_MBCS;CLIENT_DLL;GLOWS_ENABLE;TF_CLIENT_DLL;TF_DLL;VERSION_SAFE_STEAM_API_INTERFACES"
 		$TreatWarningsAsErrors				"No (/WX-)"
 	}
 
