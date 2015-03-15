@@ -243,8 +243,17 @@ void CameraTools::SpecPlayer(const CCommand &command) {
 			Warning(e.what());
 		}
 	}
+	else if (command.ArgC() == 2 && IsInteger(command.Arg(1))) {
+		Player player = atoi(command.Arg(1));
+
+		if (player) {
+			if (!spec_player_alive->GetBool() || player.IsAlive()) {
+				Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(Interfaces::GetHLTVCamera(), player->entindex());
+			}
+		}
+	}
 	else {
-		Warning("Usage: statusspec_cameratools_spec_player <team> <position>\n");
+		Warning("Usage: statusspec_cameratools_spec_player <team> <position> || statusspec_cameratools_spec_player <index>\n");
 
 		return;
 	}
