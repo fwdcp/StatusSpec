@@ -38,7 +38,7 @@ typedef enum {
 } TFTeam;
 
 typedef enum {
-	TFCond_Slowed,
+	TFCond_Slowed = 0,
 	TFCond_Zoomed,
 	TFCond_Disguising,
 	TFCond_Disguised,
@@ -70,7 +70,7 @@ typedef enum {
 	TFCond_RegenBuffed,
 	TFCond_MarkedForDeath,
 	TFCond_NoHealingDamageBuff,
-	TFCond_SpeedBuffAlly,
+	TFCond_SpeedBuffAlly, // 32
 	TFCond_HalloweenCritCandy,
 	TFCond_CritCanteen,
 	TFCond_CritDemoCharge,
@@ -102,7 +102,7 @@ typedef enum {
 	TFCond_SmallBulletResist,
 	TFCond_SmallBlastResist,
 	TFCond_SmallFireResist,
-	TFCond_Stealthed,
+	TFCond_Stealthed, // 64
 	TFCond_MedigunDebuff,
 	TFCond_StealthedUserBuffFade,
 	TFCond_BulletImmune,
@@ -120,6 +120,22 @@ typedef enum {
 	TFCond_DodgeChance = 79,
 	TFCond_Parachute,
 	TFCond_BlastJumping,
+	TFCond_HalloweenKart,
+	TFCond_HalloweenKartDash,
+	TFCond_BalloonHead,
+	TFCond_MeleeOnly,
+	TFCond_SwimmingCurse,
+	TFCond_HalloweenKartNoTurn,
+	TFCond_HalloweenKartCage,
+	TFCond_HasRune,
+	TFCond_RuneStrength,
+	TFCond_RuneHaste,
+	TFCond_RuneRegen,
+	TFCond_RuneResist,
+	TFCond_RuneVampire,
+	TFCond_RuneWarlock,
+	TFCond_RunePrecision, // 96
+	TFCond_RuneAgility,
 } TFCond;
 
 enum {
