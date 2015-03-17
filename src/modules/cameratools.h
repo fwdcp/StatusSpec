@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "cdll_int.h"
 #include "convar.h"
 
 #include "../modules.h"
@@ -24,14 +25,23 @@ public:
 	CameraTools(std::string name);
 
 	static bool CheckDependencies(std::string name);
+
+	void FrameHook(ClientFrameStage_t curStage);
 private:
+	int frameHook;
 	KeyValues *specguiSettings;
+
+	void UpdateState();
 
 	class HLTVCameraOverride;
 
 	ConCommand *spec_player;
 	ConVar *spec_player_alive;
 	ConCommand *spec_pos;
+	ConVar *state;
+	ConVar *state_enabled;
+	void ChangeState(IConVar *var, const char *pOldValue, float flOldValue);
 	void SpecPlayer(const CCommand &command);
 	void SpecPosition(const CCommand &command);
+	void ToggleStateEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
