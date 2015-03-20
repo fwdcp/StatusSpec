@@ -28,6 +28,7 @@ public:
 
 	void FrameHook(ClientFrameStage_t curStage);
 private:
+	bool currentlyUpdating;
 	int frameHook;
 	KeyValues *specguiSettings;
 
