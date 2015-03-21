@@ -166,7 +166,7 @@ void CameraTools::FrameHook(ClientFrameStage_t curStage) {
 void CameraTools::UpdateState() {
 	std::string currentState;
 
-	if (engine->IsInGame()) {
+	if (Interfaces::pEngineClient->IsInGame()) {
 		try {
 			HLTVCameraOverride *hltvcamera = (HLTVCameraOverride *)Interfaces::GetHLTVCamera();
 
