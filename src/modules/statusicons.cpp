@@ -198,7 +198,7 @@ void StatusIcons::DisplayIcon(vgui::EditablePanel *panel, const char *iconTextur
 		icon->SetEnabled(true);
 		icon->SetVisible(true);
 
-		icon->SetImage(GetVGUITexturePath(iconTexture));
+		icon->SetImage(GetVGUITexturePath(iconTexture).c_str());
 	}
 }
 

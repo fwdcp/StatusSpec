@@ -115,11 +115,11 @@ inline std::string ConvertTreeToString(std::vector<std::string> tree) {
 	return string;
 }
 
-inline const char *GetVGUITexturePath(const char *normalTexturePath) {
+inline std::string GetVGUITexturePath(std::string normalTexturePath) {
 	std::string path = "../";
 	path += normalTexturePath;
 
-	return path.c_str();
+	return path;
 }
 
 #define PLUGIN_VERSION "0.23.1"
