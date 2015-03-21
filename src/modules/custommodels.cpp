@@ -49,7 +49,7 @@ bool CustomModels::CheckDependencies(std::string name) {
 	try {
 		Funcs::GetFunc_C_BaseEntity_SetModelIndex();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Required function C_BaseEntity::SetModelIndex for module %s not available!\n", name.c_str());
 
@@ -59,7 +59,7 @@ bool CustomModels::CheckDependencies(std::string name) {
 	try {
 		Funcs::GetFunc_C_BaseEntity_SetModelPointer();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Required function C_BaseEntity::SetModelPointer for module %s not available!\n", name.c_str());
 
