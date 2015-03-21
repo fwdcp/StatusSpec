@@ -164,47 +164,60 @@ void CameraTools::FrameHook(ClientFrameStage_t curStage) {
 }
 
 void CameraTools::UpdateState() {
-	try {
-		HLTVCameraOverride *hltvcamera = (HLTVCameraOverride *)Interfaces::GetHLTVCamera();
+	std::string currentState;
 
-		Json::Value cameraState;
-		cameraState["mode"] = hltvcamera->m_nCameraMode;
-		cameraState["camera"] = hltvcamera->m_iCameraMan;
-		cameraState["origin"]["x"] = hltvcamera->m_vCamOrigin.x;
-		cameraState["origin"]["y"] = hltvcamera->m_vCamOrigin.y;
-		cameraState["origin"]["z"] = hltvcamera->m_vCamOrigin.z;
-		cameraState["angle"]["x"] = hltvcamera->m_aCamAngle.x;
-		cameraState["angle"]["y"] = hltvcamera->m_aCamAngle.y;
-		cameraState["angle"]["z"] = hltvcamera->m_aCamAngle.z;
-		cameraState["target"][0] = hltvcamera->m_iTraget1;
-		cameraState["target"][1] = hltvcamera->m_iTraget2;
-		cameraState["fov"] = hltvcamera->m_flFOV;
-		cameraState["offset"] = hltvcamera->m_flOffset;
-		cameraState["distance"] = hltvcamera->m_flDistance;
-		cameraState["lastdistance"] = hltvcamera->m_flLastDistance;
-		cameraState["theta"] = hltvcamera->m_flTheta;
-		cameraState["phi"] = hltvcamera->m_flPhi;
-		cameraState["cmd"]["angle"]["x"] = hltvcamera->m_LastCmd.viewangles.x;
-		cameraState["cmd"]["angle"]["y"] = hltvcamera->m_LastCmd.viewangles.y;
-		cameraState["cmd"]["angle"]["z"] = hltvcamera->m_LastCmd.viewangles.z;
-		cameraState["cmd"]["buttons"]["speed"] = (hltvcamera->m_LastCmd.buttons & IN_SPEED) != 0;
-		cameraState["cmd"]["forwardmove"] = hltvcamera->m_LastCmd.forwardmove;
-		cameraState["cmd"]["sidemove"] = hltvcamera->m_LastCmd.sidemove;
-		cameraState["cmd"]["upmove"] = hltvcamera->m_LastCmd.upmove;
-		cameraState["velocity"]["x"] = hltvcamera->m_vecVelocity.x;
-		cameraState["velocity"]["y"] = hltvcamera->m_vecVelocity.y;
-		cameraState["velocity"]["z"] = hltvcamera->m_vecVelocity.z;
+	if (engine->IsInGame()) {
+		try {
+			HLTVCameraOverride *hltvcamera = (HLTVCameraOverride *)Interfaces::GetHLTVCamera();
 
-		currentlyUpdating = true;
-		state->SetValue(Json::FastWriter().write(cameraState).c_str());
-		currentlyUpdating = false;
+			Json::Value cameraState;
+			cameraState["mode"] = hltvcamera->m_nCameraMode;
+			cameraState["camera"] = hltvcamera->m_iCameraMan;
+			cameraState["origin"]["x"] = hltvcamera->m_vCamOrigin.x;
+			cameraState["origin"]["y"] = hltvcamera->m_vCamOrigin.y;
+			cameraState["origin"]["z"] = hltvcamera->m_vCamOrigin.z;
+			cameraState["angle"]["x"] = hltvcamera->m_aCamAngle.x;
+			cameraState["angle"]["y"] = hltvcamera->m_aCamAngle.y;
+			cameraState["angle"]["z"] = hltvcamera->m_aCamAngle.z;
+			cameraState["target"][0] = hltvcamera->m_iTraget1;
+			cameraState["target"][1] = hltvcamera->m_iTraget2;
+			cameraState["fov"] = hltvcamera->m_flFOV;
+			cameraState["offset"] = hltvcamera->m_flOffset;
+			cameraState["distance"] = hltvcamera->m_flDistance;
+			cameraState["lastdistance"] = hltvcamera->m_flLastDistance;
+			cameraState["theta"] = hltvcamera->m_flTheta;
+			cameraState["phi"] = hltvcamera->m_flPhi;
+			cameraState["cmd"]["angle"]["x"] = hltvcamera->m_LastCmd.viewangles.x;
+			cameraState["cmd"]["angle"]["y"] = hltvcamera->m_LastCmd.viewangles.y;
+			cameraState["cmd"]["angle"]["z"] = hltvcamera->m_LastCmd.viewangles.z;
+			cameraState["cmd"]["buttons"]["speed"] = (hltvcamera->m_LastCmd.buttons & IN_SPEED) != 0;
+			cameraState["cmd"]["forwardmove"] = hltvcamera->m_LastCmd.forwardmove;
+			cameraState["cmd"]["sidemove"] = hltvcamera->m_LastCmd.sidemove;
+			cameraState["cmd"]["upmove"] = hltvcamera->m_LastCmd.upmove;
+			cameraState["velocity"]["x"] = hltvcamera->m_vecVelocity.x;
+			cameraState["velocity"]["y"] = hltvcamera->m_vecVelocity.y;
+			cameraState["velocity"]["z"] = hltvcamera->m_vecVelocity.z;
+
+			currentState = Json::FastWriter().write(cameraState);
+		}
+		catch (bad_pointer &e) {
+			Warning("%s\n", e.what());
+		}
 	}
-	catch (bad_pointer &e) {
-		Warning(e.what());
+	else {
+		currentState = "{}";
 	}
+
+	currentlyUpdating = true;
+	state->SetValue(currentState.c_str());
+	currentlyUpdating = false;
 }
 
 void CameraTools::ChangeState(IConVar *var, const char *pOldValue, float flOldValue) {
+	if (!state_enabled->GetBool()) {
+		return;
+	}
+
 	if (currentlyUpdating) {
 		return;
 	}
