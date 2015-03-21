@@ -70,7 +70,7 @@ bool PlayerOutlines::CheckDependencies(std::string name) {
 	try {
 		Interfaces::GetClientMode();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", name.c_str());
 	}
@@ -127,7 +127,7 @@ void PlayerOutlines::FrameHook(ClientFrameStage_t curStage) {
 				doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), SH_MEMBER(this, &PlayerOutlines::DoPostScreenSpaceEffectsHook), false);
 			}
 			catch (bad_pointer &e) {
-				Warning(e.what());
+				Warning("%s\n", e.what());
 			}
 		}
 	}
@@ -347,7 +347,7 @@ void PlayerOutlines::ToggleEnabled(IConVar *var, const char *pOldValue, float fl
 				doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), SH_MEMBER(this, &PlayerOutlines::DoPostScreenSpaceEffectsHook), false);
 			}
 			catch (bad_pointer &e) {
-				Warning(e.what());
+				Warning("%s\n", e.what());
 			}
 		}
 		if (!frameHook) {

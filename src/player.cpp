@@ -521,7 +521,7 @@ bool Player::CheckDependencies() {
 	try {
 		Interfaces::GetGlobalVars();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Required interface CGlobalVarsBase for player helper class not available!\n");
 

@@ -90,7 +90,7 @@ bool CameraTools::CheckDependencies(std::string name) {
 	try {
 		Interfaces::GetGlobalVars();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Required interface CGlobalVarsBase for module %s not available!\n", name.c_str());
 
@@ -100,7 +100,7 @@ bool CameraTools::CheckDependencies(std::string name) {
 	try {
 		Funcs::GetFunc_C_HLTVCamera_SetPrimaryTarget();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Required function C_HLTVCamera::SetPrimaryTarget for module %s not available!\n", name.c_str());
 
@@ -138,7 +138,7 @@ bool CameraTools::CheckDependencies(std::string name) {
 	try {
 		Interfaces::GetClientMode();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", name.c_str());
 	}
@@ -146,7 +146,7 @@ bool CameraTools::CheckDependencies(std::string name) {
 	try {
 		Interfaces::GetHLTVCamera();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Module %s requires C_HLTVCamera, which cannot be verified at this time!\n", name.c_str());
 	}
@@ -342,7 +342,7 @@ void CameraTools::ChangeState(IConVar *var, const char *pOldValue, float flOldVa
 		update.detach();
 	}
 	catch (bad_pointer &e) {
-		Warning(e.what());
+		Warning("%s\n", e.what());
 	}
 }
 
@@ -440,7 +440,7 @@ void CameraTools::SpecPlayer(const CCommand &command) {
 			Warning("No suitable player to switch to found!\n");
 		}
 		catch (bad_pointer &e) {
-			Warning(e.what());
+			Warning("%s\n", e.what());
 		}
 	}
 	else if (command.ArgC() == 2 && IsInteger(command.Arg(1))) {
@@ -478,7 +478,7 @@ void CameraTools::SpecPosition(const CCommand &command) {
 			Interfaces::pEngineClient->SetViewAngles(hltvcamera->m_aCamAngle);
 		}
 		catch (bad_pointer &e) {
-			Warning(e.what());
+			Warning("%s\n", e.what());
 		}
 	}
 	else {

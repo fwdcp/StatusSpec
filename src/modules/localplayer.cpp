@@ -59,7 +59,7 @@ bool LocalPlayer::CheckDependencies(std::string name) {
 	try {
 		Funcs::GetFunc_GetLocalPlayerIndex();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Required function GetLocalPlayerIndex for module %s not available!\n", name.c_str());
 

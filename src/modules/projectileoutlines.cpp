@@ -70,7 +70,7 @@ bool ProjectileOutlines::CheckDependencies(std::string name) {
 	try {
 		Interfaces::GetClientMode();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", name.c_str());
 	}
@@ -163,7 +163,7 @@ void ProjectileOutlines::FrameHook(ClientFrameStage_t curStage) {
 				doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), SH_MEMBER(this, &ProjectileOutlines::DoPostScreenSpaceEffectsHook), false);
 			}
 			catch (bad_pointer &e) {
-				Warning(e.what());
+				Warning("%s\n", e.what());
 			}
 		}
 	}
@@ -275,7 +275,7 @@ void ProjectileOutlines::ToggleEnabled(IConVar *var, const char *pOldValue, floa
 				doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), SH_MEMBER(this, &ProjectileOutlines::DoPostScreenSpaceEffectsHook), false);
 			}
 			catch (bad_pointer &e) {
-				Warning(e.what());
+				Warning("%s\n", e.what());
 			}
 		}
 		if (!frameHook) {

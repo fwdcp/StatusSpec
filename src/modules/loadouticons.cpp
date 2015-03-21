@@ -152,7 +152,7 @@ bool LoadoutIcons::CheckDependencies(std::string name) {
 	try {
 		Interfaces::GetClientMode();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", name.c_str());
 	}
