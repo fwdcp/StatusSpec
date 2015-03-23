@@ -9,13 +9,13 @@ Changelog
 ---------
 
 **0.24.0**
-* camera tools
-  * add command to spectate a player by index
-  * add exposure of SourceTV camera information
 * general
   * fix issues with invalid models
   * fix compatibility with Source SDK
   * increase performance with exceptions
+* camera tools
+  * add command to spectate a player by index
+  * add exposure of SourceTV camera information
 
 **0.23.1**
 * player aliases
