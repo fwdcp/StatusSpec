@@ -10,6 +10,16 @@
 
 #include "projectileoutlines.h"
 
+#include "../common.h"
+#include "../entities.h"
+#include "../funcs.h"
+#include "../ifaces.h"
+#include "../tfdefs.h"
+
+#include "cbase.h"
+#include "c_baseentity.h"
+#include "view_shared.h"
+
 ProjectileOutlines::ProjectileOutlines(std::string name) : Module(name) {
 	colors["blu"].color = Color(88, 133, 162, 255);
 	colors["blu"].command = new ConCommand("statusspec_projectileoutlines_color_blu", [](const CCommand &command) { g_ModuleManager->GetModule<ProjectileOutlines>("Projectile Outlines")->ColorCommand(command); }, "the color used for outlines for BLU projectiles", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<ProjectileOutlines>("Projectile Outlines")->GetCurrentColor(partial, commands); });
@@ -60,7 +70,7 @@ bool ProjectileOutlines::CheckDependencies(std::string name) {
 	try {
 		Interfaces::GetClientMode();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", name.c_str());
 	}
@@ -153,7 +163,7 @@ void ProjectileOutlines::FrameHook(ClientFrameStage_t curStage) {
 				doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), SH_MEMBER(this, &ProjectileOutlines::DoPostScreenSpaceEffectsHook), false);
 			}
 			catch (bad_pointer &e) {
-				Warning(e.what());
+				Warning("%s\n", e.what());
 			}
 		}
 	}
@@ -265,7 +275,7 @@ void ProjectileOutlines::ToggleEnabled(IConVar *var, const char *pOldValue, floa
 				doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), SH_MEMBER(this, &ProjectileOutlines::DoPostScreenSpaceEffectsHook), false);
 			}
 			catch (bad_pointer &e) {
-				Warning(e.what());
+				Warning("%s\n", e.what());
 			}
 		}
 		if (!frameHook) {

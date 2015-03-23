@@ -10,6 +10,13 @@
 
 #include "fovoverride.h"
 
+#include "convar.h"
+
+#include "../common.h"
+#include "../funcs.h"
+#include "../ifaces.h"
+#include "../player.h"
+
 FOVOverride::FOVOverride(std::string name) : Module(name) {
 	frameHook = 0;
 	getFOVHook = 0;

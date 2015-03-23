@@ -10,6 +10,20 @@
 
 #include "statusicons.h"
 
+#include "convar.h"
+#include "iclientmode.h"
+#include "KeyValues.h"
+#include "tier3/tier3.h"
+#include "vgui/IPanel.h"
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/ImagePanel.h"
+#include "vgui_controls/Panel.h"
+
+#include "../common.h"
+#include "../funcs.h"
+#include "../ifaces.h"
+#include "../player.h"
+
 StatusIcons::StatusIcons(std::string name) : Module(name) {
 	frameHook = 0;
 
@@ -80,7 +94,7 @@ bool StatusIcons::CheckDependencies(std::string name) {
 	try {
 		Interfaces::GetClientMode();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", name.c_str());
 	}
@@ -184,10 +198,7 @@ void StatusIcons::DisplayIcon(vgui::EditablePanel *panel, const char *iconTextur
 		icon->SetEnabled(true);
 		icon->SetVisible(true);
 
-		std::string iconPath = "../";
-		iconPath += iconTexture;
-
-		icon->SetImage(iconPath.c_str());
+		icon->SetImage(GetVGUITexturePath(iconTexture).c_str());
 	}
 }
 

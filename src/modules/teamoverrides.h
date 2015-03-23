@@ -10,18 +10,14 @@
 
 #pragma once
 
-#include "../stdafx.h"
-
-#include <string>
-
-#include "convar.h"
-#include "igameevents.h"
-#include "KeyValues.h"
 #include "vgui/VGUI.h"
 
-#include "../common.h"
-#include "../funcs.h"
 #include "../modules.h"
+
+class ConCommand;
+class ConVar;
+class IConVar;
+class KeyValues;
 
 class TeamOverrides : public Module {
 public:

@@ -10,34 +10,39 @@
 
 #pragma once
 
-#include "../stdafx.h"
-
-#include <algorithm>
-#include <array>
-#include <vector>
-
+#include "cdll_int.h"
 #include "convar.h"
-#include "vgui/IScheme.h"
-#include "vgui_controls/EditablePanel.h"
 
-#include "../common.h"
-#include "../funcs.h"
-#include "../ifaces.h"
 #include "../modules.h"
-#include "../player.h"
-#include "../tfdefs.h"
+
+class CCommand;
+class ConCommand;
+class ConVar;
+class KeyValues;
 
 class CameraTools : public Module {
 public:
 	CameraTools(std::string name);
 
 	static bool CheckDependencies(std::string name);
+
+	void FrameHook(ClientFrameStage_t curStage);
 private:
+	bool currentlyUpdating;
+	int frameHook;
 	KeyValues *specguiSettings;
+
+	void UpdateState();
+
+	class HLTVCameraOverride;
 
 	ConCommand *spec_player;
 	ConVar *spec_player_alive;
 	ConCommand *spec_pos;
+	ConVar *state;
+	ConVar *state_enabled;
+	void ChangeState(IConVar *var, const char *pOldValue, float flOldValue);
 	void SpecPlayer(const CCommand &command);
 	void SpecPosition(const CCommand &command);
+	void ToggleStateEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };

@@ -8,6 +8,15 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**0.24.0**
+* camera tools
+  * add command to spectate a player by index
+  * add exposure of SourceTV camera information
+* general
+  * fix issues with invalid models
+  * fix compatibility with Source SDK
+  * increase performance with exceptions
+
 **0.23.1**
 * player aliases
   * fix infinite recursion
@@ -279,9 +288,12 @@ To properly support forced correct timer values, you will also have to adjust `R
 *allows more options for managing the camera*
 
 #### Console Commands
-* `statusspec_cameratools_spec_player <team> <position>` - spec a certain player
+* `statusspec_cameratools_spec_player <index>` - spec a certain player by player index
+* `statusspec_cameratools_spec_player <team> <position>` - spec a certain player by position on spectator HUD
 * `statusspec_cameratools_spec_player_alive` - prevent speccing dead players
 * `statusspec_cameratools_spec_pos <x> <y> <z> <yaw> <pitch>` - spec a certain camera position
+* `statusspec_cameratools_state` - JSON of camera tools state
+* `statusspec_cameratools_state_enabled` - enable exposure of camera tools state
 
 ### Custom Materials
 *allows materials to be swapped out*

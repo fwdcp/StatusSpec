@@ -10,16 +10,15 @@
 
 #pragma once
 
-#include "../stdafx.h"
-
-#include <map>
-#include <string>
-
 #include "../common.h"
-#include "../entities.h"
-#include "../funcs.h"
 #include "../modules.h"
-#include "../ifaces.h"
+
+class CCommand;
+class ConCommand;
+class ConVar;
+class IConVar;
+class IMaterial;
+class KeyValues;
 
 class CustomMaterials : public Module {
 public:

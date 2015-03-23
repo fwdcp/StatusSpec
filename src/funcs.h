@@ -10,40 +10,23 @@
 
 #pragma once
 
-#include "stdafx.h"
-
 #include <functional>
 #include <map>
 
-#define CLIENT_DLL
+#include "sourcehook.h"
 
-#include "cbase.h"
 #include "cdll_int.h"
-#include "hltvcamera.h"
-#include "iclientmode.h"
-#include "igameevents.h"
-#include "igameresources.h"
-#include "vgui/vgui.h"
-#include "vgui/IPanel.h"
+#include "vgui/VGUI.h"
 
-#include <sourcehook_impl.h>
-#include <sourcehook.h>
-#include <MinHook.h>
-
-#include "common.h"
-#include "exceptions.h"
 #include "gamedata.h"
-#include "ifaces.h"
 
-using namespace vgui;
+class IClientMode;
+class IGameEvent;
+class IGameEventManager2;
+class IMaterialSystem;
 
-extern SourceHook::ISourceHook *g_SHPtr;
-extern int g_PLID;
-
-class StatusSpecUnloader: public SourceHook::Impl::UnloadListener
-{
-public:
-	virtual void ReadyToUnload(SourceHook::Plugin plug);
+namespace vgui {
+	class IPanel;
 };
 
 class Funcs {
@@ -111,3 +94,5 @@ private:
 
 	static bool RemoveDetour(void *target);
 };
+
+extern SourceHook::ISourceHook *g_SHPtr;

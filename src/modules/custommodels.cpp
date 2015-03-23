@@ -10,6 +10,15 @@
 
 #include "custommodels.h"
 
+#include "convar.h"
+#include "engine/ivmodelinfo.h"
+#include "filesystem.h"
+#include "KeyValues.h"
+
+#include "../exceptions.h"
+#include "../funcs.h"
+#include "../ifaces.h"
+
 CustomModels::CustomModels(std::string name) : Module(name) {
 	modelConfig = new KeyValues("models");
 	modelConfig->LoadFromFile(Interfaces::pFileSystem, "resource/custommodels.res", "mod");
@@ -40,7 +49,7 @@ bool CustomModels::CheckDependencies(std::string name) {
 	try {
 		Funcs::GetFunc_C_BaseEntity_SetModelIndex();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Required function C_BaseEntity::SetModelIndex for module %s not available!\n", name.c_str());
 
@@ -50,7 +59,7 @@ bool CustomModels::CheckDependencies(std::string name) {
 	try {
 		Funcs::GetFunc_C_BaseEntity_SetModelPointer();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Required function C_BaseEntity::SetModelPointer for module %s not available!\n", name.c_str());
 

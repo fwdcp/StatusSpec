@@ -10,20 +10,14 @@
 
 #pragma once
 
-#include "../stdafx.h"
-
-#include <map>
-#include <string>
-
 #include "../common.h"
-#include "../entities.h"
-#include "../ifaces.h"
 #include "../modules.h"
 
-typedef struct TextureReplacement_s {
-	std::string group;
-	std::string replacement;
-} TextureReplacement_t;
+class CCommand;
+class ConCommand;
+class ConVar;
+class IConVar;
+class KeyValues;
 
 class CustomTextures : public Module {
 public:

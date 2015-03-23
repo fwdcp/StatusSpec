@@ -10,6 +10,21 @@
 
 #include "player.h"
 
+#include <cstdint>
+
+#include "cbase.h"
+#include "c_baseentity.h"
+#include "cdll_int.h"
+#include "globalvars_base.h"
+#include "icliententity.h"
+#include "icliententitylist.h"
+#include "steam/steam_api.h"
+
+#include "common.h"
+#include "entities.h"
+#include "exceptions.h"
+#include "ifaces.h"
+
 Player::Player(int entindex) {
 	playerEntity = Interfaces::pClientEntityList->GetClientEntity(entindex);
 }
@@ -224,11 +239,13 @@ bool Player::CheckCondition(TFCond condition) const {
 		uint32_t condBits = *Entities::GetEntityProp<uint32_t *>(playerEntity.Get(), { "_condition_bits" });
 		uint32_t playerCondEx = *Entities::GetEntityProp<uint32_t *>(playerEntity.Get(), { "m_nPlayerCondEx" });
 		uint32_t playerCondEx2 = *Entities::GetEntityProp<uint32_t *>(playerEntity.Get(), { "m_nPlayerCondEx2" });
+		uint32_t playerCondEx3 = *Entities::GetEntityProp<uint32_t *>(playerEntity.Get(), { "m_nPlayerCondEx3" });
 
-		uint32_t conditions[3];
+		uint32_t conditions[4];
 		conditions[0] = playerCond | condBits;
 		conditions[1] = playerCondEx;
 		conditions[2] = playerCondEx2;
+		conditions[3] = playerCondEx3;
 
 		if (condition < 32) {
 			if (conditions[0] & (1 << condition)) {
@@ -242,6 +259,11 @@ bool Player::CheckCondition(TFCond condition) const {
 		}
 		else if (condition < 96) {
 			if (conditions[2] & (1 << (condition - 64))) {
+				return true;
+			}
+		}
+		else if (condition < 128) {
+			if (conditions[3] & (1 << (condition - 96))) {
 				return true;
 			}
 		}
@@ -499,7 +521,7 @@ bool Player::CheckDependencies() {
 	try {
 		Interfaces::GetGlobalVars();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Required interface CGlobalVarsBase for player helper class not available!\n");
 
@@ -551,6 +573,13 @@ bool Player::CheckDependencies() {
 	if (!Entities::RetrieveClassPropOffset("CTFPlayer", { "m_nPlayerCondEx2" })) {
 		PRINT_TAG();
 		Warning("Required property m_nPlayerCondEx2 for CTFPlayer for player helper class not available!\n");
+
+		conditionsRetrievalAvailable = false;
+	}
+
+	if (!Entities::RetrieveClassPropOffset("CTFPlayer", { "m_nPlayerCondEx3" })) {
+		PRINT_TAG();
+		Warning("Required property m_nPlayerCondEx3 for CTFPlayer for player helper class not available!\n");
 
 		conditionsRetrievalAvailable = false;
 	}

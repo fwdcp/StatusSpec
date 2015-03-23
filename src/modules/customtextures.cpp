@@ -10,6 +10,13 @@
 
 #include "customtextures.h"
 
+#include "convar.h"
+#include "filesystem.h"
+#include "KeyValues.h"
+#include "materialsystem/imaterialsystem.h"
+
+#include "../ifaces.h"
+
 CustomTextures::CustomTextures(std::string name) : Module(name) {
 	textureConfig = new KeyValues("textures");
 	textureConfig->LoadFromFile(Interfaces::pFileSystem, "resource/customtextures.res", "mod");

@@ -10,27 +10,16 @@
 
 #pragma once
 
-#include "../stdafx.h"
-
-#include <functional>
-#include <map>
-#include <sstream>
-#include <string>
-
-#include "convar.h"
-#include "ehandle.h"
-
 #include "../common.h"
-#include "../entities.h"
-#include "../funcs.h"
-#include "../ifaces.h"
 #include "../modules.h"
-#include "../player.h"
 
-typedef struct ModelReplacement_s {
-	std::string group;
-	std::string replacement;
-} ModelReplacement_t;
+class C_BaseEntity;
+class CCommand;
+class ConCommand;
+class ConVar;
+class IConVar;
+class KeyValues;
+struct model_t;
 
 class CustomModels : public Module {
 public:

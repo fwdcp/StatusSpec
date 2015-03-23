@@ -10,18 +10,17 @@
 
 #pragma once
 
-#include "../stdafx.h"
-
 #include <map>
-#include <iomanip>
 #include <string>
 
-#include "../common.h"
-#include "../entities.h"
-#include "../ifaces.h"
+class C_BaseEntity;
+class ConVar;
+class IGameEvent;
+
+#include "cdll_int.h"
+#include "ehandle.h"
+
 #include "../modules.h"
-#include "../player.h"
-#include "../tfdefs.h"
 
 class Killstreaks : public Module {
 public:
@@ -37,7 +36,7 @@ private:
 	std::map<int, std::map<std::string, int>> currentKillstreaks;
 	int fireEventClientSideHook;
 	int frameHook;
-	EHANDLE gameResourcesEntity;
+	CHandle<C_BaseEntity> gameResourcesEntity;
 	int redTopKillstreak;
 	int redTopKillstreakPlayer;
 

@@ -10,6 +10,22 @@
 
 #include "ifaces.h"
 
+#include "cbase.h"
+#include "cdll_int.h"
+#include "engine/ivmodelinfo.h"
+#include "entitylist_base.h"
+#include "filesystem_init.h"
+#include "icliententitylist.h"
+#include "igameevents.h"
+#include "ivrenderview.h"
+#include "steam/steam_api.h"
+#include "teamplayroundbased_gamerules.h"
+#include "tier3/tier3.h"
+#include "vgui_controls/Controls.h"
+
+#include "exceptions.h"
+#include "gamedata.h"
+
 IBaseClientDLL *Interfaces::pClientDLL = nullptr;
 IClientEntityList *Interfaces::pClientEntityList = nullptr;
 CDllDemandLoader *Interfaces::pClientModule = nullptr;
@@ -17,7 +33,6 @@ IVEngineClient *Interfaces::pEngineClient = nullptr;
 IFileSystem *Interfaces::pFileSystem = nullptr;
 IGameEventManager2 *Interfaces::pGameEventManager = nullptr;
 IVModelInfoClient *Interfaces::pModelInfoClient = nullptr;
-IPlayerInfoManager *Interfaces::pPlayerInfoManager = nullptr;
 IVRenderView *Interfaces::pRenderView = nullptr;
 CSteamAPIContext *Interfaces::pSteamAPIContext = nullptr;
 
@@ -125,6 +140,30 @@ C_HLTVCamera *Interfaces::GetHLTVCamera() {
 #endif
 }
 
+C_TeamplayRoundBasedRules *Interfaces::GetTeamplayRoundBasedRules() {
+#if defined _WIN32
+	static DWORD pointer = NULL;
+
+	if (!pointer) {
+		pointer = SignatureScan("client", TEAMPLAYROUNDBASEDRULES_SIG, TEAMPLAYROUNDBASEDRULES_MASK) + TEAMPLAYROUNDBASEDRULES_OFFSET;
+
+		if (!pointer) {
+			throw bad_pointer("C_TeamplayRoundBasedRules");
+		}
+	}
+
+	if (!**(C_TeamplayRoundBasedRules***)pointer) {
+		throw bad_pointer("C_TeamplayRoundBasedRules");
+	}
+
+	return **(C_TeamplayRoundBasedRules***)(pointer);
+#else
+	throw bad_pointer("C_TeamplayRoundBasedRules");
+
+	return nullptr;
+#endif
+}
+
 void Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory) {
 	ConnectTier1Libraries(&interfaceFactory, 1);
 	ConnectTier2Libraries(&interfaceFactory, 1);
@@ -135,7 +174,6 @@ void Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 	pEngineClient = (IVEngineClient *)interfaceFactory(VENGINE_CLIENT_INTERFACE_VERSION, nullptr);
 	pGameEventManager = (IGameEventManager2 *)interfaceFactory(INTERFACEVERSION_GAMEEVENTSMANAGER2, nullptr);
 	pModelInfoClient = (IVModelInfoClient *)interfaceFactory(VMODELINFO_CLIENT_INTERFACE_VERSION, nullptr);
-	pPlayerInfoManager = (IPlayerInfoManager *)gameServerFactory(INTERFACEVERSION_PLAYERINFOMANAGER, nullptr);
 	pRenderView = (IVRenderView *)interfaceFactory(VENGINE_RENDERVIEW_INTERFACE_VERSION, nullptr);
 	
 	pClientModule = new CDllDemandLoader(CLIENT_MODULE_FILE);

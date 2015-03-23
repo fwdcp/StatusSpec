@@ -10,6 +10,18 @@
 
 #include "localplayer.h"
 
+#include <string>
+
+#include "cbase.h"
+#include "c_baseplayer.h"
+#include "convar.h"
+#include "shareddefs.h"
+
+#include "../common.h"
+#include "../funcs.h"
+#include "../ifaces.h"
+#include "../player.h"
+
 LocalPlayer::LocalPlayer(std::string name) : Module(name) {
 	frameHook = 0;
 	getLocalPlayerIndexDetoured = false;
@@ -47,7 +59,7 @@ bool LocalPlayer::CheckDependencies(std::string name) {
 	try {
 		Funcs::GetFunc_GetLocalPlayerIndex();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Required function GetLocalPlayerIndex for module %s not available!\n", name.c_str());
 

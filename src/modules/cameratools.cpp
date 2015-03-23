@@ -10,7 +10,32 @@
 
 #include "cameratools.h"
 
-class HLTVCameraOverride : public C_HLTVCamera {
+#include <thread>
+
+#include "json/json.h"
+
+class C_BaseEntity;
+#include "cbase.h"
+#include "convar.h"
+#include "filesystem.h"
+#include "globalvars_base.h"
+#include "usercmd.h"
+#include "hltvcamera.h"
+#include "icliententity.h"
+#include "iclientmode.h"
+#include "in_buttons.h"
+#include "KeyValues.h"
+#include "shareddefs.h"
+#include "tier3/tier3.h"
+#include "vgui_controls/EditablePanel.h"
+
+#include "../common.h"
+#include "../exceptions.h"
+#include "../funcs.h"
+#include "../ifaces.h"
+#include "../player.h"
+
+class CameraTools::HLTVCameraOverride : public C_HLTVCamera {
 public:
 	using C_HLTVCamera::m_nCameraMode;
 	using C_HLTVCamera::m_iCameraMan;
@@ -34,12 +59,15 @@ public:
 };
 
 CameraTools::CameraTools(std::string name) : Module(name) {
+	frameHook = 0;
 	specguiSettings = new KeyValues("Resource/UI/SpectatorTournament.res");
 	specguiSettings->LoadFromFile(Interfaces::pFileSystem, "resource/ui/spectatortournament.res", "mod");
 
 	spec_player = new ConCommand("statusspec_cameratools_spec_player", [](const CCommand &command) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->SpecPlayer(command); }, "spec a certain player", FCVAR_NONE);
 	spec_player_alive = new ConVar("statusspec_cameratools_spec_player_alive", "1", FCVAR_NONE, "prevent speccing dead players");
 	spec_pos = new ConCommand("statusspec_cameratools_spec_pos", [](const CCommand &command) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->SpecPosition(command); }, "spec a certain camera position", FCVAR_NONE);
+	state = new ConVar("statusspec_cameratools_state", "{}", FCVAR_NONE, "JSON of camera tools state", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->ChangeState(var, pOldValue, flOldValue); });
+	state_enabled = new ConVar("statusspec_cameratools_state_enabled", "0", FCVAR_NONE, "enable exposure of camera tools state", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->ToggleStateEnabled(var, pOldValue, flOldValue); });
 }
 
 bool CameraTools::CheckDependencies(std::string name) {
@@ -62,7 +90,7 @@ bool CameraTools::CheckDependencies(std::string name) {
 	try {
 		Interfaces::GetGlobalVars();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Required interface CGlobalVarsBase for module %s not available!\n", name.c_str());
 
@@ -72,7 +100,7 @@ bool CameraTools::CheckDependencies(std::string name) {
 	try {
 		Funcs::GetFunc_C_HLTVCamera_SetPrimaryTarget();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Required function C_HLTVCamera::SetPrimaryTarget for module %s not available!\n", name.c_str());
 
@@ -110,7 +138,7 @@ bool CameraTools::CheckDependencies(std::string name) {
 	try {
 		Interfaces::GetClientMode();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", name.c_str());
 	}
@@ -118,12 +146,217 @@ bool CameraTools::CheckDependencies(std::string name) {
 	try {
 		Interfaces::GetHLTVCamera();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Module %s requires C_HLTVCamera, which cannot be verified at this time!\n", name.c_str());
 	}
 
 	return ready;
+}
+
+void CameraTools::FrameHook(ClientFrameStage_t curStage) {
+	if (curStage == FRAME_START) {
+		std::thread update(std::bind(&CameraTools::UpdateState, this));
+		update.detach();
+	}
+
+	RETURN_META(MRES_IGNORED);
+}
+
+void CameraTools::UpdateState() {
+	std::string currentState;
+
+	if (Interfaces::pEngineClient->IsInGame()) {
+		try {
+			HLTVCameraOverride *hltvcamera = (HLTVCameraOverride *)Interfaces::GetHLTVCamera();
+
+			Json::Value cameraState;
+			cameraState["mode"] = hltvcamera->m_nCameraMode;
+			cameraState["camera"] = hltvcamera->m_iCameraMan;
+			cameraState["origin"]["x"] = hltvcamera->m_vCamOrigin.x;
+			cameraState["origin"]["y"] = hltvcamera->m_vCamOrigin.y;
+			cameraState["origin"]["z"] = hltvcamera->m_vCamOrigin.z;
+			cameraState["angle"]["x"] = hltvcamera->m_aCamAngle.x;
+			cameraState["angle"]["y"] = hltvcamera->m_aCamAngle.y;
+			cameraState["angle"]["z"] = hltvcamera->m_aCamAngle.z;
+			cameraState["target"][0] = hltvcamera->m_iTraget1;
+			cameraState["target"][1] = hltvcamera->m_iTraget2;
+			cameraState["fov"] = hltvcamera->m_flFOV;
+			cameraState["offset"] = hltvcamera->m_flOffset;
+			cameraState["distance"] = hltvcamera->m_flDistance;
+			cameraState["lastdistance"] = hltvcamera->m_flLastDistance;
+			cameraState["theta"] = hltvcamera->m_flTheta;
+			cameraState["phi"] = hltvcamera->m_flPhi;
+			cameraState["cmd"]["angle"]["x"] = hltvcamera->m_LastCmd.viewangles.x;
+			cameraState["cmd"]["angle"]["y"] = hltvcamera->m_LastCmd.viewangles.y;
+			cameraState["cmd"]["angle"]["z"] = hltvcamera->m_LastCmd.viewangles.z;
+			cameraState["cmd"]["buttons"]["speed"] = (hltvcamera->m_LastCmd.buttons & IN_SPEED) != 0;
+			cameraState["cmd"]["forwardmove"] = hltvcamera->m_LastCmd.forwardmove;
+			cameraState["cmd"]["sidemove"] = hltvcamera->m_LastCmd.sidemove;
+			cameraState["cmd"]["upmove"] = hltvcamera->m_LastCmd.upmove;
+			cameraState["velocity"]["x"] = hltvcamera->m_vecVelocity.x;
+			cameraState["velocity"]["y"] = hltvcamera->m_vecVelocity.y;
+			cameraState["velocity"]["z"] = hltvcamera->m_vecVelocity.z;
+
+			currentState = Json::FastWriter().write(cameraState);
+		}
+		catch (bad_pointer &e) {
+			Warning("%s\n", e.what());
+		}
+	}
+	else {
+		currentState = "{}";
+	}
+
+	currentlyUpdating = true;
+	state->SetValue(currentState.c_str());
+	currentlyUpdating = false;
+}
+
+void CameraTools::ChangeState(IConVar *var, const char *pOldValue, float flOldValue) {
+	if (!state_enabled->GetBool()) {
+		return;
+	}
+
+	if (currentlyUpdating) {
+		return;
+	}
+
+	try {
+		HLTVCameraOverride *hltvcamera = (HLTVCameraOverride *)Interfaces::GetHLTVCamera();
+
+		Json::Value newState;
+		Json::Reader().parse(state->GetString(), newState);
+
+		if (newState.isMember("mode") && newState["mode"].isInt()) {
+			hltvcamera->m_nCameraMode = newState["mode"].asInt();
+		}
+
+		if (newState.isMember("camera") && newState["camera"].isInt()) {
+			hltvcamera->m_iCameraMan = newState["camera"].asInt();
+		}
+
+		if (newState.isMember("origin") && newState["origin"].isObject()) {
+			if (newState["origin"].isMember("x") && newState["origin"]["x"].isDouble()) {
+				hltvcamera->m_vCamOrigin.x = newState["origin"]["x"].asFloat();
+			}
+
+			if (newState["origin"].isMember("y") && newState["origin"]["y"].isDouble()) {
+				hltvcamera->m_vCamOrigin.y = newState["origin"]["y"].asFloat();
+			}
+
+			if (newState["origin"].isMember("z") && newState["origin"]["z"].isDouble()) {
+				hltvcamera->m_vCamOrigin.z = newState["origin"]["z"].asFloat();
+			}
+		}
+
+		if (newState.isMember("angle") && newState["angle"].isObject()) {
+			if (newState["angle"].isMember("x") && newState["angle"]["x"].isDouble()) {
+				hltvcamera->m_aCamAngle.x = newState["angle"]["x"].asFloat();
+			}
+
+			if (newState["angle"].isMember("y") && newState["angle"]["y"].isDouble()) {
+				hltvcamera->m_aCamAngle.y = newState["angle"]["y"].asFloat();
+			}
+
+			if (newState["angle"].isMember("z") && newState["angle"]["z"].isDouble()) {
+				hltvcamera->m_aCamAngle.z = newState["angle"]["z"].asFloat();
+			}
+		}
+
+		if (newState.isMember("target") && newState["target"].isArray()) {
+			if (newState["target"].isValidIndex(0) && newState["target"][0].isInt()) {
+				hltvcamera->m_iTraget1 = newState["target"][0].asInt();
+			}
+
+			if (newState["target"].isValidIndex(1) && newState["target"][1].isInt()) {
+				hltvcamera->m_iTraget2 = newState["target"][1].asInt();
+			}
+		}
+
+		if (newState.isMember("fov") && newState["fov"].isDouble()) {
+			hltvcamera->m_flFOV = newState["fov"].asFloat();
+		}
+
+		if (newState.isMember("offset") && newState["offset"].isDouble()) {
+			hltvcamera->m_flOffset = newState["offset"].asFloat();
+		}
+
+		if (newState.isMember("distance") && newState["distance"].isDouble()) {
+			hltvcamera->m_flDistance = newState["distance"].asFloat();
+		}
+
+		if (newState.isMember("lastdistance") && newState["lastdistance"].isDouble()) {
+			hltvcamera->m_flLastDistance = newState["lastdistance"].asFloat();
+		}
+
+		if (newState.isMember("theta") && newState["theta"].isDouble()) {
+			hltvcamera->m_flTheta = newState["theta"].asFloat();
+		}
+
+		if (newState.isMember("phi") && newState["phi"].isDouble()) {
+			hltvcamera->m_flPhi = newState["phi"].asFloat();
+		}
+
+		if (newState.isMember("cmd") && newState["cmd"].isObject()) {
+			if (newState["cmd"].isMember("angle") && newState["cmd"]["angle"].isObject()) {
+				if (newState["cmd"]["angle"].isMember("x") && newState["cmd"]["angle"]["x"].isDouble()) {
+					hltvcamera->m_LastCmd.viewangles.x = newState["cmd"]["angle"]["x"].asFloat();
+				}
+
+				if (newState["cmd"]["angle"].isMember("y") && newState["cmd"]["angle"]["y"].isDouble()) {
+					hltvcamera->m_LastCmd.viewangles.y = newState["cmd"]["angle"]["y"].asFloat();
+				}
+
+				if (newState["cmd"]["angle"].isMember("z") && newState["cmd"]["angle"]["z"].isDouble()) {
+					hltvcamera->m_LastCmd.viewangles.z = newState["cmd"]["angle"]["z"].asFloat();
+				}
+			}
+
+			if (newState["cmd"].isMember("buttons") && newState["cmd"]["buttons"].isObject()) {
+				if (newState["cmd"]["buttons"].isMember("speed") && newState["cmd"]["buttons"]["speed"].isBool()) {
+					if (newState["cmd"]["buttons"]["speed"].asBool()) {
+						hltvcamera->m_LastCmd.buttons |= IN_SPEED;
+					}
+					else {
+						hltvcamera->m_LastCmd.buttons &= ~(IN_SPEED);
+					}
+				}
+			}
+
+			if (newState["cmd"].isMember("forwardmove") && newState["cmd"]["forwardmove"].isDouble()) {
+				hltvcamera->m_LastCmd.forwardmove = newState["cmd"]["forwardmove"].asFloat();
+			}
+
+			if (newState["cmd"].isMember("sidemove") && newState["cmd"]["sidemove"].isDouble()) {
+				hltvcamera->m_LastCmd.sidemove = newState["cmd"]["sidemove"].asFloat();
+			}
+
+			if (newState["cmd"].isMember("upmove") && newState["cmd"]["upmove"].isDouble()) {
+				hltvcamera->m_LastCmd.upmove = newState["cmd"]["upmove"].asFloat();
+			}
+		}
+
+		if (newState.isMember("velocity") && newState["velocity"].isObject()) {
+			if (newState["velocity"].isMember("x") && newState["velocity"]["x"].isDouble()) {
+				hltvcamera->m_vecVelocity.x = newState["velocity"]["x"].asFloat();
+			}
+
+			if (newState["velocity"].isMember("y") && newState["velocity"]["y"].isDouble()) {
+				hltvcamera->m_vecVelocity.y = newState["velocity"]["y"].asFloat();
+			}
+
+			if (newState["velocity"].isMember("z") && newState["velocity"]["z"].isDouble()) {
+				hltvcamera->m_vecVelocity.z = newState["velocity"]["z"].asFloat();
+			}
+		}
+
+		std::thread update(std::bind(&CameraTools::UpdateState, this));
+		update.detach();
+	}
+	catch (bad_pointer &e) {
+		Warning("%s\n", e.what());
+	}
 }
 
 void CameraTools::SpecPlayer(const CCommand &command) {
@@ -220,11 +453,20 @@ void CameraTools::SpecPlayer(const CCommand &command) {
 			Warning("No suitable player to switch to found!\n");
 		}
 		catch (bad_pointer &e) {
-			Warning(e.what());
+			Warning("%s\n", e.what());
+		}
+	}
+	else if (command.ArgC() == 2 && IsInteger(command.Arg(1))) {
+		Player player = atoi(command.Arg(1));
+
+		if (player) {
+			if (!spec_player_alive->GetBool() || player.IsAlive()) {
+				Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(Interfaces::GetHLTVCamera(), player->entindex());
+			}
 		}
 	}
 	else {
-		Warning("Usage: statusspec_cameratools_spec_player <team> <position>\n");
+		Warning("Usage: statusspec_cameratools_spec_player <team> <position> || statusspec_cameratools_spec_player <index>\n");
 
 		return;
 	}
@@ -249,12 +491,27 @@ void CameraTools::SpecPosition(const CCommand &command) {
 			Interfaces::pEngineClient->SetViewAngles(hltvcamera->m_aCamAngle);
 		}
 		catch (bad_pointer &e) {
-			Warning(e.what());
+			Warning("%s\n", e.what());
 		}
 	}
 	else {
 		Warning("Usage: statusspec_cameratools_spec_pos <x> <y> <z> <yaw> <pitch>\n");
 
 		return;
+	}
+}
+
+void CameraTools::ToggleStateEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
+	if (state_enabled->GetBool()) {
+		if (!frameHook) {
+			frameHook = Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, SH_MEMBER(this, &CameraTools::FrameHook), true);
+		}
+	}
+	else {
+		if (frameHook) {
+			if (Funcs::RemoveHook(frameHook)) {
+				frameHook = 0;
+			}
+		}
 	}
 }

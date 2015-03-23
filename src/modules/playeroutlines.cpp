@@ -10,6 +10,12 @@
 
 #include "playeroutlines.h"
 
+#include "../funcs.h"
+#include "../ifaces.h"
+#include "../player.h"
+
+#include "view_shared.h"
+
 PlayerOutlines::PlayerOutlines(std::string name) : Module(name) {
 	colors["blu_low"].color = Color(88, 133, 162, 255);
 	colors["blu_low"].command = new ConCommand("statusspec_playeroutlines_color_blu_low", [](const CCommand &command) { g_ModuleManager->GetModule<PlayerOutlines>("Player Outlines")->ColorCommand(command); }, "the color used for outlines for BLU team players at low health", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<PlayerOutlines>("Player Outlines")->GetCurrentColor(partial, commands); });
@@ -64,7 +70,7 @@ bool PlayerOutlines::CheckDependencies(std::string name) {
 	try {
 		Interfaces::GetClientMode();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", name.c_str());
 	}
@@ -121,7 +127,7 @@ void PlayerOutlines::FrameHook(ClientFrameStage_t curStage) {
 				doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), SH_MEMBER(this, &PlayerOutlines::DoPostScreenSpaceEffectsHook), false);
 			}
 			catch (bad_pointer &e) {
-				Warning(e.what());
+				Warning("%s\n", e.what());
 			}
 		}
 	}
@@ -341,7 +347,7 @@ void PlayerOutlines::ToggleEnabled(IConVar *var, const char *pOldValue, float fl
 				doPostScreenSpaceEffectsHook = Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(Interfaces::GetClientMode(), SH_MEMBER(this, &PlayerOutlines::DoPostScreenSpaceEffectsHook), false);
 			}
 			catch (bad_pointer &e) {
-				Warning(e.what());
+				Warning("%s\n", e.what());
 			}
 		}
 		if (!frameHook) {

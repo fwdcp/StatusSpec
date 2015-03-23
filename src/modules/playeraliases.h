@@ -10,36 +10,11 @@
 
 #pragma once
 
-#include "../stdafx.h"
-
-#include <cstdint>
-#include <map>
-#include <sstream>
-#include <string>
-
+#include "cdll_int.h"
 #include "convar.h"
+#include "steam/steam_api.h"
 
-#undef null
-#include "json/json.h"
-
-#include "../common.h"
-#include "../entities.h"
-#include "../funcs.h"
-#include "../ifaces.h"
 #include "../modules.h"
-#include "../player.h"
-#include "../tfdefs.h"
-
-#if defined _WIN32
-#define strtoull _strtoui64
-#endif
-
-#define MAX_URL_LENGTH 2048
-
-#define ESEA_PLAYER_API_URL "http://play.esea.net/index.php"
-#define ETF2L_PLAYER_API_URL "http://api.etf2l.org/player/%llu.json"
-#define TWITCH_USER_API_URL "http://api.twitch.tv/api/steam/%llu"
-#define STEAM_USER_ID_FORMAT "[U:%i:%lu]"
 
 typedef enum APIStatus_s {
 	API_UNKNOWN,

@@ -10,6 +10,28 @@
 
 #include "mediguninfo.h"
 
+#include <iomanip>
+
+#include "cbase.h"
+#include "c_baseentity.h"
+#include "convar.h"
+#include "filesystem.h"
+#include "iclientmode.h"
+#include "KeyValues.h"
+#include "shareddefs.h"
+#include "vgui_controls/AnimationController.h"
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/ImagePanel.h"
+#include "../vgui_controls/ImageProgressBar.h"
+#include "vgui_controls/ScalableImagePanel.h"
+#include "../vgui_controls/VariableLabel.h"
+
+#include "../common.h"
+#include "../entities.h"
+#include "../funcs.h"
+#include "../ifaces.h"
+#include "../player.h"
+
 MedigunInfo::MedigunInfo(std::string name) : Module(name) {
 	dynamicMeterSettings = new KeyValues("MedigunInfoDynamicMeters");
 	dynamicMeterSettings->LoadFromFile(Interfaces::pFileSystem, "resource/ui/mediguninfodynamicmeters.res", "mod");
@@ -99,7 +121,7 @@ bool MedigunInfo::CheckDependencies(std::string name) {
 	try {
 		Interfaces::GetClientMode();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", name.c_str());
 	}
@@ -431,7 +453,7 @@ void MedigunInfo::Paint() {
 		switch (medigunInfo[TFTeam_Red].type) {
 		case TFMedigun_MediGun:
 		{
-			((vgui::ImagePanel *) panels["MedigunInfoRedChargeTypeIcon"])->SetImage(VGUI_TEXTURE_UBERCHARGE);
+			((vgui::ImagePanel *) panels["MedigunInfoRedChargeTypeIcon"])->SetImage(GetVGUITexturePath(TEXTURE_UBERCHARGE).c_str());
 
 			panels["MedigunInfoRedChargeTypeIcon"]->SetVisible(true);
 
@@ -439,7 +461,7 @@ void MedigunInfo::Paint() {
 		}
 		case TFMedigun_Kritzkrieg:
 		{
-			((vgui::ImagePanel *) panels["MedigunInfoRedChargeTypeIcon"])->SetImage(VGUI_TEXTURE_CRITBOOST);
+			((vgui::ImagePanel *) panels["MedigunInfoRedChargeTypeIcon"])->SetImage(GetVGUITexturePath(TEXTURE_CRITBOOST).c_str());
 
 			panels["MedigunInfoRedChargeTypeIcon"]->SetVisible(true);
 
@@ -447,7 +469,7 @@ void MedigunInfo::Paint() {
 		}
 		case TFMedigun_QuickFix:
 		{
-			((vgui::ImagePanel *) panels["MedigunInfoRedChargeTypeIcon"])->SetImage(VGUI_TEXTURE_MEGAHEALRED);
+			((vgui::ImagePanel *) panels["MedigunInfoRedChargeTypeIcon"])->SetImage(GetVGUITexturePath(TEXTURE_MEGAHEALRED).c_str());
 
 			panels["MedigunInfoRedChargeTypeIcon"]->SetVisible(true);
 
@@ -458,7 +480,7 @@ void MedigunInfo::Paint() {
 			switch (medigunInfo[TFTeam_Red].chargeResistType) {
 			case TFResistType_Bullet:
 			{
-				((vgui::ImagePanel *) panels["MedigunInfoRedChargeTypeIcon"])->SetImage(VGUI_TEXTURE_BULLETRESISTRED);
+				((vgui::ImagePanel *) panels["MedigunInfoRedChargeTypeIcon"])->SetImage(GetVGUITexturePath(TEXTURE_BULLETRESISTRED).c_str());
 
 				panels["MedigunInfoRedChargeTypeIcon"]->SetVisible(true);
 
@@ -466,7 +488,7 @@ void MedigunInfo::Paint() {
 			}
 			case TFResistType_Explosive:
 			{
-				((vgui::ImagePanel *) panels["MedigunInfoRedChargeTypeIcon"])->SetImage(VGUI_TEXTURE_BLASTRESISTRED);
+				((vgui::ImagePanel *) panels["MedigunInfoRedChargeTypeIcon"])->SetImage(GetVGUITexturePath(TEXTURE_BLASTRESISTRED).c_str());
 
 				panels["MedigunInfoRedChargeTypeIcon"]->SetVisible(true);
 
@@ -474,7 +496,7 @@ void MedigunInfo::Paint() {
 			}
 			case TFResistType_Fire:
 			{
-				((vgui::ImagePanel *) panels["MedigunInfoRedChargeTypeIcon"])->SetImage(VGUI_TEXTURE_FIRERESISTRED);
+				((vgui::ImagePanel *) panels["MedigunInfoRedChargeTypeIcon"])->SetImage(GetVGUITexturePath(TEXTURE_FIRERESISTRED).c_str());
 
 				panels["MedigunInfoRedChargeTypeIcon"]->SetVisible(true);
 
@@ -482,7 +504,7 @@ void MedigunInfo::Paint() {
 			}
 			default:
 			{
-				((vgui::ImagePanel *) panels["MedigunInfoRedChargeTypeIcon"])->SetImage(VGUI_TEXTURE_NULL);
+				((vgui::ImagePanel *) panels["MedigunInfoRedChargeTypeIcon"])->SetImage(GetVGUITexturePath(TEXTURE_NULL).c_str());
 
 				panels["MedigunInfoRedChargeTypeIcon"]->SetVisible(false);
 
@@ -495,7 +517,7 @@ void MedigunInfo::Paint() {
 		case TFMedigun_Unknown:
 		default:
 		{
-			((vgui::ImagePanel *) panels["MedigunInfoRedChargeTypeIcon"])->SetImage(VGUI_TEXTURE_NULL);
+			((vgui::ImagePanel *) panels["MedigunInfoRedChargeTypeIcon"])->SetImage(GetVGUITexturePath(TEXTURE_NULL).c_str());
 
 			panels["MedigunInfoRedChargeTypeIcon"]->SetVisible(false);
 
@@ -512,7 +534,7 @@ void MedigunInfo::Paint() {
 		((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redcharge3", 0);
 		((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redcharge4", 0);
 		((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("redadvantage", 0);
-		((vgui::ImagePanel *) panels["MedigunInfoRedChargeTypeIcon"])->SetImage(VGUI_TEXTURE_NULL);
+		((vgui::ImagePanel *) panels["MedigunInfoRedChargeTypeIcon"])->SetImage(GetVGUITexturePath(TEXTURE_NULL).c_str());
 
 		panels["MedigunInfoRedNameLabel"]->SetVisible(false);
 		panels["MedigunInfoRedChargeMeter"]->SetVisible(false);
@@ -731,7 +753,7 @@ void MedigunInfo::Paint() {
 		switch (medigunInfo[TFTeam_Blue].type) {
 		case TFMedigun_MediGun:
 		{
-			((vgui::ImagePanel *) panels["MedigunInfoBluChargeTypeIcon"])->SetImage(VGUI_TEXTURE_UBERCHARGE);
+			((vgui::ImagePanel *) panels["MedigunInfoBluChargeTypeIcon"])->SetImage(GetVGUITexturePath(TEXTURE_UBERCHARGE).c_str());
 
 			panels["MedigunInfoBluChargeTypeIcon"]->SetVisible(true);
 
@@ -739,7 +761,7 @@ void MedigunInfo::Paint() {
 		}
 		case TFMedigun_Kritzkrieg:
 		{
-			((vgui::ImagePanel *) panels["MedigunInfoBluChargeTypeIcon"])->SetImage(VGUI_TEXTURE_CRITBOOST);
+			((vgui::ImagePanel *) panels["MedigunInfoBluChargeTypeIcon"])->SetImage(GetVGUITexturePath(TEXTURE_CRITBOOST).c_str());
 
 			panels["MedigunInfoBluChargeTypeIcon"]->SetVisible(true);
 
@@ -747,7 +769,7 @@ void MedigunInfo::Paint() {
 		}
 		case TFMedigun_QuickFix:
 		{
-			((vgui::ImagePanel *) panels["MedigunInfoBluChargeTypeIcon"])->SetImage(VGUI_TEXTURE_MEGAHEALBLU);
+			((vgui::ImagePanel *) panels["MedigunInfoBluChargeTypeIcon"])->SetImage(GetVGUITexturePath(TEXTURE_MEGAHEALBLU).c_str());
 
 			panels["MedigunInfoBluChargeTypeIcon"]->SetVisible(true);
 
@@ -758,7 +780,7 @@ void MedigunInfo::Paint() {
 			switch (medigunInfo[TFTeam_Blue].chargeResistType) {
 			case TFResistType_Bullet:
 			{
-				((vgui::ImagePanel *) panels["MedigunInfoBluChargeTypeIcon"])->SetImage(VGUI_TEXTURE_BULLETRESISTBLU);
+				((vgui::ImagePanel *) panels["MedigunInfoBluChargeTypeIcon"])->SetImage(GetVGUITexturePath(TEXTURE_BULLETRESISTBLU).c_str());
 
 				panels["MedigunInfoBluChargeTypeIcon"]->SetVisible(true);
 
@@ -766,7 +788,7 @@ void MedigunInfo::Paint() {
 			}
 			case TFResistType_Explosive:
 			{
-				((vgui::ImagePanel *) panels["MedigunInfoBluChargeTypeIcon"])->SetImage(VGUI_TEXTURE_BLASTRESISTBLU);
+				((vgui::ImagePanel *) panels["MedigunInfoBluChargeTypeIcon"])->SetImage(GetVGUITexturePath(TEXTURE_BLASTRESISTBLU).c_str());
 
 				panels["MedigunInfoBluChargeTypeIcon"]->SetVisible(true);
 
@@ -774,7 +796,7 @@ void MedigunInfo::Paint() {
 			}
 			case TFResistType_Fire:
 			{
-				((vgui::ImagePanel *) panels["MedigunInfoBluChargeTypeIcon"])->SetImage(VGUI_TEXTURE_FIRERESISTBLU);
+				((vgui::ImagePanel *) panels["MedigunInfoBluChargeTypeIcon"])->SetImage(GetVGUITexturePath(TEXTURE_FIRERESISTBLU).c_str());
 
 				panels["MedigunInfoBluChargeTypeIcon"]->SetVisible(true);
 
@@ -782,7 +804,7 @@ void MedigunInfo::Paint() {
 			}
 			default:
 			{
-				((vgui::ImagePanel *) panels["MedigunInfoBluChargeTypeIcon"])->SetImage(VGUI_TEXTURE_NULL);
+				((vgui::ImagePanel *) panels["MedigunInfoBluChargeTypeIcon"])->SetImage(GetVGUITexturePath(TEXTURE_NULL).c_str());
 
 				panels["MedigunInfoBluChargeTypeIcon"]->SetVisible(false);
 
@@ -795,7 +817,7 @@ void MedigunInfo::Paint() {
 		case TFMedigun_Unknown:
 		default:
 		{
-			((vgui::ImagePanel *) panels["MedigunInfoBluChargeTypeIcon"])->SetImage(VGUI_TEXTURE_NULL);
+			((vgui::ImagePanel *) panels["MedigunInfoBluChargeTypeIcon"])->SetImage(GetVGUITexturePath(TEXTURE_NULL).c_str());
 
 			panels["MedigunInfoBluChargeTypeIcon"]->SetVisible(false);
 
@@ -812,7 +834,7 @@ void MedigunInfo::Paint() {
 		((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("blucharge3", 0);
 		((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("blucharge4", 0);
 		((vgui::EditablePanel *) panels["MedigunInfo"])->SetDialogVariable("bluadvantage", 0);
-		((vgui::ImagePanel *) panels["MedigunInfoBluChargeTypeIcon"])->SetImage(VGUI_TEXTURE_NULL);
+		((vgui::ImagePanel *) panels["MedigunInfoBluChargeTypeIcon"])->SetImage(GetVGUITexturePath(TEXTURE_NULL).c_str());
 
 		panels["MedigunInfoBluNameLabel"]->SetVisible(false);
 		panels["MedigunInfoBluChargeMeter"]->SetVisible(false);

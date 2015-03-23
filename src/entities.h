@@ -10,22 +10,14 @@
 
 #pragma once
 
-#include "stdafx.h"
-
-#include <functional>
 #include <unordered_map>
 #include <string>
-#include <sstream>
 #include <vector>
 
-#include "cdll_client_int.h"
-#include "client_class.h"
-#include "ehandle.h"
-#include "icliententity.h"
-#include "shareddefs.h"
-
-#include "exceptions.h"
-#include "ifaces.h"
+class ClientClass;
+class IClientEntity;
+class RecvProp;
+class RecvTable;
 
 class Entities {
 public:

@@ -10,6 +10,28 @@
 
 #include "antifreeze.h"
 
+#include "cbase.h"
+#include "c_baseentity.h"
+#include "convar.h"
+#include "KeyValues.h"
+#include "icliententity.h"
+#include "icliententitylist.h"
+#include "iclientmode.h"
+#include "teamplay_round_timer.h"
+#include "tier3/tier3.h"
+#include "vgui/IPanel.h"
+#include "vgui/IVGui.h"
+#include "vgui_controls/EditablePanel.h"
+
+#include "../common.h"
+#include "../entities.h"
+#include "../exceptions.h"
+#include "../funcs.h"
+#include "../ifaces.h"
+
+#define REAL_TIME_NAME "RealTime"
+#define REGULAR_TIME_NAME "TimePanelValue"
+
 AntiFreeze::AntiFreeze(std::string name) : Module(name) {
 	bluTime = 0;
 	bluTimerPanel = vgui::INVALID_PANEL;
@@ -109,7 +131,7 @@ bool AntiFreeze::CheckDependencies(std::string name) {
 	try {
 		Interfaces::GetClientMode();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", name.c_str());
 	}

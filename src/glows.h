@@ -7,18 +7,15 @@
 
 #pragma once
 
-#define CLIENT_DLL
-
 #include <map>
 
-#include "ifaces.h"
+class CViewSetup;
+class Vector;
 
 #include "cbase.h"
-#include "mathlib/vector.h"
-
-class C_BaseEntity;
-class CViewSetup;
-class CMatRenderContextPtr;
+#include "c_baseentity.h"
+#include "ehandle.h"
+#include "materialsystem/imaterialsystem.h"
 
 class GlowManager {
 public:

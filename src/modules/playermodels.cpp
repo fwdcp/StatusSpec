@@ -10,6 +10,17 @@
 
 #include "playermodels.h"
 
+#include "cbase.h"
+#include "convar.h"
+#include "filesystem.h"
+#include "KeyValues.h"
+
+#include "../common.h"
+#include "../entities.h"
+#include "../funcs.h"
+#include "../ifaces.h"
+#include "../player.h"
+
 PlayerModels::PlayerModels(std::string name) : Module(name) {
 	modelConfig = new KeyValues("models");
 	modelConfig->LoadFromFile(Interfaces::pFileSystem, "resource/playermodels.res", "mod");
@@ -46,7 +57,7 @@ bool PlayerModels::CheckDependencies(std::string name) {
 	try {
 		Funcs::GetFunc_C_BaseEntity_SetModelIndex();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Required function C_BaseEntity::SetModelIndex for module %s not available!\n", name.c_str());
 
@@ -56,7 +67,7 @@ bool PlayerModels::CheckDependencies(std::string name) {
 	try {
 		Funcs::GetFunc_C_BaseEntity_SetModelPointer();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Required function C_BaseEntity::SetModelPointer for module %s not available!\n", name.c_str());
 

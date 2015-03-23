@@ -10,13 +10,13 @@
 
 #pragma once
 
-#include "stdafx.h"
-
 #include <string>
 
-#if defined _WIN32
+#ifdef _WIN32
 #include <Windows.h>
 #include <Psapi.h>
+#undef GetClassName
+#undef SendMessage
 #endif
 
 // DLL loading info
@@ -47,6 +47,9 @@
 #define HLTVCAMERA_SIG "\xB9\x00\x00\x00\x00\xE8\x00\x00\x00\x00\x68\x00\x00\x00\x00\xC7\x05\x00\x00\x00\x00\x00\x00\x00\x00\xC6\x05\x00\x00\x00\x00\x00"
 #define HLTVCAMERA_MASK "x????x????x????xx????xxxxxx????x"
 #define HLTVCAMERA_OFFSET 1
+#define TEAMPLAYROUNDBASEDRULES_SIG "\xA1\x00\x00\x00\x00\x85\xC0\x74\x14"
+#define TEAMPLAYROUNDBASEDRULES_MASK "x????xxxx"
+#define TEAMPLAYROUNDBASEDRULES_OFFSET 1
 #define GPGLOBALS_SIG "\xA3\x00\x00\x00\x00\x8D\x45\x08\x6A\x01"
 #define GPGLOBALS_MASK "x????xxxxx"
 #define GPGLOBALS_OFFSET 1
@@ -94,3 +97,33 @@ typedef void(__thiscall *SPT_t)(C_HLTVCamera *, int);
 typedef void(__fastcall *SMIH_t)(C_BaseEntity *, void *, int);
 typedef void(__fastcall *SMPH_t)(C_BaseEntity *, void *, const model_t *);
 #endif
+
+inline bool DataCompare(const BYTE* pData, const BYTE* bSig, const char* szMask) {
+	for (; *szMask; ++szMask, ++pData, ++bSig)
+	{
+		if (*szMask == 'x' && *pData != *bSig)
+			return false;
+	}
+
+	return (*szMask) == NULL;
+}
+
+inline DWORD FindPattern(DWORD dwAddress, DWORD dwSize, BYTE* pbSig, const char* szMask) {
+	for (DWORD i = NULL; i < dwSize; i++)
+	{
+		if (DataCompare((BYTE*)(dwAddress + i), pbSig, szMask))
+			return (DWORD)(dwAddress + i);
+	}
+
+	return 0;
+}
+
+inline DWORD SignatureScan(const char *moduleName, const char *signature, const char *mask) {
+#if defined _WIN32
+	MODULEINFO clientModInfo;
+	const HMODULE clientModule = GetHandleOfModule(moduleName);
+	GetModuleInformation(GetCurrentProcess(), clientModule, &clientModInfo, sizeof(MODULEINFO));
+
+	return FindPattern((DWORD)clientModule, clientModInfo.SizeOfImage, (PBYTE)signature, mask);
+#endif
+}

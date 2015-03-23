@@ -10,6 +10,16 @@
 
 #include "teamoverrides.h"
 
+#include "cbase.h"
+#include "convar.h"
+#include "iclientmode.h"
+#include "KeyValues.h"
+#include "tier3/tier3.h"
+#include "vgui_controls/EditablePanel.h"
+
+#include "../common.h"
+#include "../funcs.h"
+
 TeamOverrides::TeamOverrides(std::string name) : Module(name) {
 	sendMessageHook = 0;
 

@@ -10,32 +10,18 @@
 
 #pragma once
 
-#include "../stdafx.h"
+#include "cdll_int.h"
 
-#include <map>
-#include <string>
-
-#include "convar.h"
-#include "vgui/IPanel.h"
-#include "vgui/IVGui.h"
-#include "vgui_controls/Controls.h"
-#include "iclientmode.h"
-#include "vgui_controls/AnimationController.h"
-#include "vgui_controls/EditablePanel.h"
-#include "vgui_controls/Label.h"
-#include "vgui_controls/ImagePanel.h"
-#include "../vgui_controls/ImageProgressBar.h"
-#include "vgui_controls/ProgressBar.h"
-#include "vgui_controls/ScalableImagePanel.h"
-#include "../vgui_controls/VariableLabel.h"
-
-#include "../common.h"
-#include "../entities.h"
-#include "../funcs.h"
-#include "../ifaces.h"
 #include "../modules.h"
-#include "../player.h"
 #include "../tfdefs.h"
+
+class ConCommand;
+class ConVar;
+class IConVar;
+
+namespace vgui {
+	class Panel;
+}
 
 class TeamHealthComparison : public Module {
 public:

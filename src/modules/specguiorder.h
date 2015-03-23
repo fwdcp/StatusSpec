@@ -10,23 +10,17 @@
 
 #pragma once
 
-#include "../stdafx.h"
-
-#include <array>
-#include <map>
 #include <set>
-#include <string>
 
-#include "convar.h"
-#include "vgui/IPanel.h"
-#include "vgui/IScheme.h"
-#include "vgui_controls/EditablePanel.h"
+#include "cdll_int.h"
+#include "vgui/VGUI.h"
 
-#include "../common.h"
-#include "../ifaces.h"
 #include "../modules.h"
 #include "../player.h"
-#include "../tfdefs.h"
+
+class ConVar;
+class IConVar;
+class KeyValues;
 
 class SpecGUIOrder : public Module {
 public:

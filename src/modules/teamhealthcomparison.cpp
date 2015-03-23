@@ -10,6 +10,17 @@
 
 #include "teamhealthcomparison.h"
 
+#include "cbase.h"
+#include "convar.h"
+#include "iclientmode.h"
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/Panel.h"
+
+#include "../common.h"
+#include "../funcs.h"
+#include "../ifaces.h"
+#include "../player.h"
+
 TeamHealthComparison::TeamHealthComparison(std::string name) : Module(name) {
 	frameHook = 0;
 
@@ -44,7 +55,7 @@ bool TeamHealthComparison::CheckDependencies(std::string name) {
 	try {
 		Interfaces::GetClientMode();
 	}
-	catch (bad_pointer &e) {
+	catch (bad_pointer) {
 		PRINT_TAG();
 		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", name.c_str());
 	}

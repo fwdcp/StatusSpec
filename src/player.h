@@ -10,20 +10,12 @@
 
 #pragma once
 
-#include "stdafx.h"
+#include "ehandle.h"
 
-#include <algorithm>
-#include <array>
-#include <cstdint>
+class C_BaseEntity;
+class CSteamID;
+class IClientEntity;
 
-#define CLIENT_DLL
-#include "cbase.h"
-#include "c_baseentity.h"
-#include "icliententity.h"
-
-#include "entities.h"
-#include "funcs.h"
-#include "ifaces.h"
 #include "tfdefs.h"
 
 class Player {

@@ -10,9 +10,9 @@
 
 #pragma once
 
-#include "stdafx.h"
-
 #include "modules.h"
+
+#include "common.h"
 
 void ModuleManager::UnloadAllModules() {
 	for (auto iterator = modules.begin(); iterator != modules.end(); ++iterator) {

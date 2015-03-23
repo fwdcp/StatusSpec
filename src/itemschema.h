@@ -1,5 +1,5 @@
 /*
- *  statusspec.h
+ *  itemschema.h
  *  StatusSpec project
  *  
  *  Copyright (c) 2014 thesupremecommander
@@ -10,16 +10,7 @@
 
 #pragma once
 
-#include "stdafx.h"
-
-#include "ifaces.h"
-
-#include "KeyValues.h"
-#include "filesystem.h"
-
-#include <vector>
-#include <string>
-#include <sstream>
+class KeyValues;
 
 class ItemSchema {
 	public:

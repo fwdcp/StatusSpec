@@ -10,13 +10,12 @@
 
 #pragma once
 
-#include "../stdafx.h"
+class ConCommand;
+class ConVar;
 
-#include "../common.h"
-#include "../funcs.h"
-#include "../ifaces.h"
+#include "cdll_int.h"
+
 #include "../modules.h"
-#include "../player.h"
 
 class LocalPlayer : public Module {
 public:
