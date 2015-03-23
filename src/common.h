@@ -122,5 +122,5 @@ inline std::string GetVGUITexturePath(std::string normalTexturePath) {
 	return path;
 }
 
-#define PLUGIN_VERSION "0.23.1"
+#define PLUGIN_VERSION "0.24.0"
 #define PRINT_TAG() ConColorMsg(Color(0, 153, 153, 255), "[StatusSpec] ")
