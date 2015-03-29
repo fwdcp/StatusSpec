@@ -12,6 +12,7 @@
 
 #include "cdll_int.h"
 #include "convar.h"
+#include "igameevents.h"
 
 #include "../modules.h"
 
@@ -20,12 +21,13 @@ class ConCommand;
 class ConVar;
 class KeyValues;
 
-class CameraTools : public Module {
+class CameraTools : public Module, IGameEventListener2 {
 public:
 	CameraTools(std::string name);
 
 	static bool CheckDependencies(std::string name);
 
+	virtual void FireGameEvent(IGameEvent *event);
 	void FrameHook(ClientFrameStage_t curStage);
 private:
 	bool currentlyUpdating;
@@ -36,6 +38,7 @@ private:
 
 	class HLTVCameraOverride;
 
+	ConVar *killer_follow_enabled;
 	ConCommand *spec_player;
 	ConVar *spec_player_alive;
 	ConCommand *spec_pos;
@@ -44,5 +47,6 @@ private:
 	void ChangeState(IConVar *var, const char *pOldValue, float flOldValue);
 	void SpecPlayer(const CCommand &command);
 	void SpecPosition(const CCommand &command);
+	void ToggleKillerFollowEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 	void ToggleStateEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };

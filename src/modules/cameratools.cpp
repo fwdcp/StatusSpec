@@ -18,6 +18,7 @@ class C_BaseEntity;
 #include "cbase.h"
 #include "convar.h"
 #include "filesystem.h"
+#include "gameeventdefs.h"
 #include "globalvars_base.h"
 #include "usercmd.h"
 #include "hltvcamera.h"
@@ -63,6 +64,7 @@ CameraTools::CameraTools(std::string name) : Module(name) {
 	specguiSettings = new KeyValues("Resource/UI/SpectatorTournament.res");
 	specguiSettings->LoadFromFile(Interfaces::pFileSystem, "resource/ui/spectatortournament.res", "mod");
 
+	killer_follow_enabled = new ConVar("statusspec_cameratools_killer_follow_enabled", "0", FCVAR_NONE, "enables switching to the kill", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->ToggleKillerFollowEnabled(var, pOldValue, flOldValue); });
 	spec_player = new ConCommand("statusspec_cameratools_spec_player", [](const CCommand &command) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->SpecPlayer(command); }, "spec a certain player", FCVAR_NONE);
 	spec_player_alive = new ConVar("statusspec_cameratools_spec_player_alive", "1", FCVAR_NONE, "prevent speccing dead players");
 	spec_pos = new ConCommand("statusspec_cameratools_spec_pos", [](const CCommand &command) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->SpecPosition(command); }, "spec a certain camera position", FCVAR_NONE);
@@ -152,6 +154,35 @@ bool CameraTools::CheckDependencies(std::string name) {
 	}
 
 	return ready;
+}
+
+void CameraTools::FireGameEvent(IGameEvent *event) {
+	if (killer_follow_enabled->GetBool()) {
+		if (strcmp(event->GetName(), GAME_EVENT_PLAYER_DEATH) == 0) {
+			Player localPlayer = Interfaces::pEngineClient->GetLocalPlayer();
+
+			if (localPlayer) {
+				if (localPlayer.GetObserverMode() == OBS_MODE_FIXED || localPlayer.GetObserverMode() == OBS_MODE_IN_EYE || localPlayer.GetObserverMode() == OBS_MODE_CHASE) {
+					Player targetPlayer = localPlayer.GetObserverTarget();
+
+					if (targetPlayer) {
+						if (event->GetInt("userid") == targetPlayer->entindex()) {
+							Player attacker = event->GetInt("attacker");
+
+							if (attacker) {
+								try {
+									Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(Interfaces::GetHLTVCamera(), event->GetInt("attacker"));
+								}
+								catch (bad_pointer &e) {
+									Warning("%s\n", e.what());
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 void CameraTools::FrameHook(ClientFrameStage_t curStage) {
@@ -518,6 +549,19 @@ void CameraTools::SpecPosition(const CCommand &command) {
 		Warning("Usage: statusspec_cameratools_spec_pos <x> <y> <z> <yaw> <pitch>\n");
 
 		return;
+	}
+}
+
+void CameraTools::ToggleKillerFollowEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
+	if (killer_follow_enabled->GetBool()) {
+		if (!Interfaces::pGameEventManager->FindListener(this, GAME_EVENT_PLAYER_DEATH)) {
+			Interfaces::pGameEventManager->AddListener(this, GAME_EVENT_PLAYER_DEATH, false);
+		}
+	}
+	else {
+		if (Interfaces::pGameEventManager->FindListener(this, GAME_EVENT_PLAYER_DEATH)) {
+			Interfaces::pGameEventManager->RemoveListener(this);
+		}
 	}
 }
 
