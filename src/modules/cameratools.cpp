@@ -64,7 +64,7 @@ CameraTools::CameraTools(std::string name) : Module(name) {
 	specguiSettings = new KeyValues("Resource/UI/SpectatorTournament.res");
 	specguiSettings->LoadFromFile(Interfaces::pFileSystem, "resource/ui/spectatortournament.res", "mod");
 
-	killer_follow_enabled = new ConVar("statusspec_cameratools_killer_follow_enabled", "0", FCVAR_NONE, "enables switching to the kill", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->ToggleKillerFollowEnabled(var, pOldValue, flOldValue); });
+	killer_follow_enabled = new ConVar("statusspec_cameratools_killer_follow_enabled", "0", FCVAR_NONE, "enables switching to the killer upon death of spectated player", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->ToggleKillerFollowEnabled(var, pOldValue, flOldValue); });
 	spec_player = new ConCommand("statusspec_cameratools_spec_player", [](const CCommand &command) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->SpecPlayer(command); }, "spec a certain player", FCVAR_NONE);
 	spec_player_alive = new ConVar("statusspec_cameratools_spec_player_alive", "1", FCVAR_NONE, "prevent speccing dead players");
 	spec_pos = new ConCommand("statusspec_cameratools_spec_pos", [](const CCommand &command) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->SpecPosition(command); }, "spec a certain camera position", FCVAR_NONE);
