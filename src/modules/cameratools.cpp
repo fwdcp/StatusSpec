@@ -512,7 +512,12 @@ void CameraTools::SpecPlayer(const CCommand &command) {
 
 		if (player) {
 			if (!spec_player_alive->GetBool() || player.IsAlive()) {
-				Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(Interfaces::GetHLTVCamera(), player->entindex());
+				try {
+					Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(Interfaces::GetHLTVCamera(), player->entindex());
+				}
+				catch (bad_pointer &e) {
+					Warning("%s\n", e.what());
+				}
 			}
 		}
 	}
