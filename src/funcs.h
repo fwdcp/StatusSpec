@@ -46,6 +46,8 @@ public:
 	static int CallFunc_GetLocalPlayerIndex();
 	static void CallFunc_C_BaseEntity_SetModelIndex(C_BaseEntity *instance, int index);
 	static void CallFunc_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, const model_t *pModel);
+	static void CallFunc_C_HLTVCamera_SetCameraAngle(C_HLTVCamera *instance, QAngle &targetAngle);
+	static void CallFunc_C_HLTVCamera_SetMode(C_HLTVCamera *instance, int iMode);
 	static void CallFunc_C_HLTVCamera_SetPrimaryTarget(C_HLTVCamera *instance, int nEntity);
 
 	static float CallFunc_C_TFPlayer_GetFOV(C_TFPlayer *instance);
@@ -59,6 +61,8 @@ public:
 	static GLPI_t GetFunc_GetLocalPlayerIndex();
 	static SMI_t GetFunc_C_BaseEntity_SetModelIndex();
 	static SMP_t GetFunc_C_BaseEntity_SetModelPointer();
+	static SCA_t GetFunc_C_HLTVCamera_SetCameraAngle();
+	static SM_t GetFunc_C_HLTVCamera_SetMode();
 	static SPT_t GetFunc_C_HLTVCamera_SetPrimaryTarget();
 
 	static bool RemoveDetour_GetLocalPlayerIndex();

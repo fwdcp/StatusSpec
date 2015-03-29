@@ -55,6 +55,10 @@
 #define GPGLOBALS_OFFSET 1
 #define GETLOCALPLAYERINDEX_SIG "\xE8\x00\x00\x00\x00\x85\xC0\x74\x08\x8D\x48\x08\x8B\x01\xFF\x60\x24\x33\xC0\xC3"
 #define GETLOCALPLAYERINDEX_MASK "x????xxxxxxxxxxxxxxx"
+#define SETCAMERAANGLE_SIG "\x55\x8B\xEC\x8B\x45\x08\x56\x8B\xF1\x8D\x56\x00\xD9\x00\xD9\x1A\xD9\x40\x00\xD9\x5A\x00\xD9\x40\x00\x52"
+#define SETCAMERAANGLE_MASK "xxxxxxxxxxx?xxxxxx?xx?xx?x"
+#define SETMODE_SIG "\x55\x8B\xEC\x8B\x45\x08\x53\x56\x8B\xF1\x8B\x5E\x00"
+#define SETMODE_MASK "xxxxxxxxxxxx?"
 #define SETMODEL_SIG "\x55\x8B\xEC\x8B\x55\x08\x56\x57\x8B\xF9\x85\xD2"
 #define SETMODEL_MASK "xxxxxxxxxxxx"
 #define SETMODELINDEX_SIG "\x55\x8B\xEC\x8B\x45\x08\x56\x8B\xF1\x57\x66\x89\x86\x00\x00\x00\x00"
@@ -91,6 +95,8 @@ typedef IGameResources *(*GGR_t)(void);
 
 // member function types
 #if defined _WIN32
+typedef void(__thiscall *SCA_t)(C_HLTVCamera *, QAngle &);
+typedef void(__thiscall *SM_t)(C_HLTVCamera *, int);
 typedef void(__thiscall *SMI_t)(C_BaseEntity *, int);
 typedef void(__thiscall *SMP_t)(C_BaseEntity *, const model_t *);
 typedef void(__thiscall *SPT_t)(C_HLTVCamera *, int);

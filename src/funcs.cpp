@@ -173,6 +173,14 @@ void Funcs::CallFunc_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, const 
 	}
 }
 
+void Funcs::CallFunc_C_HLTVCamera_SetCameraAngle(C_HLTVCamera *instance, QAngle &targetAngle) {
+	GetFunc_C_HLTVCamera_SetCameraAngle()(instance, targetAngle);
+}
+
+void Funcs::CallFunc_C_HLTVCamera_SetMode(C_HLTVCamera *instance, int iMode) {
+	GetFunc_C_HLTVCamera_SetMode()(instance, iMode);
+}
+
 void Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(C_HLTVCamera *instance, int nEntity) {
 	GetFunc_C_HLTVCamera_SetPrimaryTarget()(instance, nEntity);
 }
@@ -285,6 +293,46 @@ SMP_t Funcs::GetFunc_C_BaseEntity_SetModelPointer() {
 	return (SMP_t)(pointer);
 #else
 	throw bad_pointer("C_BaseEntity::SetModelPointer");
+
+	return nullptr;
+#endif
+}
+
+SCA_t Funcs::GetFunc_C_HLTVCamera_SetCameraAngle() {
+#if defined _WIN32
+	static DWORD pointer = NULL;
+
+	if (!pointer) {
+		pointer = SignatureScan("client", SETCAMERAANGLE_SIG, SETCAMERAANGLE_MASK);
+
+		if (!pointer) {
+			throw bad_pointer("C_HLTVCamera::SetCameraAngle");
+		}
+	}
+
+	return (SCA_t)(pointer);
+#else
+	throw bad_pointer("C_HLTVCamera::SetCameraAngle");
+
+	return nullptr;
+#endif
+}
+
+SM_t Funcs::GetFunc_C_HLTVCamera_SetMode() {
+#if defined _WIN32
+	static DWORD pointer = NULL;
+
+	if (!pointer) {
+		pointer = SignatureScan("client", SETMODE_SIG, SETMODE_MASK);
+
+		if (!pointer) {
+			throw bad_pointer("C_HLTVCamera::SetMode");
+		}
+	}
+
+	return (SM_t)(pointer);
+#else
+	throw bad_pointer("C_HLTVCamera::SetMode");
 
 	return nullptr;
 #endif
