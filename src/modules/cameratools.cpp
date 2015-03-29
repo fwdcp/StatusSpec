@@ -166,12 +166,12 @@ void CameraTools::FireGameEvent(IGameEvent *event) {
 					Player targetPlayer = localPlayer.GetObserverTarget();
 
 					if (targetPlayer) {
-						if (event->GetInt("userid") == targetPlayer->entindex()) {
-							Player attacker = event->GetInt("attacker");
+						if (Interfaces::pEngineClient->GetPlayerForUserID(event->GetInt("userid")) == targetPlayer->entindex()) {
+							Player killer = Interfaces::pEngineClient->GetPlayerForUserID(event->GetInt("attacker"));
 
-							if (attacker) {
+							if (killer) {
 								try {
-									Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(Interfaces::GetHLTVCamera(), event->GetInt("attacker"));
+									Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(Interfaces::GetHLTVCamera(), killer->entindex());
 								}
 								catch (bad_pointer &e) {
 									Warning("%s\n", e.what());
