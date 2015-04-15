@@ -34,6 +34,7 @@
 #include "modules/projectileoutlines.h"
 #include "modules/specguiorder.h"
 #include "modules/statusicons.h"
+#include "modules/steamtools.h"
 #include "modules/teamhealthcomparison.h"
 #include "modules/teamoverrides.h"
 
@@ -75,6 +76,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_ModuleManager->LoadModule<ProjectileOutlines>("Projectile Outlines");
 	g_ModuleManager->LoadModule<SpecGUIOrder>("Spec GUI Order");
 	g_ModuleManager->LoadModule<StatusIcons>("Status Icons");
+	g_ModuleManager->LoadModule<SteamTools>("Steam Tools");
 	g_ModuleManager->LoadModule<TeamHealthComparison>("Team Health Comparison");
 	g_ModuleManager->LoadModule<TeamOverrides>("Team Overrides");
 	
