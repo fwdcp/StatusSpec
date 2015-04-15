@@ -20,6 +20,7 @@
 #include "ivrenderview.h"
 #include "steam/steam_api.h"
 #include "teamplayroundbased_gamerules.h"
+#include "toolframework/ienginetool.h"
 #include "tier3/tier3.h"
 #include "vgui_controls/Controls.h"
 
@@ -28,8 +29,8 @@
 
 IBaseClientDLL *Interfaces::pClientDLL = nullptr;
 IClientEntityList *Interfaces::pClientEntityList = nullptr;
-CDllDemandLoader *Interfaces::pClientModule = nullptr;
 IVEngineClient *Interfaces::pEngineClient = nullptr;
+IEngineTool *Interfaces::pEngineTool = nullptr;
 IFileSystem *Interfaces::pFileSystem = nullptr;
 IGameEventManager2 *Interfaces::pGameEventManager = nullptr;
 IVModelInfoClient *Interfaces::pModelInfoClient = nullptr;
@@ -92,30 +93,6 @@ IGameResources *Interfaces::GetGameResources() {
 #endif
 }
 
-CGlobalVarsBase *Interfaces::GetGlobalVars() {
-#if defined _WIN32
-	static DWORD pointer = NULL;
-
-	if (!pointer) {
-		pointer = SignatureScan("client", GPGLOBALS_SIG, GPGLOBALS_MASK) + GPGLOBALS_OFFSET;
-
-		if (!pointer) {
-			throw bad_pointer("CGlobalVarsBase");
-		}
-	}
-
-	if (!**(CGlobalVarsBase***)pointer) {
-		throw bad_pointer("CGlobalVarsBase");
-	}
-
-	return **(CGlobalVarsBase***)(pointer);
-#else
-	throw bad_pointer("CGlobalVarsBase");
-
-	return nullptr;
-#endif
-}
-
 C_HLTVCamera *Interfaces::GetHLTVCamera() {
 #if defined _WIN32
 	static DWORD pointer = NULL;
@@ -172,13 +149,13 @@ void Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 	vguiLibrariesAvailable = vgui::VGui_InitInterfacesList("statusspec", &interfaceFactory, 1);
 	
 	pEngineClient = (IVEngineClient *)interfaceFactory(VENGINE_CLIENT_INTERFACE_VERSION, nullptr);
+	pEngineTool = (IEngineTool *)interfaceFactory(VENGINETOOL_INTERFACE_VERSION, nullptr);
 	pGameEventManager = (IGameEventManager2 *)interfaceFactory(INTERFACEVERSION_GAMEEVENTSMANAGER2, nullptr);
 	pModelInfoClient = (IVModelInfoClient *)interfaceFactory(VMODELINFO_CLIENT_INTERFACE_VERSION, nullptr);
 	pRenderView = (IVRenderView *)interfaceFactory(VENGINE_RENDERVIEW_INTERFACE_VERSION, nullptr);
 	
-	pClientModule = new CDllDemandLoader(CLIENT_MODULE_FILE);
-
-	CreateInterfaceFn gameClientFactory = pClientModule->GetFactory();
+	CreateInterfaceFn gameClientFactory;
+	pEngineTool->GetClientFactory(gameClientFactory);
 	
 	pClientDLL = (IBaseClientDLL*)gameClientFactory(CLIENT_DLL_INTERFACE_VERSION, nullptr);
 	pClientEntityList = (IClientEntityList*)gameClientFactory(VCLIENTENTITYLIST_INTERFACE_VERSION, nullptr);
@@ -221,9 +198,6 @@ void Interfaces::Unload() {
 	DisconnectTier1Libraries();
 	
 	pSteamAPIContext->Clear();
-
-	pClientModule->Unload();
-	pClientModule = nullptr;
 	
 	pClientDLL = nullptr;
 	pClientEntityList = nullptr;

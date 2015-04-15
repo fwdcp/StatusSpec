@@ -19,6 +19,7 @@ class CSteamAPIContext;
 class IBaseClientDLL;
 class IClientEntityList;
 class IClientMode;
+class IEngineTool;
 class IFileSystem;
 class IGameEventManager2;
 class IGameResources;
@@ -34,6 +35,7 @@ class Interfaces {
 		static IBaseClientDLL *pClientDLL;
 		static IClientEntityList *pClientEntityList;
 		static IVEngineClient *pEngineClient;
+		static IEngineTool *pEngineTool;
 		static IFileSystem *pFileSystem;
 		static IGameEventManager2 *pGameEventManager;
 		static IVModelInfoClient *pModelInfoClient;
@@ -45,9 +47,6 @@ class Interfaces {
 
 		static IClientMode *GetClientMode();
 		static IGameResources *GetGameResources();
-		static CGlobalVarsBase *GetGlobalVars();
 		static C_HLTVCamera *GetHLTVCamera();
 		static C_TeamplayRoundBasedRules *GetTeamplayRoundBasedRules();
-	private:
-		static CDllDemandLoader *pClientModule;
 };

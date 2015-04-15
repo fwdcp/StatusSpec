@@ -28,6 +28,7 @@ class C_BaseEntity;
 #include "KeyValues.h"
 #include "shareddefs.h"
 #include "tier3/tier3.h"
+#include "toolframework/ienginetool.h"
 #include "vgui_controls/EditablePanel.h"
 
 #include "../common.h"
@@ -89,10 +90,7 @@ bool CameraTools::CheckDependencies(std::string name) {
 		ready = false;
 	}
 
-	try {
-		Interfaces::GetGlobalVars();
-	}
-	catch (bad_pointer) {
+	if (!Interfaces::pEngineTool) {
 		PRINT_TAG();
 		Warning("Required interface CGlobalVarsBase for module %s not available!\n", name.c_str());
 
@@ -669,7 +667,7 @@ void CameraTools::SpecPosition(const CCommand &command) {
 			hltvcamera->m_aCamAngle.y = atoi(command.Arg(5));
 			hltvcamera->m_iTraget1 = 0;
 			hltvcamera->m_iTraget2 = 0;
-			hltvcamera->m_flLastAngleUpdateTime = Interfaces::GetGlobalVars()->realtime;
+			hltvcamera->m_flLastAngleUpdateTime = Interfaces::pEngineTool->GetRealTime();
 
 			Interfaces::pEngineClient->SetViewAngles(hltvcamera->m_aCamAngle);
 		}
