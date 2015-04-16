@@ -78,8 +78,9 @@ CameraTools::CameraTools(std::string name) : Module(name) {
 
 	killer_follow_enabled = new ConVar("statusspec_cameratools_killer_follow_enabled", "0", FCVAR_NONE, "enables switching to the killer upon death of spectated player", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->ToggleKillerFollowEnabled(var, pOldValue, flOldValue); });
 	smooth_camera_switches_enabled = new ConVar("statusspec_cameratools_smooth_camera_switches_enabled", "0", FCVAR_NONE, "enable smooth glide to new view on camera switch", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->ToggleSmoothCameraSwitchesEnabled(var, pOldValue, flOldValue); });
-	smooth_camera_switches_max_distance = new ConVar("statusspec_cameratools_smooth_camera_switches_max_distance", "800", FCVAR_NONE, "max distance at which smoothing will be performed");
-	smooth_camera_switches_move_speed = new ConVar("statusspec_cameratools_smooth_camera_switches_move_speed", "200", FCVAR_NONE, "speed to move view per second");
+	smooth_camera_switches_max_angle_difference = new ConVar("statusspec_cameratools_smooth_camera_switches_max_angle_difference", "90", FCVAR_NONE, "max angle difference at which smoothing will be performed");
+	smooth_camera_switches_max_distance = new ConVar("statusspec_cameratools_smooth_camera_switches_max_distance", "400", FCVAR_NONE, "max distance at which smoothing will be performed");
+	smooth_camera_switches_move_speed = new ConVar("statusspec_cameratools_smooth_camera_switches_move_speed", "100", FCVAR_NONE, "speed to move view per second");
 	spec_player = new ConCommand("statusspec_cameratools_spec_player", [](const CCommand &command) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->SpecPlayer(command); }, "spec a certain player", FCVAR_NONE);
 	spec_player_alive = new ConVar("statusspec_cameratools_spec_player_alive", "1", FCVAR_NONE, "prevent speccing dead players");
 	spec_pos = new ConCommand("statusspec_cameratools_spec_pos", [](const CCommand &command) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->SpecPosition(command); }, "spec a certain camera position", FCVAR_NONE);
@@ -262,7 +263,13 @@ bool CameraTools::SetupEngineViewOverride(Vector &origin, QAngle &angles, float 
 			smoothEndMode = hltvcamera->m_nCameraMode;
 			smoothEndTarget = hltvcamera->m_iTraget1;
 
-			smoothInProgress = smoothLastOrigin.DistTo(hltvcamera->m_vCamOrigin) <= smooth_camera_switches_max_distance->GetFloat();
+			Vector moveVector = origin - smoothLastOrigin;
+			Vector currentAngleVector(smoothLastAngles.x, smoothLastAngles.y, smoothLastAngles.z);
+			Vector targetAngleVector(angles.x, angles.y, angles.z);
+
+			float angle = acos(currentAngleVector.Dot(targetAngleVector) / (currentAngleVector.Length() * targetAngleVector.Length())) * 180.f / 3.14159265358979323846f;
+
+			smoothInProgress = moveVector.Length() < smooth_camera_switches_max_distance->GetFloat() && angle < smooth_camera_switches_max_angle_difference->GetFloat();
 		}
 	}
 	else {
@@ -273,8 +280,12 @@ bool CameraTools::SetupEngineViewOverride(Vector &origin, QAngle &angles, float 
 		float moveDistance = smooth_camera_switches_move_speed->GetFloat() * (Interfaces::pEngineTool->GetRealTime() - smoothLastTime);
 		
 		Vector moveVector = origin - smoothLastOrigin;
+		Vector currentAngleVector(smoothLastAngles.x, smoothLastAngles.y, smoothLastAngles.z);
+		Vector targetAngleVector(angles.x, angles.y, angles.z);
 
-		if (moveDistance < moveVector.Length() && moveVector.Length() < smooth_camera_switches_max_distance->GetFloat()) {
+		float angle = acos(currentAngleVector.Dot(targetAngleVector) / (currentAngleVector.Length() * targetAngleVector.Length())) * 180.f / 3.14159265358979323846f;
+
+		if (moveDistance < moveVector.Length() && moveVector.Length() < smooth_camera_switches_max_distance->GetFloat() && angle < smooth_camera_switches_max_angle_difference->GetFloat()) {
 			float movePercentage = moveDistance / moveVector.Length();
 
 			moveVector *= movePercentage;
@@ -285,7 +296,7 @@ bool CameraTools::SetupEngineViewOverride(Vector &origin, QAngle &angles, float 
 			smoothLastAngles.y = smoothLastAngles.y + ((angles.y - smoothLastAngles.y) * movePercentage);
 			smoothLastAngles.z = smoothLastAngles.z + ((angles.z - smoothLastAngles.z) * movePercentage);
 
-			hltvcamera->m_aCamAngle = smoothLastAngles;
+			Funcs::CallFunc_C_HLTVCamera_SetCameraAngle(hltvcamera, smoothLastAngles);
 			hltvcamera->m_vCamOrigin = smoothLastOrigin;
 
 			origin = smoothLastOrigin;
@@ -298,8 +309,8 @@ bool CameraTools::SetupEngineViewOverride(Vector &origin, QAngle &angles, float 
 	smoothEndMode = hltvcamera->m_nCameraMode;
 	smoothEndTarget = hltvcamera->m_iTraget1;
 	smoothInProgress = false;
-	smoothLastAngles = hltvcamera->m_aCamAngle;
-	smoothLastOrigin = hltvcamera->m_vCamOrigin;
+	smoothLastAngles = angles;
+	smoothLastOrigin = origin;
 	smoothLastTime = Interfaces::pEngineTool->GetRealTime();
 
 	RETURN_META_VALUE(MRES_IGNORED, false);

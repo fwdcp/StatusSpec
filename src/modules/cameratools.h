@@ -53,6 +53,7 @@ private:
 
 	ConVar *killer_follow_enabled;
 	ConVar *smooth_camera_switches_enabled;
+	ConVar *smooth_camera_switches_max_angle_difference;
 	ConVar *smooth_camera_switches_max_distance;
 	ConVar *smooth_camera_switches_move_speed;
 	ConCommand *spec_player;
