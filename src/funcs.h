@@ -20,6 +20,7 @@
 
 #include "gamedata.h"
 
+class IClientEngineTools;
 class IClientMode;
 class IGameEvent;
 class IGameEventManager2;
@@ -33,10 +34,13 @@ class Funcs {
 public:
 	static bool AddDetour_GetLocalPlayerIndex(GLPI_t detour);
 
-	static int AddGlobalHook_C_TFPlayer_GetFOV(C_TFPlayer *instance, fastdelegate::FastDelegate0<float> hook, bool post);
 	static int AddHook_C_BaseEntity_SetModel(std::function<void(C_BaseEntity *, const model_t *&)> hook);
-	static int AddHook_C_HLTVCamera_CalcView(std::function<void(C_HLTVCamera *, Vector &, QAngle &, float &)> hook);
+
+	static int AddGlobalHook_C_TFPlayer_GetFOV(C_TFPlayer *instance, fastdelegate::FastDelegate0<float> hook, bool post);
 	static int AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, fastdelegate::FastDelegate1<ClientFrameStage_t> hook, bool post);
+	static int AddHook_IClientEngineTools_InToolMode(IClientEngineTools *instance, fastdelegate::FastDelegate0<bool> hook, bool post);
+	static int AddHook_IClientEngineTools_IsThirdPersonCamera(IClientEngineTools *instance, fastdelegate::FastDelegate0<bool> hook, bool post);
+	static int AddHook_IClientEngineTools_SetupEngineView(IClientEngineTools *instance, fastdelegate::FastDelegate3<Vector &, QAngle &, float &, bool> hook, bool post);
 	static int AddHook_IClientMode_DoPostScreenSpaceEffects(IClientMode *instance, fastdelegate::FastDelegate1<const CViewSetup *, bool> hook, bool post);
 	static int AddHook_IGameEventManager2_FireEventClientSide(IGameEventManager2 *instance, fastdelegate::FastDelegate1<IGameEvent *, bool> hook, bool post);
 	static int AddHook_IMaterialSystem_FindMaterial(IMaterialSystem *instance, fastdelegate::FastDelegate4<char const *, const char *, bool, const char *, IMaterial *> hook, bool post);
@@ -47,7 +51,6 @@ public:
 	static int CallFunc_GetLocalPlayerIndex();
 	static void CallFunc_C_BaseEntity_SetModelIndex(C_BaseEntity *instance, int index);
 	static void CallFunc_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, const model_t *pModel);
-	static void CallFunc_C_HLTVCamera_CalcView(C_HLTVCamera *instance, Vector &origin, QAngle &angles, float &fov);
 	static void CallFunc_C_HLTVCamera_SetCameraAngle(C_HLTVCamera *instance, QAngle &targetAngle);
 	static void CallFunc_C_HLTVCamera_SetMode(C_HLTVCamera *instance, int iMode);
 	static void CallFunc_C_HLTVCamera_SetPrimaryTarget(C_HLTVCamera *instance, int nEntity);
@@ -63,16 +66,15 @@ public:
 	static GLPI_t GetFunc_GetLocalPlayerIndex();
 	static SMI_t GetFunc_C_BaseEntity_SetModelIndex();
 	static SMP_t GetFunc_C_BaseEntity_SetModelPointer();
-	static HLTVCV_t Funcs::GetFunc_C_HLTVCamera_CalcView();
 	static SCA_t GetFunc_C_HLTVCamera_SetCameraAngle();
 	static SM_t GetFunc_C_HLTVCamera_SetMode();
 	static SPT_t GetFunc_C_HLTVCamera_SetPrimaryTarget();
 
 	static bool RemoveDetour_GetLocalPlayerIndex();
 
-	static bool RemoveHook(int hookID);
 	static void RemoveHook_C_BaseEntity_SetModel(int hookID);
-	static void RemoveHook_C_HLTVCamera_CalcView(int hookID);
+
+	static bool RemoveHook(int hookID);
 
 	static bool Load();
 
@@ -82,13 +84,10 @@ public:
 
 	static bool Unpause();
 private:
-	static int hltvcameraCalcViewLastHookRegistered;
-	static std::map<int, std::function<void(C_HLTVCamera *, Vector &, QAngle &, float &)>> hltvcameraCalcViewHooks;
 	static int setModelLastHookRegistered;
 	static std::map<int, std::function<void(C_BaseEntity *, const model_t *&)>> setModelHooks;
 
 	static GLPI_t getLocalPlayerIndexOriginal;
-	static HLTVCV_t hltvcameraCalcViewOriginal;
 	static SMI_t setModelIndexOriginal;
 	static SMP_t setModelPointerOriginal;
 
@@ -96,15 +95,12 @@ private:
 
 	static bool AddDetour_C_BaseEntity_SetModelIndex(SMIH_t detour);
 	static bool AddDetour_C_BaseEntity_SetModelPointer(SMPH_t detour);
-	static bool AddDetour_C_HLTVCamera_CalcView(HLTVCVH_t detour);
 
 	static void __fastcall Detour_C_BaseEntity_SetModelIndex(C_BaseEntity *, void *, int);
 	static void __fastcall Detour_C_BaseEntity_SetModelPointer(C_BaseEntity *, void *, const model_t *);
-	static void __fastcall Detour_C_HLTVCamera_CalcView(C_HLTVCamera *, Vector &, QAngle &, float &);
 
 	static bool RemoveDetour_C_BaseEntity_SetModelIndex();
 	static bool RemoveDetour_C_BaseEntity_SetModelPointer();
-	static bool RemoveDetour_C_HLTVCamera_CalcView();
 
 	static bool RemoveDetour(void *target);
 };

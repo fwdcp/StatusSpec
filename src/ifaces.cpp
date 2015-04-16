@@ -20,6 +20,7 @@
 #include "ivrenderview.h"
 #include "steam/steam_api.h"
 #include "teamplayroundbased_gamerules.h"
+#include "toolframework/iclientenginetools.h"
 #include "toolframework/ienginetool.h"
 #include "tier3/tier3.h"
 #include "vgui_controls/Controls.h"
@@ -28,6 +29,7 @@
 #include "gamedata.h"
 
 IBaseClientDLL *Interfaces::pClientDLL = nullptr;
+IClientEngineTools *Interfaces::pClientEngineTools = nullptr;
 IClientEntityList *Interfaces::pClientEntityList = nullptr;
 IVEngineClient *Interfaces::pEngineClient = nullptr;
 IEngineTool *Interfaces::pEngineTool = nullptr;
@@ -148,6 +150,7 @@ void Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 	
 	vguiLibrariesAvailable = vgui::VGui_InitInterfacesList("statusspec", &interfaceFactory, 1);
 	
+	pClientEngineTools = (IClientEngineTools *)interfaceFactory(VCLIENTENGINETOOLS_INTERFACE_VERSION, nullptr);
 	pEngineClient = (IVEngineClient *)interfaceFactory(VENGINE_CLIENT_INTERFACE_VERSION, nullptr);
 	pEngineTool = (IEngineTool *)interfaceFactory(VENGINETOOL_INTERFACE_VERSION, nullptr);
 	pGameEventManager = (IGameEventManager2 *)interfaceFactory(INTERFACEVERSION_GAMEEVENTSMANAGER2, nullptr);

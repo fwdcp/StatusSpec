@@ -31,21 +31,22 @@ public:
 	virtual void FireGameEvent(IGameEvent *event);
 	void FrameHook(ClientFrameStage_t curStage);
 private:
-	int calcViewHook;
 	bool currentlyUpdating;
 	int frameHook;
-	QAngle smoothCurrentAngles;
-	Vector smoothCurrentPosition;
+	int inToolModeHook;
+	int isThirdPersonCameraHook;
+	int setupEngineViewHook;
 	int smoothEndMode;
 	int smoothEndTarget;
-	float smoothEndTime;
 	bool smoothInProgress;
-	QAngle smoothStartAngles;
-	Vector smoothStartPosition;
-	float smoothStartTime;
+	QAngle smoothLastAngles;
+	Vector smoothLastOrigin;
+	float smoothLastTime;
 	KeyValues *specguiSettings;
 
-	void CalcViewOverride(C_HLTVCamera *instance, Vector &origin, QAngle &angles, float &fov);
+	bool InToolModeOverride();
+	bool IsThirdPersonCameraOverride();
+	bool SetupEngineViewOverride(Vector &origin, QAngle &angles, float &fov);
 	void UpdateState();
 
 	class HLTVCameraOverride;
@@ -53,7 +54,7 @@ private:
 	ConVar *killer_follow_enabled;
 	ConVar *smooth_camera_switches_enabled;
 	ConVar *smooth_camera_switches_max_distance;
-	ConVar *smooth_camera_switches_time;
+	ConVar *smooth_camera_switches_move_speed;
 	ConCommand *spec_player;
 	ConVar *spec_player_alive;
 	ConCommand *spec_pos;
