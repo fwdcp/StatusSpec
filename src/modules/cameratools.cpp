@@ -62,12 +62,25 @@ public:
 };
 
 CameraTools::CameraTools(std::string name) : Module(name) {
+	calcViewHook = 0;
 	currentlyUpdating = false;
 	frameHook = 0;
+	smoothCurrentAngles = QAngle();
+	smoothCurrentPosition = Vector();
+	smoothEndMode = OBS_MODE_NONE;
+	smoothEndTarget = 0;
+	smoothEndTime = 0;
+	smoothInProgress = false;
+	smoothStartAngles = QAngle();
+	smoothStartPosition = Vector();
+	smoothStartTime = 0;
 	specguiSettings = new KeyValues("Resource/UI/SpectatorTournament.res");
 	specguiSettings->LoadFromFile(Interfaces::pFileSystem, "resource/ui/spectatortournament.res", "mod");
 
 	killer_follow_enabled = new ConVar("statusspec_cameratools_killer_follow_enabled", "0", FCVAR_NONE, "enables switching to the killer upon death of spectated player", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->ToggleKillerFollowEnabled(var, pOldValue, flOldValue); });
+	smooth_camera_switches_enabled = new ConVar("statusspec_cameratools_smooth_camera_switches_enabled", "0", FCVAR_NONE, "enable smooth glide to new view on camera switch", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->ToggleSmoothCameraSwitchesEnabled(var, pOldValue, flOldValue); });
+	smooth_camera_switches_max_distance = new ConVar("statusspec_cameratools_smooth_camera_switches_max_distance", "400", FCVAR_NONE, "max distance at which smoothing will be performed");
+	smooth_camera_switches_time = new ConVar("statusspec_cameratools_smooth_camera_switches_time", "1", FCVAR_NONE, "seconds to smooth between views");
 	spec_player = new ConCommand("statusspec_cameratools_spec_player", [](const CCommand &command) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->SpecPlayer(command); }, "spec a certain player", FCVAR_NONE);
 	spec_player_alive = new ConVar("statusspec_cameratools_spec_player_alive", "1", FCVAR_NONE, "prevent speccing dead players");
 	spec_pos = new ConCommand("statusspec_cameratools_spec_pos", [](const CCommand &command) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->SpecPosition(command); }, "spec a certain camera position", FCVAR_NONE);
@@ -95,6 +108,16 @@ bool CameraTools::CheckDependencies(std::string name) {
 	if (!Interfaces::pEngineTool) {
 		PRINT_TAG();
 		Warning("Required interface CGlobalVarsBase for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	try {
+		Funcs::GetFunc_C_HLTVCamera_CalcView();
+	}
+	catch (bad_pointer) {
+		PRINT_TAG();
+		Warning("Required function C_HLTVCamera::CalcView for module %s not available!\n", name.c_str());
 
 		ready = false;
 	}
@@ -212,6 +235,66 @@ void CameraTools::FrameHook(ClientFrameStage_t curStage) {
 	}
 
 	RETURN_META(MRES_IGNORED);
+}
+
+void CameraTools::CalcViewOverride(C_HLTVCamera *instance, Vector &origin, QAngle &angles, float &fov) {
+	/* HLTVCameraOverride *hltvcamera = (HLTVCameraOverride *)instance;
+
+	Funcs::CallFunc_C_HLTVCamera_CalcView(instance, hltvcamera->m_vCamOrigin, hltvcamera->m_aCamAngle, hltvcamera->m_flFOV);
+
+	if (hltvcamera->m_nCameraMode == OBS_MODE_IN_EYE || hltvcamera->m_nCameraMode == OBS_MODE_CHASE) {
+		if (hltvcamera->m_iTraget1 != smoothEndTarget || (hltvcamera->m_nCameraMode != smoothEndMode && !smoothInProgress)) {
+			if (smoothInProgress) {
+				smoothStartAngles = smoothCurrentAngles;
+				smoothStartPosition = smoothCurrentPosition;
+			}
+			else {
+				smoothStartAngles = hltvcamera->m_aCamAngle;
+				smoothStartPosition = hltvcamera->m_vCamOrigin;
+			}
+
+			smoothStartTime = Interfaces::pEngineTool->GetRealFrameTime();
+			smoothEndMode = hltvcamera->m_nCameraMode;
+			smoothEndTarget = hltvcamera->m_iTraget1;
+			smoothEndTime = Interfaces::pEngineTool->GetRealFrameTime() + smooth_camera_switches_time->GetFloat();
+
+			smoothInProgress = smoothStartPosition.DistTo(hltvcamera->m_vCamOrigin) <= smooth_camera_switches_max_distance->GetFloat();
+		}
+	}
+	else {
+		smoothInProgress = false;
+	}
+
+	if (smoothInProgress && Interfaces::pEngineTool->GetRealFrameTime() < smoothEndTime) {
+		float time = Interfaces::pEngineTool->GetRealFrameTime();
+
+		smoothCurrentAngles.x = smoothStartAngles.x + ((hltvcamera->m_aCamAngle.x - smoothStartAngles.x) * ((Interfaces::pEngineTool->GetRealFrameTime() - smoothStartTime) / (smoothEndTime - smoothStartTime)));
+		smoothCurrentAngles.y = smoothStartAngles.y + ((hltvcamera->m_aCamAngle.y - smoothStartAngles.y) * ((Interfaces::pEngineTool->GetRealFrameTime() - smoothStartTime) / (smoothEndTime - smoothStartTime)));
+		smoothCurrentAngles.z = smoothStartAngles.z + ((hltvcamera->m_aCamAngle.z - smoothStartAngles.z) * ((Interfaces::pEngineTool->GetRealFrameTime() - smoothStartTime) / (smoothEndTime - smoothStartTime)));
+		smoothCurrentPosition.x = smoothStartPosition.x + ((hltvcamera->m_vCamOrigin.x - smoothStartPosition.x) * ((Interfaces::pEngineTool->GetRealFrameTime() - smoothStartTime) / (smoothEndTime - smoothStartTime)));
+		smoothCurrentPosition.y = smoothStartPosition.y + ((hltvcamera->m_vCamOrigin.y - smoothStartPosition.y) * ((Interfaces::pEngineTool->GetRealFrameTime() - smoothStartTime) / (smoothEndTime - smoothStartTime)));
+		smoothCurrentPosition.z = smoothStartPosition.z + ((hltvcamera->m_vCamOrigin.z - smoothStartPosition.z) * ((Interfaces::pEngineTool->GetRealFrameTime() - smoothStartTime) / (smoothEndTime - smoothStartTime)));
+
+		hltvcamera->m_aCamAngle = smoothCurrentAngles;
+		hltvcamera->m_vCamOrigin = smoothCurrentPosition;
+	}
+	else {
+		smoothCurrentAngles = hltvcamera->m_aCamAngle;
+		smoothCurrentPosition = hltvcamera->m_vCamOrigin;
+		smoothEndMode = hltvcamera->m_nCameraMode;
+		smoothEndTarget = hltvcamera->m_iTraget1;
+		smoothEndTime = Interfaces::pEngineTool->GetRealFrameTime();
+		smoothInProgress = false;
+		smoothStartAngles = hltvcamera->m_aCamAngle;
+		smoothStartPosition = hltvcamera->m_vCamOrigin;
+		smoothStartTime = Interfaces::pEngineTool->GetRealFrameTime();
+	}
+
+	origin = smoothCurrentPosition;
+	angles = smoothCurrentAngles;
+	fov = hltvcamera->m_flFOV; */
+
+	Funcs::CallFunc_C_HLTVCamera_CalcView(instance, origin, angles, fov);
 }
 
 void CameraTools::UpdateState() {
@@ -713,6 +796,20 @@ void CameraTools::ToggleKillerFollowEnabled(IConVar *var, const char *pOldValue,
 	else {
 		if (Interfaces::pGameEventManager->FindListener(this, GAME_EVENT_PLAYER_DEATH)) {
 			Interfaces::pGameEventManager->RemoveListener(this);
+		}
+	}
+}
+
+void CameraTools::ToggleSmoothCameraSwitchesEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
+	if (smooth_camera_switches_enabled->GetBool()) {
+		if (!calcViewHook) {
+			calcViewHook = Funcs::AddHook_C_HLTVCamera_CalcView(std::bind(&CameraTools::CalcViewOverride, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
+		}
+	}
+	else {
+		if (calcViewHook) {
+			Funcs::RemoveHook_C_HLTVCamera_CalcView(calcViewHook);
+			calcViewHook = 0;
 		}
 	}
 }

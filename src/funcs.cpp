@@ -51,10 +51,13 @@ SH_DECL_HOOK3_void(IPanel, SendMessage, SH_NOATTRIB, 0, VPANEL, KeyValues *, VPA
 SH_DECL_HOOK3_void(IPanel, SetPos, SH_NOATTRIB, 0, VPANEL, int, int);
 SH_DECL_HOOK2(IVEngineClient, GetPlayerInfo, SH_NOATTRIB, 0, bool, int, player_info_t *);
 
+int Funcs::hltvcameraCalcViewLastHookRegistered = 0;
+std::map<int, std::function<void(C_HLTVCamera *, Vector &, QAngle &, float &)>> Funcs::hltvcameraCalcViewHooks;
 int Funcs::setModelLastHookRegistered = 0;
 std::map<int, std::function<void(C_BaseEntity *, const model_t *&)>> Funcs::setModelHooks;
 
 GLPI_t Funcs::getLocalPlayerIndexOriginal = nullptr;
+HLTVCV_t Funcs::hltvcameraCalcViewOriginal = nullptr;
 SMI_t Funcs::setModelIndexOriginal = nullptr;
 SMP_t Funcs::setModelPointerOriginal = nullptr;
 
@@ -103,6 +106,17 @@ bool Funcs::AddDetour_C_BaseEntity_SetModelPointer(SMPH_t detour) {
 	return false;
 }
 
+bool Funcs::AddDetour_C_HLTVCamera_CalcView(HLTVCVH_t detour) {
+	void *original;
+
+	if (AddDetour(GetFunc_C_HLTVCamera_CalcView(), detour, original)) {
+		hltvcameraCalcViewOriginal = reinterpret_cast<HLTVCV_t>(original);
+		return true;
+	}
+
+	return false;
+}
+
 int Funcs::AddGlobalHook_C_TFPlayer_GetFOV(C_TFPlayer *instance, fastdelegate::FastDelegate0<float> hook, bool post) {
 	return SH_ADD_MANUALHOOK(C_TFPlayer_GetFOV, instance, hook, post);
 }
@@ -116,6 +130,16 @@ int Funcs::AddHook_C_BaseEntity_SetModel(std::function<void(C_BaseEntity *, cons
 	setModelHooks[++setModelLastHookRegistered] = hook;
 
 	return setModelLastHookRegistered;
+}
+
+int Funcs::AddHook_C_HLTVCamera_CalcView(std::function<void(C_HLTVCamera *, Vector &, QAngle &, float &)> hook) {
+	if (hltvcameraCalcViewHooks.size() == 0) {
+		AddDetour_C_HLTVCamera_CalcView(Detour_C_HLTVCamera_CalcView);
+	}
+
+	hltvcameraCalcViewHooks[++hltvcameraCalcViewLastHookRegistered] = hook;
+
+	return hltvcameraCalcViewLastHookRegistered;
 }
 
 int Funcs::AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, fastdelegate::FastDelegate1<ClientFrameStage_t> hook, bool post) {
@@ -170,6 +194,15 @@ void Funcs::CallFunc_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, const 
 	}
 	else {
 		GetFunc_C_BaseEntity_SetModelPointer()(instance, pModel);
+	}
+}
+
+void Funcs::CallFunc_C_HLTVCamera_CalcView(C_HLTVCamera *instance, Vector &origin, QAngle &angles, float &fov) {
+	if (hltvcameraCalcViewOriginal) {
+		hltvcameraCalcViewOriginal(instance, origin, angles, fov);
+	}
+	else {
+		GetFunc_C_HLTVCamera_CalcView()(instance, origin, angles, fov);
 	}
 }
 
@@ -238,6 +271,12 @@ void Funcs::Detour_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, void *, 
 	Funcs::CallFunc_C_BaseEntity_SetModelPointer(instance, pModel);
 }
 
+void Funcs::Detour_C_HLTVCamera_CalcView(C_HLTVCamera *instance, Vector &origin, QAngle &angles, float &fov) {
+	for (auto iterator = hltvcameraCalcViewHooks.begin(); iterator != hltvcameraCalcViewHooks.end(); ++iterator) {
+		iterator->second(instance, origin, angles, fov);
+	}
+}
+
 GLPI_t Funcs::GetFunc_GetLocalPlayerIndex() {
 #if defined _WIN32
 	static DWORD pointer = NULL;
@@ -293,6 +332,26 @@ SMP_t Funcs::GetFunc_C_BaseEntity_SetModelPointer() {
 	return (SMP_t)(pointer);
 #else
 	throw bad_pointer("C_BaseEntity::SetModelPointer");
+
+	return nullptr;
+#endif
+}
+
+HLTVCV_t Funcs::GetFunc_C_HLTVCamera_CalcView() {
+#if defined _WIN32
+	static DWORD pointer = NULL;
+
+	if (!pointer) {
+		pointer = SignatureScan("client", HLTVCALCVIEW_SIG, HLTVCALCVIEW_MASK);
+
+		if (!pointer) {
+			throw bad_pointer("C_HLTVCamera::CalcView");
+		}
+	}
+
+	return (HLTVCV_t)(pointer);
+#else
+	throw bad_pointer("C_HLTVCamera::CalcView");
 
 	return nullptr;
 #endif
@@ -385,6 +444,15 @@ bool Funcs::RemoveDetour_C_BaseEntity_SetModelPointer() {
 	return false;
 }
 
+bool Funcs::RemoveDetour_C_HLTVCamera_CalcView() {
+	if (RemoveDetour(GetFunc_C_HLTVCamera_CalcView())) {
+		hltvcameraCalcViewOriginal = nullptr;
+		return true;
+	}
+
+	return false;
+}
+
 bool Funcs::RemoveDetour(void *target) {
 	MH_STATUS disableHookResult = MH_DisableHook(target);
 
@@ -407,6 +475,14 @@ void Funcs::RemoveHook_C_BaseEntity_SetModel(int hookID) {
 	if (setModelHooks.size() == 0) {
 		RemoveDetour_C_BaseEntity_SetModelIndex();
 		RemoveDetour_C_BaseEntity_SetModelPointer();
+	}
+}
+
+void Funcs::RemoveHook_C_HLTVCamera_CalcView(int hookID) {
+	hltvcameraCalcViewHooks.erase(hookID);
+
+	if (hltvcameraCalcViewHooks.size() == 0) {
+		RemoveDetour_C_HLTVCamera_CalcView();
 	}
 }
 

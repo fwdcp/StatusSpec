@@ -17,6 +17,7 @@
 #include "../modules.h"
 
 class CCommand;
+class C_HLTVCamera;
 class ConCommand;
 class ConVar;
 class KeyValues;
@@ -30,15 +31,29 @@ public:
 	virtual void FireGameEvent(IGameEvent *event);
 	void FrameHook(ClientFrameStage_t curStage);
 private:
+	int calcViewHook;
 	bool currentlyUpdating;
 	int frameHook;
+	QAngle smoothCurrentAngles;
+	Vector smoothCurrentPosition;
+	int smoothEndMode;
+	int smoothEndTarget;
+	float smoothEndTime;
+	bool smoothInProgress;
+	QAngle smoothStartAngles;
+	Vector smoothStartPosition;
+	float smoothStartTime;
 	KeyValues *specguiSettings;
 
+	void CalcViewOverride(C_HLTVCamera *instance, Vector &origin, QAngle &angles, float &fov);
 	void UpdateState();
 
 	class HLTVCameraOverride;
 
 	ConVar *killer_follow_enabled;
+	ConVar *smooth_camera_switches_enabled;
+	ConVar *smooth_camera_switches_max_distance;
+	ConVar *smooth_camera_switches_time;
 	ConCommand *spec_player;
 	ConVar *spec_player_alive;
 	ConCommand *spec_pos;
@@ -48,5 +63,6 @@ private:
 	void SpecPlayer(const CCommand &command);
 	void SpecPosition(const CCommand &command);
 	void ToggleKillerFollowEnabled(IConVar *var, const char *pOldValue, float flOldValue);
+	void ToggleSmoothCameraSwitchesEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 	void ToggleStateEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };

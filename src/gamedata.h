@@ -30,6 +30,8 @@
 
 // signatures
 #if defined _WIN32
+#define HLTVCALCVIEW_SIG "\x55\x8B\xEC\x51\x53\x56\x8B\xF1\x80\x7E\x00\x00"
+#define HLTVCALCVIEW_MASK "xxxxxxxxxx?x"
 #define GAMERESOURCES_SIG "\xA1\x00\x00\x00\x00\x85\xC0\x74\x06\x05"
 #define GAMERESOURCES_MASK "x????xxxxx"
 #define CLIENTMODE_SIG "\xC7\x05\x00\x00\x00\x00\x00\x00\x00\x00\xE8\x00\x00\x00\x00\x68\x00\x00\x00\x00\x8B\xC8"
@@ -86,11 +88,13 @@ typedef IGameResources *(*GGR_t)(void);
 
 // member function types
 #if defined _WIN32
+typedef void(__thiscall *HLTVCV_t)(C_HLTVCamera *, Vector &, QAngle &, float &);
 typedef void(__thiscall *SCA_t)(C_HLTVCamera *, QAngle &);
 typedef void(__thiscall *SM_t)(C_HLTVCamera *, int);
 typedef void(__thiscall *SMI_t)(C_BaseEntity *, int);
 typedef void(__thiscall *SMP_t)(C_BaseEntity *, const model_t *);
 typedef void(__thiscall *SPT_t)(C_HLTVCamera *, int);
+typedef void(__fastcall *HLTVCVH_t)(C_HLTVCamera *, Vector &, QAngle &, float &);
 typedef void(__fastcall *SMIH_t)(C_BaseEntity *, void *, int);
 typedef void(__fastcall *SMPH_t)(C_BaseEntity *, void *, const model_t *);
 #endif
