@@ -28,15 +28,6 @@
 #define GetHandleOfModule(szModuleName) dlopen((std::string(szModuleName) + ".so").c_str(), RTLD_NOLOAD)
 #endif
 
-// client DLL info
-#if defined _WIN32
-#define CLIENT_MODULE_FILE "tf/bin/client.dll"
-#elif defined __APPLE__
-#define CLIENT_MODULE_FILE "tf/bin/client.dylib"
-#elif defined __linux__
-#define CLIENT_MODULE_FILE "tf/bin/client.so"
-#endif
-
 // signatures
 #if defined _WIN32
 #define GAMERESOURCES_SIG "\xA1\x00\x00\x00\x00\x85\xC0\x74\x06\x05"

@@ -10,6 +10,7 @@
 
 #include "cameratools.h"
 
+#include <functional>
 #include <thread>
 
 #include "json/json.h"
@@ -61,6 +62,7 @@ public:
 };
 
 CameraTools::CameraTools(std::string name) : Module(name) {
+	currentlyUpdating = false;
 	frameHook = 0;
 	specguiSettings = new KeyValues("Resource/UI/SpectatorTournament.res");
 	specguiSettings->LoadFromFile(Interfaces::pFileSystem, "resource/ui/spectatortournament.res", "mod");
@@ -93,6 +95,26 @@ bool CameraTools::CheckDependencies(std::string name) {
 	if (!Interfaces::pEngineTool) {
 		PRINT_TAG();
 		Warning("Required interface CGlobalVarsBase for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	try {
+		Funcs::GetFunc_C_HLTVCamera_SetCameraAngle();
+	}
+	catch (bad_pointer) {
+		PRINT_TAG();
+		Warning("Required function C_HLTVCamera::SetCameraAngle for module %s not available!\n", name.c_str());
+
+		ready = false;
+	}
+
+	try {
+		Funcs::GetFunc_C_HLTVCamera_SetMode();
+	}
+	catch (bad_pointer) {
+		PRINT_TAG();
+		Warning("Required function C_HLTVCamera::SetMode for module %s not available!\n", name.c_str());
 
 		ready = false;
 	}
