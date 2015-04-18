@@ -17,6 +17,7 @@
 #include "engine/ivmodelinfo.h"
 #include "iclientmode.h"
 #include "igameevents.h"
+#include "toolframework/iclientenginetools.h"
 #include "vgui/IPanel.h"
 
 #include "exceptions.h"
@@ -44,6 +45,9 @@ SH_DECL_MANUALHOOK0(C_TFPlayer_GetMaxHealth, OFFSET_GETMAXHEALTH, 0, 0, int);
 SH_DECL_MANUALHOOK0(C_TFPlayer_GetObserverMode, OFFSET_GETOBSERVERMODE, 0, 0, int);
 SH_DECL_MANUALHOOK0(C_TFPlayer_GetObserverTarget, OFFSET_GETOBSERVERTARGET, 0, 0, C_BaseEntity *);
 SH_DECL_HOOK1_void(IBaseClientDLL, FrameStageNotify, SH_NOATTRIB, 0, ClientFrameStage_t);
+SH_DECL_HOOK0(IClientEngineTools, InToolMode, SH_NOATTRIB, 0, bool);
+SH_DECL_HOOK0(IClientEngineTools, IsThirdPersonCamera, SH_NOATTRIB, 0, bool);
+SH_DECL_HOOK3(IClientEngineTools, SetupEngineView, SH_NOATTRIB, 0, bool, Vector &, QAngle &, float &);
 SH_DECL_HOOK1(IClientMode, DoPostScreenSpaceEffects, SH_NOATTRIB, 0, bool, const CViewSetup *);
 SH_DECL_HOOK1(IGameEventManager2, FireEventClientSide, SH_NOATTRIB, 0, bool, IGameEvent *);
 SH_DECL_HOOK4(IMaterialSystem, FindMaterial, SH_NOATTRIB, 0, IMaterial *, char const *, const char *, bool, const char *);
@@ -120,6 +124,18 @@ int Funcs::AddHook_C_BaseEntity_SetModel(std::function<void(C_BaseEntity *, cons
 
 int Funcs::AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, fastdelegate::FastDelegate1<ClientFrameStage_t> hook, bool post) {
 	return SH_ADD_HOOK(IBaseClientDLL, FrameStageNotify, instance, hook, post);
+}
+
+int Funcs::AddHook_IClientEngineTools_InToolMode(IClientEngineTools *instance, fastdelegate::FastDelegate0<bool> hook, bool post) {
+	return SH_ADD_HOOK(IClientEngineTools, InToolMode, instance, hook, post);
+}
+
+int Funcs::AddHook_IClientEngineTools_IsThirdPersonCamera(IClientEngineTools *instance, fastdelegate::FastDelegate0<bool> hook, bool post) {
+	return SH_ADD_HOOK(IClientEngineTools, IsThirdPersonCamera, instance, hook, post);
+}
+
+int Funcs::AddHook_IClientEngineTools_SetupEngineView(IClientEngineTools *instance, fastdelegate::FastDelegate3<Vector &, QAngle &, float &, bool> hook, bool post) {
+	return SH_ADD_HOOK(IClientEngineTools, SetupEngineView, instance, hook, post);
 }
 
 int Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(IClientMode *instance, fastdelegate::FastDelegate1<const CViewSetup *, bool> hook, bool post) {

@@ -17,6 +17,7 @@ class C_TeamplayRoundBasedRules;
 class CGlobalVarsBase;
 class CSteamAPIContext;
 class IBaseClientDLL;
+class IClientEngineTools;
 class IClientEntityList;
 class IClientMode;
 class IEngineTool;
@@ -33,6 +34,7 @@ class Interfaces {
 		static void Unload();
 
 		static IBaseClientDLL *pClientDLL;
+		static IClientEngineTools *pClientEngineTools;
 		static IClientEntityList *pClientEntityList;
 		static IVEngineClient *pEngineClient;
 		static IEngineTool *pEngineTool;
