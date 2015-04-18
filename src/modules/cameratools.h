@@ -36,6 +36,7 @@ private:
 	int inToolModeHook;
 	int isThirdPersonCameraHook;
 	int setupEngineViewHook;
+	bool smoothEnding;
 	int smoothEndMode;
 	int smoothEndTarget;
 	bool smoothInProgress;

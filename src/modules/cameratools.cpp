@@ -67,6 +67,7 @@ CameraTools::CameraTools(std::string name) : Module(name) {
 	inToolModeHook = 0;
 	isThirdPersonCameraHook = 0;
 	setupEngineViewHook = 0;
+	smoothEnding = false;
 	smoothEndMode = OBS_MODE_NONE;
 	smoothEndTarget = 0;
 	smoothInProgress = false;
@@ -302,10 +303,35 @@ bool CameraTools::SetupEngineViewOverride(Vector &origin, QAngle &angles, float 
 			origin = smoothLastOrigin;
 			angles = smoothLastAngles;
 
-			RETURN_META_VALUE(MRES_OVERRIDE, true);
+			smoothEnding = false;
+			smoothInProgress = true;
+		}
+		else {
+			C_HLTVCamera *hltvcamera = Interfaces::GetHLTVCamera();
+
+			if (hltvcamera) {
+				Funcs::CallFunc_C_HLTVCamera_SetMode(hltvcamera, OBS_MODE_ROAMING);
+			}
+
+			smoothEnding = true;
+			smoothInProgress = false;
+		}
+
+		smoothLastAngles = angles;
+		smoothLastOrigin = origin;
+		smoothLastTime = Interfaces::pEngineTool->GetRealTime();
+
+		RETURN_META_VALUE(MRES_SUPERCEDE, true);
+	}
+	else if (smoothEnding) {
+		C_HLTVCamera *hltvcamera = Interfaces::GetHLTVCamera();
+
+		if (hltvcamera) {
+			Funcs::CallFunc_C_HLTVCamera_SetMode(hltvcamera, smoothEndMode);
 		}
 	}
 
+	smoothEnding = false;
 	smoothEndMode = hltvcamera->m_nCameraMode;
 	smoothEndTarget = hltvcamera->m_iTraget1;
 	smoothInProgress = false;
