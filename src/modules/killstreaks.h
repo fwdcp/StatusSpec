@@ -27,10 +27,10 @@ public:
 	Killstreaks(std::string name);
 
 	static bool CheckDependencies(std::string name);
-
+private:
 	bool FireEventClientSideOverride(IGameEvent *event);
 	void FrameHook(ClientFrameStage_t curStage);
-private:
+
 	int bluTopKillstreak;
 	int bluTopKillstreakPlayer;
 	std::map<int, std::map<std::string, int>> currentKillstreaks;

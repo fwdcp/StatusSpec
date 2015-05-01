@@ -25,10 +25,10 @@ public:
 
 	static bool CheckDependencies(std::string name);
 private:
+	void SetModelOverride(C_BaseEntity *entity, const model_t *&model);
+
 	KeyValues *modelConfig;
 	int setModelHook;
-
-	void SetModelOverride(C_BaseEntity *entity, const model_t *&model);
 
 	ConVar *enabled;
 	ConCommand *reload_settings;

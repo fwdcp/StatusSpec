@@ -24,9 +24,9 @@ public:
 	TeamOverrides(std::string name);
 
 	static bool CheckDependencies(std::string name);
-
-	void SendMessageOverride(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel);
 private:
+	void SendMessageOverride(vgui::VPANEL vguiPanel, KeyValues *params, vgui::VPANEL ifromPanel);
+
 	int sendMessageHook;
 
 	ConVar *enabled;

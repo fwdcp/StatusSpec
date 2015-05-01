@@ -22,10 +22,10 @@ public:
 	LocalPlayer(std::string name);
 
 	static bool CheckDependencies(std::string name);
-
+private:
 	void FrameHook(ClientFrameStage_t curStage);
 	int GetLocalPlayerIndexOverride();
-private:
+
 	int frameHook;
 	bool getLocalPlayerIndexDetoured;
 

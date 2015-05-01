@@ -20,10 +20,10 @@ public:
 	PlayerOutlines(std::string name);
 
 	static bool CheckDependencies(std::string name);
-
+private:
 	bool DoPostScreenSpaceEffectsHook(const CViewSetup *pSetup);
 	void FrameHook(ClientFrameStage_t curStage);
-private:
+
 	std::map<std::string, ColorConCommand> colors;
 	int doPostScreenSpaceEffectsHook;
 	int frameHook;

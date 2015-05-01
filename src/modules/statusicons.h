@@ -27,15 +27,15 @@ public:
 	StatusIcons(std::string name);
 
 	static bool CheckDependencies(std::string name);
-
-	void FrameHook(ClientFrameStage_t curStage);
 private:
-	int frameHook;
+	void FrameHook(ClientFrameStage_t curStage);
 
 	void ClearIcons(vgui::VPANEL statusIconsPanel);
 	void DisableHUD();
 	void DisplayIcon(vgui::EditablePanel *panel, const char *iconTexture);
 	void DisplayIcons(vgui::VPANEL playerPanel);
+
+	int frameHook;
 
 	ConVar *delta_x;
 	ConVar *delta_y;

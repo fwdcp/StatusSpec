@@ -29,9 +29,9 @@ public:
 	AntiFreeze(std::string name);
 
 	static bool CheckDependencies(std::string name);
-
-	void FrameHook(ClientFrameStage_t curStage);
 private:
+	void FrameHook(ClientFrameStage_t curStage);
+
 	float bluTime;
 	vgui::HPanel bluTimerPanel;
 	bool entitiesUpdated;

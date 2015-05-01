@@ -29,8 +29,9 @@ public:
 	static bool CheckDependencies(std::string name);
 
 	virtual void FireGameEvent(IGameEvent *event);
-	void FrameHook(ClientFrameStage_t curStage);
 private:
+	void FrameHook(ClientFrameStage_t curStage);
+
 	bool currentlyUpdating;
 	int frameHook;
 	int inToolModeHook;

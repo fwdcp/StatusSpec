@@ -27,11 +27,11 @@ public:
 
 	static bool CheckDependencies(std::string name);
 private:
+	void SetModelOverride(C_BaseEntity *entity, const model_t *&model);
+
 	KeyValues *modelConfig;
 	std::map<std::string, Replacement> modelReplacements;
 	int setModelHook;
-
-	void SetModelOverride(C_BaseEntity *entity, const model_t *&model);
 
 	ConVar *enabled;
 	ConCommand *load_replacement_group;

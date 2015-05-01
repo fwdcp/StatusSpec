@@ -22,10 +22,9 @@ public:
 	FOVOverride(std::string name);
 
 	static bool CheckDependencies(std::string name);
-
+private:
 	void FrameHook(ClientFrameStage_t curStage);
 	float GetFOVOverride();
-private:
 	bool HookGetFOV();
 
 	int frameHook;

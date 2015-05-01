@@ -37,13 +37,13 @@ public:
 	PlayerAliases(std::string name);
 
 	static bool CheckDependencies(std::string name);
-
+private:
 	bool GetPlayerInfoOverride(int ent_num, player_info_t *pinfo);
 
 	void GetESEAPlayerInfo(HTTPRequestCompleted_t *requestCompletionInfo, bool bIOFailure);
 	void GetETF2LPlayerInfo(HTTPRequestCompleted_t *requestCompletionInfo, bool bIOFailure);
 	void GetTwitchUserInfo(HTTPRequestCompleted_t *requestCompletionInfo, bool bIOFailure);
-private:
+
 	std::map<CSteamID, std::string> customAliases;
 	std::map<CSteamID, APIAlias_t> eseaAliases;
 	std::map<CSteamID, APIAlias_t> etf2lAliases;

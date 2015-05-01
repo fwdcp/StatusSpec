@@ -35,9 +35,9 @@ public:
 	MedigunInfo(std::string name);
 
 	static bool CheckDependencies(std::string name);
-
-	void FrameHook(ClientFrameStage_t curStage);
 private:
+	void FrameHook(ClientFrameStage_t curStage);
+
 	KeyValues *dynamicMeterSettings;
 	int frameHook;
 	std::map<TFTeam, Medigun_t> medigunInfo;

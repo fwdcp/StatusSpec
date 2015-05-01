@@ -25,9 +25,9 @@ public:
 	CustomMaterials(std::string name);
 
 	static bool CheckDependencies(std::string name);
-
-	IMaterial *FindMaterialOverride(char const *pMaterialName, const char *pTextureGroupName, bool complain = true, const char *pComplainPrefix = NULL);
 private:
+	IMaterial *FindMaterialOverride(char const *pMaterialName, const char *pTextureGroupName, bool complain = true, const char *pComplainPrefix = NULL);
+
 	int findMaterialHook;
 	KeyValues *materialConfig;
 	std::map<std::string, Replacement> materialReplacements;

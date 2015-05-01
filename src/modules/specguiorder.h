@@ -27,10 +27,10 @@ public:
 	SpecGUIOrder(std::string name);
 
 	static bool CheckDependencies(std::string name);
-
+private:
 	void FrameHook(ClientFrameStage_t curStage);
 	void SetPosOverride(vgui::VPANEL vguiPanel, int x, int y);
-private:
+
 	std::set<Player> bluPlayers;
 	int frameHook;
 	int setPosHook;
