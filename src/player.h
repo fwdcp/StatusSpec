@@ -97,6 +97,12 @@ public:
 	static Iterator begin();
 	static Iterator end();
 
+	class Iterable {
+	public:
+		Iterator begin();
+		Iterator end();
+	};
+
 	static bool CheckDependencies();
 	static bool classRetrievalAvailable;
 	static bool comparisonAvailable;

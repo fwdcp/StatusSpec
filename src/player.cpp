@@ -502,6 +502,14 @@ Player::Iterator Player::end() {
 	return Player::Iterator(Interfaces::pEngineTool->GetMaxClients() + 1);
 }
 
+Player::Iterator Player::Iterable::begin() {
+	return Player::begin();
+}
+
+Player::Iterator Player::Iterable::end() {
+	return Player::end();
+}
+
 bool Player::classRetrievalAvailable = false;
 bool Player::comparisonAvailable = false;
 bool Player::conditionsRetrievalAvailable = false;
