@@ -16,6 +16,7 @@
 
 #include "engine/ivmodelinfo.h"
 #include "iclientmode.h"
+#include "icvar.h"
 #include "igameevents.h"
 #include "toolframework/iclientenginetools.h"
 #include "vgui/IPanel.h"
@@ -44,6 +45,9 @@ SH_DECL_HOOK0(IClientEngineTools, InToolMode, SH_NOATTRIB, 0, bool);
 SH_DECL_HOOK0(IClientEngineTools, IsThirdPersonCamera, SH_NOATTRIB, 0, bool);
 SH_DECL_HOOK3(IClientEngineTools, SetupEngineView, SH_NOATTRIB, 0, bool, Vector &, QAngle &, float &);
 SH_DECL_HOOK1(IClientMode, DoPostScreenSpaceEffects, SH_NOATTRIB, 0, bool, const CViewSetup *);
+SH_DECL_HOOK1_void_vafmt(ICvar, ConsoleColorPrintf, const FMTFUNCTION(3, 4), 0, const Color &);
+SH_DECL_HOOK0_void_vafmt(ICvar, ConsolePrintf, const FMTFUNCTION(2, 3), 0);
+SH_DECL_HOOK0_void_vafmt(ICvar, ConsoleDPrintf, const FMTFUNCTION(2, 3), 0);
 SH_DECL_HOOK1(IGameEventManager2, FireEventClientSide, SH_NOATTRIB, 0, bool, IGameEvent *);
 SH_DECL_HOOK4(IMaterialSystem, FindMaterial, SH_NOATTRIB, 0, IMaterial *, char const *, const char *, bool, const char *);
 SH_DECL_HOOK3_void(IPanel, SendMessage, SH_NOATTRIB, 0, VPANEL, KeyValues *, VPANEL);
@@ -135,6 +139,18 @@ int Funcs::AddHook_IClientEngineTools_SetupEngineView(IClientEngineTools *instan
 
 int Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(IClientMode *instance, fastdelegate::FastDelegate1<const CViewSetup *, bool> hook, bool post) {
 	return SH_ADD_HOOK(IClientMode, DoPostScreenSpaceEffects, instance, hook, post);
+}
+
+int Funcs::AddHook_ICvar_ConsoleColorPrintf(ICvar *instance, fastdelegate::FastDelegate2<const Color &, const char *> hook, bool post) {
+	return SH_ADD_HOOK(ICvar, ConsoleColorPrintf, instance, hook, post);
+}
+
+int Funcs::AddHook_ICvar_ConsoleDPrintf(ICvar *instance, fastdelegate::FastDelegate1<const char *> hook, bool post) {
+	return SH_ADD_HOOK(ICvar, ConsoleDPrintf, instance, hook, post);
+}
+
+int Funcs::AddHook_ICvar_ConsolePrintf(ICvar *instance, fastdelegate::FastDelegate1<const char *> hook, bool post) {
+	return SH_ADD_HOOK(ICvar, ConsolePrintf, instance, hook, post);
 }
 
 int Funcs::AddHook_IGameEventManager2_FireEventClientSide(IGameEventManager2 *instance, fastdelegate::FastDelegate1<IGameEvent *, bool> hook, bool post) {

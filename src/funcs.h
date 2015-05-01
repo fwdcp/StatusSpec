@@ -23,6 +23,7 @@
 class C_TFPlayer;
 class IClientEngineTools;
 class IClientMode;
+class ICvar;
 class IGameEvent;
 class IGameEventManager2;
 class IMaterialSystem;
@@ -43,6 +44,9 @@ public:
 	static int AddHook_IClientEngineTools_IsThirdPersonCamera(IClientEngineTools *instance, fastdelegate::FastDelegate0<bool> hook, bool post);
 	static int AddHook_IClientEngineTools_SetupEngineView(IClientEngineTools *instance, fastdelegate::FastDelegate3<Vector &, QAngle &, float &, bool> hook, bool post);
 	static int AddHook_IClientMode_DoPostScreenSpaceEffects(IClientMode *instance, fastdelegate::FastDelegate1<const CViewSetup *, bool> hook, bool post);
+	static int AddHook_ICvar_ConsoleColorPrintf(ICvar *instance, fastdelegate::FastDelegate2<const Color &, const char *> hook, bool post);
+	static int AddHook_ICvar_ConsoleDPrintf(ICvar *instance, fastdelegate::FastDelegate1<const char *> hook, bool post);
+	static int AddHook_ICvar_ConsolePrintf(ICvar *instance, fastdelegate::FastDelegate1<const char *> hook, bool post);
 	static int AddHook_IGameEventManager2_FireEventClientSide(IGameEventManager2 *instance, fastdelegate::FastDelegate1<IGameEvent *, bool> hook, bool post);
 	static int AddHook_IMaterialSystem_FindMaterial(IMaterialSystem *instance, fastdelegate::FastDelegate4<char const *, const char *, bool, const char *, IMaterial *> hook, bool post);
 	static int AddHook_IPanel_SendMessage(vgui::IPanel *instance, fastdelegate::FastDelegate3<vgui::VPANEL, KeyValues *, vgui::VPANEL> hook, bool post);
