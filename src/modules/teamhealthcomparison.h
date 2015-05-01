@@ -28,15 +28,9 @@ public:
 	TeamHealthComparison(std::string name);
 
 	static bool CheckDependencies(std::string name);
-
-	void FrameHook(ClientFrameStage_t curStage);
 private:
-	int frameHook;
-	std::map<std::string, vgui::Panel *> panels;
-	std::map<TFTeam, int> teamHealthAggregate;
-
-	void InitHUD();
-	void Paint();
+	class Panel;
+	Panel *panel;
 
 	ConVar *enabled;
 	ConCommand *reload_settings;
