@@ -13,7 +13,6 @@
 #include "interface.h"
 
 class C_HLTVCamera;
-class C_TeamplayRoundBasedRules;
 class CGlobalVarsBase;
 class CSteamAPIContext;
 class IBaseClientDLL;
@@ -23,7 +22,6 @@ class IClientMode;
 class IEngineTool;
 class IFileSystem;
 class IGameEventManager2;
-class IGameResources;
 class IVEngineClient;
 class IVModelInfoClient;
 class IVRenderView;
@@ -48,7 +46,5 @@ class Interfaces {
 		static bool vguiLibrariesAvailable;
 
 		static IClientMode *GetClientMode();
-		static IGameResources *GetGameResources();
 		static C_HLTVCamera *GetHLTVCamera();
-		static C_TeamplayRoundBasedRules *GetTeamplayRoundBasedRules();
 };

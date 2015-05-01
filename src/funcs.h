@@ -20,6 +20,7 @@
 
 #include "gamedata.h"
 
+class C_TFPlayer;
 class IClientEngineTools;
 class IClientMode;
 class IGameEvent;
@@ -57,10 +58,6 @@ public:
 
 	static float CallFunc_C_TFPlayer_GetFOV(C_TFPlayer *instance);
 	static void CallFunc_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *instance, float *r, float *g, float *b);
-	static int CallFunc_C_TFPlayer_GetHealth(C_TFPlayer *instance);
-	static int CallFunc_C_TFPlayer_GetMaxHealth(C_TFPlayer *instance);
-	static int CallFunc_C_TFPlayer_GetObserverMode(C_TFPlayer *instance);
-	static C_BaseEntity *CallFunc_C_TFPlayer_GetObserverTarget(C_TFPlayer *instance);
 	static bool CallFunc_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, int ent_num, player_info_t *pinfo);
 
 	static GLPI_t GetFunc_GetLocalPlayerIndex();

@@ -68,33 +68,6 @@ IClientMode *Interfaces::GetClientMode() {
 #endif
 }
 
-IGameResources *Interfaces::GetGameResources() {
-#if defined _WIN32
-	static DWORD pointer = NULL;
-
-	if (!pointer) {
-		pointer = SignatureScan("client", GAMERESOURCES_SIG, GAMERESOURCES_MASK);
-
-		if (!pointer) {
-			throw bad_pointer("IGameResources");
-		}
-	}
-
-	GGR_t GGR = (GGR_t) pointer;
-	IGameResources *gr = GGR();
-
-	if (!gr) {
-		throw bad_pointer("IGameResources");
-	}
-
-	return gr;
-#else
-	throw bad_pointer("IGameResources");
-
-	return nullptr;
-#endif
-}
-
 C_HLTVCamera *Interfaces::GetHLTVCamera() {
 #if defined _WIN32
 	static DWORD pointer = NULL;
@@ -114,30 +87,6 @@ C_HLTVCamera *Interfaces::GetHLTVCamera() {
 	return *(C_HLTVCamera**)(pointer);
 #else
 	throw bad_pointer("C_HLTVCamera");
-
-	return nullptr;
-#endif
-}
-
-C_TeamplayRoundBasedRules *Interfaces::GetTeamplayRoundBasedRules() {
-#if defined _WIN32
-	static DWORD pointer = NULL;
-
-	if (!pointer) {
-		pointer = SignatureScan("client", TEAMPLAYROUNDBASEDRULES_SIG, TEAMPLAYROUNDBASEDRULES_MASK) + TEAMPLAYROUNDBASEDRULES_OFFSET;
-
-		if (!pointer) {
-			throw bad_pointer("C_TeamplayRoundBasedRules");
-		}
-	}
-
-	if (!**(C_TeamplayRoundBasedRules***)pointer) {
-		throw bad_pointer("C_TeamplayRoundBasedRules");
-	}
-
-	return **(C_TeamplayRoundBasedRules***)(pointer);
-#else
-	throw bad_pointer("C_TeamplayRoundBasedRules");
 
 	return nullptr;
 #endif
