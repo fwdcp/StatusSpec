@@ -80,17 +80,17 @@ bool ProjectileOutlines::CheckDependencies(std::string name) {
 
 bool ProjectileOutlines::DoPostScreenSpaceEffectsHook(const CViewSetup *pSetup) {
 	if (fade->GetBool()) {
-		for (auto iterator = glows.begin(); iterator != glows.end(); ++iterator) {
-			if (iterator->first.Get()) {
-				vec_t distance = pSetup->origin.DistTo(iterator->first->GetRenderOrigin());
+		for (auto iterator : glows) {
+			if (iterator.first.Get()) {
+				vec_t distance = pSetup->origin.DistTo(iterator.first->GetRenderOrigin());
 
 				if (distance > fade_distance->GetFloat()) {
-					Color glowColor = GetGlowColor(iterator->first);
+					Color glowColor = GetGlowColor(iterator.first);
 					float alpha = glowColor.a() / 255.0f;
 
 					float scalar = fade_distance->GetFloat() / distance;
 
-					iterator->second->SetAlpha(alpha * scalar);
+					iterator.second->SetAlpha(alpha * scalar);
 				}
 			}
 		}

@@ -707,9 +707,7 @@ void CameraTools::SpecPlayer(const CCommand &command) {
 									if (dialogVariables) {
 										const char *name = dialogVariables->GetString("playername");
 
-										for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
-											Player player = *iterator;
-
+										for (Player player : Player::Iterable()) {
 											if (player.GetName().compare(name) == 0) {
 												int baseX = 0;
 												int baseY = 0;

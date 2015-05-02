@@ -83,13 +83,13 @@ void CustomTextures::LoadReplacementGroup(const CCommand &command) {
 
 void CustomTextures::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
 	if (enabled->GetBool()) {
-		for (auto iterator = textureReplacements.begin(); iterator != textureReplacements.end(); ++iterator) {
-			g_pMaterialSystem->AddTextureAlias(iterator->first.c_str(), iterator->second.replacement.c_str());
+		for (auto iterator : textureReplacements) {
+			g_pMaterialSystem->AddTextureAlias(iterator.first.c_str(), iterator.second.replacement.c_str());
 		}
 	}
 	else {
-		for (auto iterator = textureReplacements.begin(); iterator != textureReplacements.end(); ++iterator) {
-			g_pMaterialSystem->RemoveTextureAlias(iterator->first.c_str());
+		for (auto iterator : textureReplacements) {
+			g_pMaterialSystem->RemoveTextureAlias(iterator.first.c_str());
 		}
 	}
 }

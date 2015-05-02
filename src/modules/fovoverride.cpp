@@ -81,9 +81,7 @@ bool FOVOverride::HookGetFOV() {
 		return true;
 	}
 
-	for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
-		Player player = *iterator;
-
+	for (Player player : Player::Iterable()) {
 		getFOVHook = Funcs::AddGlobalHook_C_TFPlayer_GetFOV((C_TFPlayer *)player.GetEntity(), SH_MEMBER(this, &FOVOverride::GetFOVOverride), false);
 
 		if (getFOVHook) {

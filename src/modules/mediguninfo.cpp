@@ -133,9 +133,7 @@ void MedigunInfo::FrameHook(ClientFrameStage_t curStage) {
 	if (curStage == FRAME_NET_UPDATE_END) {
 		medigunInfo.clear();
 
-		for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
-			Player player = *iterator;
-
+		for (Player player : Player::Iterable()) {
 			TFTeam team = player.GetTeam();
 
 			if (team != TFTeam_Red && team != TFTeam_Blue) {

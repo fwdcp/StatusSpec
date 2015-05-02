@@ -37,7 +37,7 @@ bool Entities::RetrieveClassPropOffset(std::string className, std::vector<std::s
 			RecvProp *prop = nullptr;
 
 			if (table) {
-				for (auto iterator = propertyTree.begin(); iterator != propertyTree.end(); ++iterator) {
+				for (std::string propertyName : propertyTree) {
 					int subOffset = 0;
 
 					if (prop && prop->GetType() == DPT_DataTable) {
@@ -48,7 +48,7 @@ bool Entities::RetrieveClassPropOffset(std::string className, std::vector<std::s
 						return false;
 					}
 
-					if (GetSubProp(table, iterator->c_str(), prop, subOffset)) {
+					if (GetSubProp(table, propertyName.c_str(), prop, subOffset)) {
 						offset += subOffset;
 					}
 					else {

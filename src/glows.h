@@ -132,8 +132,8 @@ private:
 	}
 
 	bool HasGlowEffect(C_BaseEntity *pEntity) {
-		for (auto iterator = m_GlowObjectDefinitions.begin(); iterator != m_GlowObjectDefinitions.end(); ++iterator) {
-			if (iterator->second.m_hEntity.Get() == pEntity) {
+		for (auto iterator : m_GlowObjectDefinitions) {
+			if (iterator.second.m_hEntity.Get() == pEntity) {
 				return true;
 			}
 		}

@@ -132,16 +132,16 @@ void GlowManager::RenderGlowModels(const CViewSetup *pSetup, CMatRenderContextPt
 
 	stencilState.SetStencilState(pRenderContext);
 
-	for (auto iterator = m_GlowObjectDefinitions.begin(); iterator != m_GlowObjectDefinitions.end(); ++iterator) {
-		if (!iterator->second.ShouldDraw()) {
+	for (auto iterator : m_GlowObjectDefinitions) {
+		if (!iterator.second.ShouldDraw()) {
 			continue;
 		}
 
-		Interfaces::pRenderView->SetBlend(iterator->second.m_flGlowAlpha);
-		Vector vGlowColor = iterator->second.m_vGlowColor * iterator->second.m_flGlowAlpha;
+		Interfaces::pRenderView->SetBlend(iterator.second.m_flGlowAlpha);
+		Vector vGlowColor = iterator.second.m_vGlowColor * iterator.second.m_flGlowAlpha;
 		Interfaces::pRenderView->SetColorModulation(&vGlowColor[0]);
 
-		iterator->second.DrawModel();
+		iterator.second.DrawModel();
 	}
 
 	g_pStudioRender->ForcedMaterialOverride(NULL);
@@ -169,13 +169,13 @@ void GlowManager::ApplyEntityGlowEffects(const CViewSetup *pSetup, CMatRenderCon
 
 	int iNumGlowObjects = 0;
 
-	for (auto iterator = m_GlowObjectDefinitions.begin(); iterator != m_GlowObjectDefinitions.end(); ++iterator) {
-		if (!iterator->second.ShouldDraw()) {
+	for (auto iterator : m_GlowObjectDefinitions) {
+		if (!iterator.second.ShouldDraw()) {
 			continue;
 		}
 
-		if (iterator->second.m_bRenderWhenOccluded || iterator->second.m_bRenderWhenUnoccluded) {
-			if (iterator->second.m_bRenderWhenOccluded && iterator->second.m_bRenderWhenUnoccluded) {
+		if (iterator.second.m_bRenderWhenOccluded || iterator.second.m_bRenderWhenUnoccluded) {
+			if (iterator.second.m_bRenderWhenOccluded && iterator.second.m_bRenderWhenUnoccluded) {
 				ShaderStencilState_t stencilState;
 				stencilState.m_bEnable = true;
 				stencilState.m_nReferenceValue = 1;
@@ -186,9 +186,9 @@ void GlowManager::ApplyEntityGlowEffects(const CViewSetup *pSetup, CMatRenderCon
 
 				stencilState.SetStencilState(pRenderContext);
 
-				iterator->second.DrawModel();
+				iterator.second.DrawModel();
 			}
-			else if (iterator->second.m_bRenderWhenOccluded) {
+			else if (iterator.second.m_bRenderWhenOccluded) {
 				ShaderStencilState_t stencilState;
 				stencilState.m_bEnable = true;
 				stencilState.m_nReferenceValue = 1;
@@ -199,9 +199,9 @@ void GlowManager::ApplyEntityGlowEffects(const CViewSetup *pSetup, CMatRenderCon
 
 				stencilState.SetStencilState(pRenderContext);
 
-				iterator->second.DrawModel();
+				iterator.second.DrawModel();
 			}
-			else if (iterator->second.m_bRenderWhenUnoccluded) {
+			else if (iterator.second.m_bRenderWhenUnoccluded) {
 				ShaderStencilState_t stencilState;
 				stencilState.m_bEnable = true;
 				stencilState.m_nReferenceValue = 2;
@@ -214,19 +214,19 @@ void GlowManager::ApplyEntityGlowEffects(const CViewSetup *pSetup, CMatRenderCon
 
 				stencilState.SetStencilState(pRenderContext);
 
-				iterator->second.DrawModel();
+				iterator.second.DrawModel();
 			}
 		}
 
 		iNumGlowObjects++;
 	}
 
-	for (auto iterator = m_GlowObjectDefinitions.begin(); iterator != m_GlowObjectDefinitions.end(); ++iterator) {
-		if (!iterator->second.ShouldDraw()) {
+	for (auto iterator : m_GlowObjectDefinitions) {
+		if (!iterator.second.ShouldDraw()) {
 			continue;
 		}
 
-		if (iterator->second.m_bRenderWhenOccluded && !iterator->second.m_bRenderWhenUnoccluded) {
+		if (iterator.second.m_bRenderWhenOccluded && !iterator.second.m_bRenderWhenUnoccluded) {
 			ShaderStencilState_t stencilState;
 			stencilState.m_bEnable = true;
 			stencilState.m_nReferenceValue = 2;
@@ -236,7 +236,7 @@ void GlowManager::ApplyEntityGlowEffects(const CViewSetup *pSetup, CMatRenderCon
 			stencilState.m_ZFailOp = STENCILOPERATION_KEEP;
 			stencilState.SetStencilState(pRenderContext);
 
-			iterator->second.DrawModel();
+			iterator.second.DrawModel();
 		}
 	}
 

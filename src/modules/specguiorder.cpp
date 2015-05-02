@@ -92,9 +92,7 @@ void SpecGUIOrder::FrameHook(ClientFrameStage_t curStage) {
 		bluPlayers.clear();
 		redPlayers.clear();
 
-		for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
-			Player player = *iterator;
-
+		for (Player player : Player::Iterable()) {
 			TFTeam team = player.GetTeam();
 
 			if (team == TFTeam_Red) {
@@ -119,9 +117,7 @@ void SpecGUIOrder::SetPosOverride(vgui::VPANEL vguiPanel, int x, int y) {
 			if (dialogVariables) {
 				const char *name = dialogVariables->GetString("playername");
 
-				for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
-					Player player = *iterator;
-
+				for (Player player : Player::Iterable()) {
 					if (player.GetName().compare(name) == 0) {
 						TFTeam team = player.GetTeam();
 

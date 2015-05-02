@@ -228,8 +228,8 @@ void Funcs::Detour_C_BaseEntity_SetModelIndex(C_BaseEntity *instance, void *, in
 	const model_t *model = Interfaces::pModelInfoClient->GetModel(index);
 	const char *oldModelName = Interfaces::pModelInfoClient->GetModelName(model);
 
-	for (auto iterator = setModelHooks.begin(); iterator != setModelHooks.end(); ++iterator) {
-		iterator->second(instance, model);
+	for (auto iterator : setModelHooks) {
+		iterator.second(instance, model);
 	}
 
 	if (strcmp(oldModelName, Interfaces::pModelInfoClient->GetModelName(model)) == 0) {
@@ -242,8 +242,8 @@ void Funcs::Detour_C_BaseEntity_SetModelIndex(C_BaseEntity *instance, void *, in
 }
 
 void Funcs::Detour_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, void *, const model_t *pModel) {
-	for (auto iterator = setModelHooks.begin(); iterator != setModelHooks.end(); ++iterator) {
-		iterator->second(instance, pModel);
+	for (auto iterator : setModelHooks) {
+		iterator.second(instance, pModel);
 	}
 
 	Funcs::CallFunc_C_BaseEntity_SetModelPointer(instance, pModel);

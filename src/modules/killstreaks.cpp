@@ -291,9 +291,7 @@ void Killstreaks::FrameHook(ClientFrameStage_t curStage) {
 			}
 		}
 
-		for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
-			Player player = *iterator;
-
+		for (Player player : Player::Iterable()) {
 			int *killstreakPrimary = Entities::GetEntityProp<int *>(player.GetEntity(), { "m_nStreaks", "000" });
 			int *killstreakSecondary = Entities::GetEntityProp<int *>(player.GetEntity(), { "m_nStreaks", "001" });
 			int *killstreakMelee = Entities::GetEntityProp<int *>(player.GetEntity(), { "m_nStreaks", "002" });
@@ -346,8 +344,8 @@ void Killstreaks::FrameHook(ClientFrameStage_t curStage) {
 int Killstreaks::GetCurrentPlayerKillstreak(int userid) {
 	int killstreak = 0;
 
-	for (auto iterator = currentKillstreaks[userid].begin(); iterator != currentKillstreaks[userid].end(); ++iterator) {
-		killstreak += iterator->second;
+	for (auto iterator : currentKillstreaks[userid]) {
+		killstreak += iterator.second;
 	}
 
 	return killstreak;
@@ -356,8 +354,8 @@ int Killstreaks::GetCurrentPlayerKillstreak(int userid) {
 int Killstreaks::GetCurrentSlotKillstreak(int userid, int slot) {
 	int killstreak = 0;
 
-	for (auto iterator = TFDefinitions::slotKillIcons.find(slot)->second.begin(); iterator != TFDefinitions::slotKillIcons.find(slot)->second.end(); ++iterator) {
-		killstreak += currentKillstreaks[userid][*iterator];
+	for (auto iterator : TFDefinitions::slotKillIcons.find(slot)->second) {
+		killstreak += currentKillstreaks[userid][iterator];
 	}
 
 	if (slot == 1) {
@@ -369,10 +367,10 @@ int Killstreaks::GetCurrentSlotKillstreak(int userid, int slot) {
 }
 
 int Killstreaks::GetKillTypeSlot(std::string killType) {
-	for (auto slotIterator = TFDefinitions::slotKillIcons.begin(); slotIterator != TFDefinitions::slotKillIcons.end(); ++slotIterator) {
-		for (auto iterator = slotIterator->second.begin(); iterator != slotIterator->second.end(); ++iterator) {
-			if (killType.compare(*iterator) == 0) {
-				return slotIterator->first;
+	for (auto slotIterator : TFDefinitions::slotKillIcons) {
+		for (auto iterator : slotIterator.second) {
+			if (killType.compare(iterator) == 0) {
+				return slotIterator.first;
 			}
 		}
 	}
@@ -381,9 +379,9 @@ int Killstreaks::GetKillTypeSlot(std::string killType) {
 }
 
 bool Killstreaks::IsAttributableKill(std::string killType) {
-	for (auto slotIterator = TFDefinitions::slotKillIcons.begin(); slotIterator != TFDefinitions::slotKillIcons.end(); ++slotIterator) {
-		for (auto iterator = slotIterator->second.begin(); iterator != slotIterator->second.end(); ++iterator) {
-			if (killType.compare(*iterator) == 0) {
+	for (auto slotIterator : TFDefinitions::slotKillIcons) {
+		for (auto iterator : slotIterator.second) {
+			if (killType.compare(iterator) == 0) {
 				return true;
 			}
 		}
@@ -441,9 +439,7 @@ void Killstreaks::ToggleEnabled(IConVar *var, const char *pOldValue, float flOld
 			}
 		}
 
-		for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
-			Player player = *iterator;
-
+		for (Player player : Player::Iterable()) {
 			int *killstreakPrimary = Entities::GetEntityProp<int *>(player.GetEntity(), { "m_nStreaks", "000" });
 			int *killstreakSecondary = Entities::GetEntityProp<int *>(player.GetEntity(), { "m_nStreaks", "001" });
 			int *killstreakMelee = Entities::GetEntityProp<int *>(player.GetEntity(), { "m_nStreaks", "002" });

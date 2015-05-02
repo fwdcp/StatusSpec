@@ -80,17 +80,17 @@ bool PlayerOutlines::CheckDependencies(std::string name) {
 
 bool PlayerOutlines::DoPostScreenSpaceEffectsHook(const CViewSetup *pSetup) {
 	if (fade->GetBool()) {
-		for (auto iterator = glows.begin(); iterator != glows.end(); ++iterator) {
-			if (iterator->first) {
-				vec_t distance = pSetup->origin.DistTo(iterator->first->GetRenderOrigin());
+		for (auto iterator : glows) {
+			if (iterator.first) {
+				vec_t distance = pSetup->origin.DistTo(iterator.first->GetRenderOrigin());
 
 				if (distance > fade_distance->GetFloat()) {
-					Color glowColor = GetGlowColor(iterator->first.Get());
+					Color glowColor = GetGlowColor(iterator.first.Get());
 					float alpha = glowColor.a() / 255.0f;
 
 					float scalar = fade_distance->GetFloat() / distance;
 
-					iterator->second->SetAlpha(alpha * scalar);
+					iterator.second->SetAlpha(alpha * scalar);
 				}
 			}
 		}
@@ -103,9 +103,7 @@ bool PlayerOutlines::DoPostScreenSpaceEffectsHook(const CViewSetup *pSetup) {
 
 void PlayerOutlines::FrameHook(ClientFrameStage_t curStage) {
 	if (curStage == FRAME_NET_UPDATE_END) {
-		for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
-			Player player = *iterator;
-
+		for (Player player : Player::Iterable()) {
 			if (enabled->GetBool()) {
 				Color glowColor = GetGlowColor(player);
 
@@ -355,8 +353,8 @@ void PlayerOutlines::ToggleEnabled(IConVar *var, const char *pOldValue, float fl
 		}
 	}
 	else {
-		for (auto iterator = glows.begin(); iterator != glows.end(); ++iterator) {
-			delete iterator->second;
+		for (auto iterator : glows) {
+			delete iterator.second;
 		}
 
 		glows.clear();

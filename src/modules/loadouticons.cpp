@@ -241,9 +241,7 @@ void LoadoutIcons::FrameHook(ClientFrameStage_t curStage) {
 			}
 		}
 
-		for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
-			Player player = *iterator;
-
+		for (Player player : Player::Iterable()) {
 			TFClassType tfclass = player.GetClass();
 			int activeWeapon = Entities::GetEntityProp<EHANDLE *>(player.GetEntity(), { "m_hActiveWeapon" })->GetEntryIndex();
 
@@ -423,9 +421,7 @@ void LoadoutIcons::DisplayIcons(vgui::VPANEL playerPanel) {
 			if (dialogVariables) {
 				const char *name = dialogVariables->GetString("playername");
 
-				for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
-					Player player = *iterator;
-
+				for (Player player : Player::Iterable()) {
 					if (player.GetName().compare(name) == 0) {
 						if (only_active->GetBool()) {
 							DisplayIcon(dynamic_cast<vgui::ImagePanel *>(loadoutIconPanels[panelHandle]["LoadoutIconsItem1"]), loadoutInfo[player].activeWeaponSlot, true);

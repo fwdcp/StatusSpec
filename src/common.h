@@ -105,9 +105,9 @@ inline std::string ConvertTreeToString(std::vector<std::string> tree) {
 	std::stringstream ss;
 	std::string string;
 
-	for (auto iterator = tree.begin(); iterator != tree.end(); ++iterator) {
+	for (std::string branch : tree) {
 		ss << ">";
-		ss << *iterator;
+		ss << branch;
 	}
 
 	ss >> string;

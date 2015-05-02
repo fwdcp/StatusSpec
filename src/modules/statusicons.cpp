@@ -212,9 +212,7 @@ void StatusIcons::DisplayIcons(vgui::VPANEL playerPanel) {
 			if (dialogVariables) {
 				const char *name = dialogVariables->GetString("playername");
 
-				for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
-					Player player = *iterator;
-
+				for (Player player : Player::Iterable()) {
 					if (player.GetName().compare(name) == 0) {
 						for (int i = 0; i < g_pVGuiPanel->GetChildCount(playerPanel); i++) {
 							vgui::VPANEL statusIconsVPanel = g_pVGuiPanel->GetChild(playerPanel, i);

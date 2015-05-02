@@ -341,8 +341,8 @@ int PlayerAliases::GetCurrentAliasedPlayers(const char *partial, char commands[C
 	std::string command;
 	std::getline(ss, command, ' ');
 
-	for (auto playerAlias = customAliases.begin(); playerAlias != customAliases.end() && playerCount < COMMAND_COMPLETION_MAXITEMS; ++playerAlias) {
-		CSteamID playerSteamID = playerAlias->first;
+	for (auto iterator : customAliases) {
+		CSteamID playerSteamID = iterator.first;
 
 		V_snprintf(commands[playerCount], COMMAND_COMPLETION_ITEM_LENGTH, "%s %llu", command.c_str(), playerSteamID.ConvertToUint64());
 		playerCount++;
@@ -358,9 +358,7 @@ int PlayerAliases::GetCurrentGamePlayers(const char *partial, char commands[COMM
 	std::string command;
 	std::getline(ss, command, ' ');
 
-	for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
-		Player player = *iterator;
-
+	for (Player player : Player::Iterable()) {
 		CSteamID playerSteamID = player.GetSteamID();
 			
 		if (playerSteamID.IsValid()) {
