@@ -63,15 +63,15 @@ typedef int(*GLPI_t)(void);
 
 // member function types
 #if defined _WIN32
-typedef void(__thiscall *HLTVCV_t)(C_HLTVCamera *, Vector &, QAngle &, float &);
 typedef void(__thiscall *SCA_t)(C_HLTVCamera *, QAngle &);
 typedef void(__thiscall *SM_t)(C_HLTVCamera *, int);
 typedef void(__thiscall *SMI_t)(C_BaseEntity *, int);
 typedef void(__thiscall *SMP_t)(C_BaseEntity *, const model_t *);
 typedef void(__thiscall *SPT_t)(C_HLTVCamera *, int);
-typedef void(__fastcall *HLTVCVH_t)(C_HLTVCamera *, Vector &, QAngle &, float &);
+typedef void(__fastcall *SMH_t)(C_HLTVCamera *, void *, int);
 typedef void(__fastcall *SMIH_t)(C_BaseEntity *, void *, int);
 typedef void(__fastcall *SMPH_t)(C_BaseEntity *, void *, const model_t *);
+typedef void(__fastcall *SPTH_t)(C_HLTVCamera *, void *, int);
 #endif
 
 inline bool DataCompare(const BYTE* pData, const BYTE* bSig, const char* szMask) {

@@ -37,6 +37,8 @@ public:
 	static bool AddDetour_GetLocalPlayerIndex(GLPI_t detour);
 
 	static int AddHook_C_BaseEntity_SetModel(std::function<void(C_BaseEntity *, const model_t *&)> hook);
+	static int AddHook_C_HLTVCamera_SetMode(std::function<void(C_HLTVCamera *, int &)> hook);
+	static int AddHook_C_HLTVCamera_SetPrimaryTarget(std::function<void(C_HLTVCamera *, int &)> hook);
 
 	static int AddGlobalHook_C_TFPlayer_GetFOV(C_TFPlayer *instance, fastdelegate::FastDelegate0<float> hook, bool post);
 	static int AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, fastdelegate::FastDelegate1<ClientFrameStage_t> hook, bool post);
@@ -74,6 +76,8 @@ public:
 	static bool RemoveDetour_GetLocalPlayerIndex();
 
 	static void RemoveHook_C_BaseEntity_SetModel(int hookID);
+	static void RemoveHook_C_HLTVCamera_SetMode(int hookID);
+	static void RemoveHook_C_HLTVCamera_SetPrimaryTarget(int hookID);
 
 	static bool RemoveHook(int hookID);
 
@@ -85,10 +89,16 @@ public:
 
 	static bool Unpause();
 private:
+	static int setModeLastHookRegistered;
+	static std::map<int, std::function<void(C_HLTVCamera *, int &)>> setModeHooks;
 	static int setModelLastHookRegistered;
 	static std::map<int, std::function<void(C_BaseEntity *, const model_t *&)>> setModelHooks;
+	static int setPrimaryTargetLastHookRegistered;
+	static std::map<int, std::function<void(C_HLTVCamera *, int &)>> setPrimaryTargetHooks;
 
 	static GLPI_t getLocalPlayerIndexOriginal;
+	static SM_t setModeOriginal;
+	static SPT_t setPrimaryTargetOriginal;
 	static SMI_t setModelIndexOriginal;
 	static SMP_t setModelPointerOriginal;
 
@@ -96,12 +106,18 @@ private:
 
 	static bool AddDetour_C_BaseEntity_SetModelIndex(SMIH_t detour);
 	static bool AddDetour_C_BaseEntity_SetModelPointer(SMPH_t detour);
+	static bool AddDetour_C_HLTVCamera_SetMode(SMH_t detour);
+	static bool AddDetour_C_HLTVCamera_SetPrimaryTarget(SPTH_t detour);
 
 	static void __fastcall Detour_C_BaseEntity_SetModelIndex(C_BaseEntity *, void *, int);
 	static void __fastcall Detour_C_BaseEntity_SetModelPointer(C_BaseEntity *, void *, const model_t *);
+	static void __fastcall Detour_C_HLTVCamera_SetMode(C_HLTVCamera *, void *, int);
+	static void __fastcall Detour_C_HLTVCamera_SetPrimaryTarget(C_HLTVCamera *, void *, int);
 
 	static bool RemoveDetour_C_BaseEntity_SetModelIndex();
 	static bool RemoveDetour_C_BaseEntity_SetModelPointer();
+	static bool RemoveDetour_C_HLTVCamera_SetMode();
+	static bool RemoveDetour_C_HLTVCamera_SetPrimaryTarget();
 
 	static bool RemoveDetour(void *target);
 };

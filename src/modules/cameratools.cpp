@@ -66,6 +66,8 @@ CameraTools::CameraTools(std::string name) : Module(name) {
 	frameHook = 0;
 	inToolModeHook = 0;
 	isThirdPersonCameraHook = 0;
+	setModeHook = 0;
+	setPrimaryTargetHook = 0;
 	setupEngineViewHook = 0;
 	smoothEnding = false;
 	smoothEndMode = OBS_MODE_NONE;
@@ -77,6 +79,9 @@ CameraTools::CameraTools(std::string name) : Module(name) {
 	specguiSettings = new KeyValues("Resource/UI/SpectatorTournament.res");
 	specguiSettings->LoadFromFile(Interfaces::pFileSystem, "resource/ui/spectatortournament.res", "mod");
 
+	force_mode = new ConVar("statusspec_cameratools_force_mode", "0", FCVAR_NONE, "if a valid mode, force the camera mode to this", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->ChangeForceMode(var, pOldValue, flOldValue); });
+	force_target = new ConVar("statusspec_cameratools_force_target", "-1", FCVAR_NONE, "if a valid target, force the camera target to this", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->ChangeForceTarget(var, pOldValue, flOldValue); });
+	force_valid_target = new ConVar("statusspec_cameratools_force_valid_target", "0", FCVAR_NONE, "forces the camera to only have valid targets", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->ToggleForceValidTarget(var, pOldValue, flOldValue); });
 	killer_follow_enabled = new ConVar("statusspec_cameratools_killer_follow_enabled", "0", FCVAR_NONE, "enables switching to the killer upon death of spectated player", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->ToggleKillerFollowEnabled(var, pOldValue, flOldValue); });
 	smooth_camera_switches_enabled = new ConVar("statusspec_cameratools_smooth_camera_switches_enabled", "0", FCVAR_NONE, "enable smooth glide to new view on camera switch", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->ToggleSmoothCameraSwitchesEnabled(var, pOldValue, flOldValue); });
 	smooth_camera_switches_max_angle_difference = new ConVar("statusspec_cameratools_smooth_camera_switches_max_angle_difference", "90", FCVAR_NONE, "max angle difference at which smoothing will be performed");
@@ -219,6 +224,57 @@ void CameraTools::FireGameEvent(IGameEvent *event) {
 	}
 }
 
+void CameraTools::UpdateState() {
+	std::string currentState;
+
+	if (Interfaces::pEngineClient->IsInGame()) {
+		try {
+			HLTVCameraOverride *hltvcamera = (HLTVCameraOverride *)Interfaces::GetHLTVCamera();
+
+			Json::Value cameraState;
+			cameraState["mode"] = hltvcamera->m_nCameraMode;
+			cameraState["camera"] = hltvcamera->m_iCameraMan;
+			cameraState["origin"]["x"] = hltvcamera->m_vCamOrigin.x;
+			cameraState["origin"]["y"] = hltvcamera->m_vCamOrigin.y;
+			cameraState["origin"]["z"] = hltvcamera->m_vCamOrigin.z;
+			cameraState["angle"]["x"] = hltvcamera->m_aCamAngle.x;
+			cameraState["angle"]["y"] = hltvcamera->m_aCamAngle.y;
+			cameraState["angle"]["z"] = hltvcamera->m_aCamAngle.z;
+			cameraState["target"][0] = hltvcamera->m_iTraget1;
+			cameraState["target"][1] = hltvcamera->m_iTraget2;
+			cameraState["fov"] = hltvcamera->m_flFOV;
+			cameraState["offset"] = hltvcamera->m_flOffset;
+			cameraState["distance"] = hltvcamera->m_flDistance;
+			cameraState["lastdistance"] = hltvcamera->m_flLastDistance;
+			cameraState["theta"] = hltvcamera->m_flTheta;
+			cameraState["phi"] = hltvcamera->m_flPhi;
+			cameraState["inertia"] = hltvcamera->m_flInertia;
+			cameraState["cmd"]["angle"]["x"] = hltvcamera->m_LastCmd.viewangles.x;
+			cameraState["cmd"]["angle"]["y"] = hltvcamera->m_LastCmd.viewangles.y;
+			cameraState["cmd"]["angle"]["z"] = hltvcamera->m_LastCmd.viewangles.z;
+			cameraState["cmd"]["buttons"]["speed"] = (hltvcamera->m_LastCmd.buttons & IN_SPEED) != 0;
+			cameraState["cmd"]["forwardmove"] = hltvcamera->m_LastCmd.forwardmove;
+			cameraState["cmd"]["sidemove"] = hltvcamera->m_LastCmd.sidemove;
+			cameraState["cmd"]["upmove"] = hltvcamera->m_LastCmd.upmove;
+			cameraState["velocity"]["x"] = hltvcamera->m_vecVelocity.x;
+			cameraState["velocity"]["y"] = hltvcamera->m_vecVelocity.y;
+			cameraState["velocity"]["z"] = hltvcamera->m_vecVelocity.z;
+
+			currentState = Json::FastWriter().write(cameraState);
+		}
+		catch (bad_pointer &e) {
+			Warning("%s\n", e.what());
+		}
+	}
+	else {
+		currentState = "{}";
+	}
+
+	currentlyUpdating = true;
+	state->SetValue(currentState.c_str());
+	currentlyUpdating = false;
+}
+
 void CameraTools::FrameHook(ClientFrameStage_t curStage) {
 	if (curStage == FRAME_START) {
 		std::thread update(std::bind(&CameraTools::UpdateState, this));
@@ -250,6 +306,26 @@ bool CameraTools::IsThirdPersonCameraOverride() {
 	}
 
 	RETURN_META_VALUE(MRES_IGNORED, false);
+}
+
+void CameraTools::SetModeOverride(C_HLTVCamera *hltvcamera, int &iMode) {
+	int forceMode = force_mode->GetInt();
+
+	if (forceMode == OBS_MODE_FIXED || forceMode == OBS_MODE_IN_EYE || forceMode == OBS_MODE_CHASE || forceMode == OBS_MODE_ROAMING) {
+		iMode = forceMode;
+	}
+}
+
+void CameraTools::SetPrimaryTargetOverride(C_HLTVCamera *hltvcamera, int &nEntity) {
+	int forceTarget = force_target->GetInt();
+
+	if (Interfaces::pClientEntityList->GetClientEntity(forceTarget)) {
+		nEntity = forceTarget;
+	}
+
+	if (!Interfaces::pClientEntityList->GetClientEntity(nEntity)) {
+		nEntity = ((HLTVCameraOverride *)hltvcamera)->m_iTraget1;
+	}
 }
 
 bool CameraTools::SetupEngineViewOverride(Vector &origin, QAngle &angles, float &fov) {
@@ -342,55 +418,54 @@ bool CameraTools::SetupEngineViewOverride(Vector &origin, QAngle &angles, float 
 	RETURN_META_VALUE(MRES_IGNORED, false);
 }
 
-void CameraTools::UpdateState() {
-	std::string currentState;
+void CameraTools::ChangeForceMode(IConVar *var, const char *pOldValue, float flOldValue) {
+	int forceMode = force_mode->GetInt();
 
-	if (Interfaces::pEngineClient->IsInGame()) {
-		try {
-			HLTVCameraOverride *hltvcamera = (HLTVCameraOverride *)Interfaces::GetHLTVCamera();
-
-			Json::Value cameraState;
-			cameraState["mode"] = hltvcamera->m_nCameraMode;
-			cameraState["camera"] = hltvcamera->m_iCameraMan;
-			cameraState["origin"]["x"] = hltvcamera->m_vCamOrigin.x;
-			cameraState["origin"]["y"] = hltvcamera->m_vCamOrigin.y;
-			cameraState["origin"]["z"] = hltvcamera->m_vCamOrigin.z;
-			cameraState["angle"]["x"] = hltvcamera->m_aCamAngle.x;
-			cameraState["angle"]["y"] = hltvcamera->m_aCamAngle.y;
-			cameraState["angle"]["z"] = hltvcamera->m_aCamAngle.z;
-			cameraState["target"][0] = hltvcamera->m_iTraget1;
-			cameraState["target"][1] = hltvcamera->m_iTraget2;
-			cameraState["fov"] = hltvcamera->m_flFOV;
-			cameraState["offset"] = hltvcamera->m_flOffset;
-			cameraState["distance"] = hltvcamera->m_flDistance;
-			cameraState["lastdistance"] = hltvcamera->m_flLastDistance;
-			cameraState["theta"] = hltvcamera->m_flTheta;
-			cameraState["phi"] = hltvcamera->m_flPhi;
-			cameraState["inertia"] = hltvcamera->m_flInertia;
-			cameraState["cmd"]["angle"]["x"] = hltvcamera->m_LastCmd.viewangles.x;
-			cameraState["cmd"]["angle"]["y"] = hltvcamera->m_LastCmd.viewangles.y;
-			cameraState["cmd"]["angle"]["z"] = hltvcamera->m_LastCmd.viewangles.z;
-			cameraState["cmd"]["buttons"]["speed"] = (hltvcamera->m_LastCmd.buttons & IN_SPEED) != 0;
-			cameraState["cmd"]["forwardmove"] = hltvcamera->m_LastCmd.forwardmove;
-			cameraState["cmd"]["sidemove"] = hltvcamera->m_LastCmd.sidemove;
-			cameraState["cmd"]["upmove"] = hltvcamera->m_LastCmd.upmove;
-			cameraState["velocity"]["x"] = hltvcamera->m_vecVelocity.x;
-			cameraState["velocity"]["y"] = hltvcamera->m_vecVelocity.y;
-			cameraState["velocity"]["z"] = hltvcamera->m_vecVelocity.z;
-
-			currentState = Json::FastWriter().write(cameraState);
+	if (forceMode == OBS_MODE_FIXED || forceMode == OBS_MODE_IN_EYE || forceMode == OBS_MODE_CHASE || forceMode == OBS_MODE_ROAMING) {
+		if (!setModeHook) {
+			setModeHook = Funcs::AddHook_C_HLTVCamera_SetMode(std::bind(&CameraTools::SetModeOverride, this, std::placeholders::_1, std::placeholders::_2));
 		}
-		catch (bad_pointer &e) {
-			Warning("%s\n", e.what());
+
+		try {
+			Funcs::CallFunc_C_HLTVCamera_SetMode(Interfaces::GetHLTVCamera(), forceMode);
+		}
+		catch (bad_pointer) {
+			Warning("Error in setting mode.\n");
 		}
 	}
 	else {
-		currentState = "{}";
-	}
+		var->SetValue(OBS_MODE_NONE);
 
-	currentlyUpdating = true;
-	state->SetValue(currentState.c_str());
-	currentlyUpdating = false;
+		if (setModeHook) {
+			Funcs::RemoveHook_C_HLTVCamera_SetMode(setModeHook);
+			setModeHook = 0;
+		}
+	}
+}
+
+void CameraTools::ChangeForceTarget(IConVar *var, const char *pOldValue, float flOldValue) {
+	int forceTarget = force_target->GetInt();
+
+	if (Interfaces::pClientEntityList->GetClientEntity(forceTarget)) {
+		if (!setPrimaryTargetHook) {
+			setPrimaryTargetHook = Funcs::AddHook_C_HLTVCamera_SetPrimaryTarget(std::bind(&CameraTools::SetPrimaryTargetOverride, this, std::placeholders::_1, std::placeholders::_2));
+		}
+
+		try {
+			Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(Interfaces::GetHLTVCamera(), forceTarget);
+		}
+		catch (bad_pointer) {
+			Warning("Error in setting target.\n");
+		}
+	}
+	else {
+		if (!force_valid_target->GetBool()) {
+			if (setPrimaryTargetHook) {
+				Funcs::RemoveHook_C_HLTVCamera_SetPrimaryTarget(setPrimaryTargetHook);
+				setPrimaryTargetHook = 0;
+			}
+		}
+	}
 }
 
 void CameraTools::ChangeState(IConVar *var, const char *pOldValue, float flOldValue) {
@@ -827,6 +902,22 @@ void CameraTools::SpecPosition(const CCommand &command) {
 		Warning("Usage: statusspec_cameratools_spec_pos <x> <y> <z> <yaw> <pitch>\n");
 
 		return;
+	}
+}
+
+void CameraTools::ToggleForceValidTarget(IConVar *var, const char *pOldValue, float flOldValue) {
+	if (force_valid_target->GetBool()) {
+		if (!setPrimaryTargetHook) {
+			setPrimaryTargetHook = Funcs::AddHook_C_HLTVCamera_SetPrimaryTarget(std::bind(&CameraTools::SetPrimaryTargetOverride, this, std::placeholders::_1, std::placeholders::_2));
+		}
+	}
+	else {
+		if (!Interfaces::pClientEntityList->GetClientEntity(force_target->GetInt())) {
+			if (setPrimaryTargetHook) {
+				Funcs::RemoveHook_C_HLTVCamera_SetPrimaryTarget(setPrimaryTargetHook);
+				setPrimaryTargetHook = 0;
+			}
+		}
 	}
 }
 
