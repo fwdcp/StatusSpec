@@ -13,7 +13,9 @@
 #include <functional>
 #include <thread>
 
-#include "json/json.h"
+#include "rapidjson/document.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
 
 class C_BaseEntity;
 #include "cbase.h"
@@ -231,36 +233,48 @@ void CameraTools::UpdateState() {
 		try {
 			HLTVCameraOverride *hltvcamera = (HLTVCameraOverride *)Interfaces::GetHLTVCamera();
 
-			Json::Value cameraState;
-			cameraState["mode"] = hltvcamera->m_nCameraMode;
-			cameraState["camera"] = hltvcamera->m_iCameraMan;
-			cameraState["origin"]["x"] = hltvcamera->m_vCamOrigin.x;
-			cameraState["origin"]["y"] = hltvcamera->m_vCamOrigin.y;
-			cameraState["origin"]["z"] = hltvcamera->m_vCamOrigin.z;
-			cameraState["angle"]["x"] = hltvcamera->m_aCamAngle.x;
-			cameraState["angle"]["y"] = hltvcamera->m_aCamAngle.y;
-			cameraState["angle"]["z"] = hltvcamera->m_aCamAngle.z;
-			cameraState["target"][0] = hltvcamera->m_iTraget1;
-			cameraState["target"][1] = hltvcamera->m_iTraget2;
-			cameraState["fov"] = hltvcamera->m_flFOV;
-			cameraState["offset"] = hltvcamera->m_flOffset;
-			cameraState["distance"] = hltvcamera->m_flDistance;
-			cameraState["lastdistance"] = hltvcamera->m_flLastDistance;
-			cameraState["theta"] = hltvcamera->m_flTheta;
-			cameraState["phi"] = hltvcamera->m_flPhi;
-			cameraState["inertia"] = hltvcamera->m_flInertia;
-			cameraState["cmd"]["angle"]["x"] = hltvcamera->m_LastCmd.viewangles.x;
-			cameraState["cmd"]["angle"]["y"] = hltvcamera->m_LastCmd.viewangles.y;
-			cameraState["cmd"]["angle"]["z"] = hltvcamera->m_LastCmd.viewangles.z;
-			cameraState["cmd"]["buttons"]["speed"] = (hltvcamera->m_LastCmd.buttons & IN_SPEED) != 0;
-			cameraState["cmd"]["forwardmove"] = hltvcamera->m_LastCmd.forwardmove;
-			cameraState["cmd"]["sidemove"] = hltvcamera->m_LastCmd.sidemove;
-			cameraState["cmd"]["upmove"] = hltvcamera->m_LastCmd.upmove;
-			cameraState["velocity"]["x"] = hltvcamera->m_vecVelocity.x;
-			cameraState["velocity"]["y"] = hltvcamera->m_vecVelocity.y;
-			cameraState["velocity"]["z"] = hltvcamera->m_vecVelocity.z;
+			rapidjson::Document cameraState;
+			cameraState.SetObject();
+			cameraState.AddMember("mode", hltvcamera->m_nCameraMode, cameraState.GetAllocator());
+			cameraState.AddMember("camera", hltvcamera->m_iCameraMan, cameraState.GetAllocator());
+			cameraState.AddMember("origin", rapidjson::Value(rapidjson::kObjectType), cameraState.GetAllocator());
+			cameraState["origin"].AddMember("x", hltvcamera->m_vCamOrigin.x, cameraState.GetAllocator());
+			cameraState["origin"].AddMember("y", hltvcamera->m_vCamOrigin.y, cameraState.GetAllocator());
+			cameraState["origin"].AddMember("z", hltvcamera->m_vCamOrigin.z, cameraState.GetAllocator());
+			cameraState.AddMember("angle", rapidjson::Value(rapidjson::kObjectType), cameraState.GetAllocator());
+			cameraState["angle"].AddMember("x", hltvcamera->m_aCamAngle.x, cameraState.GetAllocator());
+			cameraState["angle"].AddMember("y", hltvcamera->m_aCamAngle.y, cameraState.GetAllocator());
+			cameraState["angle"].AddMember("z", hltvcamera->m_aCamAngle.z, cameraState.GetAllocator());
+			cameraState.AddMember("target", rapidjson::Value(rapidjson::kArrayType), cameraState.GetAllocator());
+			cameraState["target"].PushBack(hltvcamera->m_iTraget1, cameraState.GetAllocator());
+			cameraState["target"].PushBack(hltvcamera->m_iTraget2, cameraState.GetAllocator());
+			cameraState.AddMember("fov", hltvcamera->m_flFOV, cameraState.GetAllocator());
+			cameraState.AddMember("offset", hltvcamera->m_flOffset, cameraState.GetAllocator());
+			cameraState.AddMember("distance", hltvcamera->m_flDistance, cameraState.GetAllocator());
+			cameraState.AddMember("lastdistance", hltvcamera->m_flLastDistance, cameraState.GetAllocator());
+			cameraState.AddMember("theta", hltvcamera->m_flTheta, cameraState.GetAllocator());
+			cameraState.AddMember("phi", hltvcamera->m_flPhi, cameraState.GetAllocator());
+			cameraState.AddMember("inertia", hltvcamera->m_flInertia, cameraState.GetAllocator());
+			cameraState.AddMember("cmd", rapidjson::Value(rapidjson::kObjectType), cameraState.GetAllocator());
+			cameraState["cmd"].AddMember("angle", rapidjson::Value(rapidjson::kObjectType), cameraState.GetAllocator());
+			cameraState["cmd"]["angle"].AddMember("x", hltvcamera->m_LastCmd.viewangles.x, cameraState.GetAllocator());
+			cameraState["cmd"]["angle"].AddMember("y", hltvcamera->m_LastCmd.viewangles.y, cameraState.GetAllocator());
+			cameraState["cmd"]["angle"].AddMember("z", hltvcamera->m_LastCmd.viewangles.z, cameraState.GetAllocator());
+			cameraState["cmd"].AddMember("buttons", rapidjson::Value(rapidjson::kObjectType), cameraState.GetAllocator());
+			cameraState["cmd"]["buttons"].AddMember("speed", (hltvcamera->m_LastCmd.buttons & IN_SPEED) != 0, cameraState.GetAllocator());
+			cameraState["cmd"].AddMember("forwardmove", hltvcamera->m_LastCmd.forwardmove, cameraState.GetAllocator());
+			cameraState["cmd"].AddMember("sidemove", hltvcamera->m_LastCmd.sidemove, cameraState.GetAllocator());
+			cameraState["cmd"].AddMember("upmove", hltvcamera->m_LastCmd.upmove, cameraState.GetAllocator());
+			cameraState.AddMember("velocity", rapidjson::Value(rapidjson::kObjectType), cameraState.GetAllocator());
+			cameraState["velocity"].AddMember("x", hltvcamera->m_vecVelocity.x, cameraState.GetAllocator());
+			cameraState["velocity"].AddMember("y", hltvcamera->m_vecVelocity.y, cameraState.GetAllocator());
+			cameraState["velocity"].AddMember("z", hltvcamera->m_vecVelocity.z, cameraState.GetAllocator());
 
-			currentState = Json::FastWriter().write(cameraState);
+			rapidjson::StringBuffer buffer;
+			rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+			cameraState.Accept(writer);
+
+			currentState = buffer.GetString();
 		}
 		catch (bad_pointer &e) {
 			Warning("%s\n", e.what());
@@ -480,45 +494,49 @@ void CameraTools::ChangeState(IConVar *var, const char *pOldValue, float flOldVa
 	try {
 		HLTVCameraOverride *hltvcamera = (HLTVCameraOverride *)Interfaces::GetHLTVCamera();
 
-		Json::Value newState;
-		Json::Reader().parse(state->GetString(), newState);
+		rapidjson::Document newState;
+		newState.Parse(state->GetString());
+
+		if (!newState.IsObject()) {
+			return;
+		}
 
 		int cameraman = hltvcamera->m_iCameraMan;
-		if (newState.isMember("camera") && newState["camera"].isInt()) {
-			cameraman = newState["camera"].asInt();
+		if (newState.HasMember("camera") && newState["camera"].IsInt()) {
+			cameraman = newState["camera"].GetInt();
 		}
 
 		hltvcamera->m_iCameraMan = cameraman;
 
 		if (cameraman <= 0) {
 			int mode = hltvcamera->m_nCameraMode;
-			if (newState.isMember("mode") && newState["mode"].isInt()) {
-				mode = newState["mode"].asInt();
+			if (newState.HasMember("mode") && newState["mode"].IsInt()) {
+				mode = newState["mode"].GetInt();
 			}
 
 			if (hltvcamera->m_nCameraMode != mode) {
-				Funcs::CallFunc_C_HLTVCamera_SetMode(Interfaces::GetHLTVCamera(), newState["mode"].asInt());
+				Funcs::CallFunc_C_HLTVCamera_SetMode(Interfaces::GetHLTVCamera(), newState["mode"].GetInt());
 			}
 
 			if (mode == OBS_MODE_ROAMING) {
-				if (newState.isMember("cmd") && newState["cmd"].isObject()) {
-					if (newState["cmd"].isMember("angle") && newState["cmd"]["angle"].isObject()) {
-						if (newState["cmd"]["angle"].isMember("x") && newState["cmd"]["angle"]["x"].isDouble()) {
-							hltvcamera->m_LastCmd.viewangles.x = newState["cmd"]["angle"]["x"].asFloat();
+				if (newState.HasMember("cmd") && newState["cmd"].IsObject()) {
+					if (newState["cmd"].HasMember("angle") && newState["cmd"]["angle"].IsObject()) {
+						if (newState["cmd"]["angle"].HasMember("x") && newState["cmd"]["angle"]["x"].IsDouble()) {
+							hltvcamera->m_LastCmd.viewangles.x = newState["cmd"]["angle"]["x"].GetDouble();
 						}
 
-						if (newState["cmd"]["angle"].isMember("y") && newState["cmd"]["angle"]["y"].isDouble()) {
-							hltvcamera->m_LastCmd.viewangles.y = newState["cmd"]["angle"]["y"].asFloat();
+						if (newState["cmd"]["angle"].HasMember("y") && newState["cmd"]["angle"]["y"].IsDouble()) {
+							hltvcamera->m_LastCmd.viewangles.y = newState["cmd"]["angle"]["y"].GetDouble();
 						}
 
-						if (newState["cmd"]["angle"].isMember("z") && newState["cmd"]["angle"]["z"].isDouble()) {
-							hltvcamera->m_LastCmd.viewangles.z = newState["cmd"]["angle"]["z"].asFloat();
+						if (newState["cmd"]["angle"].HasMember("z") && newState["cmd"]["angle"]["z"].IsDouble()) {
+							hltvcamera->m_LastCmd.viewangles.z = newState["cmd"]["angle"]["z"].GetDouble();
 						}
 					}
 
-					if (newState["cmd"].isMember("buttons") && newState["cmd"]["buttons"].isObject()) {
-						if (newState["cmd"]["buttons"].isMember("speed") && newState["cmd"]["buttons"]["speed"].isBool()) {
-							if (newState["cmd"]["buttons"]["speed"].asBool()) {
+					if (newState["cmd"].HasMember("buttons") && newState["cmd"]["buttons"].IsObject()) {
+						if (newState["cmd"]["buttons"].HasMember("speed") && newState["cmd"]["buttons"]["speed"].IsBool()) {
+							if (newState["cmd"]["buttons"]["speed"].GetBool()) {
 								hltvcamera->m_LastCmd.buttons |= IN_SPEED;
 							}
 							else {
@@ -527,66 +545,66 @@ void CameraTools::ChangeState(IConVar *var, const char *pOldValue, float flOldVa
 						}
 					}
 
-					if (newState["cmd"].isMember("forwardmove") && newState["cmd"]["forwardmove"].isDouble()) {
-						hltvcamera->m_LastCmd.forwardmove = newState["cmd"]["forwardmove"].asFloat();
+					if (newState["cmd"].HasMember("forwardmove") && newState["cmd"]["forwardmove"].IsDouble()) {
+						hltvcamera->m_LastCmd.forwardmove = newState["cmd"]["forwardmove"].GetDouble();
 					}
 
-					if (newState["cmd"].isMember("sidemove") && newState["cmd"]["sidemove"].isDouble()) {
-						hltvcamera->m_LastCmd.sidemove = newState["cmd"]["sidemove"].asFloat();
+					if (newState["cmd"].HasMember("sidemove") && newState["cmd"]["sidemove"].IsDouble()) {
+						hltvcamera->m_LastCmd.sidemove = newState["cmd"]["sidemove"].GetDouble();
 					}
 
-					if (newState["cmd"].isMember("upmove") && newState["cmd"]["upmove"].isDouble()) {
-						hltvcamera->m_LastCmd.upmove = newState["cmd"]["upmove"].asFloat();
-					}
-				}
-
-				if (newState.isMember("velocity") && newState["velocity"].isObject()) {
-					if (newState["velocity"].isMember("x") && newState["velocity"]["x"].isDouble()) {
-						hltvcamera->m_vecVelocity.x = newState["velocity"]["x"].asFloat();
-					}
-
-					if (newState["velocity"].isMember("y") && newState["velocity"]["y"].isDouble()) {
-						hltvcamera->m_vecVelocity.y = newState["velocity"]["y"].asFloat();
-					}
-
-					if (newState["velocity"].isMember("z") && newState["velocity"]["z"].isDouble()) {
-						hltvcamera->m_vecVelocity.z = newState["velocity"]["z"].asFloat();
+					if (newState["cmd"].HasMember("upmove") && newState["cmd"]["upmove"].IsDouble()) {
+						hltvcamera->m_LastCmd.upmove = newState["cmd"]["upmove"].GetDouble();
 					}
 				}
 
-				if (newState.isMember("origin") && newState["origin"].isObject()) {
-					if (newState["origin"].isMember("x") && newState["origin"]["x"].isDouble()) {
-						hltvcamera->m_vCamOrigin.x = newState["origin"]["x"].asFloat();
+				if (newState.HasMember("velocity") && newState["velocity"].IsObject()) {
+					if (newState["velocity"].HasMember("x") && newState["velocity"]["x"].IsDouble()) {
+						hltvcamera->m_vecVelocity.x = newState["velocity"]["x"].GetDouble();
 					}
 
-					if (newState["origin"].isMember("y") && newState["origin"]["y"].isDouble()) {
-						hltvcamera->m_vCamOrigin.y = newState["origin"]["y"].asFloat();
+					if (newState["velocity"].HasMember("y") && newState["velocity"]["y"].IsDouble()) {
+						hltvcamera->m_vecVelocity.y = newState["velocity"]["y"].GetDouble();
 					}
 
-					if (newState["origin"].isMember("z") && newState["origin"]["z"].isDouble()) {
-						hltvcamera->m_vCamOrigin.z = newState["origin"]["z"].asFloat();
+					if (newState["velocity"].HasMember("z") && newState["velocity"]["z"].IsDouble()) {
+						hltvcamera->m_vecVelocity.z = newState["velocity"]["z"].GetDouble();
 					}
 				}
 
-				if (newState.isMember("angle") && newState["angle"].isObject()) {
+				if (newState.HasMember("origin") && newState["origin"].IsObject()) {
+					if (newState["origin"].HasMember("x") && newState["origin"]["x"].IsDouble()) {
+						hltvcamera->m_vCamOrigin.x = newState["origin"]["x"].GetDouble();
+					}
+
+					if (newState["origin"].HasMember("y") && newState["origin"]["y"].IsDouble()) {
+						hltvcamera->m_vCamOrigin.y = newState["origin"]["y"].GetDouble();
+					}
+
+					if (newState["origin"].HasMember("z") && newState["origin"]["z"].IsDouble()) {
+						hltvcamera->m_vCamOrigin.z = newState["origin"]["z"].GetDouble();
+					}
+				}
+
+				if (newState.HasMember("angle") && newState["angle"].IsObject()) {
 					QAngle angle;
 
-					if (newState["angle"].isMember("x") && newState["angle"]["x"].isDouble()) {
-						angle.x = newState["angle"]["x"].asFloat();
+					if (newState["angle"].HasMember("x") && newState["angle"]["x"].IsDouble()) {
+						angle.x = newState["angle"]["x"].GetDouble();
 					}
 					else {
 						angle.x = hltvcamera->m_aCamAngle.x;
 					}
 
-					if (newState["angle"].isMember("y") && newState["angle"]["y"].isDouble()) {
-						angle.y = newState["angle"]["y"].asFloat();
+					if (newState["angle"].HasMember("y") && newState["angle"]["y"].IsDouble()) {
+						angle.y = newState["angle"]["y"].GetDouble();
 					}
 					else {
 						angle.y = hltvcamera->m_aCamAngle.y;
 					}
 
-					if (newState["angle"].isMember("z") && newState["angle"]["z"].isDouble()) {
-						angle.z = newState["angle"]["z"].asFloat();
+					if (newState["angle"].HasMember("z") && newState["angle"]["z"].IsDouble()) {
+						angle.z = newState["angle"]["z"].GetDouble();
 					}
 					else {
 						angle.z = hltvcamera->m_aCamAngle.z;
@@ -597,44 +615,44 @@ void CameraTools::ChangeState(IConVar *var, const char *pOldValue, float flOldVa
 					}
 				}
 
-				if (newState.isMember("fov") && newState["fov"].isDouble()) {
-					hltvcamera->m_flFOV = newState["fov"].asFloat();
+				if (newState.HasMember("fov") && newState["fov"].IsDouble()) {
+					hltvcamera->m_flFOV = newState["fov"].GetDouble();
 				}
 			}
 			else if (mode == OBS_MODE_FIXED) {
-				if (newState.isMember("origin") && newState["origin"].isObject()) {
-					if (newState["origin"].isMember("x") && newState["origin"]["x"].isDouble()) {
-						hltvcamera->m_vCamOrigin.x = newState["origin"]["x"].asFloat();
+				if (newState.HasMember("origin") && newState["origin"].IsObject()) {
+					if (newState["origin"].HasMember("x") && newState["origin"]["x"].IsDouble()) {
+						hltvcamera->m_vCamOrigin.x = newState["origin"]["x"].GetDouble();
 					}
 
-					if (newState["origin"].isMember("y") && newState["origin"]["y"].isDouble()) {
-						hltvcamera->m_vCamOrigin.y = newState["origin"]["y"].asFloat();
+					if (newState["origin"].HasMember("y") && newState["origin"]["y"].IsDouble()) {
+						hltvcamera->m_vCamOrigin.y = newState["origin"]["y"].GetDouble();
 					}
 
-					if (newState["origin"].isMember("z") && newState["origin"]["z"].isDouble()) {
-						hltvcamera->m_vCamOrigin.z = newState["origin"]["z"].asFloat();
+					if (newState["origin"].HasMember("z") && newState["origin"]["z"].IsDouble()) {
+						hltvcamera->m_vCamOrigin.z = newState["origin"]["z"].GetDouble();
 					}
 				}
 
-				if (newState.isMember("angle") && newState["angle"].isObject()) {
+				if (newState.HasMember("angle") && newState["angle"].IsObject()) {
 					QAngle angle;
 
-					if (newState["angle"].isMember("x") && newState["angle"]["x"].isDouble()) {
-						angle.x = newState["angle"]["x"].asFloat();
+					if (newState["angle"].HasMember("x") && newState["angle"]["x"].IsDouble()) {
+						angle.x = newState["angle"]["x"].GetDouble();
 					}
 					else {
 						angle.x = hltvcamera->m_aCamAngle.x;
 					}
 
-					if (newState["angle"].isMember("y") && newState["angle"]["y"].isDouble()) {
-						angle.y = newState["angle"]["y"].asFloat();
+					if (newState["angle"].HasMember("y") && newState["angle"]["y"].IsDouble()) {
+						angle.y = newState["angle"]["y"].GetDouble();
 					}
 					else {
 						angle.y = hltvcamera->m_aCamAngle.y;
 					}
 
-					if (newState["angle"].isMember("z") && newState["angle"]["z"].isDouble()) {
-						angle.z = newState["angle"]["z"].asFloat();
+					if (newState["angle"].HasMember("z") && newState["angle"]["z"].IsDouble()) {
+						angle.z = newState["angle"]["z"].GetDouble();
 					}
 					else {
 						angle.z = hltvcamera->m_aCamAngle.z;
@@ -645,71 +663,71 @@ void CameraTools::ChangeState(IConVar *var, const char *pOldValue, float flOldVa
 					}
 				}
 
-				if (newState.isMember("fov") && newState["fov"].isDouble()) {
-					hltvcamera->m_flFOV = newState["fov"].asFloat();
+				if (newState.HasMember("fov") && newState["fov"].IsDouble()) {
+					hltvcamera->m_flFOV = newState["fov"].GetDouble();
 				}
 
-				if (newState.isMember("target") && newState["target"].isArray()) {
-					if (newState["target"].isValidIndex(0) && newState["target"][0].isInt()) {
-						if (hltvcamera->m_iTraget1 != newState["target"][0].asInt()) {
-							Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(Interfaces::GetHLTVCamera(), newState["target"][0].asInt());
+				if (newState.HasMember("target") && newState["target"].IsArray()) {
+					if (newState["target"][0].IsInt()) {
+						if (hltvcamera->m_iTraget1 != newState["target"][0].GetInt()) {
+							Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(Interfaces::GetHLTVCamera(), newState["target"][0].GetInt());
 						}
 					}
 				}
 
-				if (newState.isMember("inertia") && newState["inertia"].isDouble()) {
-					hltvcamera->m_flInertia = newState["inertia"].asFloat();
+				if (newState.HasMember("inertia") && newState["inertia"].IsDouble()) {
+					hltvcamera->m_flInertia = newState["inertia"].GetDouble();
 				}
 			}
 			else if (mode == OBS_MODE_IN_EYE) {
-				if (newState.isMember("target") && newState["target"].isArray()) {
-					if (newState["target"].isValidIndex(0) && newState["target"][0].isInt()) {
-						if (hltvcamera->m_iTraget1 != newState["target"][0].asInt()) {
-							Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(Interfaces::GetHLTVCamera(), newState["target"][0].asInt());
+				if (newState.HasMember("target") && newState["target"].IsArray()) {
+					if (newState["target"][0].IsInt()) {
+						if (hltvcamera->m_iTraget1 != newState["target"][0].GetInt()) {
+							Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(Interfaces::GetHLTVCamera(), newState["target"][0].GetInt());
 						}
 					}
 				}
 			}
 			else if (mode == OBS_MODE_CHASE) {
-				if (newState.isMember("target") && newState["target"].isArray()) {
-					if (newState["target"].isValidIndex(0) && newState["target"][0].isInt()) {
-						if (hltvcamera->m_iTraget1 != newState["target"][0].asInt()) {
-							Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(Interfaces::GetHLTVCamera(), newState["target"][0].asInt());
+				if (newState.HasMember("target") && newState["target"].IsArray()) {
+					if (newState["target"][0].IsInt()) {
+						if (hltvcamera->m_iTraget1 != newState["target"][0].GetInt()) {
+							Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(Interfaces::GetHLTVCamera(), newState["target"][0].GetInt());
 						}
 					}
 
-					if (newState["target"].isValidIndex(1) && newState["target"][1].isInt()) {
-						hltvcamera->m_iTraget2 = newState["target"][1].asInt();
+					if (newState["target"][1].IsInt()) {
+						hltvcamera->m_iTraget2 = newState["target"][1].GetInt();
 					}
 				}
 
-				if (newState.isMember("phi") && newState["phi"].isDouble()) {
-					hltvcamera->m_flPhi = newState["phi"].asFloat();
+				if (newState.HasMember("phi") && newState["phi"].IsDouble()) {
+					hltvcamera->m_flPhi = newState["phi"].GetDouble();
 				}
 
-				if (newState.isMember("theta") && newState["theta"].isDouble()) {
-					hltvcamera->m_flTheta = newState["theta"].asFloat();
+				if (newState.HasMember("theta") && newState["theta"].IsDouble()) {
+					hltvcamera->m_flTheta = newState["theta"].GetDouble();
 				}
 
-				if (newState.isMember("angle") && newState["angle"].isObject()) {
+				if (newState.HasMember("angle") && newState["angle"].IsObject()) {
 					QAngle angle;
 
-					if (newState["angle"].isMember("x") && newState["angle"]["x"].isDouble()) {
-						angle.x = newState["angle"]["x"].asFloat();
+					if (newState["angle"].HasMember("x") && newState["angle"]["x"].IsDouble()) {
+						angle.x = newState["angle"]["x"].GetDouble();
 					}
 					else {
 						angle.x = hltvcamera->m_aCamAngle.x;
 					}
 
-					if (newState["angle"].isMember("y") && newState["angle"]["y"].isDouble()) {
-						angle.y = newState["angle"]["y"].asFloat();
+					if (newState["angle"].HasMember("y") && newState["angle"]["y"].IsDouble()) {
+						angle.y = newState["angle"]["y"].GetDouble();
 					}
 					else {
 						angle.y = hltvcamera->m_aCamAngle.y;
 					}
 
-					if (newState["angle"].isMember("z") && newState["angle"]["z"].isDouble()) {
-						angle.z = newState["angle"]["z"].asFloat();
+					if (newState["angle"].HasMember("z") && newState["angle"]["z"].IsDouble()) {
+						angle.z = newState["angle"]["z"].GetDouble();
 					}
 					else {
 						angle.z = hltvcamera->m_aCamAngle.z;
@@ -720,33 +738,33 @@ void CameraTools::ChangeState(IConVar *var, const char *pOldValue, float flOldVa
 					}
 				}
 
-				if (newState.isMember("distance") && newState["distance"].isDouble()) {
-					hltvcamera->m_flDistance = newState["distance"].asFloat();
+				if (newState.HasMember("distance") && newState["distance"].IsDouble()) {
+					hltvcamera->m_flDistance = newState["distance"].GetDouble();
 				}
 
-				if (newState.isMember("offset") && newState["offset"].isDouble()) {
-					hltvcamera->m_flOffset = newState["offset"].asFloat();
+				if (newState.HasMember("offset") && newState["offset"].IsDouble()) {
+					hltvcamera->m_flOffset = newState["offset"].GetDouble();
 				}
 
-				if (newState.isMember("lastdistance") && newState["lastdistance"].isDouble()) {
-					hltvcamera->m_flLastDistance = newState["lastdistance"].asFloat();
+				if (newState.HasMember("lastdistance") && newState["lastdistance"].IsDouble()) {
+					hltvcamera->m_flLastDistance = newState["lastdistance"].GetDouble();
 				}
 
-				if (newState.isMember("inertia") && newState["inertia"].isDouble()) {
-					hltvcamera->m_flInertia = newState["inertia"].asFloat();
+				if (newState.HasMember("inertia") && newState["inertia"].IsDouble()) {
+					hltvcamera->m_flInertia = newState["inertia"].GetDouble();
 				}
 
-				if (newState.isMember("origin") && newState["origin"].isObject()) {
-					if (newState["origin"].isMember("x") && newState["origin"]["x"].isDouble()) {
-						hltvcamera->m_vCamOrigin.x = newState["origin"]["x"].asFloat();
+				if (newState.HasMember("origin") && newState["origin"].IsObject()) {
+					if (newState["origin"].HasMember("x") && newState["origin"]["x"].IsDouble()) {
+						hltvcamera->m_vCamOrigin.x = newState["origin"]["x"].GetDouble();
 					}
 
-					if (newState["origin"].isMember("y") && newState["origin"]["y"].isDouble()) {
-						hltvcamera->m_vCamOrigin.y = newState["origin"]["y"].asFloat();
+					if (newState["origin"].HasMember("y") && newState["origin"]["y"].IsDouble()) {
+						hltvcamera->m_vCamOrigin.y = newState["origin"]["y"].GetDouble();
 					}
 
-					if (newState["origin"].isMember("z") && newState["origin"]["z"].isDouble()) {
-						hltvcamera->m_vCamOrigin.z = newState["origin"]["z"].asFloat();
+					if (newState["origin"].HasMember("z") && newState["origin"]["z"].IsDouble()) {
+						hltvcamera->m_vCamOrigin.z = newState["origin"]["z"].GetDouble();
 					}
 				}
 			}

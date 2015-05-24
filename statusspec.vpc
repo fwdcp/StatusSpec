@@ -10,7 +10,7 @@ $Macro OUTBINDIR		".\addons"
 $Macro MMSOURCE_DEV		"..\..\..\..\..\metamod-source"
 $Macro MINHOOK			"..\..\..\..\..\minhook"
 $Macro MINHOOK_BUILD	"$MINHOOK\build\VC12"
-$Macro JSONCPP			"..\..\..\..\..\jsoncpp\dist"
+$Macro RAPIDJSON		"..\..\..\..\..\rapidjson\include"
 
 $Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 
@@ -18,7 +18,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\game\client;$SRCDIR\game\shared;$SRCDIR\public;$MMSOURCE_DEV\core\sourcehook;$MINHOOK\include;$JSONCPP"
+		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\game\client;$SRCDIR\game\shared;$SRCDIR\public;$MMSOURCE_DEV\core\sourcehook;$MINHOOK\include;$RAPIDJSON"
 		$PreprocessorDefinitions			"$BASE;statusspecONLY;_MBCS;CLIENT_DLL;GLOWS_ENABLE;TF_CLIENT_DLL;TF_DLL;VERSION_SAFE_STEAM_API_INTERFACES"
 		$TreatWarningsAsErrors				"No (/WX-)"
 	}
@@ -85,7 +85,6 @@ $Project "StatusSpec"
 		$File	"$MMSOURCE_DEV\core\sourcehook\sourcehook_impl_chookmaninfo.cpp"
 		$File	"$MMSOURCE_DEV\core\sourcehook\sourcehook_impl_cproto.cpp"
 		$File	"$MMSOURCE_DEV\core\sourcehook\sourcehook_impl_cvfnptr.cpp"
-		$File	"$JSONCPP\jsoncpp.cpp"
 		$File	"$SRCDIR\public\filesystem_init.cpp"
 		$File	"$SRCDIR\public\vgui_controls\vgui_controls.cpp"
 		$File	"src\vgui_controls\gameconsoledialog.cpp"

@@ -10,7 +10,7 @@
 
 #include "playeraliases.h"
 
-#include "json/json.h"
+#include "rapidjson/document.h"
 
 #include "../common.h"
 #include "../funcs.h"
@@ -177,20 +177,16 @@ void PlayerAliases::GetESEAPlayerInfo(HTTPRequestCompleted_t *requestCompletionI
 		uint8 *body = new uint8[bodySize];
 		httpClient->GetHTTPResponseBodyData(requestCompletionInfo->m_hRequest, body, bodySize);
 
-		std::string json = (char *)body;
+		rapidjson::Document root;
+		root.Parse<rapidjson::RAPIDJSON_PARSE_DEFAULT_FLAGS | rapidjson::kParseStopWhenDoneFlag>((char *)body);
 
-		Json::Reader reader;
-		Json::Value root;
+		if (root.HasMember("results") && root["results"].Size() > 0) {
+			if (root["results"][0].HasMember("alias")) {
+				eseaAliases[player].name = root["results"][0]["alias"].GetString();
+				eseaAliases[player].status = API_SUCCESSFUL;
+				httpClient->ReleaseHTTPRequest(requestCompletionInfo->m_hRequest);
 
-		if (reader.parse(json, root)) {
-			if (root.isMember("results") && root["results"].size() > 0) {
-				if (root["results"][0].isMember("alias")) {
-					eseaAliases[player].name = root["results"][0]["alias"].asString();
-					eseaAliases[player].status = API_SUCCESSFUL;
-					httpClient->ReleaseHTTPRequest(requestCompletionInfo->m_hRequest);
-
-					return;
-				}
+				return;
 			}
 		}
 
@@ -218,20 +214,16 @@ void PlayerAliases::GetETF2LPlayerInfo(HTTPRequestCompleted_t *requestCompletion
 		uint8 *body = new uint8[bodySize];
 		httpClient->GetHTTPResponseBodyData(requestCompletionInfo->m_hRequest, body, bodySize);
 
-		std::string json = (char *)body;
-		
-		Json::Reader reader;
-		Json::Value root;
+		rapidjson::Document root;
+		root.Parse<rapidjson::RAPIDJSON_PARSE_DEFAULT_FLAGS | rapidjson::kParseStopWhenDoneFlag>((char *)body);
 
-		if (reader.parse(json, root)) {
-			if (root["status"]["code"].asInt() == 200) {
-				if (root["player"]["steam"]["id64"].asString() == std::to_string(player.ConvertToUint64())) {
-					etf2lAliases[player].name = root["player"]["name"].asString();
-					etf2lAliases[player].status = API_SUCCESSFUL;
-					httpClient->ReleaseHTTPRequest(requestCompletionInfo->m_hRequest);
+		if (root["status"]["code"].GetInt() == 200) {
+			if (root["player"]["steam"]["id64"].GetString() == std::to_string(player.ConvertToUint64())) {
+				etf2lAliases[player].name = root["player"]["name"].GetString();
+				etf2lAliases[player].status = API_SUCCESSFUL;
+				httpClient->ReleaseHTTPRequest(requestCompletionInfo->m_hRequest);
 
-					return;
-				}
+				return;
 			}
 		}
 
@@ -259,19 +251,15 @@ void PlayerAliases::GetTwitchUserInfo(HTTPRequestCompleted_t *requestCompletionI
 		uint8 *body = new uint8[bodySize];
 		httpClient->GetHTTPResponseBodyData(requestCompletionInfo->m_hRequest, body, bodySize);
 
-		std::string json = (char *)body;
+		rapidjson::Document root;
+		root.Parse<rapidjson::RAPIDJSON_PARSE_DEFAULT_FLAGS | rapidjson::kParseStopWhenDoneFlag>((char *)body);
 
-		Json::Reader reader;
-		Json::Value root;
+		if (!root.HasMember("status") || root["status"] == 200) {
+			twitchAliases[player].name = root["name"].GetString();
+			twitchAliases[player].status = API_SUCCESSFUL;
+			httpClient->ReleaseHTTPRequest(requestCompletionInfo->m_hRequest);
 
-		if (reader.parse(json, root)) {
-			if (!root.isMember("status") || root["status"] == 200) {
-				twitchAliases[player].name = root["name"].asString();
-				twitchAliases[player].status = API_SUCCESSFUL;
-				httpClient->ReleaseHTTPRequest(requestCompletionInfo->m_hRequest);
-
-				return;
-			}
+			return;
 		}
 
 		twitchAliases[player].status = API_FAILED;
