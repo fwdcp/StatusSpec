@@ -1,5 +1,5 @@
 /*
- *  consolemanager.cpp
+ *  consoletools.cpp
  *  StatusSpec project
  *
  *  Copyright (c) 2015 thesupremecommander
@@ -8,7 +8,7 @@
  *
  */
 
-#include "consolemanager.h"
+#include "consoletools.h"
 
 #include <regex>
 
@@ -32,19 +32,19 @@ void CCvar::SetFlags(ConCommandBase *base, int flags) {
 	base->m_nFlags = flags;
 }
 
-ConsoleManager::ConsoleManager(std::string name) : Module(name) {
+ConsoleTools::ConsoleTools(std::string name) : Module(name) {
 	consoleColorPrintfHook = 0;
 	consoleDPrintfHook = 0;
 	consolePrintfHook = 0;
 
-	filter_add = new ConCommand("statusspec_consolemanager_filter_add", [](const CCommand &command) { g_ModuleManager->GetModule<ConsoleManager>("Console Manager")->AddFilter(command); }, "add a console filter", FCVAR_NONE);
-	filter_enabled = new ConVar("statusspec_consolemanager_filter_enabled", "0", FCVAR_NONE, "enable console filtering", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<ConsoleManager>("Console Manager")->ToggleFilterEnabled(var, pOldValue, flOldValue); });
-	filter_remove = new ConCommand("statusspec_consolemanager_filter_remove", [](const CCommand &command) { g_ModuleManager->GetModule<ConsoleManager>("Console Manager")->RemoveFilter(command); }, "remove a console filter", FCVAR_NONE);
-	flags_add = new ConCommand("statusspec_consolemanager_flags_add", [](const CCommand &command) { g_ModuleManager->GetModule<ConsoleManager>("Console Manager")->AddFlags(command); }, "add a flag to a console command or variable", FCVAR_NONE);
-	flags_remove = new ConCommand("statusspec_consolemanager_flags_remove", [](const CCommand &command) { g_ModuleManager->GetModule<ConsoleManager>("Console Manager")->RemoveFlags(command); }, "remove a flag from a console command or variable", FCVAR_NONE);
+	filter_add = new ConCommand("statusspec_consoletools_filter_add", [](const CCommand &command) { g_ModuleManager->GetModule<ConsoleTools>("Console Tools")->AddFilter(command); }, "add a console filter", FCVAR_NONE);
+	filter_enabled = new ConVar("statusspec_consoletools_filter_enabled", "0", FCVAR_NONE, "enable console filtering", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<ConsoleTools>("Console Tools")->ToggleFilterEnabled(var, pOldValue, flOldValue); });
+	filter_remove = new ConCommand("statusspec_consoletools_filter_remove", [](const CCommand &command) { g_ModuleManager->GetModule<ConsoleTools>("Console Tools")->RemoveFilter(command); }, "remove a console filter", FCVAR_NONE);
+	flags_add = new ConCommand("statusspec_consoletools_flags_add", [](const CCommand &command) { g_ModuleManager->GetModule<ConsoleTools>("Console Tools")->AddFlags(command); }, "add a flag to a console command or variable", FCVAR_NONE);
+	flags_remove = new ConCommand("statusspec_consoletools_flags_remove", [](const CCommand &command) { g_ModuleManager->GetModule<ConsoleTools>("Console Tools")->RemoveFlags(command); }, "remove a flag from a console command or variable", FCVAR_NONE);
 }
 
-bool ConsoleManager::CheckDependencies(std::string name) {
+bool ConsoleTools::CheckDependencies(std::string name) {
 	bool ready = true;
 
 	if (!g_pCVar) {
@@ -57,7 +57,7 @@ bool ConsoleManager::CheckDependencies(std::string name) {
 	return ready;
 }
 
-void ConsoleManager::ConsoleColorPrintfHook(const Color &clr, const char *message) {
+void ConsoleTools::ConsoleColorPrintfHook(const Color &clr, const char *message) {
 	if (CheckFilters(message)) {
 		RETURN_META(MRES_SUPERCEDE);
 	}
@@ -65,7 +65,7 @@ void ConsoleManager::ConsoleColorPrintfHook(const Color &clr, const char *messag
 	RETURN_META(MRES_IGNORED);
 }
 
-void ConsoleManager::ConsoleDPrintfHook(const char *message) {
+void ConsoleTools::ConsoleDPrintfHook(const char *message) {
 	if (CheckFilters(message)) {
 		RETURN_META(MRES_SUPERCEDE);
 	}
@@ -73,7 +73,7 @@ void ConsoleManager::ConsoleDPrintfHook(const char *message) {
 	RETURN_META(MRES_IGNORED);
 }
 
-void ConsoleManager::ConsolePrintfHook(const char *message) {
+void ConsoleTools::ConsolePrintfHook(const char *message) {
 	if (CheckFilters(message)) {
 		RETURN_META(MRES_SUPERCEDE);
 	}
@@ -81,7 +81,7 @@ void ConsoleManager::ConsolePrintfHook(const char *message) {
 	RETURN_META(MRES_IGNORED);
 }
 
-bool ConsoleManager::CheckFilters(std::string message) {
+bool ConsoleTools::CheckFilters(std::string message) {
 	for (std::string filter : filters) {
 		if (std::regex_search(message, std::regex(filter))) {
 			return true;
@@ -91,7 +91,7 @@ bool ConsoleManager::CheckFilters(std::string message) {
 	return false;
 }
 
-void ConsoleManager::AddFlags(const CCommand &command) {
+void ConsoleTools::AddFlags(const CCommand &command) {
 	if (command.ArgC() >= 3) {
 		const char *name = command.Arg(1);
 
@@ -144,11 +144,11 @@ void ConsoleManager::AddFlags(const CCommand &command) {
 		}
 	}
 	else {
-		Warning("Usage: statusspec_consolemanager_flags_add <name> <flag1> [flag2 ...]\n");
+		Warning("Usage: statusspec_consoletools_flags_add <name> <flag1> [flag2 ...]\n");
 	}
 }
 
-void ConsoleManager::AddFilter(const CCommand &command) {
+void ConsoleTools::AddFilter(const CCommand &command) {
 	if (command.ArgC() >= 2) {
 		std::string filter = command.Arg(1);
 
@@ -160,11 +160,11 @@ void ConsoleManager::AddFilter(const CCommand &command) {
 		}
 	}
 	else {
-		Warning("Usage: statusspec_consolemanager_filter_add <filter>\n");
+		Warning("Usage: statusspec_consoletools_filter_add <filter>\n");
 	}
 }
 
-void ConsoleManager::RemoveFlags(const CCommand &command) {
+void ConsoleTools::RemoveFlags(const CCommand &command) {
 	if (command.ArgC() >= 3) {
 		const char *name = command.Arg(1);
 
@@ -221,11 +221,11 @@ void ConsoleManager::RemoveFlags(const CCommand &command) {
 		}
 	}
 	else {
-		Warning("Usage: statusspec_consolemanager_flags_remove <name> <flag1> [flag2 ...]\n");
+		Warning("Usage: statusspec_consoletools_flags_remove <name> <flag1> [flag2 ...]\n");
 	}
 }
 
-void ConsoleManager::RemoveFilter(const CCommand &command) {
+void ConsoleTools::RemoveFilter(const CCommand &command) {
 	if (command.ArgC() >= 2) {
 		std::string filter = command.Arg(1);
 
@@ -237,22 +237,22 @@ void ConsoleManager::RemoveFilter(const CCommand &command) {
 		}
 	}
 	else {
-		Warning("Usage: statusspec_consolemanager_filter_remove <filter>\n");
+		Warning("Usage: statusspec_consoletools_filter_remove <filter>\n");
 	}
 }
 
-void ConsoleManager::ToggleFilterEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
+void ConsoleTools::ToggleFilterEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
 	if (filter_enabled->GetBool()) {
 		if (!consoleColorPrintfHook) {
-			consoleColorPrintfHook = Funcs::AddHook_ICvar_ConsoleColorPrintf(g_pCVar, SH_MEMBER(this, &ConsoleManager::ConsoleColorPrintfHook), false);
+			consoleColorPrintfHook = Funcs::AddHook_ICvar_ConsoleColorPrintf(g_pCVar, SH_MEMBER(this, &ConsoleTools::ConsoleColorPrintfHook), false);
 		}
 
 		if (!consoleDPrintfHook) {
-			consoleDPrintfHook = Funcs::AddHook_ICvar_ConsoleDPrintf(g_pCVar, SH_MEMBER(this, &ConsoleManager::ConsoleDPrintfHook), false);
+			consoleDPrintfHook = Funcs::AddHook_ICvar_ConsoleDPrintf(g_pCVar, SH_MEMBER(this, &ConsoleTools::ConsoleDPrintfHook), false);
 		}
 		
 		if (!consolePrintfHook) {
-			consolePrintfHook = Funcs::AddHook_ICvar_ConsolePrintf(g_pCVar, SH_MEMBER(this, &ConsoleManager::ConsolePrintfHook), false);
+			consolePrintfHook = Funcs::AddHook_ICvar_ConsolePrintf(g_pCVar, SH_MEMBER(this, &ConsoleTools::ConsolePrintfHook), false);
 		}
 	}
 	else {

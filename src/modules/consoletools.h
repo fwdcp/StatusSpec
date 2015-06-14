@@ -1,5 +1,5 @@
 /*
- *  consolemanager.h
+ *  consoletools.h
  *  StatusSpec project
  *
  *  Copyright (c) 2015 thesupremecommander
@@ -18,9 +18,9 @@ class ConCommand;
 class ConVar;
 class IConVar;
 
-class ConsoleManager : public Module {
+class ConsoleTools : public Module {
 public:
-	ConsoleManager(std::string name);
+	ConsoleTools(std::string name);
 
 	static bool CheckDependencies(std::string name);
 private:
