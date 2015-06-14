@@ -91,6 +91,22 @@ bool ConsoleTools::CheckFilters(std::string message) {
 	return false;
 }
 
+void ConsoleTools::AddFilter(const CCommand &command) {
+	if (command.ArgC() >= 2) {
+		std::string filter = command.Arg(1);
+
+		if (!filters.count(filter)) {
+			filters.insert(filter);
+		}
+		else {
+			Warning("Filter %s is already present.\n", command.Arg(1));
+		}
+	}
+	else {
+		Warning("Usage: statusspec_consoletools_filter_add <filter>\n");
+	}
+}
+
 void ConsoleTools::AddFlags(const CCommand &command) {
 	if (command.ArgC() >= 3) {
 		const char *name = command.Arg(1);
@@ -148,19 +164,19 @@ void ConsoleTools::AddFlags(const CCommand &command) {
 	}
 }
 
-void ConsoleTools::AddFilter(const CCommand &command) {
+void ConsoleTools::RemoveFilter(const CCommand &command) {
 	if (command.ArgC() >= 2) {
 		std::string filter = command.Arg(1);
 
-		if (!filters.count(filter)) {
-			filters.insert(filter);
+		if (filters.count(filter)) {
+			filters.erase(filter);
 		}
 		else {
-			Warning("Filter %s is already present.\n", command.Arg(1));
+			Warning("Filter %s is not already present.\n", command.Arg(1));
 		}
 	}
 	else {
-		Warning("Usage: statusspec_consoletools_filter_add <filter>\n");
+		Warning("Usage: statusspec_consoletools_filter_remove <filter>\n");
 	}
 }
 
@@ -222,22 +238,6 @@ void ConsoleTools::RemoveFlags(const CCommand &command) {
 	}
 	else {
 		Warning("Usage: statusspec_consoletools_flags_remove <name> <flag1> [flag2 ...]\n");
-	}
-}
-
-void ConsoleTools::RemoveFilter(const CCommand &command) {
-	if (command.ArgC() >= 2) {
-		std::string filter = command.Arg(1);
-
-		if (filters.count(filter)) {
-			filters.erase(filter);
-		}
-		else {
-			Warning("Filter %s is not already present.\n", command.Arg(1));
-		}
-	}
-	else {
-		Warning("Usage: statusspec_consoletools_filter_remove <filter>\n");
 	}
 }
 

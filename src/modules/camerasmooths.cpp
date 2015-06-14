@@ -55,7 +55,7 @@ CameraSmooths::CameraSmooths(std::string name) : Module(name) {
 	smoothLastOrigin = Vector();
 	smoothLastTime = 0;
 
-	enabled = new ConVar("statusspec_camerasmooths_enabled", "0", FCVAR_NONE, "enable smooth glide to new view on camera switch", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraSmooths>("Camera Smooths")->ToggleEnabled(var, pOldValue, flOldValue); });
+	enabled = new ConVar("statusspec_camerasmooths_enabled", "0", FCVAR_NONE, "smooth transition between camera positions", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraSmooths>("Camera Smooths")->ToggleEnabled(var, pOldValue, flOldValue); });
 	max_angle_difference = new ConVar("statusspec_camerasmooths_max_angle_difference", "90", FCVAR_NONE, "max angle difference at which smoothing will be performed");
 	max_distance = new ConVar("statusspec_camerasmooths_max_distance", "400", FCVAR_NONE, "max distance at which smoothing will be performed");
 	move_speed = new ConVar("statusspec_camerasmooths_move_speed", "100", FCVAR_NONE, "speed to move view per second");
