@@ -34,26 +34,13 @@ private:
 
 	bool currentlyUpdating;
 	int frameHook;
-	int inToolModeHook;
-	int isThirdPersonCameraHook;
 	int setModeHook;
 	int setPrimaryTargetHook;
-	int setupEngineViewHook;
-	bool smoothEnding;
-	int smoothEndMode;
-	int smoothEndTarget;
-	bool smoothInProgress;
-	QAngle smoothLastAngles;
-	Vector smoothLastOrigin;
-	float smoothLastTime;
 	KeyValues *specguiSettings;
 
 	void FrameHook(ClientFrameStage_t curStage);
-	bool InToolModeOverride();
-	bool IsThirdPersonCameraOverride();
 	void SetModeOverride(C_HLTVCamera *hltvcamera, int &iMode);
 	void SetPrimaryTargetOverride(C_HLTVCamera *hltvcamera, int &nEntity);
-	bool SetupEngineViewOverride(Vector &origin, QAngle &angles, float &fov);
 
 	class HLTVCameraOverride;
 
@@ -61,10 +48,6 @@ private:
 	ConVar *force_target;
 	ConVar *force_valid_target;
 	ConVar *killer_follow_enabled;
-	ConVar *smooth_camera_switches_enabled;
-	ConVar *smooth_camera_switches_max_angle_difference;
-	ConVar *smooth_camera_switches_max_distance;
-	ConVar *smooth_camera_switches_move_speed;
 	ConCommand *spec_player;
 	ConVar *spec_player_alive;
 	ConCommand *spec_pos;
@@ -77,6 +60,5 @@ private:
 	void SpecPosition(const CCommand &command);
 	void ToggleForceValidTarget(IConVar *var, const char *pOldValue, float flOldValue);
 	void ToggleKillerFollowEnabled(IConVar *var, const char *pOldValue, float flOldValue);
-	void ToggleSmoothCameraSwitchesEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 	void ToggleStateEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
