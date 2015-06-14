@@ -475,11 +475,8 @@ In addition, the following HUD animations are triggered by this plugin and may b
 
 #### Console Variables
 * `statusspec_playeraliases_enabled` - enable player aliases
-* `statusspec_playeraliases_esea` - enable player aliases from the ESEA API
-* `statusspec_playeraliases_etf2l` - enable player aliases from the ETF2L API
 * `statusspec_playeraliases_format_blu` - the name format for BLU players
 * `statusspec_playeraliases_format_red` - the name format for RED players
-* `statusspec_playeraliases_twitch` - enable player aliases from the Twitch API
 
 #### Console Commands
 * `statusspec_playeraliases_get <steamid>` - get an alias for a player

@@ -17,25 +17,15 @@
 #include "../ifaces.h"
 #include "../player.h"
 
-#define MAX_URL_LENGTH 2048
-
-#define ESEA_PLAYER_API_URL "http://play.esea.net/index.php"
-#define ETF2L_PLAYER_API_URL "http://api.etf2l.org/player/%llu.json"
-#define TWITCH_USER_API_URL "http://api.twitch.tv/api/steam/%llu"
-#define STEAM_USER_ID_FORMAT "[U:%i:%lu]"
-
 PlayerAliases::PlayerAliases(std::string name) : Module(name) {
 	getPlayerInfoHook = 0;
 
 	enabled = new ConVar("statusspec_playeraliases_enabled", "0", FCVAR_NONE, "enable player aliases", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<PlayerAliases>("Player Aliases")->ToggleEnabled(var, pOldValue, flOldValue); });
-	esea = new ConVar("statusspec_playeraliases_esea", "0", FCVAR_NONE, "enable player aliases from the ESEA API");
-	etf2l = new ConVar("statusspec_playeraliases_etf2l", "0", FCVAR_NONE, "enable player aliases from the ETF2L API");
 	format_blu = new ConVar("statusspec_playeraliases_format_blu", "%alias%", FCVAR_NONE, "the name format for BLU players");
 	format_red = new ConVar("statusspec_playeraliases_format_red", "%alias%", FCVAR_NONE, "the name format for RED players");
 	get = new ConCommand("statusspec_playeraliases_get", [](const CCommand &command) { g_ModuleManager->GetModule<PlayerAliases>("Player Aliases")->GetCustomPlayerAlias(command); }, "get a custom player alias", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<PlayerAliases>("Player Aliases")->GetCurrentAliasedPlayers(partial, commands); });
 	remove = new ConCommand("statusspec_playeraliases_remove", [](const CCommand &command) { g_ModuleManager->GetModule<PlayerAliases>("Player Aliases")->RemoveCustomPlayerAlias(command); }, "remove a custom player alias", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<PlayerAliases>("Player Aliases")->GetCurrentAliasedPlayers(partial, commands); });
 	set = new ConCommand("statusspec_playeraliases_set", [](const CCommand &command) { g_ModuleManager->GetModule<PlayerAliases>("Player Aliases")->SetCustomPlayerAlias(command); }, "set a custom player alias", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<PlayerAliases>("Player Aliases")->GetCurrentGamePlayers(partial, commands); });
-	twitch = new ConVar("statusspec_playeraliases_twitch", "0", FCVAR_NONE, "enable player aliases from the Twitch API");
 	switch_teams = new ConCommand("statusspec_playeraliases_switch_teams", []() { g_ModuleManager->GetModule<PlayerAliases>("Player Aliases")->SwitchTeams(); }, "switch name formats for both teams", FCVAR_NONE);
 }
 
@@ -128,198 +118,8 @@ std::string PlayerAliases::GetAlias(CSteamID player, std::string gameAlias) {
 	if (customAliases.find(player) != customAliases.end()) {
 		return customAliases[player];
 	}
-
-	if (esea->GetBool()) {
-		if (eseaAliases[player].status == API_UNKNOWN) {
-			RequestESEAPlayerInfo(player);
-		}
-		else if (eseaAliases[player].status == API_SUCCESSFUL) {
-			return eseaAliases[player].name;
-		}
-	}
-
-	if (etf2l->GetBool()) {
-		if (etf2lAliases[player].status == API_UNKNOWN) {
-			RequestETF2LPlayerInfo(player);
-		}
-		else if (etf2lAliases[player].status == API_SUCCESSFUL) {
-			return etf2lAliases[player].name;
-		}
-	}
-
-	if (twitch->GetBool()) {
-		if (twitchAliases[player].status == API_UNKNOWN) {
-			RequestTwitchUserInfo(player);
-		}
-		else if (twitchAliases[player].status == API_SUCCESSFUL) {
-			return twitchAliases[player].name;
-		}
-	}
 	
 	return gameAlias;
-}
-
-void PlayerAliases::GetESEAPlayerInfo(HTTPRequestCompleted_t *requestCompletionInfo, bool bIOFailure) {
-	CSteamID player = CSteamID(requestCompletionInfo->m_ulContextValue);
-
-	if (bIOFailure || !requestCompletionInfo->m_bRequestSuccessful) {
-		eseaAliases[player].status = API_UNKNOWN;
-	}
-	else if (requestCompletionInfo->m_eStatusCode != k_EHTTPStatusCode200OK) {
-		eseaAliases[player].status = API_FAILED;
-	}
-	else {
-		ISteamHTTP *httpClient = Interfaces::pSteamAPIContext->SteamHTTP();
-
-		uint32 bodySize;
-		httpClient->GetHTTPResponseBodySize(requestCompletionInfo->m_hRequest, &bodySize);
-
-		uint8 *body = new uint8[bodySize];
-		httpClient->GetHTTPResponseBodyData(requestCompletionInfo->m_hRequest, body, bodySize);
-
-		rapidjson::Document root;
-		root.Parse<rapidjson::RAPIDJSON_PARSE_DEFAULT_FLAGS | rapidjson::kParseStopWhenDoneFlag>((char *)body);
-
-		if (root.HasMember("results") && root["results"].Size() > 0) {
-			if (root["results"][0].HasMember("alias")) {
-				eseaAliases[player].name = root["results"][0]["alias"].GetString();
-				eseaAliases[player].status = API_SUCCESSFUL;
-				httpClient->ReleaseHTTPRequest(requestCompletionInfo->m_hRequest);
-
-				return;
-			}
-		}
-
-		eseaAliases[player].status = API_FAILED;
-	}
-
-	Interfaces::pSteamAPIContext->SteamHTTP()->ReleaseHTTPRequest(requestCompletionInfo->m_hRequest);
-}
-
-void PlayerAliases::GetETF2LPlayerInfo(HTTPRequestCompleted_t *requestCompletionInfo, bool bIOFailure) {
-	CSteamID player = CSteamID(requestCompletionInfo->m_ulContextValue);
-
-	if (bIOFailure || !requestCompletionInfo->m_bRequestSuccessful) {
-		etf2lAliases[player].status = API_UNKNOWN;
-	}
-	else if (requestCompletionInfo->m_eStatusCode != k_EHTTPStatusCode200OK) {
-		etf2lAliases[player].status = API_FAILED;
-	}
-	else {
-		ISteamHTTP *httpClient = Interfaces::pSteamAPIContext->SteamHTTP();
-		
-		uint32 bodySize;
-		httpClient->GetHTTPResponseBodySize(requestCompletionInfo->m_hRequest, &bodySize);
-
-		uint8 *body = new uint8[bodySize];
-		httpClient->GetHTTPResponseBodyData(requestCompletionInfo->m_hRequest, body, bodySize);
-
-		rapidjson::Document root;
-		root.Parse<rapidjson::RAPIDJSON_PARSE_DEFAULT_FLAGS | rapidjson::kParseStopWhenDoneFlag>((char *)body);
-
-		if (root["status"]["code"].GetInt() == 200) {
-			if (root["player"]["steam"]["id64"].GetString() == std::to_string(player.ConvertToUint64())) {
-				etf2lAliases[player].name = root["player"]["name"].GetString();
-				etf2lAliases[player].status = API_SUCCESSFUL;
-				httpClient->ReleaseHTTPRequest(requestCompletionInfo->m_hRequest);
-
-				return;
-			}
-		}
-
-		etf2lAliases[player].status = API_FAILED;
-	}
-
-	Interfaces::pSteamAPIContext->SteamHTTP()->ReleaseHTTPRequest(requestCompletionInfo->m_hRequest);
-}
-
-void PlayerAliases::GetTwitchUserInfo(HTTPRequestCompleted_t *requestCompletionInfo, bool bIOFailure) {
-	CSteamID player = CSteamID(requestCompletionInfo->m_ulContextValue);
-
-	if (bIOFailure || !requestCompletionInfo->m_bRequestSuccessful) {
-		twitchAliases[player].status = API_UNKNOWN;
-	}
-	else if (requestCompletionInfo->m_eStatusCode != k_EHTTPStatusCode200OK) {
-		twitchAliases[player].status = API_FAILED;
-	}
-	else {
-		ISteamHTTP *httpClient = Interfaces::pSteamAPIContext->SteamHTTP();
-
-		uint32 bodySize;
-		httpClient->GetHTTPResponseBodySize(requestCompletionInfo->m_hRequest, &bodySize);
-
-		uint8 *body = new uint8[bodySize];
-		httpClient->GetHTTPResponseBodyData(requestCompletionInfo->m_hRequest, body, bodySize);
-
-		rapidjson::Document root;
-		root.Parse<rapidjson::RAPIDJSON_PARSE_DEFAULT_FLAGS | rapidjson::kParseStopWhenDoneFlag>((char *)body);
-
-		if (!root.HasMember("status") || root["status"] == 200) {
-			twitchAliases[player].name = root["name"].GetString();
-			twitchAliases[player].status = API_SUCCESSFUL;
-			httpClient->ReleaseHTTPRequest(requestCompletionInfo->m_hRequest);
-
-			return;
-		}
-
-		twitchAliases[player].status = API_FAILED;
-	}
-
-	Interfaces::pSteamAPIContext->SteamHTTP()->ReleaseHTTPRequest(requestCompletionInfo->m_hRequest);
-}
-
-void PlayerAliases::RequestESEAPlayerInfo(CSteamID player) {
-	ISteamHTTP *httpClient = Interfaces::pSteamAPIContext->SteamHTTP();
-
-	char id[MAX_URL_LENGTH];
-	V_snprintf(id, sizeof(id), STEAM_USER_ID_FORMAT, Interfaces::pSteamAPIContext->SteamUtils()->GetConnectedUniverse(), player.GetAccountID());
-
-	HTTPRequestHandle request = httpClient->CreateHTTPRequest(k_EHTTPMethodGET, ESEA_PLAYER_API_URL);
-	httpClient->SetHTTPRequestGetOrPostParameter(request, "s", "search");
-	httpClient->SetHTTPRequestGetOrPostParameter(request, "query", id);
-	httpClient->SetHTTPRequestGetOrPostParameter(request, "source", "users");
-	httpClient->SetHTTPRequestGetOrPostParameter(request, "fields%5Bunique_ids%5D", "1");
-	httpClient->SetHTTPRequestGetOrPostParameter(request, "format", "json");
-	httpClient->SetHTTPRequestHeaderValue(request, "Cookie", "viewed_welcome_page=1");
-	httpClient->SetHTTPRequestContextValue(request, player.ConvertToUint64());
-
-	SteamAPICall_t apiCall;
-	if (httpClient->SendHTTPRequest(request, &apiCall)) {
-		eseaAliases[player].status = API_REQUESTED;
-		eseaAliases[player].call.Set(apiCall, this, &PlayerAliases::GetESEAPlayerInfo);
-	}
-}
-
-void PlayerAliases::RequestETF2LPlayerInfo(CSteamID player) {
-	ISteamHTTP *httpClient = Interfaces::pSteamAPIContext->SteamHTTP();
-
-	char url[MAX_URL_LENGTH];
-	V_snprintf(url, sizeof(url), ETF2L_PLAYER_API_URL, player.ConvertToUint64());
-
-	HTTPRequestHandle request = httpClient->CreateHTTPRequest(k_EHTTPMethodGET, url);
-	httpClient->SetHTTPRequestContextValue(request, player.ConvertToUint64());
-
-	SteamAPICall_t apiCall;
-	if (httpClient->SendHTTPRequest(request, &apiCall)) {
-		etf2lAliases[player].status = API_REQUESTED;
-		etf2lAliases[player].call.Set(apiCall, this, &PlayerAliases::GetETF2LPlayerInfo);
-	}
-}
-
-void PlayerAliases::RequestTwitchUserInfo(CSteamID player) {
-	ISteamHTTP *httpClient = Interfaces::pSteamAPIContext->SteamHTTP();
-
-	char url[MAX_URL_LENGTH];
-	V_snprintf(url, sizeof(url), TWITCH_USER_API_URL, player.ConvertToUint64());
-
-	HTTPRequestHandle request = httpClient->CreateHTTPRequest(k_EHTTPMethodGET, url);
-	httpClient->SetHTTPRequestContextValue(request, player.ConvertToUint64());
-
-	SteamAPICall_t apiCall;
-	if (httpClient->SendHTTPRequest(request, &apiCall)) {
-		twitchAliases[player].status = API_REQUESTED;
-		twitchAliases[player].call.Set(apiCall, this, &PlayerAliases::GetTwitchUserInfo);
-	}
 }
 
 int PlayerAliases::GetCurrentAliasedPlayers(const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH]) {
