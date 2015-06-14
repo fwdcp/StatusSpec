@@ -11,6 +11,7 @@
 #include "camerasmooths.h"
 
 #include "cbase.h"
+#include "convar.h"
 #include "hltvcamera.h"
 #include "shareddefs.h"
 #include "toolframework/ienginetool.h"

@@ -11,7 +11,6 @@
 #pragma once
 
 #include "cdll_int.h"
-#include "convar.h"
 #include "igameevents.h"
 
 #include "../modules.h"

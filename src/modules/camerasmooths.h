@@ -10,11 +10,12 @@
 
 #pragma once
 
-#include "convar.h"
+#include "mathlib/vector.h"
 
 #include "../modules.h"
 
 class ConVar;
+class IConVar;
 
 class CameraSmooths : public Module {
 public:
