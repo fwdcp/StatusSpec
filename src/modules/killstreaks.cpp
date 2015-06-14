@@ -33,7 +33,6 @@ Killstreaks::Killstreaks(std::string name) : Module(name) {
 	redTopKillstreakPlayer = 0;
 
 	enabled = new ConVar("statusspec_killstreaks_enabled", "0", FCVAR_NONE, "enable killstreaks display", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<Killstreaks>("Killstreaks")->ToggleEnabled(var, pOldValue, flOldValue); });
-	total_killfeed = new ConVar("statusspec_killstreaks_total_killfeed", "0", FCVAR_NONE, "display total kills for player in killfeed instead of only kills with single weapon");
 }
 
 bool Killstreaks::CheckDependencies(std::string name) {
@@ -157,34 +156,23 @@ bool Killstreaks::FireEventClientSideOverride(IGameEvent *event) {
 
 		if (attackerUserID != -1) {
 			if (attackerUserID != victimUserID) {
-				currentKillstreaks[attackerUserID][weapon]++;
+				currentKillstreaks[attackerUserID]++;
 
-				event->SetInt("kill_streak_total", GetCurrentPlayerKillstreak(attackerUserID));
-
-				if (total_killfeed->GetBool()) {
-					event->SetInt("kill_streak_wep", GetCurrentPlayerKillstreak(attackerUserID));
-				}
-				else {
-					if (IsAttributableKill(weapon)) {
-						event->SetInt("kill_streak_wep", GetCurrentSlotKillstreak(attackerUserID, GetKillTypeSlot(weapon)));
-					}
-					else {
-						event->SetInt("kill_streak_wep", 0);
-					}
-				}
+				event->SetInt("kill_streak_total", currentKillstreaks[attackerUserID]);
+				event->SetInt("kill_streak_wep", currentKillstreaks[attackerUserID]);
 
 				Player attacker = Interfaces::pEngineClient->GetPlayerForUserID(attackerUserID);
 
 				if (attacker) {
 					if (attacker.GetTeam() == TFTeam_Red) {
-						if (GetCurrentPlayerKillstreak(attackerUserID) > redTopKillstreak) {
-							redTopKillstreak = GetCurrentPlayerKillstreak(attackerUserID);
+						if (currentKillstreaks[attackerUserID] > redTopKillstreak) {
+							redTopKillstreak = currentKillstreaks[attackerUserID];
 							redTopKillstreakPlayer = attackerUserID;
 						}
 					}
 					else if (attacker.GetTeam() == TFTeam_Blue) {
-						if (GetCurrentPlayerKillstreak(attackerUserID) > bluTopKillstreak) {
-							bluTopKillstreak = GetCurrentPlayerKillstreak(attackerUserID);
+						if (currentKillstreaks[attackerUserID] > bluTopKillstreak) {
+							bluTopKillstreak = currentKillstreaks[attackerUserID];
 							bluTopKillstreakPlayer = attackerUserID;
 						}
 					}
@@ -218,18 +206,17 @@ bool Killstreaks::FireEventClientSideOverride(IGameEvent *event) {
 						int healingTarget = Entities::GetEntityProp<EHANDLE *>(weapon, { "m_hHealingTarget" })->GetEntryIndex();
 
 						if (healingTarget == Interfaces::pEngineClient->GetPlayerForUserID(attackerUserID)) {
-							// add medigun killstreak onto a special "kill type"
-							currentKillstreaks[assisterUserID]["medigun"]++;
+							currentKillstreaks[assisterUserID]++;
 
 							if (assister.GetTeam() == TFTeam_Red) {
-								if (GetCurrentPlayerKillstreak(assisterUserID) > redTopKillstreak) {
-									redTopKillstreak = GetCurrentPlayerKillstreak(assisterUserID);
+								if (currentKillstreaks[assisterUserID] > redTopKillstreak) {
+									redTopKillstreak = currentKillstreaks[assisterUserID];
 									redTopKillstreakPlayer = assisterUserID;
 								}
 							}
 							else if (assister.GetTeam() == TFTeam_Blue) {
-								if (GetCurrentPlayerKillstreak(assisterUserID) > bluTopKillstreak) {
-									bluTopKillstreak = GetCurrentPlayerKillstreak(assisterUserID);
+								if (currentKillstreaks[assisterUserID] > bluTopKillstreak) {
+									bluTopKillstreak = currentKillstreaks[assisterUserID];
 									bluTopKillstreakPlayer = assisterUserID;
 								}
 							}
@@ -238,11 +225,11 @@ bool Killstreaks::FireEventClientSideOverride(IGameEvent *event) {
 				}
 			}
 
-			event->SetInt("kill_streak_assist", GetCurrentPlayerKillstreak(assisterUserID));
+			event->SetInt("kill_streak_assist", currentKillstreaks[assisterUserID]);
 		}
 
 		if (victimUserID != -1) {
-			event->SetInt("kill_streak_victim", GetCurrentPlayerKillstreak(victimUserID));
+			event->SetInt("kill_streak_victim", currentKillstreaks[victimUserID]);
 		}
 
 		RETURN_META_VALUE(MRES_HANDLED, false);
@@ -299,9 +286,9 @@ void Killstreaks::FrameHook(ClientFrameStage_t curStage) {
 			int userid = player.GetUserID();
 
 			if (currentKillstreaks.find(userid) != currentKillstreaks.end()) {
-				*killstreakPrimary = GetCurrentSlotKillstreak(userid, 0);
-				*killstreakSecondary = GetCurrentSlotKillstreak(userid, 1);
-				*killstreakMelee = GetCurrentSlotKillstreak(userid, 2);
+				*killstreakPrimary = currentKillstreaks[userid];
+				*killstreakSecondary = currentKillstreaks[userid];
+				*killstreakMelee = currentKillstreaks[userid];
 
 				if (gameResourcesEntity.IsValid() && gameResourcesEntity.Get()) {
 					std::stringstream ss;
@@ -310,7 +297,7 @@ void Killstreaks::FrameHook(ClientFrameStage_t curStage) {
 					ss >> arrayIndex;
 
 					int *killstreakGlobal = Entities::GetEntityProp<int *>(gameResourcesEntity.Get(), { "m_iStreaks", arrayIndex });
-					*killstreakGlobal = GetCurrentPlayerKillstreak(userid);
+					*killstreakGlobal = currentKillstreaks[userid];
 				}
 			}
 			else {
@@ -339,55 +326,6 @@ void Killstreaks::FrameHook(ClientFrameStage_t curStage) {
 	}
 
 	RETURN_META(MRES_IGNORED);
-}
-
-int Killstreaks::GetCurrentPlayerKillstreak(int userid) {
-	int killstreak = 0;
-
-	for (auto iterator : currentKillstreaks[userid]) {
-		killstreak += iterator.second;
-	}
-
-	return killstreak;
-}
-
-int Killstreaks::GetCurrentSlotKillstreak(int userid, int slot) {
-	int killstreak = 0;
-
-	for (auto iterator : TFDefinitions::slotKillIcons.find(slot)->second) {
-		killstreak += currentKillstreaks[userid][iterator];
-	}
-
-	if (slot == 1) {
-		// mediguns aren't kill icons, so let's add them in manually to the secondary slot
-		killstreak += currentKillstreaks[userid]["medigun"];
-	}
-
-	return killstreak;
-}
-
-int Killstreaks::GetKillTypeSlot(std::string killType) {
-	for (auto slotIterator : TFDefinitions::slotKillIcons) {
-		for (auto iterator : slotIterator.second) {
-			if (killType.compare(iterator) == 0) {
-				return slotIterator.first;
-			}
-		}
-	}
-
-	return -1;
-}
-
-bool Killstreaks::IsAttributableKill(std::string killType) {
-	for (auto slotIterator : TFDefinitions::slotKillIcons) {
-		for (auto iterator : slotIterator.second) {
-			if (killType.compare(iterator) == 0) {
-				return true;
-			}
-		}
-	}
-
-	return false;
 }
 
 void Killstreaks::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {

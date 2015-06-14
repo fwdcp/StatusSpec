@@ -33,19 +33,13 @@ private:
 
 	int bluTopKillstreak;
 	int bluTopKillstreakPlayer;
-	std::map<int, std::map<std::string, int>> currentKillstreaks;
+	std::map<int, int> currentKillstreaks;
 	int fireEventClientSideHook;
 	int frameHook;
 	CHandle<C_BaseEntity> gameResourcesEntity;
 	int redTopKillstreak;
 	int redTopKillstreakPlayer;
 
-	int GetCurrentSlotKillstreak(int userid, int slot);
-	int GetCurrentPlayerKillstreak(int userid);
-	int GetKillTypeSlot(std::string killType);
-	bool IsAttributableKill(std::string killType);
-
 	ConVar *enabled;
-	ConVar *total_killfeed;
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };

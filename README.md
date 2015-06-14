@@ -381,11 +381,10 @@ Custom texture configuration is loaded from the `Resource/CustomTextures.res` fi
 * `statusspec_fovoverride_zoomed` - enable FOV override even when sniper rifle is zoomed
 
 ### Killstreaks
-*enables killstreak tracking for all weapons, all players*
+*enables killstreak tracking for all players*
 
 #### Console Variables
 * `statusspec_killstreaks_enabled` - enable killstreaks display
-* `statusspec_killstreaks_total_killfeed` - display total kills for player in killfeed instead of only kills with single weapon
 
 ### Loadout Icons
 *displays icons to represent weapons in a player's loadout*
