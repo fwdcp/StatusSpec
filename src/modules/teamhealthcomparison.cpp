@@ -22,7 +22,7 @@
 #include "../ifaces.h"
 #include "../player.h"
 
-class TeamHealthComparison::Panel : public vgui::EditablePanel{
+class TeamHealthComparison::Panel : public vgui::EditablePanel {
 public:
 	Panel(vgui::Panel *parent, const char *panelName);
 
@@ -94,7 +94,6 @@ void TeamHealthComparison::ToggleEnabled(IConVar *var, const char *pOldValue, fl
 
 				if (viewport) {
 					panel = new Panel(viewport, "TeamHealthComparison");
-					panel->LoadControlSettings("Resource/UI/TeamHealthComparison.res");
 				}
 				else {
 					Warning("Could not initialize the panel!\n");
@@ -121,6 +120,8 @@ void TeamHealthComparison::ToggleEnabled(IConVar *var, const char *pOldValue, fl
 
 TeamHealthComparison::Panel::Panel(vgui::Panel *parent, const char *panelName) : vgui::EditablePanel(parent, panelName) {
 	g_pVGui->AddTickSignal(GetVPanel());
+
+	LoadControlSettings("Resource/UI/TeamHealthComparison.res");
 }
 
 void TeamHealthComparison::Panel::OnTick() {
