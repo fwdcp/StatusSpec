@@ -8,6 +8,29 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+**WIP**
+* general
+  * increase reliability
+  * optimize performance and size
+* camera smooths
+  * new module
+* camera tools
+  * fix issues with switching camera state
+  * optimize camera state updates
+  * add option to automatically switch to killer on death
+  * add forcing of camera mode and target
+* console tools
+  * new module
+  * add option to change CVar flags
+  * add console filtering
+* player aliases
+  * removed API-based (ESEA/ETF2L/Twitch) aliases
+* Steam tools
+  * new module
+  * add rich presence change
+* team health comparison
+  * optimized performance
+
 **0.24.0**
 * general
   * fix issues with invalid models
