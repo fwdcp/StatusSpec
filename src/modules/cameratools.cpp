@@ -30,6 +30,7 @@ class C_BaseEntity;
 #include "KeyValues.h"
 #include "shareddefs.h"
 #include "tier3/tier3.h"
+#include "toolframework/ienginetool.h"
 #include "vgui_controls/EditablePanel.h"
 
 #include "../common.h"
