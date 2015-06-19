@@ -12,8 +12,10 @@
 
 #include <vector>
 
+#include "cbase.h"
 #include "convar.h"
 #include "iclientmode.h"
+#include "vgui/ISurface.h"
 #include "vgui/IVGui.h"
 #include "vgui_controls/EditablePanel.h"
 
@@ -27,10 +29,36 @@ class MedigunInfo::MainPanel : public vgui::EditablePanel {
 public:
 	MainPanel(vgui::Panel *parent, const char *panelName);
 
+	virtual void ApplySettings(KeyValues *inResourceData);
 	virtual void OnTick();
 private:
-	std::vector<MedigunPanel> bluMedigunPanels;
-	std::vector<MedigunPanel> redMedigunPanels;
+	int bluBaseX;
+	int bluBaseY;
+	int bluOffsetX;
+	int bluOffsetY;
+	int redBaseX;
+	int redBaseY;
+	int redOffsetX;
+	int redOffsetY;
+
+	std::vector<MedigunPanel *> bluMedigunPanels;
+	std::vector<MedigunPanel *> redMedigunPanels;
+};
+
+class MedigunInfo::MedigunPanel : public vgui::EditablePanel {
+	DECLARE_CLASS_SIMPLE(MedigunPanel, vgui::EditablePanel);
+
+public:
+	MedigunPanel(vgui::Panel *parent, const char *panelName);
+
+private:
+	MESSAGE_FUNC_PARAMS(OnMedigunInfoUpdate, "MedigunInfo", attributes);
+
+	bool alive;
+	float level;
+	TFMedigun medigun;
+	TFResistType resistType;
+	TFTeam team;
 };
 
 MedigunInfo::MedigunInfo(std::string name) : Module(name) {
@@ -96,7 +124,6 @@ bool MedigunInfo::CheckDependencies(std::string name) {
 
 void MedigunInfo::ReloadSettings() {
 	mainPanel->LoadControlSettings("Resource/UI/MedigunInfo.res");
-
 }
 
 void MedigunInfo::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
@@ -132,5 +159,132 @@ void MedigunInfo::ToggleEnabled(IConVar *var, const char *pOldValue, float flOld
 }
 
 MedigunInfo::MainPanel::MainPanel(vgui::Panel *parent, const char *panelName) : vgui::EditablePanel(parent, panelName) {
+	LoadControlSettings("Resource/UI/MedigunInfo.res");
+
 	g_pVGui->AddTickSignal(GetVPanel());
+}
+
+void MedigunInfo::MainPanel::ApplySettings(KeyValues *inResourceData) {
+	vgui::EditablePanel::ApplySettings(inResourceData);
+
+	int alignScreenWide, alignScreenTall;
+	g_pVGuiSurface->GetScreenSize(alignScreenWide, alignScreenTall);
+
+	int wide, tall;
+	GetSize(wide, tall);
+
+	GetPos(redBaseX, redBaseY);
+	ComputePos(inResourceData->GetString("red_base_x"), redBaseX, wide, alignScreenWide, true);
+	ComputePos(inResourceData->GetString("red_base_y"), redBaseY, tall, alignScreenTall, false);
+
+	GetPos(bluBaseX, bluBaseY);
+	ComputePos(inResourceData->GetString("blu_base_x"), bluBaseX, wide, alignScreenWide, true);
+	ComputePos(inResourceData->GetString("blu_base_y"), bluBaseY, tall, alignScreenTall, false);
+
+	redOffsetX = inResourceData->GetInt("red_offset_x");
+	redOffsetY = inResourceData->GetInt("red_offset_y");
+	bluOffsetX = inResourceData->GetInt("blu_offset_x");
+	bluOffsetY = inResourceData->GetInt("blu_offset_y");
+}
+
+void MedigunInfo::MainPanel::OnTick() {
+	size_t bluMediguns = 0;
+	size_t redMediguns = 0;
+
+	for (Player player : Player::Iterable()) {
+		if (player.GetClass() == TFClass_Medic && (player.GetTeam() == TFTeam_Blue || player.GetTeam() == TFTeam_Red)) {
+			for (int weaponIndex = 0; weaponIndex < MAX_WEAPONS; weaponIndex++) {
+				C_BaseCombatWeapon *weapon = player.GetWeapon(weaponIndex);
+
+				if (weapon && Entities::CheckEntityBaseclass(weapon, "WeaponMedigun")) {
+					MedigunPanel *medigunPanel;
+
+					if (player.GetTeam() == TFTeam_Red) {
+						redMediguns++;
+
+						if (redMediguns > redMedigunPanels.size()) {
+							medigunPanel = new MedigunPanel(this, "MedigunPanel");
+							redMedigunPanels.push_back(medigunPanel);
+						}
+						else {
+							medigunPanel = redMedigunPanels.at(redMediguns - 1);
+						}
+
+						medigunPanel->SetPos(redBaseX + (redOffsetX * (redMediguns - 1)), redBaseY + (redOffsetY * (redMediguns - 1)));
+					}
+					else if (player.GetTeam() == TFTeam_Blue) {
+						bluMediguns++;
+
+						if (bluMediguns > bluMedigunPanels.size()) {
+							medigunPanel = new MedigunPanel(this, "MedigunPanel");
+							bluMedigunPanels.push_back(medigunPanel);
+						}
+						else {
+							medigunPanel = bluMedigunPanels.at(bluMediguns - 1);
+						}
+
+						medigunPanel->SetPos(bluBaseX + (bluOffsetX * (bluMediguns - 1)), bluBaseY + (bluOffsetY * (bluMediguns - 1)));
+					}
+
+					KeyValues *medigunInfo = new KeyValues("MedigunInfo");
+
+					int itemDefinitionIndex = *Entities::GetEntityProp<int *>(weapon, { "m_iItemDefinitionIndex" });
+					TFMedigun type = TFMedigun_Unknown;
+					if (itemDefinitionIndex == 29 || itemDefinitionIndex == 211 || itemDefinitionIndex == 663 || itemDefinitionIndex == 796 || itemDefinitionIndex == 805 || itemDefinitionIndex == 885 || itemDefinitionIndex == 894 || itemDefinitionIndex == 903 || itemDefinitionIndex == 912 || itemDefinitionIndex == 961 || itemDefinitionIndex == 970) {
+						type = TFMedigun_MediGun;
+					}
+					else if (itemDefinitionIndex == 35) {
+						type = TFMedigun_Kritzkrieg;
+					}
+					else if (itemDefinitionIndex == 411) {
+						type = TFMedigun_QuickFix;
+					}
+					else if (itemDefinitionIndex == 998) {
+						type = TFMedigun_Vaccinator;
+					}
+
+					medigunInfo->SetBool("alive", player.IsAlive());
+					medigunInfo->SetFloat("level", *Entities::GetEntityProp<float *>(weapon, { "m_flChargeLevel" }));
+					medigunInfo->SetInt("medigun", type);
+					medigunInfo->SetInt("resistType", *Entities::GetEntityProp<int *>(weapon, { "m_nChargeResistType" }));
+					medigunInfo->SetInt("team", player.GetTeam());
+
+					PostMessage(medigunPanel, medigunInfo);
+
+					break;
+				}
+			}
+		}
+	}
+
+	while (redMediguns < redMedigunPanels.size()) {
+		delete redMedigunPanels.back();
+		redMedigunPanels.pop_back();
+	}
+	
+	while (bluMediguns < bluMedigunPanels.size()) {
+		delete bluMedigunPanels.back();
+		bluMedigunPanels.pop_back();
+	}
+}
+
+MedigunInfo::MedigunPanel::MedigunPanel(vgui::Panel *parent, const char *panelName) : vgui::EditablePanel(parent, panelName) {}
+
+void MedigunInfo::MedigunPanel::OnMedigunInfoUpdate(KeyValues *attributes) {
+	if (alive != attributes->GetBool("alive") || medigun != attributes->GetInt("medigun") || resistType != attributes->GetInt("resistType") || team != attributes->GetInt("team")) {
+		LoadControlSettings("Resource/UI/MedigunInfoSingle.res", nullptr, nullptr, attributes);
+	}
+
+	alive = attributes->GetBool("alive");
+	level = attributes->GetFloat("percentage");
+	medigun = (TFMedigun) attributes->GetInt("medigun");
+	resistType = (TFResistType) attributes->GetInt("resistType");
+	team = (TFTeam) attributes->GetInt("team");
+
+	SetDialogVariable("redcharge", int(floor(level * 100.0f)));
+	SetDialogVariable("redcharges", int(floor(level * 4.0f)));
+	SetDialogVariable("redcharge1", int(floor(level * 400.0f) - 0.0f) < 0 ? 0 : int(floor(level * 400.0f) - 0.0f));
+	SetDialogVariable("redcharge2", int(floor(level * 400.0f) - 100.0f) < 0 ? 0 : int(floor(level * 400.0f) - 100.0f));
+	SetDialogVariable("redcharge3", int(floor(level * 400.0f) - 200.0f) < 0 ? 0 : int(floor(level * 400.0f) - 200.0f));
+	SetDialogVariable("redcharge4", int(floor(level * 400.0f) - 300.0f) < 0 ? 0 : int(floor(level * 400.0f) - 300.0f));
 }

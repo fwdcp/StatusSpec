@@ -10,10 +10,13 @@
 
 #pragma once
 
-class ConCommand;
-class ConVar;
+#include <string>
 
 #include "../modules.h"
+
+class ConCommand;
+class ConVar;
+class IConVar;
 
 class MedigunInfo : public Module {
 public:
