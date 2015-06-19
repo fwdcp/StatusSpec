@@ -12,6 +12,7 @@
 
 #include "ehandle.h"
 
+class C_BaseCombatWeapon;
 class C_BaseEntity;
 class CSteamID;
 class IClientEntity;
@@ -69,6 +70,7 @@ public:
 	CSteamID GetSteamID() const;
 	TFTeam GetTeam() const;
 	int GetUserID() const;
+	C_BaseCombatWeapon *GetWeapon(int i) const;
 	bool IsAlive() const;
 
 	class Iterator {
