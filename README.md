@@ -8,7 +8,7 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
-**WIP**
+### WIP
 * general
   * increased reliability
   * optimized performance and size
@@ -38,7 +38,7 @@ Changelog
 * team health comparison
   * optimized performance
 
-**0.24.0**
+### 0.24.0
 * general
   * fix issues with invalid models
   * fix compatibility with Source SDK
@@ -47,11 +47,11 @@ Changelog
   * add command to spectate a player by index
   * add exposure of SourceTV camera information
 
-**0.23.1**
+### 0.23.1
 * player aliases
   * fix infinite recursion
 
-**0.23.0**
+### 0.23.0
 * general
   * major modularization - modules check dependencies and fail separately
   * revamp support structures
@@ -61,25 +61,25 @@ Changelog
 * loadout icons
   * fixed recent issues
 
-**0.22.3**
+### 0.22.3
 * general
   * fix issues with multiple detours causing crashes
 
-**0.22.2**
+### 0.22.2
 * player models
   * add functionality to replace ragdolls
 
-**0.22.1**
+### 0.22.1
 * antifreeze
   * added feature to fix timer freezes
 
-**0.22.0**
+### 0.22.0
 * general
   * fixed issues with outlines (hopefully)
 * custom models
   * new module
 
-**0.21.0**
+### 0.21.0
 * general
   * optimized plugin
 * camera tools
@@ -95,7 +95,7 @@ Changelog
 * team health comparison
   * new module
 
-**0.20.1**
+### 0.20.1
 * general
   * fix crashing due to invalid entities
 * camera tools
@@ -103,7 +103,7 @@ Changelog
 * spec GUI order
   * fix gaps in between players
 
-**0.20.0**
+### 0.20.0
 * camera tools
   * new module
 * FOV override
@@ -116,11 +116,11 @@ Changelog
 * spec GUI order
   * added reverse ordering of players
 
-**0.19.2**
+### 0.19.2
 * general
   * fixed crashes
 
-**0.19.1**
+### 0.19.1
 * custom materials
   * removed module
 * custom textures
@@ -128,7 +128,7 @@ Changelog
 * spec GUI order
   * new module
 
-**0.19.0**
+### 0.19.0
 * custom materials
   * new module
 * player aliases
@@ -144,7 +144,7 @@ Changelog
 * team overrides
   * new module
 
-**0.18.0**
+### 0.18.0
 * general
   * added plugin glow system
   * fix issues caused by the 2014-09-10 update
@@ -154,29 +154,29 @@ Changelog
 * projectile outlines
   * new module
 
-**0.17.4**
+### 0.17.4
 * general
   * adjust paint method hooking so that we can draw at the correct location
 
-**0.17.3**
+### 0.17.3
 * general
   * update offsets for 2014-07-30 update
 
-**0.17.2**
+### 0.17.2
 * general
   * updated version of MinHook and changed build procedures
 
-**0.17.1**
+### 0.17.1
 * medigun info
   * fix issues with charge advantage info (thanks Bluee/MattMcNam)
 * player aliases
   * add Twitch API support
 
-**0.17.0**
+### 0.17.0
 * player aliases
   * add ETF2L API support
 
-**0.16.0**
+### 0.16.0
 * loadout icons
   * add ability to only show the active weapon
 * local player
@@ -186,7 +186,7 @@ Changelog
   * change how progress bars are set (requires changes to MedigunInfo.res)
   * add ability to have custom meter settings based on medigun type
 
-**0.15.0**
+### 0.15.0
 * antifreeze
   * now supports displaying a message when a freeze is occurring
 * killstreaks
@@ -200,72 +200,72 @@ Changelog
   * make player outline calculations more efficient
   * add option to disable health-based calculations
 
-**0.14.1**
+### 0.14.1
 * fix glitches with killstreaks on death
 * add command to help stop flickering issues with player outlines
 
-**0.14.0**
+### 0.14.0
 * add killstreaks module
 
-**0.13.1**
+### 0.13.1
 * fix bleed icons not showing up
 
-**0.13.0**
+### 0.13.0
 * add support for health-based team colored outlines
 
-**0.12.1**
+### 0.12.1
 * fix medigun info not disappearing properly
 * make unloading/pausing/unpausing cleaner and hopefully less error-prone
 
-**0.12.0**
+### 0.12.0
 * add support for HUD features required for casting HUDs
 * add ability to set progress direction via resource file and removed command
 * add setting to allow Vaccinator to have only one charge meter
 * add ability to view medigun charge advantage
 * fix issues with medigun finding
 
-**0.11.3**
+### 0.11.3
 * fix issues with player outlines not changing color after reloads
 
-**0.11.2**
+### 0.11.2
 * fix player outline issues with players not being hooked/unhooked properly
 
-**0.11.1**
+### 0.11.1
 * update offsets for TF2 update on 2014-06-11
 
-**0.11.0**
+### 0.11.0
 * reorganize entire plugin into modules (changing many console variables and commands)
 * add player outlines module
 
-**0.10.0**
+### 0.10.0
 * fix player alias incompatibility with Spec Tools
 * add utility command for setting the direction of a progress bar
 
-**0.9.0**
+### 0.9.0
 * implement medigun info box
 
-**0.8.0**
+### 0.8.0
 * implement player aliasing
 
-**0.7.0**
+### 0.7.0
 * implement loadout icons
 
-**0.6.0**
+### 0.6.0
 * implement status icons as part of spectator GUI
 
-**0.5.0**
+### 0.5.0
 * added option to force refreshing of spectator GUI (partially to fully fixes post-pause issues, YMMV)
 
-**0.4.0**
+### 0.4.0
 * added option (enabled by default) to have icon backgrounds adjust with icons rather than be static
 
-**0.3.0**
+### 0.3.0
 * scale HUD positioning values automatically
 
-**0.2.0**
+### 0.2.0
 * added Vaccinator resistances/Ubers, Soldier banners, Jarate, Mad Milk, bleeding, and on fire icons to display
 
-**0.1.0**
+### 0.1.0
 * initial version
 * Uber, Kritz, marked for death status icons
 * many CVars for customizing appearance
