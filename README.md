@@ -26,7 +26,7 @@ Changelog
   * added ability to filter console by regular expressions
 * medigun info
   * optimized performance
-  * revamped configuration Files
+  * revamped required HUD files
   * removed redundant CVars
   * removed advantage calculations
   * removed custom animations
