@@ -123,7 +123,7 @@
 
     "MedigunPanelChargeLabel"
     {
-        "ControlName"	"CExLabel"
+        "ControlName"	"VariableLabel"
         "fieldName"		"MedigunPanelChargeLabel"
         "xpos"			"147"
         "ypos"			"2"
