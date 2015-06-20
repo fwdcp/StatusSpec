@@ -24,6 +24,12 @@ Changelog
   * created new module
   * added ability to change CVar flags
   * added ability to filter console by regular expressions
+* medigun info
+  * optimized performance
+  * revamped configuration Files
+  * removed redundant CVars
+  * removed advantage calculations
+  * removed custom animations
 * player aliases
   * removed API-based (ESEA/ETF2L/Twitch) aliases
 * Steam tools
@@ -286,9 +292,9 @@ The configuration file for the freeze info HUD is `Resource/UI/FreezeInfo.res`. 
 To properly support forced correct timer values, you will also have to adjust `Resource/UI/HudObjectiveTimePanel.res` so that it includes something similar to the `RealTime` section, as demonstrated below.
 ```
 "Resource/UI/HudObjectiveTimePanel.res"
-{	
+{
 	...
-	
+
 	"RealTime"
 	{
 		"ControlName"	"CExLabel"
@@ -453,11 +459,11 @@ The configuration file for the loadout icons is `Resource/UI/LoadoutIcons.res`. 
 	"specgui"
 	{
 		...
-		   
+
 		"playerpanels_kv"
 		{
 			...
-			
+
 			"LoadoutIcons"
 			{
 				"ControlName"   "EditablePanel"
@@ -472,8 +478,8 @@ The configuration file for the loadout icons is `Resource/UI/LoadoutIcons.res`. 
 			}
 		}
 	}
-	
-	...	
+
+	...
 }
 ```
 
@@ -494,20 +500,10 @@ The configuration file for the loadout icons is `Resource/UI/LoadoutIcons.res`. 
 * `statusspec_mediguninfo_reload_settings` - reload settings for the medigun info HUD from the resource file
 
 #### Console Variables
-* `statusspec_mediguninfo_dynamic_meters` - enable charge meters to change based on medigun
 * `statusspec_mediguninfo_enabled` - enable medigun info
-* `statusspec_mediguninfo_individual_charge_meters` - enable individual charge meters (for Vaccinator)
 
 #### UI Resource Files
-The configuration file for the medigun info HUD is `Resource/UI/MedigunInfo.res`. In addition, the `Resource/UI/MedigunInfoDynamicMeters.res` file is used for the dynamic meters feature, and contains empty sections for each medigun within which you can add progress bar options that will be applied when the specified medigun is being used. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_mediguninfo_reload_settings` is provided as a replacement.
-
-In addition, the following HUD animations are triggered by this plugin and may be used to show events on the HUD:
-* `MedigunInfoBluChargeReady` - triggered when a BLU medigun charge is ready for use
-* `MedigunInfoBluChargeReleased` - triggered when a BLU medigun charge has been released/popped
-* `MedigunInfoBluChargeStop` - triggered when the BLU medigun charge is no longer ready/released
-* `MedigunInfoRedChargeReady` - triggered when a RED medigun charge is ready for use
-* `MedigunInfoRedChargeReleased` - triggered when a RED medigun charge has been released/popped
-* `MedigunInfoRedChargeStop` - triggered when the RED medigun charge is no longer ready/released (after a charge is completed/dropped)
+The configuration files for the medigun info HUD are `Resource/UI/MedigunInfo.res`, which controls the overall layout of the panel, and `Resource/UI/MedigunPanel.res`, which controls the display of each medigun. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_mediguninfo_reload_settings` is provided as a replacement.
 
 ### Multipanel
 *displays panels on top of the main game*
@@ -622,11 +618,11 @@ The configuration file for the status icons is `Resource/UI/StatusIcon.res`. A c
 	"specgui"
 	{
 		...
-		   
+
 		"playerpanels_kv"
 		{
 			...
-			
+
 			"StatusIcons"
 			{
 				"ControlName"   "EditablePanel"
@@ -641,8 +637,8 @@ The configuration file for the status icons is `Resource/UI/StatusIcon.res`. A c
 			}
 		}
 	}
-	
-	...	
+
+	...
 }
 ```
 

@@ -13,6 +13,7 @@
 #include <cstdint>
 
 #include "cbase.h"
+#include "c_basecombatcharacter.h"
 #include "c_baseentity.h"
 #include "cdll_int.h"
 #include "globalvars_base.h"
@@ -375,6 +376,14 @@ int Player::GetUserID() const {
 	}
 
 	return 0;
+}
+
+C_BaseCombatWeapon *Player::GetWeapon(int i) const {
+	if (IsValid()) {
+		return dynamic_cast<C_BaseCombatCharacter *>(playerEntity.Get())->GetWeapon(i);
+	}
+
+	return nullptr;
 }
 
 bool Player::IsAlive() const {

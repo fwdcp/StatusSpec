@@ -16,6 +16,7 @@
 #include <Windows.h>
 #include <Psapi.h>
 #undef GetClassName
+#undef PostMessage
 #undef SendMessage
 #endif
 
