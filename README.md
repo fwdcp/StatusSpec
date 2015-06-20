@@ -26,6 +26,8 @@ Changelog
   * added ability to filter console by regular expressions
 * medigun info
   * optimized performance
+  * add support for multiple mediguns per team
+  * add direct support for dynamically switching HUD appearance
   * revamped required HUD files
   * removed redundant CVars
   * removed advantage calculations
@@ -504,6 +506,34 @@ The configuration file for the loadout icons is `Resource/UI/LoadoutIcons.res`. 
 
 #### UI Resource Files
 The configuration files for the medigun info HUD are `Resource/UI/MedigunInfo.res`, which controls the overall layout of the panel, and `Resource/UI/MedigunPanel.res`, which controls the display of each medigun. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_mediguninfo_reload_settings` is provided as a replacement.
+
+The medigun panel located in `Resource/UI/MedigunPanel.res` supports conditional sections. This allows the HUD to change based on certain conditions, such as the medigun type or player team, by putting relevant keys within a section named with the condition. Conditions can be stacked by placing one conditional section within another, which will only trigger the contained keys if both conditions are triggered. The following conditions are supported:
+* `charges-0` - no charges are ready
+* `charges-1` - one charge is ready
+* `charges-2` - two charges are ready
+* `charges-3` - three charges are ready
+* `charges-4` - four charges are ready
+* `resist-bullet` - current medigun resistance is bullet
+* `resist-explosive` - current medigun resistance is explosive
+* `resist-fire` - current medigun resistance is fire
+* `medigun-kritzkrieg` - medigun is the Kritzkrieg
+* `medigun-medigun` - medigun is the stock Medi Gun
+* `medigun-quickfix` - medigun is the Quick-Fix
+* `medigun-vaccinator` - medigun is the Vaccinator
+* `player-alive` - player using medigun is currently alive
+* `player-dead` - player using medigun is currently dead
+* `status-building` - charge is being built
+* `status-released` - charge is being used
+* `team-blu` - player using medigun is on the BLU team
+* `team-red` - player using medigun is on the RED team
+
+In addition, certain dialog variables will be set for each medigun panel. They are:
+* `charge` - total percentage of uber filled (out of 100)
+* `charges` - number of Vaccinator charges available
+* `charge1` - percentage of first Vaccinator charge filled (out of 100)
+* `charge2` - percentage of second Vaccinator charge filled (out of 100)
+* `charge3` - percentage of third Vaccinator charge filled (out of 100)
+* `charge4` - percentage of fourth Vaccinator charge filled (out of 100)
 
 ### Multipanel
 *displays panels on top of the main game*
