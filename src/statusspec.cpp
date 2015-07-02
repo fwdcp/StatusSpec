@@ -36,7 +36,6 @@
 #include "modules/statusicons.h"
 #include "modules/steamtools.h"
 #include "modules/teamhealthcomparison.h"
-#include "modules/teamoverrides.h"
 
 ModuleManager *g_ModuleManager = nullptr;
 
@@ -78,7 +77,6 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_ModuleManager->LoadModule<StatusIcons>("Status Icons");
 	g_ModuleManager->LoadModule<SteamTools>("Steam Tools");
 	g_ModuleManager->LoadModule<TeamHealthComparison>("Team Health Comparison");
-	g_ModuleManager->LoadModule<TeamOverrides>("Team Overrides");
 	
 	ConVar_Register();
 

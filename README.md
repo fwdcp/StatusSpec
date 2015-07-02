@@ -43,6 +43,8 @@ Changelog
   * added ability to set rich presence
 * team health comparison
   * optimized performance
+* team overrides
+  * removed module
 
 ### 0.24.0
 * general
@@ -665,21 +667,6 @@ The configuration file for the status icons is `Resource/UI/StatusIcon.res`. A c
 
 #### UI Resource Files
 The configuration file for the team health comparison HUD is `Resource/UI/TeamHealthComparison.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_teamhealthcomparison_reload_settings` is provided as a replacement.
-
-### Team Overrides
-*override team info in HUD*
-
-#### Console Commands
-* `statusspec_teamoverrides_switch_teams` - switch names and scores for both teams
-
-#### Console Variables
-* `statusspec_teamoverrides_enabled` - enable team overrides
-* `statusspec_teamoverrides_name_blu` - BLU team name
-* `statusspec_teamoverrides_name_red` - RED team name
-* `statusspec_teamoverrides_names` - enable overrides for team names
-* `statusspec_teamoverrides_score_blu` - BLU team score
-* `statusspec_teamoverrides_score_red` - RED team score
-* `statusspec_teamoverrides_scores` - enable overrides for team scores
 
 Thanks
 ------
