@@ -32,7 +32,6 @@
 #include "modules/multipanel.h"
 #include "modules/playeraliases.h"
 #include "modules/playermodels.h"
-#include "modules/playeroutlines.h"
 #include "modules/projectileoutlines.h"
 #include "modules/specguiorder.h"
 #include "modules/statusicons.h"
@@ -76,7 +75,6 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_ModuleManager->LoadModule<MultiPanel>("MultiPanel");
 	g_ModuleManager->LoadModule<PlayerAliases>("Player Aliases");
 	g_ModuleManager->LoadModule<PlayerModels>("Player Models");
-	g_ModuleManager->LoadModule<PlayerOutlines>("Player Outlines");
 	g_ModuleManager->LoadModule<ProjectileOutlines>("Projectile Outlines");
 	g_ModuleManager->LoadModule<SpecGUIOrder>("Spec GUI Order");
 	g_ModuleManager->LoadModule<StatusIcons>("Status Icons");

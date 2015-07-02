@@ -34,6 +34,8 @@ Changelog
   * removed custom animations
 * player aliases
   * removed API-based (ESEA/ETF2L/Twitch) aliases
+* player outlines
+  * removed module
 * Steam tools
   * created new module
   * added ability to set rich presence
@@ -588,26 +590,6 @@ Player model configuration is loaded from the `Resource/PlayerModels.res` file. 
 	}
 }
 ```
-
-### Player Outlines
-*displays bright outlines around players that can be seen through walls*
-
-#### Console Commands
-* `statusspec_playeroutlines_color_blu_buff <red> <green> <blue> [alpha]` - the color used for outlines for BLU team players at max buffed health
-* `statusspec_playeroutlines_color_blu_full <red> <green> <blue> [alpha]` - the color used for outlines for BLU team players at full health
-* `statusspec_playeroutlines_color_blu_low <red> <green> <blue> [alpha]` - the color used for outlines for BLU team players at low health
-* `statusspec_playeroutlines_color_blu_medium <red> <green> <blue> [alpha]` - the color used for outlines for BLU team players at medium health
-* `statusspec_playeroutlines_color_red_buff <red> <green> <blue> [alpha]` - the color used for outlines for RED team players at max buffed health
-* `statusspec_playeroutlines_color_red_full <red> <green> <blue> [alpha]` - the color used for outlines for RED team players at full health
-* `statusspec_playeroutlines_color_red_low <red> <green> <blue> [alpha]` - the color used for outlines for RED team players at low health
-* `statusspec_playeroutlines_color_red_medium <red> <green> <blue> [alpha]` - the color used for outlines for RED team players at medium health
-
-#### Console Variables
-* `statusspec_playeroutlines_enabled` - enable player outlines
-* `statusspec_playeroutlines_fade` - make outlines fade with distance
-* `statusspec_playeroutlines_fade_distance` - the distance (in Hammer units) at which outlines will fade
-* `statusspec_playeroutlines_health_adjusted_team_colors` - adjusts team colors depending on health of players
-* `statusspec_playeroutlines_team_colors` - override default health-based outline colors with team colors
 
 ### Projectile Outlines
 *displays bright outlines around projectiles that can be seen through walls*
