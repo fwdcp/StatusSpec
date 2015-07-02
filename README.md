@@ -36,6 +36,8 @@ Changelog
   * removed API-based (ESEA/ETF2L/Twitch) aliases
 * player outlines
   * removed module
+* spec GUI order
+  * removed module
 * Steam tools
   * created new module
   * added ability to set rich presence
@@ -605,14 +607,6 @@ Player model configuration is loaded from the `Resource/PlayerModels.res` file. 
 * `statusspec_projectileoutlines_grenades` - enable outlines for grenades
 * `statusspec_projectileoutlines_rockets` - enable outlines for rockets
 * `statusspec_projectileoutlines_stickybombs` - enable outlines for stickybombs
-
-### Spec GUI Order
-*orders the spec GUI more logically than player indices*
-
-#### Console Variables
-* `statusspec_specguiorder_enabled` - enable ordering of spec GUI
-* `statusspec_specguiorder_reverse_blu` - reverse order for BLU players
-* `statusspec_specguiorder_reverse_red` - reverse order for RED players
 
 ### Status Icons
 *displays icons representing special statuses of a player*

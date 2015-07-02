@@ -33,7 +33,6 @@
 #include "modules/playeraliases.h"
 #include "modules/playermodels.h"
 #include "modules/projectileoutlines.h"
-#include "modules/specguiorder.h"
 #include "modules/statusicons.h"
 #include "modules/steamtools.h"
 #include "modules/teamhealthcomparison.h"
@@ -76,7 +75,6 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_ModuleManager->LoadModule<PlayerAliases>("Player Aliases");
 	g_ModuleManager->LoadModule<PlayerModels>("Player Models");
 	g_ModuleManager->LoadModule<ProjectileOutlines>("Projectile Outlines");
-	g_ModuleManager->LoadModule<SpecGUIOrder>("Spec GUI Order");
 	g_ModuleManager->LoadModule<StatusIcons>("Status Icons");
 	g_ModuleManager->LoadModule<SteamTools>("Steam Tools");
 	g_ModuleManager->LoadModule<TeamHealthComparison>("Team Health Comparison");
