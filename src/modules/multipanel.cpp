@@ -16,11 +16,10 @@
 #include "iclientmode.h"
 #include "vgui/IVGui.h"
 #include "../vgui_controls/gameconsoledialog.h"
+#include "viewport_panel_names.h"
 
 #include "../common.h"
 #include "../ifaces.h"
-
-#define SCOREBOARD_PANEL_NAME "scores"
 
 MultiPanel::MultiPanel(std::string name) : Module(name) {
 	consoleDialog = nullptr;
@@ -83,7 +82,7 @@ void MultiPanel::InitHud() {
 				for (int i = 0; i < children; i++) {
 					vgui::VPANEL child = g_pVGuiPanel->GetChild(vpanel, i);
 
-					if (strcmp(g_pVGuiPanel->GetName(child), SCOREBOARD_PANEL_NAME) == 0) {
+					if (strcmp(g_pVGuiPanel->GetName(child), PANEL_SCOREBOARD) == 0) {
 						scoreboardPanel = g_pVGui->PanelToHandle(child);
 
 						break;
@@ -123,8 +122,8 @@ void MultiPanel::ToggleScoreboard(IConVar *var, const char *pOldValue, float flO
 			IViewPort *viewport = dynamic_cast<IViewPort *>(Interfaces::GetClientMode()->GetViewport());
 
 			if (viewport) {
-				viewport->ShowPanel(SCOREBOARD_PANEL_NAME, true);
-				viewport->ShowPanel(SCOREBOARD_PANEL_NAME, false);
+				viewport->ShowPanel(PANEL_SCOREBOARD, true);
+				viewport->ShowPanel(PANEL_SCOREBOARD, false);
 			}
 		}
 
