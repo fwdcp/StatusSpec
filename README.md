@@ -40,6 +40,8 @@ Changelog
   * removed module
 * spec GUI order
   * removed module
+* status icons
+  * removed module
 * Steam tools
   * created new module
   * added ability to set rich presence
