@@ -451,50 +451,6 @@ Custom texture configuration is loaded from the `Resource/CustomTextures.res` fi
 #### Console Variables
 * `statusspec_killstreaks_enabled` - enable killstreaks display
 
-### Loadout Icons
-*displays icons to represent weapons in a player's loadout*
-
-#### Console Commands
-* `statusspec_loadouticons_filter_active <red> <green> <blue> <alpha>` - the RGBA filter applied to the icon for an active item
-* `statusspec_loadouticons_filter_inactive <red> <green> <blue> <alpha>` - the RGBA filter applied to the icon for an inactive item
-
-#### Console Variables
-* `statusspec_loadouticons_enabled` - enable loadout icons
-* `statusspec_loadouticons_nonloadout` - enable loadout icons for nonloadout items
-* `statusspec_loadouticons_only_active` - only display loadout icons for the active weapon
-
-#### UI Resource Files
-The configuration file for the loadout icons is `Resource/UI/LoadoutIcons.res`. To properly support loadout icons, you will also have to adjust `Resource/UI/SpectatorTournament.res` so that it includes something similar to the `LoadoutIcons` section below contained within the `playerpanels_kv` section of the `specgui` section, as demonstrated below.
-```
-"Resource/UI/SpectatorTournament.res"
-{
-	"specgui"
-	{
-		...
-
-		"playerpanels_kv"
-		{
-			...
-
-			"LoadoutIcons"
-			{
-				"ControlName"   "EditablePanel"
-				"fieldName"	 "LoadoutIcons"
-				"xpos"		  "160"
-				"ypos"		  "0"
-				"zpos"		  "2"
-				"wide"		  "45"
-				"tall"		  "15"
-				"visible"	   "1"
-				"enabled"	   "1"
-			}
-		}
-	}
-
-	...
-}
-```
-
 ### Local Player
 *changes the local player locally to affect certain HUD elements like the killfeed*
 
@@ -613,46 +569,6 @@ Player model configuration is loaded from the `Resource/PlayerModels.res` file. 
 * `statusspec_projectileoutlines_grenades` - enable outlines for grenades
 * `statusspec_projectileoutlines_rockets` - enable outlines for rockets
 * `statusspec_projectileoutlines_stickybombs` - enable outlines for stickybombs
-
-### Status Icons
-*displays icons representing special statuses of a player*
-
-#### Console Variables
-* `statusspec_statusicons_delta_x` - change in the x direction for each icon
-* `statusspec_statusicons_delta_y` - change in the y direction for each icon
-* `statusspec_statusicons_enabled` - enable status icons
-
-#### UI Resource Files
-The configuration file for the status icons is `Resource/UI/StatusIcon.res`. A copy of the elements in that file will be created and configured for each icon. To properly support status icons, you will also have to adjust `Resource/UI/SpectatorTournament.res` so that it includes something similar to the `StatusIcons` section below contained within the `playerpanels_kv` section of the `specgui` section, as demonstrated below.
-```
-"Resource/UI/SpectatorTournament.res"
-{
-	"specgui"
-	{
-		...
-
-		"playerpanels_kv"
-		{
-			...
-
-			"StatusIcons"
-			{
-				"ControlName"   "EditablePanel"
-				"fieldName"	 "StatusIcons"
-				"xpos"		  "160"
-				"ypos"		  "0"
-				"zpos"		  "8"
-				"wide"		  "45"
-				"tall"		  "15"
-				"visible"	   "1"
-				"enabled"	   "1"
-			}
-		}
-	}
-
-	...
-}
-```
 
 ### Steam Tools
 *allows more options for interacting with Steam*
