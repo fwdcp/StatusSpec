@@ -26,7 +26,6 @@
 #include "modules/customtextures.h"
 #include "modules/fovoverride.h"
 #include "modules/killstreaks.h"
-#include "modules/loadouticons.h"
 #include "modules/localplayer.h"
 #include "modules/mediguninfo.h"
 #include "modules/multipanel.h"
@@ -67,7 +66,6 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_ModuleManager->LoadModule<CustomTextures>("Custom Textures");
 	g_ModuleManager->LoadModule<FOVOverride>("FOV Override");
 	g_ModuleManager->LoadModule<Killstreaks>("Killstreaks");
-	g_ModuleManager->LoadModule<LoadoutIcons>("Loadout Icons");
 	g_ModuleManager->LoadModule<LocalPlayer>("Local Player");
 	g_ModuleManager->LoadModule<MedigunInfo>("Medigun Info");
 	g_ModuleManager->LoadModule<MultiPanel>("MultiPanel");

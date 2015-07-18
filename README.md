@@ -24,6 +24,8 @@ Changelog
   * created new module
   * added ability to change CVar flags
   * added ability to filter console by regular expressions
+* loadout icons
+  * removed module
 * medigun info
   * optimized performance
   * add support for multiple mediguns per team
