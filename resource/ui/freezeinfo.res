@@ -28,7 +28,7 @@
 		"pinCorner"		"0"
 		"visible" 		"1"
 		"enabled" 		"1"
-		"fillcolor" 	"NotoDark"
+		"fillcolor" 	"HudBlack"
 	}
 	
 	"FreezeInfoIcon"
@@ -48,7 +48,7 @@
 	"FreezeInfoLabel"
 	{
 		"ControlName"	"VariableLabel"
-		"fieldName"		"MedigunInfoRedNameLabel"
+		"fieldName"		"FreezeInfoLabel"
 		"xpos"			"32"
 		"ypos"			"0"
 		"wide"			"128"
@@ -61,7 +61,7 @@
 		"textAlignment"	"center"
 		"dulltext"		"0"
 		"brighttext"	"0"
-		"font"			"Noto16"
-		"fgcolor"		"NotoWhite"
+		"font"			"HudFontMediumSmallSecondary"
+		"fgcolor"		"HudWhite"
 	}
 }
