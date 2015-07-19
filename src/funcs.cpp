@@ -18,6 +18,7 @@
 #include "iclientmode.h"
 #include "icvar.h"
 #include "igameevents.h"
+#include "iprediction.h"
 #include "toolframework/iclientenginetools.h"
 #include "vgui/IPanel.h"
 
@@ -50,6 +51,7 @@ SH_DECL_HOOK0_void_vafmt(ICvar, ConsolePrintf, const FMTFUNCTION(2, 3), 0);
 SH_DECL_HOOK0_void_vafmt(ICvar, ConsoleDPrintf, const FMTFUNCTION(2, 3), 0);
 SH_DECL_HOOK1(IGameEventManager2, FireEventClientSide, SH_NOATTRIB, 0, bool, IGameEvent *);
 SH_DECL_HOOK4(IMaterialSystem, FindMaterial, SH_NOATTRIB, 0, IMaterial *, char const *, const char *, bool, const char *);
+SH_DECL_HOOK0_void(IPrediction, PostEntityPacketReceived, SH_NOATTRIB, 0);
 SH_DECL_HOOK2(IVEngineClient, GetPlayerInfo, SH_NOATTRIB, 0, bool, int, player_info_t *);
 
 int Funcs::setModeLastHookRegistered = 0;
@@ -205,6 +207,10 @@ int Funcs::AddHook_IGameEventManager2_FireEventClientSide(IGameEventManager2 *in
 
 int Funcs::AddHook_IMaterialSystem_FindMaterial(IMaterialSystem *instance, fastdelegate::FastDelegate4<char const *, const char *, bool, const char *, IMaterial *> hook, bool post) {
 	return SH_ADD_HOOK(IMaterialSystem, FindMaterial, instance, hook, post);
+}
+
+int Funcs::AddHook_IPrediction_PostEntityPacketReceived(IPrediction *instance, fastdelegate::FastDelegate0<> hook, bool post) {
+	return SH_ADD_HOOK(IPrediction, PostEntityPacketReceived, instance, hook, post);
 }
 
 int Funcs::AddHook_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, fastdelegate::FastDelegate2<int, player_info_t *, bool> hook, bool post) {

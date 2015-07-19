@@ -27,6 +27,7 @@ class ICvar;
 class IGameEvent;
 class IGameEventManager2;
 class IMaterialSystem;
+class IPrediction;
 
 namespace vgui {
 	class IPanel;
@@ -51,6 +52,7 @@ public:
 	static int AddHook_ICvar_ConsolePrintf(ICvar *instance, fastdelegate::FastDelegate1<const char *> hook, bool post);
 	static int AddHook_IGameEventManager2_FireEventClientSide(IGameEventManager2 *instance, fastdelegate::FastDelegate1<IGameEvent *, bool> hook, bool post);
 	static int AddHook_IMaterialSystem_FindMaterial(IMaterialSystem *instance, fastdelegate::FastDelegate4<char const *, const char *, bool, const char *, IMaterial *> hook, bool post);
+	static int AddHook_IPrediction_PostEntityPacketReceived(IPrediction *instance, fastdelegate::FastDelegate0<> hook, bool post);
 	static int AddHook_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, fastdelegate::FastDelegate2<int, player_info_t *, bool> hook, bool post);
 
 	static int CallFunc_GetLocalPlayerIndex();
