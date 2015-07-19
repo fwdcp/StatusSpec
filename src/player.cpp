@@ -538,7 +538,7 @@ bool Player::CheckDependencies() {
 
 	if (!Interfaces::pEngineTool) {
 		PRINT_TAG();
-		Warning("Required interface CGlobalVarsBase for player helper class not available!\n");
+		Warning("Required interface IEngineTool for player helper class not available!\n");
 
 		ready = false;
 	}

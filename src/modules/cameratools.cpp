@@ -93,7 +93,7 @@ bool CameraTools::CheckDependencies(std::string name) {
 
 	if (!Interfaces::pEngineTool) {
 		PRINT_TAG();
-		Warning("Required interface CGlobalVarsBase for module %s not available!\n", name.c_str());
+		Warning("Required interface IEngineTool for module %s not available!\n", name.c_str());
 
 		ready = false;
 	}

@@ -48,13 +48,6 @@ bool TeamHealthComparison::CheckDependencies(std::string name) {
 		ready = false;
 	}
 
-	if (!Interfaces::pClientDLL) {
-		PRINT_TAG();
-		Warning("Required interface IBaseClientDLL for module %s not available!\n", name.c_str());
-
-		ready = false;
-	}
-
 	if (!Interfaces::vguiLibrariesAvailable) {
 		PRINT_TAG();
 		Warning("Required VGUI library for module %s not available!\n", name.c_str());

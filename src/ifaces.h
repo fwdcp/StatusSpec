@@ -13,7 +13,6 @@
 #include "interface.h"
 
 class C_HLTVCamera;
-class CGlobalVarsBase;
 class CSteamAPIContext;
 class IBaseClientDLL;
 class IClientEngineTools;
