@@ -22,6 +22,7 @@ class IClientMode;
 class IEngineTool;
 class IFileSystem;
 class IGameEventManager2;
+class IPrediction;
 class IVEngineClient;
 class IVModelInfoClient;
 class IVRenderView;
@@ -39,6 +40,7 @@ class Interfaces {
 		static IFileSystem *pFileSystem;
 		static IGameEventManager2 *pGameEventManager;
 		static IVModelInfoClient *pModelInfoClient;
+		static IPrediction *pPrediction;
 		static IVRenderView *pRenderView;
 		static CSteamAPIContext *pSteamAPIContext;
 

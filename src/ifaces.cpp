@@ -17,6 +17,7 @@
 #include "filesystem_init.h"
 #include "icliententitylist.h"
 #include "igameevents.h"
+#include "iprediction.h"
 #include "ivrenderview.h"
 #include "steam/steam_api.h"
 #include "teamplayroundbased_gamerules.h"
@@ -35,6 +36,7 @@ IVEngineClient *Interfaces::pEngineClient = nullptr;
 IEngineTool *Interfaces::pEngineTool = nullptr;
 IFileSystem *Interfaces::pFileSystem = nullptr;
 IGameEventManager2 *Interfaces::pGameEventManager = nullptr;
+IPrediction *Interfaces::pPrediction = nullptr;
 IVModelInfoClient *Interfaces::pModelInfoClient = nullptr;
 IVRenderView *Interfaces::pRenderView = nullptr;
 CSteamAPIContext *Interfaces::pSteamAPIContext = nullptr;
@@ -111,6 +113,7 @@ void Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 	
 	pClientDLL = (IBaseClientDLL*)gameClientFactory(CLIENT_DLL_INTERFACE_VERSION, nullptr);
 	pClientEntityList = (IClientEntityList*)gameClientFactory(VCLIENTENTITYLIST_INTERFACE_VERSION, nullptr);
+	pPrediction = (IPrediction *)gameClientFactory(VCLIENT_PREDICTION_INTERFACE_VERSION, nullptr);
 
 	pSteamAPIContext = new CSteamAPIContext();
 	steamLibrariesAvailable = SteamAPI_InitSafe() && pSteamAPIContext->Init();
