@@ -11,7 +11,6 @@
 #include "camerastate.h"
 
 #include <functional>
-#include <thread>
 
 #include "rapidjson/document.h"
 #include "rapidjson/stringbuffer.h"

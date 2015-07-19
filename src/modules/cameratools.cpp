@@ -10,6 +10,8 @@
 
 #include "cameratools.h"
 
+#include <functional>
+
 #include "cbase.h"
 #include "filesystem.h"
 #include "hltvcamera.h"
