@@ -125,7 +125,7 @@ void CameraAutoSwitch::FireGameEvent(IGameEvent *event) {
 								}
 								else {
 									try {
-										Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(Interfaces::GetHLTVCamera(), killer->entindex());
+										Funcs::GetFunc_C_HLTVCamera_SetPrimaryTarget()(Interfaces::GetHLTVCamera(), killer->entindex());
 									}
 									catch (bad_pointer &e) {
 										Warning("%s\n", e.what());
@@ -180,7 +180,7 @@ void CameraAutoSwitch::Panel::OnTick() {
 		killerSwitch = false;
 
 		try {
-			Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(Interfaces::GetHLTVCamera(), killerSwitchPlayer);
+			Funcs::GetFunc_C_HLTVCamera_SetPrimaryTarget()(Interfaces::GetHLTVCamera(), killerSwitchPlayer);
 		}
 		catch (bad_pointer &e) {
 			Warning("%s\n", e.what());
