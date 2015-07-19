@@ -160,7 +160,7 @@ bool CameraSmooths::SetupEngineViewOverride(Vector &origin, QAngle &angles, floa
 	}
 
 	if (smoothInProgress) {
-		float moveDistance = move_speed->GetFloat() * (Interfaces::pEngineTool->GetRealTime() - smoothLastTime);
+		float moveDistance = move_speed->GetFloat() * (Interfaces::pEngineTool->HostTime() - smoothLastTime);
 		
 		Vector moveVector = origin - smoothLastOrigin;
 		Vector currentAngleVector(smoothLastAngles.x, smoothLastAngles.y, smoothLastAngles.z);
@@ -201,7 +201,7 @@ bool CameraSmooths::SetupEngineViewOverride(Vector &origin, QAngle &angles, floa
 
 		smoothLastAngles = angles;
 		smoothLastOrigin = origin;
-		smoothLastTime = Interfaces::pEngineTool->GetRealTime();
+		smoothLastTime = Interfaces::pEngineTool->HostTime();
 
 		RETURN_META_VALUE(MRES_SUPERCEDE, true);
 	}
@@ -219,7 +219,7 @@ bool CameraSmooths::SetupEngineViewOverride(Vector &origin, QAngle &angles, floa
 	smoothInProgress = false;
 	smoothLastAngles = angles;
 	smoothLastOrigin = origin;
-	smoothLastTime = Interfaces::pEngineTool->GetRealTime();
+	smoothLastTime = Interfaces::pEngineTool->HostTime();
 
 	RETURN_META_VALUE(MRES_IGNORED, false);
 }
