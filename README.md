@@ -49,6 +49,10 @@ Changelog
   * removed API-based (ESEA/ETF2L/Twitch) aliases
 * player outlines
   * removed module
+* projectile outlines
+  * optimized module
+  * fix color commands
+  * fix grenades and stickybombs not being highlighted
 * spec GUI order
   * removed module
 * status icons

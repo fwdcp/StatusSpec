@@ -23,14 +23,14 @@ public:
 
 	static bool CheckDependencies();
 private:
-	bool DoPostScreenSpaceEffectsHook(const CViewSetup *pSetup);
-	void FrameHook(ClientFrameStage_t curStage);
+	void UpdateGlowFades(Vector origin);
+	void UpdateGlows();
 
 	std::map<std::string, ColorConCommand> colors;
-	int doPostScreenSpaceEffectsHook;
-	int frameHook;
 	std::map<EHANDLE, GlowManager::GlowObject *> glows;
-	GlowManager glowManager;
+
+	class Panel;
+	Panel *panel;
 
 	Color GetGlowColor(IClientEntity *entity);
 	void SetGlowEffect(IClientEntity *entity, bool enabled, Vector color = Vector(1.0f, 1.0f, 1.0f), float alpha = 1.0f);
