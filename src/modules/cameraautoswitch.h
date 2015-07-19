@@ -8,6 +8,8 @@
  *
  */
 
+#pragma once
+
 #include "igameevents.h"
 
 #include "../modules.h"
