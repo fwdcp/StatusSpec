@@ -10,9 +10,9 @@
 
 #pragma once
 
-#include "../modules.h"
+#include "mathlib/vector.h"
 
-#include "cdll_int.h"
+#include "../modules.h"
 
 class ConVar;
 class IConVar;
@@ -23,12 +23,12 @@ public:
 
 	static bool CheckDependencies(std::string name);
 private:
-	void FrameHook(ClientFrameStage_t curStage);
-	float GetFOVOverride();
-	bool HookGetFOV();
+	int inToolModeHook;
+	int setupEngineViewHook;
+	bool InToolModeOverride();
+	bool SetupEngineViewOverride(Vector &origin, QAngle &angles, float &fov);
 
-	int frameHook;
-	int getFOVHook;
+	class HLTVCameraOverride;
 
 	ConVar *enabled;
 	ConVar *fov;
