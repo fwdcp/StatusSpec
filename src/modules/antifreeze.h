@@ -30,35 +30,17 @@ public:
 
 	static bool CheckDependencies(std::string name);
 private:
-	void FrameHook(ClientFrameStage_t curStage);
-
-	float bluTime;
-	vgui::HPanel bluTimerPanel;
-	bool entitiesUpdated;
-	int frameHook;
-	vgui::EditablePanel *freezeInfoPanel;
-	double lastEntityUpdate;
-	float mainTime;
-	vgui::HPanel mainTimerPanel;
-	KeyValues *performLayoutCommand;
-	float redTime;
-	vgui::HPanel redTimerPanel;
-	vgui::HPanel specguiPanel;
-	float stopwatchTime;
-	vgui::HPanel stopwatchTimerPanel;
-
-	void GetSpecGUI();
-	void GetTimers();
-	void InitHUD();
-	void InitTimers(bool moduleTime);
+	class DisplayPanel;
+	class RefreshPanel;
+	DisplayPanel *displayPanel;
+	RefreshPanel *refreshPanel;
 
 	ConVar *display;
 	ConCommand *display_reload_settings;
 	ConVar *display_threshold;
 	ConVar *enabled;
-	ConVar *timers;
+	void ChangeDisplayThreshold(IConVar *var, const char *pOldValue, float flOldValue);
 	void ReloadSettings();
 	void ToggleDisplay(IConVar *var, const char *pOldValue, float flOldValue);
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
-	void ToggleTimers(IConVar *var, const char *pOldValue, float flOldValue);
 };
