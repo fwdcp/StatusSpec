@@ -10,6 +10,7 @@
 
 #include "antifreeze.h"
 
+#include "cbase.h"
 #include "convar.h"
 #include "iclientmode.h"
 #include "tier3/tier3.h"
