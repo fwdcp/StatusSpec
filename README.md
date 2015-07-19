@@ -337,6 +337,9 @@ To install, place the `StatusSpec` folder within the `custom` folder in the `tf`
 * `statusspec_cameratools_spec_pos <x> <y> <z> <yaw> <pitch>` - spec a certain camera position
 
 #### Console Variables
+* `statusspec_cameratools_force_mode` - if a valid mode, force the camera mode to this
+* `statusspec_cameratools_force_target` - if a valid target, force the camera target to this
+* `statusspec_cameratools_force_valid_target` - forces the camera to only have valid targets
 * `statusspec_cameratools_spec_player_alive` - prevent speccing dead players
 
 ### Console Tools
