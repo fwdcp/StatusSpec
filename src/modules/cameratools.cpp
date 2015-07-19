@@ -21,7 +21,6 @@ class C_BaseEntity;
 #include "cbase.h"
 #include "convar.h"
 #include "filesystem.h"
-#include "gameeventdefs.h"
 #include "usercmd.h"
 #include "hltvcamera.h"
 #include "icliententity.h"
@@ -73,7 +72,6 @@ CameraTools::CameraTools() {
 	force_mode = new ConVar("statusspec_cameratools_force_mode", "0", FCVAR_NONE, "if a valid mode, force the camera mode to this", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>()->ChangeForceMode(var, pOldValue, flOldValue); });
 	force_target = new ConVar("statusspec_cameratools_force_target", "-1", FCVAR_NONE, "if a valid target, force the camera target to this", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>()->ChangeForceTarget(var, pOldValue, flOldValue); });
 	force_valid_target = new ConVar("statusspec_cameratools_force_valid_target", "0", FCVAR_NONE, "forces the camera to only have valid targets", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>()->ToggleForceValidTarget(var, pOldValue, flOldValue); });
-	killer_follow_enabled = new ConVar("statusspec_cameratools_killer_follow_enabled", "0", FCVAR_NONE, "enables switching to the killer upon death of spectated player", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>()->ToggleKillerFollowEnabled(var, pOldValue, flOldValue); });
 	spec_player = new ConCommand("statusspec_cameratools_spec_player", [](const CCommand &command) { g_ModuleManager->GetModule<CameraTools>()->SpecPlayer(command); }, "spec a certain player", FCVAR_NONE);
 	spec_player_alive = new ConVar("statusspec_cameratools_spec_player_alive", "1", FCVAR_NONE, "prevent speccing dead players");
 	spec_pos = new ConCommand("statusspec_cameratools_spec_pos", [](const CCommand &command) { g_ModuleManager->GetModule<CameraTools>()->SpecPosition(command); }, "spec a certain camera position", FCVAR_NONE);
@@ -180,35 +178,6 @@ bool CameraTools::CheckDependencies() {
 	}
 
 	return ready;
-}
-
-void CameraTools::FireGameEvent(IGameEvent *event) {
-	if (killer_follow_enabled->GetBool()) {
-		if (strcmp(event->GetName(), GAME_EVENT_PLAYER_DEATH) == 0) {
-			Player localPlayer = Interfaces::pEngineClient->GetLocalPlayer();
-
-			if (localPlayer) {
-				if (localPlayer.GetObserverMode() == OBS_MODE_FIXED || localPlayer.GetObserverMode() == OBS_MODE_IN_EYE || localPlayer.GetObserverMode() == OBS_MODE_CHASE) {
-					Player targetPlayer = localPlayer.GetObserverTarget();
-
-					if (targetPlayer) {
-						if (Interfaces::pEngineClient->GetPlayerForUserID(event->GetInt("userid")) == targetPlayer->entindex()) {
-							Player killer = Interfaces::pEngineClient->GetPlayerForUserID(event->GetInt("attacker"));
-
-							if (killer) {
-								try {
-									Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(Interfaces::GetHLTVCamera(), killer->entindex());
-								}
-								catch (bad_pointer &e) {
-									Warning("%s\n", e.what());
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
 }
 
 void CameraTools::UpdateState() {
@@ -806,19 +775,6 @@ void CameraTools::ToggleForceValidTarget(IConVar *var, const char *pOldValue, fl
 				Funcs::RemoveHook_C_HLTVCamera_SetPrimaryTarget(setPrimaryTargetHook);
 				setPrimaryTargetHook = 0;
 			}
-		}
-	}
-}
-
-void CameraTools::ToggleKillerFollowEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
-	if (killer_follow_enabled->GetBool()) {
-		if (!Interfaces::pGameEventManager->FindListener(this, GAME_EVENT_PLAYER_DEATH)) {
-			Interfaces::pGameEventManager->AddListener(this, GAME_EVENT_PLAYER_DEATH, false);
-		}
-	}
-	else {
-		if (Interfaces::pGameEventManager->FindListener(this, GAME_EVENT_PLAYER_DEATH)) {
-			Interfaces::pGameEventManager->RemoveListener(this);
 		}
 	}
 }

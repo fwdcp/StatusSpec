@@ -21,13 +21,11 @@ class ConCommand;
 class ConVar;
 class KeyValues;
 
-class CameraTools : public Module, IGameEventListener2 {
+class CameraTools : public Module {
 public:
 	CameraTools();
 
 	static bool CheckDependencies();
-
-	virtual void FireGameEvent(IGameEvent *event);
 private:
 	void UpdateState();
 
@@ -46,7 +44,6 @@ private:
 	ConVar *force_mode;
 	ConVar *force_target;
 	ConVar *force_valid_target;
-	ConVar *killer_follow_enabled;
 	ConCommand *spec_player;
 	ConVar *spec_player_alive;
 	ConCommand *spec_pos;
@@ -58,6 +55,5 @@ private:
 	void SpecPlayer(const CCommand &command);
 	void SpecPosition(const CCommand &command);
 	void ToggleForceValidTarget(IConVar *var, const char *pOldValue, float flOldValue);
-	void ToggleKillerFollowEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 	void ToggleStateEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
