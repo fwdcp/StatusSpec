@@ -663,7 +663,7 @@ void CameraTools::SpecPlayer(const CCommand &command) {
 							vgui::VPANEL playerPanel = g_pVGuiPanel->GetChild(specgui, i);
 
 							if (strcmp(g_pVGuiPanel->GetClassName(playerPanel), "CTFPlayerPanel") == 0) {
-								vgui::EditablePanel *panel = dynamic_cast<vgui::EditablePanel *>(g_pVGuiPanel->GetPanel(playerPanel, "ClientDLL"));
+								vgui::EditablePanel *panel = dynamic_cast<vgui::EditablePanel *>(g_pVGuiPanel->GetPanel(playerPanel, GAME_PANEL_MODULE));
 
 								if (panel) {
 									KeyValues *dialogVariables = panel->GetDialogVariables();

@@ -21,6 +21,7 @@
 
 class ConCommand;
 
+#define GAME_PANEL_MODULE "ClientDLL"
 
 typedef struct Replacement {
 	std::string group;
