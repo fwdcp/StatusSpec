@@ -41,7 +41,7 @@ private:
 FreezeInfo::FreezeInfo() {
 	panel = nullptr;
 
-	enabled = new ConVar("statusspec_antifreeze_enabled", "0", FCVAR_NONE, "enables display of an info panel when a freeze is detected", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<FreezeInfo>()->ToggleEnabled(var, pOldValue, flOldValue); });
+	enabled = new ConVar("statusspec_freezeinfo_enabled", "0", FCVAR_NONE, "enables display of an info panel when a freeze is detected", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<FreezeInfo>()->ToggleEnabled(var, pOldValue, flOldValue); });
 	reload_settings = new ConCommand("statusspec_freezeinfo_reload_settings", []() { g_ModuleManager->GetModule<FreezeInfo>()->ReloadSettings(); }, "reload settings for the freeze info panel from the resource file", FCVAR_NONE);
 	threshold = new ConVar("statusspec_freezeinfo_threshold", "1", FCVAR_NONE, "the time of a freeze (in seconds) before the info panel is displayed", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<FreezeInfo>()->ChangeThreshold(var, pOldValue, flOldValue); });
 }
