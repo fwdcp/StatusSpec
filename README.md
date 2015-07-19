@@ -310,17 +310,12 @@ To install, place the `StatusSpec` folder within the `custom` folder in the `tf`
 * `statusspec_camerasmooths_move_speed` - speed to move view per second
 
 ### Camera Auto Switch
-*allows more options for managing the camera*
-
-#### Console Commands
-* `statusspec_cameratools_spec_player <index>` - spec a certain player by player index
-* `statusspec_cameratools_spec_player <team> <position>` - spec a certain player by position on spectator HUD
-* `statusspec_cameratools_spec_pos <x> <y> <z> <yaw> <pitch>` - spec a certain camera position
+*automatically switches the camera based on game events*
 
 #### Console Variables
-* `statusspec_cameratools_spec_player_alive` - prevent speccing dead players
-* `statusspec_cameratools_state` - JSON of camera tools state
-* `statusspec_cameratools_state_enabled` - enable exposure of camera tools state
+* `statusspec_cameraautoswitch_enabled` - enable automatic switching of camera
+* `statusspec_cameraautoswitch_killer` - switch to killer upon spectated player death
+* `statusspec_cameraautoswitch_killer_delay` - delay before switching to killer
 
 ### Camera Tools
 *allows more options for managing the camera*
