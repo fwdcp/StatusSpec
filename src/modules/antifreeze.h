@@ -10,19 +10,11 @@
 
 #pragma once
 
-#include "cdll_int.h"
-#include "vgui/VGUI.h"
-
 #include "../modules.h"
 
 class ConCommand;
 class ConVar;
 class IConVar;
-class KeyValues;
-
-namespace vgui {
-	class EditablePanel;
-};
 
 class AntiFreeze : public Module {
 public:
