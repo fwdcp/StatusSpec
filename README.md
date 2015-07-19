@@ -16,13 +16,15 @@ Changelog
   * optimized module
   * removed timer functionality
   * moved freeze info to separate module
+* camera auto switch
+  * created new module
+  * added ability to automatically switch to killer on death (with configurable delay)
 * camera smooths
   * created new module
   * added ability to automatically smooth transitions between camera views
 * camera tools
   * fixed issues with switching camera state
   * optimized camera state updates
-  * added ability to automatically switch to killer on death
   * added ability to force of camera mode and target
 * console tools
   * created new module
@@ -306,6 +308,19 @@ To install, place the `StatusSpec` folder within the `custom` folder in the `tf`
 * `statusspec_camerasmooths_max_angle_difference` - max angle difference at which smoothing will be performed
 * `statusspec_camerasmooths_max_distance` - max distance at which smoothing will be performed
 * `statusspec_camerasmooths_move_speed` - speed to move view per second
+
+### Camera Auto Switch
+*allows more options for managing the camera*
+
+#### Console Commands
+* `statusspec_cameratools_spec_player <index>` - spec a certain player by player index
+* `statusspec_cameratools_spec_player <team> <position>` - spec a certain player by position on spectator HUD
+* `statusspec_cameratools_spec_pos <x> <y> <z> <yaw> <pitch>` - spec a certain camera position
+
+#### Console Variables
+* `statusspec_cameratools_spec_player_alive` - prevent speccing dead players
+* `statusspec_cameratools_state` - JSON of camera tools state
+* `statusspec_cameratools_state_enabled` - enable exposure of camera tools state
 
 ### Camera Tools
 *allows more options for managing the camera*
