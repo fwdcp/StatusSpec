@@ -12,6 +12,10 @@ Changelog
 * general
   * increased reliability
   * optimized performance and size
+* antifreeze
+  * optimized module
+  * removed timer functionality
+  * moved freeze info to separate module
 * camera smooths
   * created new module
   * added ability to automatically smooth transitions between camera views
@@ -24,6 +28,8 @@ Changelog
   * created new module
   * added ability to change CVar flags
   * added ability to filter console by regular expressions
+* freeze info
+  * created new module
 * loadout icons
   * removed module
 * medigun info
@@ -289,42 +295,8 @@ To install, place the `StatusSpec` folder within the `custom` folder in the `tf`
 ### AntiFreeze
 *forces spectator GUI to refresh constantly, eliminating many HUD issues after game unpauses*
 
-#### Console Commands
-* `statusspec_antifreeze_display_reload_settings` - reload settings for the freeze info panel from the resource file
-
 #### Console Variables
-* `statusspec_antifreeze_display` - enables display of an info panel when a freeze is detected
-* `statusspec_antifreeze_display_threshold` - the time of a freeze (in seconds) before the info panel is displayed
 * `statusspec_antifreeze_enabled` - enable antifreeze (forces the spectator GUI to refresh)
-* `statusspec_antifreeze_timers` - enable forcing of timers to right values
-
-#### UI Resource Files
-The configuration file for the freeze info HUD is `Resource/UI/FreezeInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_antifreeze_display_reload_settings` is provided as a replacement.
-
-To properly support forced correct timer values, you will also have to adjust `Resource/UI/HudObjectiveTimePanel.res` so that it includes something similar to the `RealTime` section, as demonstrated below.
-```
-"Resource/UI/HudObjectiveTimePanel.res"
-{
-	...
-
-	"RealTime"
-	{
-		"ControlName"	"CExLabel"
-		"fieldName"		"RealTime"
-		"font"			"NotoBold22"
-		"fgcolor"		"220 220 220 255"
-		"xpos"			"0"
-		"ypos"			"0"
-		"zpos"			"3"
-		"wide"			"110"
-		"tall"			"19"
-		"visible"		"0"
-		"enabled"		"0"
-		"textAlignment"	"center"
-		"labelText"		""
-	}
-}
-```
 
 ### Camera Smooths
 *smooth transitions between camera positions*
@@ -444,6 +416,19 @@ Custom texture configuration is loaded from the `Resource/CustomTextures.res` fi
 * `statusspec_fovoverride_enabled` - enable FOV override
 * `statusspec_fovoverride_fov` - the FOV value used
 * `statusspec_fovoverride_zoomed` - enable FOV override even when sniper rifle is zoomed
+
+### Freeze Info
+*displays info when the game is frozen*
+
+#### Console Commands
+* `statusspec_freezeinfo_reload_settings` - reload settings for the freeze info panel from the resource file
+
+#### Console Variables
+* `statusspec_freezeinfo_enabled` - enables display of an info panel when a freeze is detected
+* `statusspec_freezeinfo_threshold` - the time of a freeze (in seconds) before the info panel is displayed
+
+#### UI Resource Files
+The configuration file for the freeze info HUD is `Resource/UI/FreezeInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_freezeinfo_reload_settings` is provided as a replacement.
 
 ### Killstreaks
 *enables killstreak tracking for all players*
