@@ -20,6 +20,7 @@
 #include "modules/antifreeze.h"
 #include "modules/cameraautoswitch.h"
 #include "modules/camerasmooths.h"
+#include "modules/camerastate.h"
 #include "modules/cameratools.h"
 #include "modules/consoletools.h"
 #include "modules/custommaterials.h"
@@ -61,6 +62,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_ModuleManager->RegisterAndLoadModule<AntiFreeze>("AntiFreeze");
 	g_ModuleManager->RegisterAndLoadModule<CameraAutoSwitch>("Camera Auto Switch");
 	g_ModuleManager->RegisterAndLoadModule<CameraSmooths>("Camera Smooths");
+	g_ModuleManager->RegisterAndLoadModule<CameraState>("Camera State");
 	g_ModuleManager->RegisterAndLoadModule<CameraTools>("Camera Tools");
 	g_ModuleManager->RegisterAndLoadModule<ConsoleTools>("Console Tools");
 	g_ModuleManager->RegisterAndLoadModule<CustomMaterials>("Custom Materials");

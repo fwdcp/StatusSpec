@@ -22,10 +22,13 @@ Changelog
 * camera smooths
   * created new module
   * added ability to automatically smooth transitions between camera views
-* camera tools
-  * fixed issues with switching camera state
+* camera state
+  * created new module
   * optimized camera state updates
-  * added ability to force of camera mode and target
+  * fixed issues with switching camera state
+* camera tools
+  * added ability to force camera mode and target
+  * moved camera state into separate module
 * console tools
   * created new module
   * added ability to change CVar flags
@@ -317,6 +320,14 @@ To install, place the `StatusSpec` folder within the `custom` folder in the `tf`
 * `statusspec_cameraautoswitch_killer` - switch to killer upon spectated player death
 * `statusspec_cameraautoswitch_killer_delay` - delay before switching to killer
 
+### Camera State
+*exposes the current SourceTV camera state*
+
+#### Console Variables
+* `statusspec_camerastate_change` - JSON to change camera state to
+* `statusspec_camerastate_current` - JSON of current camera state
+* `statusspec_camerastate_enabled` - enable exposure of camera state
+
 ### Camera Tools
 *allows more options for managing the camera*
 
@@ -327,8 +338,6 @@ To install, place the `StatusSpec` folder within the `custom` folder in the `tf`
 
 #### Console Variables
 * `statusspec_cameratools_spec_player_alive` - prevent speccing dead players
-* `statusspec_cameratools_state` - JSON of camera tools state
-* `statusspec_cameratools_state_enabled` - enable exposure of camera tools state
 
 ### Console Tools
 *allows more options for managing the console*

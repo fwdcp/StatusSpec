@@ -10,9 +10,6 @@
 
 #pragma once
 
-#include "cdll_int.h"
-#include "igameevents.h"
-
 #include "../modules.h"
 
 class CCommand;
@@ -20,6 +17,7 @@ class C_HLTVCamera;
 class ConCommand;
 class ConVar;
 class KeyValues;
+class IConVar;
 
 class CameraTools : public Module {
 public:
@@ -27,15 +25,10 @@ public:
 
 	static bool CheckDependencies();
 private:
-	void UpdateState();
-
-	bool currentlyUpdating;
-	int frameHook;
 	int setModeHook;
 	int setPrimaryTargetHook;
 	KeyValues *specguiSettings;
 
-	void FrameHook(ClientFrameStage_t curStage);
 	void SetModeOverride(C_HLTVCamera *hltvcamera, int &iMode);
 	void SetPrimaryTargetOverride(C_HLTVCamera *hltvcamera, int &nEntity);
 
@@ -47,13 +40,9 @@ private:
 	ConCommand *spec_player;
 	ConVar *spec_player_alive;
 	ConCommand *spec_pos;
-	ConVar *state;
-	ConVar *state_enabled;
 	void ChangeForceMode(IConVar *var, const char *pOldValue, float flOldValue);
 	void ChangeForceTarget(IConVar *var, const char *pOldValue, float flOldValue);
-	void ChangeState(IConVar *var, const char *pOldValue, float flOldValue);
 	void SpecPlayer(const CCommand &command);
 	void SpecPosition(const CCommand &command);
 	void ToggleForceValidTarget(IConVar *var, const char *pOldValue, float flOldValue);
-	void ToggleStateEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
