@@ -22,9 +22,9 @@ class KeyValues;
 
 class CustomMaterials : public Module {
 public:
-	CustomMaterials(std::string name);
+	CustomMaterials();
 
-	static bool CheckDependencies(std::string name);
+	static bool CheckDependencies();
 private:
 	IMaterial *FindMaterialOverride(char const *pMaterialName, const char *pTextureGroupName, bool complain = true, const char *pComplainPrefix = NULL);
 

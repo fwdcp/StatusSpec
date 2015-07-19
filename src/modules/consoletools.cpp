@@ -32,24 +32,24 @@ void CCvar::SetFlags(ConCommandBase *base, int flags) {
 	base->m_nFlags = flags;
 }
 
-ConsoleTools::ConsoleTools(std::string name) : Module(name) {
+ConsoleTools::ConsoleTools() {
 	consoleColorPrintfHook = 0;
 	consoleDPrintfHook = 0;
 	consolePrintfHook = 0;
 
-	filter_add = new ConCommand("statusspec_consoletools_filter_add", [](const CCommand &command) { g_ModuleManager->GetModule<ConsoleTools>("Console Tools")->AddFilter(command); }, "add a console filter", FCVAR_NONE);
-	filter_enabled = new ConVar("statusspec_consoletools_filter_enabled", "0", FCVAR_NONE, "enable console filtering", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<ConsoleTools>("Console Tools")->ToggleFilterEnabled(var, pOldValue, flOldValue); });
-	filter_remove = new ConCommand("statusspec_consoletools_filter_remove", [](const CCommand &command) { g_ModuleManager->GetModule<ConsoleTools>("Console Tools")->RemoveFilter(command); }, "remove a console filter", FCVAR_NONE);
-	flags_add = new ConCommand("statusspec_consoletools_flags_add", [](const CCommand &command) { g_ModuleManager->GetModule<ConsoleTools>("Console Tools")->AddFlags(command); }, "add a flag to a console command or variable", FCVAR_NONE);
-	flags_remove = new ConCommand("statusspec_consoletools_flags_remove", [](const CCommand &command) { g_ModuleManager->GetModule<ConsoleTools>("Console Tools")->RemoveFlags(command); }, "remove a flag from a console command or variable", FCVAR_NONE);
+	filter_add = new ConCommand("statusspec_consoletools_filter_add", [](const CCommand &command) { g_ModuleManager->GetModule<ConsoleTools>()->AddFilter(command); }, "add a console filter", FCVAR_NONE);
+	filter_enabled = new ConVar("statusspec_consoletools_filter_enabled", "0", FCVAR_NONE, "enable console filtering", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<ConsoleTools>()->ToggleFilterEnabled(var, pOldValue, flOldValue); });
+	filter_remove = new ConCommand("statusspec_consoletools_filter_remove", [](const CCommand &command) { g_ModuleManager->GetModule<ConsoleTools>()->RemoveFilter(command); }, "remove a console filter", FCVAR_NONE);
+	flags_add = new ConCommand("statusspec_consoletools_flags_add", [](const CCommand &command) { g_ModuleManager->GetModule<ConsoleTools>()->AddFlags(command); }, "add a flag to a console command or variable", FCVAR_NONE);
+	flags_remove = new ConCommand("statusspec_consoletools_flags_remove", [](const CCommand &command) { g_ModuleManager->GetModule<ConsoleTools>()->RemoveFlags(command); }, "remove a flag from a console command or variable", FCVAR_NONE);
 }
 
-bool ConsoleTools::CheckDependencies(std::string name) {
+bool ConsoleTools::CheckDependencies() {
 	bool ready = true;
 
 	if (!g_pCVar) {
 		PRINT_TAG();
-		Warning("Required interface ICVar for module %s not available!\n", name.c_str());
+		Warning("Required interface ICVar for module %s not available!\n", g_ModuleManager->GetModuleName<ConsoleTools>().c_str());
 
 		ready = false;
 	}

@@ -21,9 +21,9 @@ struct model_t;
 
 class PlayerModels : public Module {
 public:
-	PlayerModels(std::string name);
+	PlayerModels();
 
-	static bool CheckDependencies(std::string name);
+	static bool CheckDependencies();
 private:
 	void SetModelOverride(C_BaseEntity *entity, const model_t *&model);
 

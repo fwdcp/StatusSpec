@@ -20,9 +20,9 @@ class IConVar;
 
 class ConsoleTools : public Module {
 public:
-	ConsoleTools(std::string name);
+	ConsoleTools();
 
-	static bool CheckDependencies(std::string name);
+	static bool CheckDependencies();
 private:
 	void ConsoleColorPrintfHook(const Color &clr, const char *message);
 	void ConsoleDPrintfHook(const char *message);

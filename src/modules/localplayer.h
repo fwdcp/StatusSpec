@@ -19,9 +19,9 @@ class ConVar;
 
 class LocalPlayer : public Module {
 public:
-	LocalPlayer(std::string name);
+	LocalPlayer();
 
-	static bool CheckDependencies(std::string name);
+	static bool CheckDependencies();
 private:
 	void FrameHook(ClientFrameStage_t curStage);
 	int GetLocalPlayerIndexOverride();

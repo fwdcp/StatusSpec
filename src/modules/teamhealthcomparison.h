@@ -25,9 +25,9 @@ namespace vgui {
 
 class TeamHealthComparison : public Module {
 public:
-	TeamHealthComparison(std::string name);
+	TeamHealthComparison();
 
-	static bool CheckDependencies(std::string name);
+	static bool CheckDependencies();
 private:
 	class Panel;
 	Panel *panel;

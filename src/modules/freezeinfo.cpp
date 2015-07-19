@@ -38,48 +38,48 @@ private:
 	float threshold;
 };
 
-FreezeInfo::FreezeInfo(std::string name) : Module(name) {
+FreezeInfo::FreezeInfo() {
 	panel = nullptr;
 
-	enabled = new ConVar("statusspec_antifreeze_enabled", "0", FCVAR_NONE, "enables display of an info panel when a freeze is detected", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<FreezeInfo>("Freeze Info")->ToggleEnabled(var, pOldValue, flOldValue); });
-	reload_settings = new ConCommand("statusspec_freezeinfo_reload_settings", []() { g_ModuleManager->GetModule<FreezeInfo>("Freeze Info")->ReloadSettings(); }, "reload settings for the freeze info panel from the resource file", FCVAR_NONE);
-	threshold = new ConVar("statusspec_freezeinfo_threshold", "1", FCVAR_NONE, "the time of a freeze (in seconds) before the info panel is displayed", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<FreezeInfo>("Freeze Info")->ChangeThreshold(var, pOldValue, flOldValue); });
+	enabled = new ConVar("statusspec_antifreeze_enabled", "0", FCVAR_NONE, "enables display of an info panel when a freeze is detected", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<FreezeInfo>()->ToggleEnabled(var, pOldValue, flOldValue); });
+	reload_settings = new ConCommand("statusspec_freezeinfo_reload_settings", []() { g_ModuleManager->GetModule<FreezeInfo>()->ReloadSettings(); }, "reload settings for the freeze info panel from the resource file", FCVAR_NONE);
+	threshold = new ConVar("statusspec_freezeinfo_threshold", "1", FCVAR_NONE, "the time of a freeze (in seconds) before the info panel is displayed", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<FreezeInfo>()->ChangeThreshold(var, pOldValue, flOldValue); });
 }
 
-bool FreezeInfo::CheckDependencies(std::string name) {
+bool FreezeInfo::CheckDependencies() {
 	bool ready = true;
 
 	if (!Interfaces::pEngineTool) {
 		PRINT_TAG();
-		Warning("Required interface IEngineTool for module %s not available!\n", name.c_str());
+		Warning("Required interface IEngineTool for module %s not available!\n", g_ModuleManager->GetModuleName<FreezeInfo>().c_str());
 
 		ready = false;
 	}
 
 	if (!Interfaces::pPrediction) {
 		PRINT_TAG();
-		Warning("Required interface IPrediction for module %s not available!\n", name.c_str());
+		Warning("Required interface IPrediction for module %s not available!\n", g_ModuleManager->GetModuleName<FreezeInfo>().c_str());
 
 		ready = false;
 	}
 
 	if (!Interfaces::vguiLibrariesAvailable) {
 		PRINT_TAG();
-		Warning("Required VGUI library for module %s not available!\n", name.c_str());
+		Warning("Required VGUI library for module %s not available!\n", g_ModuleManager->GetModuleName<FreezeInfo>().c_str());
 
 		ready = false;
 	}
 
 	if (!g_pVGui) {
 		PRINT_TAG();
-		Warning("Required interface vgui::IVGui for module %s not available!\n", name.c_str());
+		Warning("Required interface vgui::IVGui for module %s not available!\n", g_ModuleManager->GetModuleName<FreezeInfo>().c_str());
 
 		ready = false;
 	}
 
 	if (!g_pVGuiPanel) {
 		PRINT_TAG();
-		Warning("Required interface vgui::IPanel for module %s not available!\n", name.c_str());
+		Warning("Required interface vgui::IPanel for module %s not available!\n", g_ModuleManager->GetModuleName<FreezeInfo>().c_str());
 
 		ready = false;
 	}
@@ -89,7 +89,7 @@ bool FreezeInfo::CheckDependencies(std::string name) {
 	}
 	catch (bad_pointer) {
 		PRINT_TAG();
-		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", name.c_str());
+		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", g_ModuleManager->GetModuleName<FreezeInfo>().c_str());
 	}
 
 	return ready;

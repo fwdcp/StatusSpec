@@ -29,39 +29,39 @@ public:
 	virtual void OnTick();
 };
 
-AntiFreeze::AntiFreeze(std::string name) : Module(name) {
+AntiFreeze::AntiFreeze() {
 	panel = nullptr;
 
-	enabled = new ConVar("statusspec_antifreeze_enabled", "0", FCVAR_NONE, "enable antifreeze (forces the spectator GUI to refresh)", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<AntiFreeze>("AntiFreeze")->ToggleEnabled(var, pOldValue, flOldValue); });
+	enabled = new ConVar("statusspec_antifreeze_enabled", "0", FCVAR_NONE, "enable antifreeze (forces the spectator GUI to refresh)", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<AntiFreeze>()->ToggleEnabled(var, pOldValue, flOldValue); });
 }
 
-bool AntiFreeze::CheckDependencies(std::string name) {
+bool AntiFreeze::CheckDependencies() {
 	bool ready = true;
 
 	if (!Interfaces::pEngineTool) {
 		PRINT_TAG();
-		Warning("Required interface IEngineTool for module %s not available!\n", name.c_str());
+		Warning("Required interface IEngineTool for module %s not available!\n", g_ModuleManager->GetModuleName<AntiFreeze>().c_str());
 
 		ready = false;
 	}
 
 	if (!Interfaces::vguiLibrariesAvailable) {
 		PRINT_TAG();
-		Warning("Required VGUI library for module %s not available!\n", name.c_str());
+		Warning("Required VGUI library for module %s not available!\n", g_ModuleManager->GetModuleName<AntiFreeze>().c_str());
 
 		ready = false;
 	}
 
 	if (!g_pVGui) {
 		PRINT_TAG();
-		Warning("Required interface vgui::IVGui for module %s not available!\n", name.c_str());
+		Warning("Required interface vgui::IVGui for module %s not available!\n", g_ModuleManager->GetModuleName<AntiFreeze>().c_str());
 
 		ready = false;
 	}
 
 	if (!g_pVGuiPanel) {
 		PRINT_TAG();
-		Warning("Required interface vgui::IPanel for module %s not available!\n", name.c_str());
+		Warning("Required interface vgui::IPanel for module %s not available!\n", g_ModuleManager->GetModuleName<AntiFreeze>().c_str());
 
 		ready = false;
 	}
@@ -71,7 +71,7 @@ bool AntiFreeze::CheckDependencies(std::string name) {
 	}
 	catch (bad_pointer) {
 		PRINT_TAG();
-		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", name.c_str());
+		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", g_ModuleManager->GetModuleName<AntiFreeze>().c_str());
 	}
 
 	return ready;

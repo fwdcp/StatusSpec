@@ -20,9 +20,9 @@ class IConVar;
 
 class MedigunInfo : public Module {
 public:
-	MedigunInfo(std::string name);
+	MedigunInfo();
 
-	static bool CheckDependencies(std::string name);
+	static bool CheckDependencies();
 private:
 	class MainPanel;
 	MainPanel *mainPanel;

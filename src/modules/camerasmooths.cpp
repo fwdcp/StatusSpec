@@ -44,7 +44,7 @@ public:
 	using C_HLTVCamera::m_vecVelocity;
 };
 
-CameraSmooths::CameraSmooths(std::string name) : Module(name) {
+CameraSmooths::CameraSmooths() {
 	inToolModeHook = 0;
 	isThirdPersonCameraHook = 0;
 	setupEngineViewHook = 0;
@@ -56,32 +56,32 @@ CameraSmooths::CameraSmooths(std::string name) : Module(name) {
 	smoothLastOrigin = Vector();
 	smoothLastTime = 0;
 
-	enabled = new ConVar("statusspec_camerasmooths_enabled", "0", FCVAR_NONE, "smooth transition between camera positions", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraSmooths>("Camera Smooths")->ToggleEnabled(var, pOldValue, flOldValue); });
+	enabled = new ConVar("statusspec_camerasmooths_enabled", "0", FCVAR_NONE, "smooth transition between camera positions", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraSmooths>()->ToggleEnabled(var, pOldValue, flOldValue); });
 	max_angle_difference = new ConVar("statusspec_camerasmooths_max_angle_difference", "90", FCVAR_NONE, "max angle difference at which smoothing will be performed");
 	max_distance = new ConVar("statusspec_camerasmooths_max_distance", "800", FCVAR_NONE, "max distance at which smoothing will be performed");
 	move_speed = new ConVar("statusspec_camerasmooths_move_speed", "800", FCVAR_NONE, "speed to move view per second");
 }
 
-bool CameraSmooths::CheckDependencies(std::string name) {
+bool CameraSmooths::CheckDependencies() {
 	bool ready = true;
 
 	if (!Interfaces::pClientEngineTools) {
 		PRINT_TAG();
-		Warning("Required interface IClientEngineTools for module %s not available!\n", name.c_str());
+		Warning("Required interface IClientEngineTools for module %s not available!\n", g_ModuleManager->GetModuleName<CameraSmooths>().c_str());
 
 		ready = false;
 	}
 
 	if (!Interfaces::pEngineClient) {
 		PRINT_TAG();
-		Warning("Required interface IVEngineClient for module %s not available!\n", name.c_str());
+		Warning("Required interface IVEngineClient for module %s not available!\n", g_ModuleManager->GetModuleName<CameraSmooths>().c_str());
 
 		ready = false;
 	}
 
 	if (!Interfaces::pEngineTool) {
 		PRINT_TAG();
-		Warning("Required interface IEngineTool for module %s not available!\n", name.c_str());
+		Warning("Required interface IEngineTool for module %s not available!\n", g_ModuleManager->GetModuleName<CameraSmooths>().c_str());
 
 		ready = false;
 	}
@@ -91,7 +91,7 @@ bool CameraSmooths::CheckDependencies(std::string name) {
 	}
 	catch (bad_pointer) {
 		PRINT_TAG();
-		Warning("Required function C_HLTVCamera::SetCameraAngle for module %s not available!\n", name.c_str());
+		Warning("Required function C_HLTVCamera::SetCameraAngle for module %s not available!\n", g_ModuleManager->GetModuleName<CameraSmooths>().c_str());
 
 		ready = false;
 	}
@@ -101,7 +101,7 @@ bool CameraSmooths::CheckDependencies(std::string name) {
 	}
 	catch (bad_pointer) {
 		PRINT_TAG();
-		Warning("Required function C_HLTVCamera::SetMode for module %s not available!\n", name.c_str());
+		Warning("Required function C_HLTVCamera::SetMode for module %s not available!\n", g_ModuleManager->GetModuleName<CameraSmooths>().c_str());
 
 		ready = false;
 	}
@@ -111,7 +111,7 @@ bool CameraSmooths::CheckDependencies(std::string name) {
 	}
 	catch (bad_pointer) {
 		PRINT_TAG();
-		Warning("Module %s requires C_HLTVCamera, which cannot be verified at this time!\n", name.c_str());
+		Warning("Module %s requires C_HLTVCamera, which cannot be verified at this time!\n", g_ModuleManager->GetModuleName<CameraSmooths>().c_str());
 	}
 
 	return ready;

@@ -17,28 +17,28 @@
 
 #include "../ifaces.h"
 
-CustomTextures::CustomTextures(std::string name) : Module(name) {
+CustomTextures::CustomTextures() {
 	textureConfig = new KeyValues("textures");
 	textureConfig->LoadFromFile(Interfaces::pFileSystem, "resource/customtextures.res", "mod");
 
-	enabled = new ConVar("statusspec_customtextures_enabled", "0", FCVAR_NONE, "enable custom materials", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CustomTextures>("Custom Textures")->ToggleEnabled(var, pOldValue, flOldValue); });
-	load_replacement_group = new ConCommand("statusspec_customtextures_load_replacement_group", [](const CCommand &command) { g_ModuleManager->GetModule<CustomTextures>("Custom Textures")->LoadReplacementGroup(command); }, "load a texture replacement group", FCVAR_NONE);
-	unload_replacement_group = new ConCommand("statusspec_customtextures_unload_replacement_group", [](const CCommand &command) { g_ModuleManager->GetModule<CustomTextures>("Custom Textures")->UnloadReplacementGroup(command); }, "unload a texture replacement group", FCVAR_NONE);
+	enabled = new ConVar("statusspec_customtextures_enabled", "0", FCVAR_NONE, "enable custom materials", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CustomTextures>()->ToggleEnabled(var, pOldValue, flOldValue); });
+	load_replacement_group = new ConCommand("statusspec_customtextures_load_replacement_group", [](const CCommand &command) { g_ModuleManager->GetModule<CustomTextures>()->LoadReplacementGroup(command); }, "load a texture replacement group", FCVAR_NONE);
+	unload_replacement_group = new ConCommand("statusspec_customtextures_unload_replacement_group", [](const CCommand &command) { g_ModuleManager->GetModule<CustomTextures>()->UnloadReplacementGroup(command); }, "unload a texture replacement group", FCVAR_NONE);
 }
 
-bool CustomTextures::CheckDependencies(std::string name) {
+bool CustomTextures::CheckDependencies() {
 	bool ready = true;
 
 	if (!Interfaces::pFileSystem) {
 		PRINT_TAG();
-		Warning("Required interface IFileSystem for module %s not available!\n", name.c_str());
+		Warning("Required interface IFileSystem for module %s not available!\n", g_ModuleManager->GetModuleName<CustomTextures>().c_str());
 
 		ready = false;
 	}
 
 	if (!g_pMaterialSystem) {
 		PRINT_TAG();
-		Warning("Required interface IMaterialSystem for module %s not available!\n", name.c_str());
+		Warning("Required interface IMaterialSystem for module %s not available!\n", g_ModuleManager->GetModuleName<CustomTextures>().c_str());
 
 		ready = false;
 	}

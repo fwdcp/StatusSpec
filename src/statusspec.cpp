@@ -57,24 +57,24 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 
 	g_ModuleManager = new ModuleManager();
 
-	g_ModuleManager->LoadModule<AntiFreeze>("AntiFreeze");
-	g_ModuleManager->LoadModule<CameraSmooths>("Camera Smooths");
-	g_ModuleManager->LoadModule<CameraTools>("Camera Tools");
-	g_ModuleManager->LoadModule<ConsoleTools>("Console Tools");
-	g_ModuleManager->LoadModule<CustomMaterials>("Custom Materials");
-	g_ModuleManager->LoadModule<CustomModels>("Custom Models");
-	g_ModuleManager->LoadModule<CustomTextures>("Custom Textures");
-	g_ModuleManager->LoadModule<FOVOverride>("FOV Override");
-	g_ModuleManager->LoadModule<FreezeInfo>("Freeze Info");
-	g_ModuleManager->LoadModule<Killstreaks>("Killstreaks");
-	g_ModuleManager->LoadModule<LocalPlayer>("Local Player");
-	g_ModuleManager->LoadModule<MedigunInfo>("Medigun Info");
-	g_ModuleManager->LoadModule<MultiPanel>("MultiPanel");
-	g_ModuleManager->LoadModule<PlayerAliases>("Player Aliases");
-	g_ModuleManager->LoadModule<PlayerModels>("Player Models");
-	g_ModuleManager->LoadModule<ProjectileOutlines>("Projectile Outlines");
-	g_ModuleManager->LoadModule<SteamTools>("Steam Tools");
-	g_ModuleManager->LoadModule<TeamHealthComparison>("Team Health Comparison");
+	g_ModuleManager->RegisterAndLoadModule<AntiFreeze>("AntiFreeze");
+	g_ModuleManager->RegisterAndLoadModule<CameraSmooths>("Camera Smooths");
+	g_ModuleManager->RegisterAndLoadModule<CameraTools>("Camera Tools");
+	g_ModuleManager->RegisterAndLoadModule<ConsoleTools>("Console Tools");
+	g_ModuleManager->RegisterAndLoadModule<CustomMaterials>("Custom Materials");
+	g_ModuleManager->RegisterAndLoadModule<CustomModels>("Custom Models");
+	g_ModuleManager->RegisterAndLoadModule<CustomTextures>("Custom Textures");
+	g_ModuleManager->RegisterAndLoadModule<FOVOverride>("FOV Override");
+	g_ModuleManager->RegisterAndLoadModule<FreezeInfo>("Freeze Info");
+	g_ModuleManager->RegisterAndLoadModule<Killstreaks>("Killstreaks");
+	g_ModuleManager->RegisterAndLoadModule<LocalPlayer>("Local Player");
+	g_ModuleManager->RegisterAndLoadModule<MedigunInfo>("Medigun Info");
+	g_ModuleManager->RegisterAndLoadModule<MultiPanel>("MultiPanel");
+	g_ModuleManager->RegisterAndLoadModule<PlayerAliases>("Player Aliases");
+	g_ModuleManager->RegisterAndLoadModule<PlayerModels>("Player Models");
+	g_ModuleManager->RegisterAndLoadModule<ProjectileOutlines>("Projectile Outlines");
+	g_ModuleManager->RegisterAndLoadModule<SteamTools>("Steam Tools");
+	g_ModuleManager->RegisterAndLoadModule<TeamHealthComparison>("Team Health Comparison");
 	
 	ConVar_Register();
 

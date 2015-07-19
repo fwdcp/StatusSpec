@@ -17,45 +17,45 @@
 #include "../ifaces.h"
 #include "../player.h"
 
-PlayerAliases::PlayerAliases(std::string name) : Module(name) {
+PlayerAliases::PlayerAliases() {
 	getPlayerInfoHook = 0;
 
-	enabled = new ConVar("statusspec_playeraliases_enabled", "0", FCVAR_NONE, "enable player aliases", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<PlayerAliases>("Player Aliases")->ToggleEnabled(var, pOldValue, flOldValue); });
+	enabled = new ConVar("statusspec_playeraliases_enabled", "0", FCVAR_NONE, "enable player aliases", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<PlayerAliases>()->ToggleEnabled(var, pOldValue, flOldValue); });
 	format_blu = new ConVar("statusspec_playeraliases_format_blu", "%alias%", FCVAR_NONE, "the name format for BLU players");
 	format_red = new ConVar("statusspec_playeraliases_format_red", "%alias%", FCVAR_NONE, "the name format for RED players");
-	get = new ConCommand("statusspec_playeraliases_get", [](const CCommand &command) { g_ModuleManager->GetModule<PlayerAliases>("Player Aliases")->GetCustomPlayerAlias(command); }, "get a custom player alias", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<PlayerAliases>("Player Aliases")->GetCurrentAliasedPlayers(partial, commands); });
-	remove = new ConCommand("statusspec_playeraliases_remove", [](const CCommand &command) { g_ModuleManager->GetModule<PlayerAliases>("Player Aliases")->RemoveCustomPlayerAlias(command); }, "remove a custom player alias", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<PlayerAliases>("Player Aliases")->GetCurrentAliasedPlayers(partial, commands); });
-	set = new ConCommand("statusspec_playeraliases_set", [](const CCommand &command) { g_ModuleManager->GetModule<PlayerAliases>("Player Aliases")->SetCustomPlayerAlias(command); }, "set a custom player alias", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<PlayerAliases>("Player Aliases")->GetCurrentGamePlayers(partial, commands); });
-	switch_teams = new ConCommand("statusspec_playeraliases_switch_teams", []() { g_ModuleManager->GetModule<PlayerAliases>("Player Aliases")->SwitchTeams(); }, "switch name formats for both teams", FCVAR_NONE);
+	get = new ConCommand("statusspec_playeraliases_get", [](const CCommand &command) { g_ModuleManager->GetModule<PlayerAliases>()->GetCustomPlayerAlias(command); }, "get a custom player alias", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<PlayerAliases>()->GetCurrentAliasedPlayers(partial, commands); });
+	remove = new ConCommand("statusspec_playeraliases_remove", [](const CCommand &command) { g_ModuleManager->GetModule<PlayerAliases>()->RemoveCustomPlayerAlias(command); }, "remove a custom player alias", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<PlayerAliases>()->GetCurrentAliasedPlayers(partial, commands); });
+	set = new ConCommand("statusspec_playeraliases_set", [](const CCommand &command) { g_ModuleManager->GetModule<PlayerAliases>()->SetCustomPlayerAlias(command); }, "set a custom player alias", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<PlayerAliases>()->GetCurrentGamePlayers(partial, commands); });
+	switch_teams = new ConCommand("statusspec_playeraliases_switch_teams", []() { g_ModuleManager->GetModule<PlayerAliases>()->SwitchTeams(); }, "switch name formats for both teams", FCVAR_NONE);
 }
 
-bool PlayerAliases::CheckDependencies(std::string name) {
+bool PlayerAliases::CheckDependencies() {
 	bool ready = true;
 
 	if (!Interfaces::pEngineClient) {
 		PRINT_TAG();
-		Warning("Required interface IVEngineClient for module %s not available!\n", name.c_str());
+		Warning("Required interface IVEngineClient for module %s not available!\n", g_ModuleManager->GetModuleName<PlayerAliases>().c_str());
 
 		ready = false;
 	}
 
 	if (!Interfaces::steamLibrariesAvailable) {
 		PRINT_TAG();
-		Warning("Required Steam libraries for module %s not available!\n", name.c_str());
+		Warning("Required Steam libraries for module %s not available!\n", g_ModuleManager->GetModuleName<PlayerAliases>().c_str());
 
 		ready = false;
 	}
 
 	if (!Player::CheckDependencies()) {
 		PRINT_TAG();
-		Warning("Required player helper class for module %s not available!\n", name.c_str());
+		Warning("Required player helper class for module %s not available!\n", g_ModuleManager->GetModuleName<PlayerAliases>().c_str());
 
 		ready = false;
 	}
 
 	if (!Player::steamIDRetrievalAvailable) {
 		PRINT_TAG();
-		Warning("Required player Steam ID retrieval for module %s not available!\n", name.c_str());
+		Warning("Required player Steam ID retrieval for module %s not available!\n", g_ModuleManager->GetModuleName<PlayerAliases>().c_str());
 
 		ready = false;
 	}

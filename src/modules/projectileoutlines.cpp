@@ -20,15 +20,15 @@
 #include "c_baseentity.h"
 #include "view_shared.h"
 
-ProjectileOutlines::ProjectileOutlines(std::string name) : Module(name) {
+ProjectileOutlines::ProjectileOutlines() {
 	colors["blu"].color = Color(88, 133, 162, 255);
-	colors["blu"].command = new ConCommand("statusspec_projectileoutlines_color_blu", [](const CCommand &command) { g_ModuleManager->GetModule<ProjectileOutlines>("Projectile Outlines")->ColorCommand(command); }, "the color used for outlines for BLU projectiles", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<ProjectileOutlines>("Projectile Outlines")->GetCurrentColor(partial, commands); });
+	colors["blu"].command = new ConCommand("statusspec_projectileoutlines_color_blu", [](const CCommand &command) { g_ModuleManager->GetModule<ProjectileOutlines>()->ColorCommand(command); }, "the color used for outlines for BLU projectiles", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<ProjectileOutlines>()->GetCurrentColor(partial, commands); });
 	colors["red"].color = Color(184, 56, 59, 255);
-	colors["red"].command = new ConCommand("statusspec_projectileoutlines_color_red", [](const CCommand &command) { g_ModuleManager->GetModule<ProjectileOutlines>("Projectile Outlines")->ColorCommand(command); }, "the color used for outlines for RED projectiles", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<ProjectileOutlines>("Projectile Outlines")->GetCurrentColor(partial, commands); });
+	colors["red"].command = new ConCommand("statusspec_projectileoutlines_color_red", [](const CCommand &command) { g_ModuleManager->GetModule<ProjectileOutlines>()->ColorCommand(command); }, "the color used for outlines for RED projectiles", FCVAR_NONE, [](const char *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])->int { return g_ModuleManager->GetModule<ProjectileOutlines>()->GetCurrentColor(partial, commands); });
 	doPostScreenSpaceEffectsHook = 0;
 	frameHook = 0;
 
-	enabled = new ConVar("statusspec_projectileoutlines_enabled", "0", FCVAR_NONE, "enable projectile outlines", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<ProjectileOutlines>("Projectile Outlines")->ToggleEnabled(var, pOldValue, flOldValue); });
+	enabled = new ConVar("statusspec_projectileoutlines_enabled", "0", FCVAR_NONE, "enable projectile outlines", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<ProjectileOutlines>()->ToggleEnabled(var, pOldValue, flOldValue); });
 	fade = new ConVar("statusspec_projectileoutlines_fade", "0", FCVAR_NONE, "make outlines fade with distance");
 	fade_distance = new ConVar("statusspec_projectileoutlines_fade_distance", "1600", FCVAR_NONE, "the distance (in Hammer units) at which outlines will fade");
 	grenades = new ConVar("statusspec_projectileoutlines_grenades", "0", FCVAR_NONE, "enable outlines for grenades");
@@ -36,33 +36,33 @@ ProjectileOutlines::ProjectileOutlines(std::string name) : Module(name) {
 	stickybombs = new ConVar("statusspec_projectileoutlines_stickybombs", "0", FCVAR_NONE, "enable outlines for stickybombs");
 }
 
-bool ProjectileOutlines::CheckDependencies(std::string name) {
+bool ProjectileOutlines::CheckDependencies() {
 	bool ready = true;
 
 	if (!Interfaces::pClientDLL) {
 		PRINT_TAG();
-		Warning("Required interface IBaseClientDLL for module %s not available!\n", name.c_str());
+		Warning("Required interface IBaseClientDLL for module %s not available!\n", g_ModuleManager->GetModuleName<ProjectileOutlines>().c_str());
 
 		ready = false;
 	}
 
 	if (!Interfaces::pClientEntityList) {
 		PRINT_TAG();
-		Warning("Required interface IClientEntityList for module %s not available!\n", name.c_str());
+		Warning("Required interface IClientEntityList for module %s not available!\n", g_ModuleManager->GetModuleName<ProjectileOutlines>().c_str());
 
 		ready = false;
 	}
 
 	if (!Entities::RetrieveClassPropOffset("CTFGrenadePipebombProjectile", { "m_iType" })) {
 		PRINT_TAG();
-		Warning("Required property m_iType for CTFGrenadePipebombProjectile for module %s not available!\n", name.c_str());
+		Warning("Required property m_iType for CTFGrenadePipebombProjectile for module %s not available!\n", g_ModuleManager->GetModuleName<ProjectileOutlines>().c_str());
 
 		ready = false;
 	}
 
 	if (!GlowManager::CheckDependencies()) {
 		PRINT_TAG();
-		Warning("Required glow manager for module %s not available!\n", name.c_str());
+		Warning("Required glow manager for module %s not available!\n", g_ModuleManager->GetModuleName<ProjectileOutlines>().c_str());
 
 		ready = false;
 	}
@@ -72,7 +72,7 @@ bool ProjectileOutlines::CheckDependencies(std::string name) {
 	}
 	catch (bad_pointer) {
 		PRINT_TAG();
-		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", name.c_str());
+		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", g_ModuleManager->GetModuleName<ProjectileOutlines>().c_str());
 	}
 
 	return ready;

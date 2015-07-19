@@ -19,29 +19,29 @@
 #include "../funcs.h"
 #include "../ifaces.h"
 
-CustomModels::CustomModels(std::string name) : Module(name) {
+CustomModels::CustomModels() {
 	modelConfig = new KeyValues("models");
 	modelConfig->LoadFromFile(Interfaces::pFileSystem, "resource/custommodels.res", "mod");
 	setModelHook = 0;
 
-	enabled = new ConVar("statusspec_custommodels_enabled", "0", FCVAR_NONE, "enable custom models", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CustomModels>("Custom Models")->ToggleEnabled(var, pOldValue, flOldValue); });
-	load_replacement_group = new ConCommand("statusspec_custommodels_load_replacement_group", [](const CCommand &command) { g_ModuleManager->GetModule<CustomModels>("Custom Models")->LoadReplacementGroup(command); }, "load a model replacement group", FCVAR_NONE);
-	unload_replacement_group = new ConCommand("statusspec_custommodels_unload_replacement_group", [](const CCommand &command) { g_ModuleManager->GetModule<CustomModels>("Custom Models")->UnloadReplacementGroup(command); }, "unload a model replacement group", FCVAR_NONE);
+	enabled = new ConVar("statusspec_custommodels_enabled", "0", FCVAR_NONE, "enable custom models", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CustomModels>()->ToggleEnabled(var, pOldValue, flOldValue); });
+	load_replacement_group = new ConCommand("statusspec_custommodels_load_replacement_group", [](const CCommand &command) { g_ModuleManager->GetModule<CustomModels>()->LoadReplacementGroup(command); }, "load a model replacement group", FCVAR_NONE);
+	unload_replacement_group = new ConCommand("statusspec_custommodels_unload_replacement_group", [](const CCommand &command) { g_ModuleManager->GetModule<CustomModels>()->UnloadReplacementGroup(command); }, "unload a model replacement group", FCVAR_NONE);
 }
 
-bool CustomModels::CheckDependencies(std::string name) {
+bool CustomModels::CheckDependencies() {
 	bool ready = true;
 
 	if (!Interfaces::pFileSystem) {
 		PRINT_TAG();
-		Warning("Required interface IFileSystem for module %s not available!\n", name.c_str());
+		Warning("Required interface IFileSystem for module %s not available!\n", g_ModuleManager->GetModuleName<CustomModels>().c_str());
 
 		ready = false;
 	}
 
 	if (!Interfaces::pModelInfoClient) {
 		PRINT_TAG();
-		Warning("Required interface IVModelInfoClient for module %s not available!\n", name.c_str());
+		Warning("Required interface IVModelInfoClient for module %s not available!\n", g_ModuleManager->GetModuleName<CustomModels>().c_str());
 
 		ready = false;
 	}
@@ -51,7 +51,7 @@ bool CustomModels::CheckDependencies(std::string name) {
 	}
 	catch (bad_pointer) {
 		PRINT_TAG();
-		Warning("Required function C_BaseEntity::SetModelIndex for module %s not available!\n", name.c_str());
+		Warning("Required function C_BaseEntity::SetModelIndex for module %s not available!\n", g_ModuleManager->GetModuleName<CustomModels>().c_str());
 
 		ready = false;
 	}
@@ -61,7 +61,7 @@ bool CustomModels::CheckDependencies(std::string name) {
 	}
 	catch (bad_pointer) {
 		PRINT_TAG();
-		Warning("Required function C_BaseEntity::SetModelPointer for module %s not available!\n", name.c_str());
+		Warning("Required function C_BaseEntity::SetModelPointer for module %s not available!\n", g_ModuleManager->GetModuleName<CustomModels>().c_str());
 
 		ready = false;
 	}

@@ -69,68 +69,68 @@ private:
 	TFTeam team;
 };
 
-MedigunInfo::MedigunInfo(std::string name) : Module(name) {
+MedigunInfo::MedigunInfo() {
 	mainPanel = nullptr;
 
-	enabled = new ConVar("statusspec_mediguninfo_enabled", "0", FCVAR_NONE, "enable medigun info", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<MedigunInfo>("Medigun Info")->ToggleEnabled(var, pOldValue, flOldValue); });
-	reload_settings = new ConCommand("statusspec_mediguninfo_reload_settings", []() { g_ModuleManager->GetModule<MedigunInfo>("Medigun Info")->ReloadSettings(); }, "reload settings for the medigun info HUD from the resource file", FCVAR_NONE);
+	enabled = new ConVar("statusspec_mediguninfo_enabled", "0", FCVAR_NONE, "enable medigun info", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<MedigunInfo>()->ToggleEnabled(var, pOldValue, flOldValue); });
+	reload_settings = new ConCommand("statusspec_mediguninfo_reload_settings", []() { g_ModuleManager->GetModule<MedigunInfo>()->ReloadSettings(); }, "reload settings for the medigun info HUD from the resource file", FCVAR_NONE);
 }
 
-bool MedigunInfo::CheckDependencies(std::string name) {
+bool MedigunInfo::CheckDependencies() {
 	bool ready = true;
 
 	if (!g_pVGuiSchemeManager) {
 		PRINT_TAG();
-		Warning("Required interface vgui::ISchemeManager for module %s not available!\n", name.c_str());
+		Warning("Required interface vgui::ISchemeManager for module %s not available!\n", g_ModuleManager->GetModuleName<MedigunInfo>().c_str());
 
 		ready = false;
 	}
 
 	if (!g_pVGuiSurface) {
 		PRINT_TAG();
-		Warning("Required interface vgui::ISurface for module %s not available!\n", name.c_str());
+		Warning("Required interface vgui::ISurface for module %s not available!\n", g_ModuleManager->GetModuleName<MedigunInfo>().c_str());
 
 		ready = false;
 	}
 
 	if (!Interfaces::vguiLibrariesAvailable) {
 		PRINT_TAG();
-		Warning("Required VGUI library for module %s not available!\n", name.c_str());
+		Warning("Required VGUI library for module %s not available!\n", g_ModuleManager->GetModuleName<MedigunInfo>().c_str());
 
 		ready = false;
 	}
 
 	if (!Entities::RetrieveClassPropOffset("CWeaponMedigun", { "m_iItemDefinitionIndex" })) {
 		PRINT_TAG();
-		Warning("Required property m_iItemDefinitionIndex for CWeaponMedigun for module %s not available!\n", name.c_str());
+		Warning("Required property m_iItemDefinitionIndex for CWeaponMedigun for module %s not available!\n", g_ModuleManager->GetModuleName<MedigunInfo>().c_str());
 
 		ready = false;
 	}
 
 	if (!Entities::RetrieveClassPropOffset("CWeaponMedigun", { "m_bChargeRelease" })) {
 		PRINT_TAG();
-		Warning("Required property m_bChargeRelease for CWeaponMedigun for module %s not available!\n", name.c_str());
+		Warning("Required property m_bChargeRelease for CWeaponMedigun for module %s not available!\n", g_ModuleManager->GetModuleName<MedigunInfo>().c_str());
 
 		ready = false;
 	}
 
 	if (!Entities::RetrieveClassPropOffset("CWeaponMedigun", { "m_nChargeResistType" })) {
 		PRINT_TAG();
-		Warning("Required property m_nChargeResistType for CWeaponMedigun for module %s not available!\n", name.c_str());
+		Warning("Required property m_nChargeResistType for CWeaponMedigun for module %s not available!\n", g_ModuleManager->GetModuleName<MedigunInfo>().c_str());
 
 		ready = false;
 	}
 
 	if (!Entities::RetrieveClassPropOffset("CWeaponMedigun", { "m_flChargeLevel" })) {
 		PRINT_TAG();
-		Warning("Required property m_flChargeLevel for CWeaponMedigun for module %s not available!\n", name.c_str());
+		Warning("Required property m_flChargeLevel for CWeaponMedigun for module %s not available!\n", g_ModuleManager->GetModuleName<MedigunInfo>().c_str());
 
 		ready = false;
 	}
 
 	if (!Player::CheckDependencies()) {
 		PRINT_TAG();
-		Warning("Required player helper class for module %s not available!\n", name.c_str());
+		Warning("Required player helper class for module %s not available!\n", g_ModuleManager->GetModuleName<MedigunInfo>().c_str());
 
 		ready = false;
 	}
@@ -140,7 +140,7 @@ bool MedigunInfo::CheckDependencies(std::string name) {
 	}
 	catch (bad_pointer) {
 		PRINT_TAG();
-		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", name.c_str());
+		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", g_ModuleManager->GetModuleName<MedigunInfo>().c_str());
 	}
 
 	return ready;

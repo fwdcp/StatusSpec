@@ -21,35 +21,35 @@
 #include "../ifaces.h"
 #include "../player.h"
 
-PlayerModels::PlayerModels(std::string name) : Module(name) {
+PlayerModels::PlayerModels() {
 	modelConfig = new KeyValues("models");
 	modelConfig->LoadFromFile(Interfaces::pFileSystem, "resource/playermodels.res", "mod");
 	setModelHook = 0;
 
-	enabled = new ConVar("statusspec_playermodels_enabled", "0", FCVAR_NONE, "enable custom player models", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<PlayerModels>("Player Models")->ToggleEnabled(var, pOldValue, flOldValue); });
-	reload_settings = new ConCommand("statusspec_playermodels_reload_settings", []() { g_ModuleManager->GetModule<PlayerModels>("Player Models")->ReloadSettings(); }, "reload settings for the player models from the resource file", FCVAR_NONE);
+	enabled = new ConVar("statusspec_playermodels_enabled", "0", FCVAR_NONE, "enable custom player models", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<PlayerModels>()->ToggleEnabled(var, pOldValue, flOldValue); });
+	reload_settings = new ConCommand("statusspec_playermodels_reload_settings", []() { g_ModuleManager->GetModule<PlayerModels>()->ReloadSettings(); }, "reload settings for the player models from the resource file", FCVAR_NONE);
 }
 
-bool PlayerModels::CheckDependencies(std::string name) {
+bool PlayerModels::CheckDependencies() {
 	bool ready = true;
 
 	if (!Interfaces::pFileSystem) {
 		PRINT_TAG();
-		Warning("Required interface IFileSystem for module %s not available!\n", name.c_str());
+		Warning("Required interface IFileSystem for module %s not available!\n", g_ModuleManager->GetModuleName<PlayerModels>().c_str());
 
 		ready = false;
 	}
 
 	if (!Interfaces::pModelInfoClient) {
 		PRINT_TAG();
-		Warning("Required interface IVModelInfoClient for module %s not available!\n", name.c_str());
+		Warning("Required interface IVModelInfoClient for module %s not available!\n", g_ModuleManager->GetModuleName<PlayerModels>().c_str());
 
 		ready = false;
 	}
 
 	if (!Entities::RetrieveClassPropOffset("CTFRagdoll", { "m_iPlayerIndex" })) {
 		PRINT_TAG();
-		Warning("Required property m_iPlayerIndex for CTFRagdoll for module %s not available!\n", name.c_str());
+		Warning("Required property m_iPlayerIndex for CTFRagdoll for module %s not available!\n", g_ModuleManager->GetModuleName<PlayerModels>().c_str());
 
 		ready = false;
 	}
@@ -59,7 +59,7 @@ bool PlayerModels::CheckDependencies(std::string name) {
 	}
 	catch (bad_pointer) {
 		PRINT_TAG();
-		Warning("Required function C_BaseEntity::SetModelIndex for module %s not available!\n", name.c_str());
+		Warning("Required function C_BaseEntity::SetModelIndex for module %s not available!\n", g_ModuleManager->GetModuleName<PlayerModels>().c_str());
 
 		ready = false;
 	}
@@ -69,21 +69,21 @@ bool PlayerModels::CheckDependencies(std::string name) {
 	}
 	catch (bad_pointer) {
 		PRINT_TAG();
-		Warning("Required function C_BaseEntity::SetModelPointer for module %s not available!\n", name.c_str());
+		Warning("Required function C_BaseEntity::SetModelPointer for module %s not available!\n", g_ModuleManager->GetModuleName<PlayerModels>().c_str());
 
 		ready = false;
 	}
 
 	if (!Player::CheckDependencies()) {
 		PRINT_TAG();
-		Warning("Required player helper class for module %s not available!\n", name.c_str());
+		Warning("Required player helper class for module %s not available!\n", g_ModuleManager->GetModuleName<PlayerModels>().c_str());
 
 		ready = false;
 	}
 
 	if (!Player::steamIDRetrievalAvailable) {
 		PRINT_TAG();
-		Warning("Required player Steam ID retrieval for module %s not available!\n", name.c_str());
+		Warning("Required player Steam ID retrieval for module %s not available!\n", g_ModuleManager->GetModuleName<PlayerModels>().c_str());
 
 		ready = false;
 	}

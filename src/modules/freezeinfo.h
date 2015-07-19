@@ -18,9 +18,9 @@ class IConVar;
 
 class FreezeInfo : public Module {
 public:
-	FreezeInfo(std::string name);
+	FreezeInfo();
 
-	static bool CheckDependencies(std::string name);
+	static bool CheckDependencies();
 private:
 	class Panel;
 	Panel *panel;

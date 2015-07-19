@@ -19,9 +19,9 @@ class IConVar;
 
 class CameraSmooths : public Module {
 public:
-	CameraSmooths(std::string name);
+	CameraSmooths();
 
-	static bool CheckDependencies(std::string name);
+	static bool CheckDependencies();
 private:
 	int inToolModeHook;
 	int isThirdPersonCameraHook;

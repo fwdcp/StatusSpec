@@ -23,9 +23,9 @@ struct model_t;
 
 class CustomModels : public Module {
 public:
-	CustomModels(std::string name);
+	CustomModels();
 
-	static bool CheckDependencies(std::string name);
+	static bool CheckDependencies();
 private:
 	void SetModelOverride(C_BaseEntity *entity, const model_t *&model);
 

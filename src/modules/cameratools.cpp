@@ -62,7 +62,7 @@ public:
 	using C_HLTVCamera::m_vecVelocity;
 };
 
-CameraTools::CameraTools(std::string name) : Module(name) {
+CameraTools::CameraTools() {
 	currentlyUpdating = false;
 	frameHook = 0;
 	setModeHook = 0;
@@ -70,37 +70,37 @@ CameraTools::CameraTools(std::string name) : Module(name) {
 	specguiSettings = new KeyValues("Resource/UI/SpectatorTournament.res");
 	specguiSettings->LoadFromFile(Interfaces::pFileSystem, "resource/ui/spectatortournament.res", "mod");
 
-	force_mode = new ConVar("statusspec_cameratools_force_mode", "0", FCVAR_NONE, "if a valid mode, force the camera mode to this", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->ChangeForceMode(var, pOldValue, flOldValue); });
-	force_target = new ConVar("statusspec_cameratools_force_target", "-1", FCVAR_NONE, "if a valid target, force the camera target to this", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->ChangeForceTarget(var, pOldValue, flOldValue); });
-	force_valid_target = new ConVar("statusspec_cameratools_force_valid_target", "0", FCVAR_NONE, "forces the camera to only have valid targets", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->ToggleForceValidTarget(var, pOldValue, flOldValue); });
-	killer_follow_enabled = new ConVar("statusspec_cameratools_killer_follow_enabled", "0", FCVAR_NONE, "enables switching to the killer upon death of spectated player", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->ToggleKillerFollowEnabled(var, pOldValue, flOldValue); });
-	spec_player = new ConCommand("statusspec_cameratools_spec_player", [](const CCommand &command) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->SpecPlayer(command); }, "spec a certain player", FCVAR_NONE);
+	force_mode = new ConVar("statusspec_cameratools_force_mode", "0", FCVAR_NONE, "if a valid mode, force the camera mode to this", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>()->ChangeForceMode(var, pOldValue, flOldValue); });
+	force_target = new ConVar("statusspec_cameratools_force_target", "-1", FCVAR_NONE, "if a valid target, force the camera target to this", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>()->ChangeForceTarget(var, pOldValue, flOldValue); });
+	force_valid_target = new ConVar("statusspec_cameratools_force_valid_target", "0", FCVAR_NONE, "forces the camera to only have valid targets", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>()->ToggleForceValidTarget(var, pOldValue, flOldValue); });
+	killer_follow_enabled = new ConVar("statusspec_cameratools_killer_follow_enabled", "0", FCVAR_NONE, "enables switching to the killer upon death of spectated player", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>()->ToggleKillerFollowEnabled(var, pOldValue, flOldValue); });
+	spec_player = new ConCommand("statusspec_cameratools_spec_player", [](const CCommand &command) { g_ModuleManager->GetModule<CameraTools>()->SpecPlayer(command); }, "spec a certain player", FCVAR_NONE);
 	spec_player_alive = new ConVar("statusspec_cameratools_spec_player_alive", "1", FCVAR_NONE, "prevent speccing dead players");
-	spec_pos = new ConCommand("statusspec_cameratools_spec_pos", [](const CCommand &command) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->SpecPosition(command); }, "spec a certain camera position", FCVAR_NONE);
-	state = new ConVar("statusspec_cameratools_state", "{}", FCVAR_NONE, "JSON of camera tools state", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->ChangeState(var, pOldValue, flOldValue); });
-	state_enabled = new ConVar("statusspec_cameratools_state_enabled", "0", FCVAR_NONE, "enable exposure of camera tools state", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>("Camera Tools")->ToggleStateEnabled(var, pOldValue, flOldValue); });
+	spec_pos = new ConCommand("statusspec_cameratools_spec_pos", [](const CCommand &command) { g_ModuleManager->GetModule<CameraTools>()->SpecPosition(command); }, "spec a certain camera position", FCVAR_NONE);
+	state = new ConVar("statusspec_cameratools_state", "{}", FCVAR_NONE, "JSON of camera tools state", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>()->ChangeState(var, pOldValue, flOldValue); });
+	state_enabled = new ConVar("statusspec_cameratools_state_enabled", "0", FCVAR_NONE, "enable exposure of camera tools state", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>()->ToggleStateEnabled(var, pOldValue, flOldValue); });
 }
 
-bool CameraTools::CheckDependencies(std::string name) {
+bool CameraTools::CheckDependencies() {
 	bool ready = true;
 
 	if (!Interfaces::pEngineClient) {
 		PRINT_TAG();
-		Warning("Required interface IVEngineClient for module %s not available!\n", name.c_str());
+		Warning("Required interface IVEngineClient for module %s not available!\n", g_ModuleManager->GetModuleName<CameraTools>().c_str());
 
 		ready = false;
 	}
 
 	if (!Interfaces::pEngineTool) {
 		PRINT_TAG();
-		Warning("Required interface IEngineTool for module %s not available!\n", name.c_str());
+		Warning("Required interface IEngineTool for module %s not available!\n", g_ModuleManager->GetModuleName<CameraTools>().c_str());
 
 		ready = false;
 	}
 
 	if (!Interfaces::pFileSystem) {
 		PRINT_TAG();
-		Warning("Required interface IFileSystem for module %s not available!\n", name.c_str());
+		Warning("Required interface IFileSystem for module %s not available!\n", g_ModuleManager->GetModuleName<CameraTools>().c_str());
 
 		ready = false;
 	}
@@ -110,7 +110,7 @@ bool CameraTools::CheckDependencies(std::string name) {
 	}
 	catch (bad_pointer) {
 		PRINT_TAG();
-		Warning("Required function C_HLTVCamera::SetCameraAngle for module %s not available!\n", name.c_str());
+		Warning("Required function C_HLTVCamera::SetCameraAngle for module %s not available!\n", g_ModuleManager->GetModuleName<CameraTools>().c_str());
 
 		ready = false;
 	}
@@ -120,7 +120,7 @@ bool CameraTools::CheckDependencies(std::string name) {
 	}
 	catch (bad_pointer) {
 		PRINT_TAG();
-		Warning("Required function C_HLTVCamera::SetMode for module %s not available!\n", name.c_str());
+		Warning("Required function C_HLTVCamera::SetMode for module %s not available!\n", g_ModuleManager->GetModuleName<CameraTools>().c_str());
 
 		ready = false;
 	}
@@ -130,35 +130,35 @@ bool CameraTools::CheckDependencies(std::string name) {
 	}
 	catch (bad_pointer) {
 		PRINT_TAG();
-		Warning("Required function C_HLTVCamera::SetPrimaryTarget for module %s not available!\n", name.c_str());
+		Warning("Required function C_HLTVCamera::SetPrimaryTarget for module %s not available!\n", g_ModuleManager->GetModuleName<CameraTools>().c_str());
 
 		ready = false;
 	}
 
 	if (!g_pVGuiPanel) {
 		PRINT_TAG();
-		Warning("Required interface vgui::IPanel for module %s not available!\n", name.c_str());
+		Warning("Required interface vgui::IPanel for module %s not available!\n", g_ModuleManager->GetModuleName<CameraTools>().c_str());
 
 		ready = false;
 	}
 
 	if (!g_pVGuiSchemeManager) {
 		PRINT_TAG();
-		Warning("Required interface vgui::ISchemeManager for module %s not available!\n", name.c_str());
+		Warning("Required interface vgui::ISchemeManager for module %s not available!\n", g_ModuleManager->GetModuleName<CameraTools>().c_str());
 
 		ready = false;
 	}
 
 	if (!Player::CheckDependencies()) {
 		PRINT_TAG();
-		Warning("Required player helper class for module %s not available!\n", name.c_str());
+		Warning("Required player helper class for module %s not available!\n", g_ModuleManager->GetModuleName<CameraTools>().c_str());
 
 		ready = false;
 	}
 
 	if (!Player::nameRetrievalAvailable) {
 		PRINT_TAG();
-		Warning("Required player name retrieval for module %s not available!\n", name.c_str());
+		Warning("Required player name retrieval for module %s not available!\n", g_ModuleManager->GetModuleName<CameraTools>().c_str());
 
 		ready = false;
 	}
@@ -168,7 +168,7 @@ bool CameraTools::CheckDependencies(std::string name) {
 	}
 	catch (bad_pointer) {
 		PRINT_TAG();
-		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", name.c_str());
+		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", g_ModuleManager->GetModuleName<CameraTools>().c_str());
 	}
 
 	try {
@@ -176,7 +176,7 @@ bool CameraTools::CheckDependencies(std::string name) {
 	}
 	catch (bad_pointer) {
 		PRINT_TAG();
-		Warning("Module %s requires C_HLTVCamera, which cannot be verified at this time!\n", name.c_str());
+		Warning("Module %s requires C_HLTVCamera, which cannot be verified at this time!\n", g_ModuleManager->GetModuleName<CameraTools>().c_str());
 	}
 
 	return ready;

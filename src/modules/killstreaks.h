@@ -24,9 +24,9 @@ class IGameEvent;
 
 class Killstreaks : public Module {
 public:
-	Killstreaks(std::string name);
+	Killstreaks();
 
-	static bool CheckDependencies(std::string name);
+	static bool CheckDependencies();
 private:
 	bool FireEventClientSideOverride(IGameEvent *event);
 	void FrameHook(ClientFrameStage_t curStage);

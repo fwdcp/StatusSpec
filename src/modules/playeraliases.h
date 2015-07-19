@@ -18,9 +18,9 @@
 
 class PlayerAliases : public Module {
 public:
-	PlayerAliases(std::string name);
+	PlayerAliases();
 
-	static bool CheckDependencies(std::string name);
+	static bool CheckDependencies();
 private:
 	bool GetPlayerInfoOverride(int ent_num, player_info_t *pinfo);
 

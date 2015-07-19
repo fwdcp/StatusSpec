@@ -18,9 +18,9 @@ class IConVar;
 
 class AntiFreeze : public Module {
 public:
-	AntiFreeze(std::string name);
+	AntiFreeze();
 
-	static bool CheckDependencies(std::string name);
+	static bool CheckDependencies();
 private:
 	class Panel;
 	Panel *panel;

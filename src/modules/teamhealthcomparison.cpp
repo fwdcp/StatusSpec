@@ -31,33 +31,33 @@ private:
 	std::map<TFTeam, int> teamHealthAggregate;
 };
 
-TeamHealthComparison::TeamHealthComparison(std::string name) : Module(name) {
+TeamHealthComparison::TeamHealthComparison() {
 	panel = nullptr;
 
-	enabled = new ConVar("statusspec_teamhealthcomparison_enabled", "0", FCVAR_NONE, "enable team health comparison", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<TeamHealthComparison>("Team Health Comparison")->ToggleEnabled(var, pOldValue, flOldValue); });
-	reload_settings = new ConCommand("statusspec_teamhealthcomparison_reload_settings", []() { g_ModuleManager->GetModule<TeamHealthComparison>("Team Health Comparison")->ReloadSettings(); }, "reload settings for the team health comparison HUD from the resource file", FCVAR_NONE);
+	enabled = new ConVar("statusspec_teamhealthcomparison_enabled", "0", FCVAR_NONE, "enable team health comparison", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<TeamHealthComparison>()->ToggleEnabled(var, pOldValue, flOldValue); });
+	reload_settings = new ConCommand("statusspec_teamhealthcomparison_reload_settings", []() { g_ModuleManager->GetModule<TeamHealthComparison>()->ReloadSettings(); }, "reload settings for the team health comparison HUD from the resource file", FCVAR_NONE);
 }
 
-bool TeamHealthComparison::CheckDependencies(std::string name) {
+bool TeamHealthComparison::CheckDependencies() {
 	bool ready = true;
 
 	if (!g_pVGui) {
 		PRINT_TAG();
-		Warning("Required interface IVGui for module %s not available!\n", name.c_str());
+		Warning("Required interface IVGui for module %s not available!\n", g_ModuleManager->GetModuleName<TeamHealthComparison>().c_str());
 
 		ready = false;
 	}
 
 	if (!Interfaces::vguiLibrariesAvailable) {
 		PRINT_TAG();
-		Warning("Required VGUI library for module %s not available!\n", name.c_str());
+		Warning("Required VGUI library for module %s not available!\n", g_ModuleManager->GetModuleName<TeamHealthComparison>().c_str());
 
 		ready = false;
 	}
 
 	if (!Player::CheckDependencies()) {
 		PRINT_TAG();
-		Warning("Required player helper class for module %s not available!\n", name.c_str());
+		Warning("Required player helper class for module %s not available!\n", g_ModuleManager->GetModuleName<TeamHealthComparison>().c_str());
 
 		ready = false;
 	}
@@ -67,7 +67,7 @@ bool TeamHealthComparison::CheckDependencies(std::string name) {
 	}
 	catch (bad_pointer) {
 		PRINT_TAG();
-		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", name.c_str());
+		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", g_ModuleManager->GetModuleName<TeamHealthComparison>().c_str());
 	}
 
 	return ready;

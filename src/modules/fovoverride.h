@@ -19,9 +19,9 @@ class IConVar;
 
 class FOVOverride : public Module {
 public:
-	FOVOverride(std::string name);
+	FOVOverride();
 
-	static bool CheckDependencies(std::string name);
+	static bool CheckDependencies();
 private:
 	int inToolModeHook;
 	int setupEngineViewHook;

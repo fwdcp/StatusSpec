@@ -19,9 +19,9 @@ class IConVar;
 
 class SteamTools : public Module {
 public:
-	SteamTools(std::string name);
+	SteamTools();
 
-	static bool CheckDependencies(std::string name);
+	static bool CheckDependencies();
 private:
 	ConVar *rich_presence_status;
 	void ChangeRichPresenceStatus(IConVar *var, const char *pOldValue, float flOldValue);

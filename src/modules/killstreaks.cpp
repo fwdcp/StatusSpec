@@ -24,7 +24,7 @@
 #include "../ifaces.h"
 #include "../player.h"
 
-Killstreaks::Killstreaks(std::string name) : Module(name) {
+Killstreaks::Killstreaks() {
 	bluTopKillstreak = 0;
 	bluTopKillstreakPlayer = 0;
 	fireEventClientSideHook = 0;
@@ -32,43 +32,43 @@ Killstreaks::Killstreaks(std::string name) : Module(name) {
 	redTopKillstreak = 0;
 	redTopKillstreakPlayer = 0;
 
-	enabled = new ConVar("statusspec_killstreaks_enabled", "0", FCVAR_NONE, "enable killstreaks display", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<Killstreaks>("Killstreaks")->ToggleEnabled(var, pOldValue, flOldValue); });
+	enabled = new ConVar("statusspec_killstreaks_enabled", "0", FCVAR_NONE, "enable killstreaks display", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<Killstreaks>()->ToggleEnabled(var, pOldValue, flOldValue); });
 }
 
-bool Killstreaks::CheckDependencies(std::string name) {
+bool Killstreaks::CheckDependencies() {
 	bool ready = true;
 
 	if (!Interfaces::pClientEntityList) {
 		PRINT_TAG();
-		Warning("Required interface IClientEntityList for module %s not available!\n", name.c_str());
+		Warning("Required interface IClientEntityList for module %s not available!\n", g_ModuleManager->GetModuleName<Killstreaks>().c_str());
 
 		ready = false;
 	}
 
 	if (!Interfaces::pClientDLL) {
 		PRINT_TAG();
-		Warning("Required interface IBaseClientDLL for module %s not available!\n", name.c_str());
+		Warning("Required interface IBaseClientDLL for module %s not available!\n", g_ModuleManager->GetModuleName<Killstreaks>().c_str());
 
 		ready = false;
 	}
 
 	if (!Interfaces::pEngineClient) {
 		PRINT_TAG();
-		Warning("Required interface IVEngineClient for module %s not available!\n", name.c_str());
+		Warning("Required interface IVEngineClient for module %s not available!\n", g_ModuleManager->GetModuleName<Killstreaks>().c_str());
 
 		ready = false;
 	}
 
 	if (!Interfaces::pGameEventManager) {
 		PRINT_TAG();
-		Warning("Required interface IGameEventManager2 for module %s not available!\n", name.c_str());
+		Warning("Required interface IGameEventManager2 for module %s not available!\n", g_ModuleManager->GetModuleName<Killstreaks>().c_str());
 
 		ready = false;
 	}
 
 	if (!Player::CheckDependencies()) {
 		PRINT_TAG();
-		Warning("Required player helper class for module %s not available!\n", name.c_str());
+		Warning("Required player helper class for module %s not available!\n", g_ModuleManager->GetModuleName<Killstreaks>().c_str());
 
 		ready = false;
 	}
@@ -81,7 +81,7 @@ bool Killstreaks::CheckDependencies(std::string name) {
 
 		if (!Entities::RetrieveClassPropOffset("CTFPlayer", { "m_hMyWeapons", arrayIndex })) {
 			PRINT_TAG();
-			Warning("Required property table m_hMyWeapons for CTFPlayer for module %s not available!\n", name.c_str());
+			Warning("Required property table m_hMyWeapons for CTFPlayer for module %s not available!\n", g_ModuleManager->GetModuleName<Killstreaks>().c_str());
 
 			ready = false;
 
@@ -97,7 +97,7 @@ bool Killstreaks::CheckDependencies(std::string name) {
 
 		if (!Entities::RetrieveClassPropOffset("CTFPlayer", { "m_nStreaks", arrayIndex })) {
 			PRINT_TAG();
-			Warning("Required property table m_nStreaks for CTFPlayer for module %s not available!\n", name.c_str());
+			Warning("Required property table m_nStreaks for CTFPlayer for module %s not available!\n", g_ModuleManager->GetModuleName<Killstreaks>().c_str());
 
 			ready = false;
 
@@ -113,7 +113,7 @@ bool Killstreaks::CheckDependencies(std::string name) {
 
 		if (!Entities::RetrieveClassPropOffset("CTFPlayerResource", { "m_iStreaks", arrayIndex })) {
 			PRINT_TAG();
-			Warning("Required property table m_iStreaks for CTFPlayerResource for module %s not available!\n", name.c_str());
+			Warning("Required property table m_iStreaks for CTFPlayerResource for module %s not available!\n", g_ModuleManager->GetModuleName<Killstreaks>().c_str());
 
 			ready = false;
 
@@ -123,14 +123,14 @@ bool Killstreaks::CheckDependencies(std::string name) {
 
 	if (!Entities::RetrieveClassPropOffset("CWeaponMedigun", { "m_bHealing" })) {
 		PRINT_TAG();
-		Warning("Required property m_bHealing for CWeaponMedigun for module %s not available!\n", name.c_str());
+		Warning("Required property m_bHealing for CWeaponMedigun for module %s not available!\n", g_ModuleManager->GetModuleName<Killstreaks>().c_str());
 
 		ready = false;
 	}
 
 	if (!Entities::RetrieveClassPropOffset("CWeaponMedigun", { "m_hHealingTarget" })) {
 		PRINT_TAG();
-		Warning("Required property m_hHealingTarget for CWeaponMedigun for module %s not available!\n", name.c_str());
+		Warning("Required property m_hHealingTarget for CWeaponMedigun for module %s not available!\n", g_ModuleManager->GetModuleName<Killstreaks>().c_str());
 
 		ready = false;
 	}

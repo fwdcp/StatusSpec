@@ -20,9 +20,9 @@ class IConVar;
 
 class MultiPanel : public Module {
 public:
-	MultiPanel(std::string name);
+	MultiPanel();
 
-	static bool CheckDependencies(std::string name);
+	static bool CheckDependencies();
 private:
 	CGameConsoleDialog *consoleDialog;
 	vgui::HPanel scoreboardPanel;

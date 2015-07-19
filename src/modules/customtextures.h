@@ -21,9 +21,9 @@ class KeyValues;
 
 class CustomTextures : public Module {
 public:
-	CustomTextures(std::string name);
+	CustomTextures();
 
-	static bool CheckDependencies(std::string name);
+	static bool CheckDependencies();
 private:
 	KeyValues *textureConfig;
 	std::map<std::string, Replacement> textureReplacements;

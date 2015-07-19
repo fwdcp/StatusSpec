@@ -23,9 +23,9 @@ class KeyValues;
 
 class CameraTools : public Module, IGameEventListener2 {
 public:
-	CameraTools(std::string name);
+	CameraTools();
 
-	static bool CheckDependencies(std::string name);
+	static bool CheckDependencies();
 
 	virtual void FireGameEvent(IGameEvent *event);
 private:

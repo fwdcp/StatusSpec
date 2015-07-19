@@ -19,9 +19,9 @@
 
 class ProjectileOutlines : public Module {
 public:
-	ProjectileOutlines(std::string name);
+	ProjectileOutlines();
 
-	static bool CheckDependencies(std::string name);
+	static bool CheckDependencies();
 private:
 	bool DoPostScreenSpaceEffectsHook(const CViewSetup *pSetup);
 	void FrameHook(ClientFrameStage_t curStage);
