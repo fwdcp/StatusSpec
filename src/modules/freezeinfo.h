@@ -1,7 +1,7 @@
 /*
- *  antifreeze.h
+ *  freezeinfo.h
  *  StatusSpec project
- *  
+ *
  *  Copyright (c) 2014-2015 Forward Command Post
  *  BSD 2-Clause License
  *  http://opensource.org/licenses/BSD-2-Clause
@@ -16,9 +16,9 @@ class ConCommand;
 class ConVar;
 class IConVar;
 
-class AntiFreeze : public Module {
+class FreezeInfo : public Module {
 public:
-	AntiFreeze(std::string name);
+	FreezeInfo(std::string name);
 
 	static bool CheckDependencies(std::string name);
 private:
@@ -26,5 +26,9 @@ private:
 	Panel *panel;
 
 	ConVar *enabled;
+	ConCommand *reload_settings;
+	ConVar *threshold;
+	void ChangeThreshold(IConVar *var, const char *pOldValue, float flOldValue);
+	void ReloadSettings();
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };
