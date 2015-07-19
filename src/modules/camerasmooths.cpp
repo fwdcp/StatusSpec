@@ -173,17 +173,14 @@ bool CameraSmooths::SetupEngineViewOverride(Vector &origin, QAngle &angles, floa
 
 			moveVector *= movePercentage;
 
-			smoothLastOrigin += moveVector;
+			origin = smoothLastOrigin + moveVector;
 
-			smoothLastAngles.x = smoothLastAngles.x + ((angles.x - smoothLastAngles.x) * movePercentage);
-			smoothLastAngles.y = smoothLastAngles.y + ((angles.y - smoothLastAngles.y) * movePercentage);
-			smoothLastAngles.z = smoothLastAngles.z + ((angles.z - smoothLastAngles.z) * movePercentage);
+			angles.x = smoothLastAngles.x + ((angles.x - smoothLastAngles.x) * movePercentage);
+			angles.y = smoothLastAngles.y + ((angles.y - smoothLastAngles.y) * movePercentage);
+			angles.z = smoothLastAngles.z + ((angles.z - smoothLastAngles.z) * movePercentage);
 
-			Funcs::CallFunc_C_HLTVCamera_SetCameraAngle(hltvcamera, smoothLastAngles);
-			hltvcamera->m_vCamOrigin = smoothLastOrigin;
-
-			origin = smoothLastOrigin;
-			angles = smoothLastAngles;
+			Funcs::CallFunc_C_HLTVCamera_SetCameraAngle(hltvcamera, angles);
+			hltvcamera->m_vCamOrigin = origin;
 
 			smoothEnding = false;
 			smoothInProgress = true;
