@@ -42,7 +42,6 @@ public:
 	static int AddHook_C_HLTVCamera_SetPrimaryTarget(std::function<void(C_HLTVCamera *, int &)> hook);
 
 	static int AddGlobalHook_C_TFPlayer_GetFOV(C_TFPlayer *instance, fastdelegate::FastDelegate0<float> hook, bool post);
-	static int AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, fastdelegate::FastDelegate1<ClientFrameStage_t> hook, bool post);
 	static int AddHook_IClientEngineTools_InToolMode(IClientEngineTools *instance, fastdelegate::FastDelegate0<bool> hook, bool post);
 	static int AddHook_IClientEngineTools_IsThirdPersonCamera(IClientEngineTools *instance, fastdelegate::FastDelegate0<bool> hook, bool post);
 	static int AddHook_IClientEngineTools_SetupEngineView(IClientEngineTools *instance, fastdelegate::FastDelegate3<Vector &, QAngle &, float &, bool> hook, bool post);

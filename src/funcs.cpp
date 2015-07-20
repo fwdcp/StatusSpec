@@ -169,10 +169,6 @@ int Funcs::AddHook_C_HLTVCamera_SetPrimaryTarget(std::function<void(C_HLTVCamera
 	return setPrimaryTargetLastHookRegistered;
 }
 
-int Funcs::AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, fastdelegate::FastDelegate1<ClientFrameStage_t> hook, bool post) {
-	return SH_ADD_HOOK(IBaseClientDLL, FrameStageNotify, instance, hook, post);
-}
-
 int Funcs::AddHook_IClientEngineTools_InToolMode(IClientEngineTools *instance, fastdelegate::FastDelegate0<bool> hook, bool post) {
 	return SH_ADD_HOOK(IClientEngineTools, InToolMode, instance, hook, post);
 }
