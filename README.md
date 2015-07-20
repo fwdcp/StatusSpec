@@ -3,8 +3,6 @@ StatusSpec
 
 a Team Fortress 2 client plugin that augments game spectating
 
-![screenshot](http://i.imgur.com/HliUKLk.png)
-
 Changelog
 ---------
 
