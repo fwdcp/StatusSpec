@@ -33,6 +33,14 @@ Changelog
   * created new module
   * added ability to change CVar flags
   * added ability to filter console by regular expressions
+* custom materials
+  * added reload settings command
+* custom models
+  * added reload settings command
+* custom textures
+  * added reload settings command
+* FOV override
+  * optimized and generalized module
 * freeze info
   * created new module
 * killstreaks
@@ -51,6 +59,8 @@ Changelog
   * removed custom animations
 * player aliases
   * removed API-based (ESEA/ETF2L/Twitch) aliases
+* player models
+  * documented previously added reload settings command
 * player outlines
   * removed module
 * projectile outlines
@@ -311,6 +321,14 @@ To install, place the `StatusSpec` folder within the `custom` folder in the `tf`
 #### Console Variables
 * `statusspec_antifreeze_enabled` - enable antifreeze (forces the spectator GUI to refresh)
 
+### Camera Auto Switch
+*automatically switches the camera based on game events*
+
+#### Console Variables
+* `statusspec_cameraautoswitch_enabled` - enable automatic switching of camera
+* `statusspec_cameraautoswitch_killer` - switch to killer upon spectated player death
+* `statusspec_cameraautoswitch_killer_delay` - delay before switching to killer
+
 ### Camera Smooths
 *smooth transitions between camera positions*
 
@@ -319,14 +337,6 @@ To install, place the `StatusSpec` folder within the `custom` folder in the `tf`
 * `statusspec_camerasmooths_max_angle_difference` - max angle difference at which smoothing will be performed
 * `statusspec_camerasmooths_max_distance` - max distance at which smoothing will be performed
 * `statusspec_camerasmooths_move_speed` - speed to move view per second
-
-### Camera Auto Switch
-*automatically switches the camera based on game events*
-
-#### Console Variables
-* `statusspec_cameraautoswitch_enabled` - enable automatic switching of camera
-* `statusspec_cameraautoswitch_killer` - switch to killer upon spectated player death
-* `statusspec_cameraautoswitch_killer_delay` - delay before switching to killer
 
 ### Camera State
 *exposes the current SourceTV camera state*
@@ -367,6 +377,7 @@ To install, place the `StatusSpec` folder within the `custom` folder in the `tf`
 
 #### Console Commands
 * `statusspec_custommaterials_load_replacement_group <group>` - load a material replacement group
+* `statusspec_custommaterials_reload_settings` - reload settings for the custom materials from the resource file
 * `statusspec_custommaterials_unload_replacement_group <group>` - unload a material replacement group
 
 #### Console Variables
@@ -390,6 +401,7 @@ Custom material configuration is loaded from the `Resource/CustomMaterials.res` 
 
 #### Console Commands
 * `statusspec_custommodels_load_replacement_group <group>` - load a model replacement group
+* `statusspec_custommodels_reload_settings` - reload settings for the custom models from the resource file
 * `statusspec_custommodels_unload_replacement_group <group>` - unload a model replacement group
 
 #### Console Variables
@@ -421,6 +433,7 @@ Custom model configuration is loaded from the `Resource/CustomModels.res` file. 
 
 #### Console Commands
 * `statusspec_customtextures_load_replacement_group <group>` - load a texture replacement group
+* `statusspec_customtextures_reload_settings` - reload settings for the custom textures from the resource file
 * `statusspec_customtextures_unload_replacement_group <group>` - unload a texture replacement group
 
 #### Console Variables
@@ -475,6 +488,7 @@ The configuration file for the freeze info HUD is `Resource/UI/FreezeInfo.res`. 
 #### Console Variables
 * `statusspec_localplayer_enabled` - enable local player override
 * `statusspec_localplayer_player` - player index to set as the local player
+* `statusspec_localplayer_trac_spec_target` - have the local player value track the spectator target
 
 ### Medigun Info
 *displays info about mediguns for both teams*
@@ -539,6 +553,9 @@ In addition, certain dialog variables will be set for each medigun panel. They a
 
 ### Player Models
 *changes the model used based on the player*
+
+#### Console Commands
+* `statusspec_playermodels_reload_settings` - reload settings for the player models from the resource file
 
 #### Console Variables
 * `statusspec_playermodels_enabled` - enable custom player models
