@@ -35,8 +35,12 @@ Changelog
   * added ability to filter console by regular expressions
 * freeze info
   * created new module
+* killstreaks
+  * optimized module
 * loadout icons
   * removed module
+* local player
+  * optimized module
 * medigun info
   * optimized performance
   * add support for multiple mediguns per team
