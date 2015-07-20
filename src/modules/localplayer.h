@@ -31,8 +31,8 @@ private:
 
 	ConVar *enabled;
 	ConVar *player;
-	ConVar *track_spec_target;
 	ConCommand *set_current_target;
+	ConVar *track_spec_target;
 	void SetToCurrentTarget();
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 	void ToggleTrackSpecTarget(IConVar *var, const char *pOldValue, float flOldValue);

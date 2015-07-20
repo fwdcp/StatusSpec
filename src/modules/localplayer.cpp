@@ -41,8 +41,8 @@ LocalPlayer::LocalPlayer() {
 
 	enabled = new ConVar("statusspec_localplayer_enabled", "0", FCVAR_NONE, "enable local player override", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<LocalPlayer>()->ToggleEnabled(var, pOldValue, flOldValue); });
 	player = new ConVar("statusspec_localplayer_player", "0", FCVAR_NONE, "player index to set as the local player");
-	track_spec_target = new ConVar("statusspec_localplayer_track_spec_target", "0", FCVAR_NONE, "have the local player value track the spectator target", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<LocalPlayer>()->ToggleTrackSpecTarget(var, pOldValue, flOldValue); });
 	set_current_target = new ConCommand("statusspec_localplayer_set_current_target", []() { g_ModuleManager->GetModule<LocalPlayer>()->SetToCurrentTarget(); }, "set the local player to the current spectator target", FCVAR_NONE);
+	track_spec_target = new ConVar("statusspec_localplayer_track_spec_target", "0", FCVAR_NONE, "have the local player value track the spectator target", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<LocalPlayer>()->ToggleTrackSpecTarget(var, pOldValue, flOldValue); });
 }
 
 bool LocalPlayer::CheckDependencies() {
