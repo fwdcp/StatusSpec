@@ -26,6 +26,7 @@ CustomModels::CustomModels() {
 
 	enabled = new ConVar("statusspec_custommodels_enabled", "0", FCVAR_NONE, "enable custom models", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CustomModels>()->ToggleEnabled(var, pOldValue, flOldValue); });
 	load_replacement_group = new ConCommand("statusspec_custommodels_load_replacement_group", [](const CCommand &command) { g_ModuleManager->GetModule<CustomModels>()->LoadReplacementGroup(command); }, "load a model replacement group", FCVAR_NONE);
+	reload_settings = new ConCommand("statusspec_custommodels_reload_settings", []() { g_ModuleManager->GetModule<CustomModels>()->ReloadSettings(); }, "reload settings for the custom models from the resource file", FCVAR_NONE);
 	unload_replacement_group = new ConCommand("statusspec_custommodels_unload_replacement_group", [](const CCommand &command) { g_ModuleManager->GetModule<CustomModels>()->UnloadReplacementGroup(command); }, "unload a model replacement group", FCVAR_NONE);
 }
 
@@ -102,6 +103,11 @@ void CustomModels::LoadReplacementGroup(const CCommand &command) {
 	else {
 		Warning("Must specify a valid replacement group to load!\n");
 	}
+}
+
+void CustomModels::ReloadSettings() {
+	modelConfig = new KeyValues("models");
+	modelConfig->LoadFromFile(Interfaces::pFileSystem, "resource/custommodels.res", "mod");
 }
 
 void CustomModels::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {

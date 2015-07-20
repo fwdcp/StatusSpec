@@ -133,6 +133,7 @@ void PlayerModels::SetModelOverride(C_BaseEntity *entity, const model_t *&model)
 }
 
 void PlayerModels::ReloadSettings() {
+	modelConfig = new KeyValues("models");
 	modelConfig->LoadFromFile(Interfaces::pFileSystem, "resource/playermodels.res", "mod");
 }
 

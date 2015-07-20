@@ -23,6 +23,7 @@ CustomTextures::CustomTextures() {
 
 	enabled = new ConVar("statusspec_customtextures_enabled", "0", FCVAR_NONE, "enable custom materials", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CustomTextures>()->ToggleEnabled(var, pOldValue, flOldValue); });
 	load_replacement_group = new ConCommand("statusspec_customtextures_load_replacement_group", [](const CCommand &command) { g_ModuleManager->GetModule<CustomTextures>()->LoadReplacementGroup(command); }, "load a texture replacement group", FCVAR_NONE);
+	reload_settings = new ConCommand("statusspec_customtextures_reload_settings", []() { g_ModuleManager->GetModule<CustomTextures>()->ReloadSettings(); }, "reload settings for the custom textures from the resource file", FCVAR_NONE);
 	unload_replacement_group = new ConCommand("statusspec_customtextures_unload_replacement_group", [](const CCommand &command) { g_ModuleManager->GetModule<CustomTextures>()->UnloadReplacementGroup(command); }, "unload a texture replacement group", FCVAR_NONE);
 }
 
@@ -79,6 +80,11 @@ void CustomTextures::LoadReplacementGroup(const CCommand &command) {
 	else {
 		Warning("Must specify a valid replacement group to load!\n");
 	}
+}
+
+void CustomTextures::ReloadSettings() {
+	textureConfig = new KeyValues("textures");
+	textureConfig->LoadFromFile(Interfaces::pFileSystem, "resource/customtextures.res", "mod");
 }
 
 void CustomTextures::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
