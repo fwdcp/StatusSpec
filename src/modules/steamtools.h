@@ -1,7 +1,7 @@
 /*
- *  antifreeze.h
+ *  steamtools.h
  *  StatusSpec project
- *  
+ *
  *  Copyright (c) 2014-2015 Forward Command Post
  *  BSD 2-Clause License
  *  http://opensource.org/licenses/BSD-2-Clause
@@ -12,19 +12,17 @@
 
 #include "../modules.h"
 
-class ConCommand;
+#include "steam/steamclientpublic.h"
+
 class ConVar;
 class IConVar;
 
-class AntiFreeze : public Module {
+class SteamTools : public Module {
 public:
-	AntiFreeze();
+	SteamTools();
 
 	static bool CheckDependencies();
 private:
-	class Panel;
-	Panel *panel;
-
-	ConVar *enabled;
-	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
+	ConVar *rich_presence_status;
+	void ChangeRichPresenceStatus(IConVar *var, const char *pOldValue, float flOldValue);
 };

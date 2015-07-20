@@ -2,7 +2,7 @@
  *  ifaces.h
  *  StatusSpec project
  *  
- *  Copyright (c) 2014 thesupremecommander
+ *  Copyright (c) 2014-2015 Forward Command Post
  *  BSD 2-Clause License
  *  http://opensource.org/licenses/BSD-2-Clause
  *
@@ -13,15 +13,15 @@
 #include "interface.h"
 
 class C_HLTVCamera;
-class C_TeamplayRoundBasedRules;
-class CGlobalVarsBase;
 class CSteamAPIContext;
 class IBaseClientDLL;
+class IClientEngineTools;
 class IClientEntityList;
 class IClientMode;
+class IEngineTool;
 class IFileSystem;
 class IGameEventManager2;
-class IGameResources;
+class IPrediction;
 class IVEngineClient;
 class IVModelInfoClient;
 class IVRenderView;
@@ -32,11 +32,14 @@ class Interfaces {
 		static void Unload();
 
 		static IBaseClientDLL *pClientDLL;
+		static IClientEngineTools *pClientEngineTools;
 		static IClientEntityList *pClientEntityList;
 		static IVEngineClient *pEngineClient;
+		static IEngineTool *pEngineTool;
 		static IFileSystem *pFileSystem;
 		static IGameEventManager2 *pGameEventManager;
 		static IVModelInfoClient *pModelInfoClient;
+		static IPrediction *pPrediction;
 		static IVRenderView *pRenderView;
 		static CSteamAPIContext *pSteamAPIContext;
 
@@ -44,10 +47,5 @@ class Interfaces {
 		static bool vguiLibrariesAvailable;
 
 		static IClientMode *GetClientMode();
-		static IGameResources *GetGameResources();
-		static CGlobalVarsBase *GetGlobalVars();
 		static C_HLTVCamera *GetHLTVCamera();
-		static C_TeamplayRoundBasedRules *GetTeamplayRoundBasedRules();
-	private:
-		static CDllDemandLoader *pClientModule;
 };

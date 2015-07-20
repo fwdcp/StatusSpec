@@ -2,7 +2,7 @@
  *  statusspec.cpp
  *  StatusSpec project
  *  
- *  Copyright (c) 2014 thesupremecommander
+ *  Copyright (c) 2014-2015 Forward Command Post
  *  BSD 2-Clause License
  *  http://opensource.org/licenses/BSD-2-Clause
  *
@@ -18,24 +18,25 @@
 #include "modules.h"
 
 #include "modules/antifreeze.h"
+#include "modules/cameraautoswitch.h"
+#include "modules/camerasmooths.h"
+#include "modules/camerastate.h"
 #include "modules/cameratools.h"
+#include "modules/consoletools.h"
 #include "modules/custommaterials.h"
 #include "modules/custommodels.h"
 #include "modules/customtextures.h"
 #include "modules/fovoverride.h"
+#include "modules/freezeinfo.h"
 #include "modules/killstreaks.h"
-#include "modules/loadouticons.h"
 #include "modules/localplayer.h"
 #include "modules/mediguninfo.h"
 #include "modules/multipanel.h"
 #include "modules/playeraliases.h"
 #include "modules/playermodels.h"
-#include "modules/playeroutlines.h"
 #include "modules/projectileoutlines.h"
-#include "modules/specguiorder.h"
-#include "modules/statusicons.h"
+#include "modules/steamtools.h"
 #include "modules/teamhealthcomparison.h"
-#include "modules/teamoverrides.h"
 
 ModuleManager *g_ModuleManager = nullptr;
 
@@ -58,25 +59,26 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 
 	g_ModuleManager = new ModuleManager();
 
-	g_ModuleManager->LoadModule<AntiFreeze>("AntiFreeze");
-	g_ModuleManager->LoadModule<CameraTools>("Camera Tools");
-	g_ModuleManager->LoadModule<CustomMaterials>("Custom Materials");
-	g_ModuleManager->LoadModule<CustomModels>("Custom Models");
-	g_ModuleManager->LoadModule<CustomTextures>("Custom Textures");
-	g_ModuleManager->LoadModule<FOVOverride>("FOV Override");
-	g_ModuleManager->LoadModule<Killstreaks>("Killstreaks");
-	g_ModuleManager->LoadModule<LoadoutIcons>("Loadout Icons");
-	g_ModuleManager->LoadModule<LocalPlayer>("Local Player");
-	g_ModuleManager->LoadModule<MedigunInfo>("Medigun Info");
-	g_ModuleManager->LoadModule<MultiPanel>("MultiPanel");
-	g_ModuleManager->LoadModule<PlayerAliases>("Player Aliases");
-	g_ModuleManager->LoadModule<PlayerModels>("Player Models");
-	g_ModuleManager->LoadModule<PlayerOutlines>("Player Outlines");
-	g_ModuleManager->LoadModule<ProjectileOutlines>("Projectile Outlines");
-	g_ModuleManager->LoadModule<SpecGUIOrder>("Spec GUI Order");
-	g_ModuleManager->LoadModule<StatusIcons>("Status Icons");
-	g_ModuleManager->LoadModule<TeamHealthComparison>("Team Health Comparison");
-	g_ModuleManager->LoadModule<TeamOverrides>("Team Overrides");
+	g_ModuleManager->RegisterAndLoadModule<AntiFreeze>("AntiFreeze");
+	g_ModuleManager->RegisterAndLoadModule<CameraAutoSwitch>("Camera Auto Switch");
+	g_ModuleManager->RegisterAndLoadModule<CameraSmooths>("Camera Smooths");
+	g_ModuleManager->RegisterAndLoadModule<CameraState>("Camera State");
+	g_ModuleManager->RegisterAndLoadModule<CameraTools>("Camera Tools");
+	g_ModuleManager->RegisterAndLoadModule<ConsoleTools>("Console Tools");
+	g_ModuleManager->RegisterAndLoadModule<CustomMaterials>("Custom Materials");
+	g_ModuleManager->RegisterAndLoadModule<CustomModels>("Custom Models");
+	g_ModuleManager->RegisterAndLoadModule<CustomTextures>("Custom Textures");
+	g_ModuleManager->RegisterAndLoadModule<FOVOverride>("FOV Override");
+	g_ModuleManager->RegisterAndLoadModule<FreezeInfo>("Freeze Info");
+	g_ModuleManager->RegisterAndLoadModule<Killstreaks>("Killstreaks");
+	g_ModuleManager->RegisterAndLoadModule<LocalPlayer>("Local Player");
+	g_ModuleManager->RegisterAndLoadModule<MedigunInfo>("Medigun Info");
+	g_ModuleManager->RegisterAndLoadModule<MultiPanel>("MultiPanel");
+	g_ModuleManager->RegisterAndLoadModule<PlayerAliases>("Player Aliases");
+	g_ModuleManager->RegisterAndLoadModule<PlayerModels>("Player Models");
+	g_ModuleManager->RegisterAndLoadModule<ProjectileOutlines>("Projectile Outlines");
+	g_ModuleManager->RegisterAndLoadModule<SteamTools>("Steam Tools");
+	g_ModuleManager->RegisterAndLoadModule<TeamHealthComparison>("Team Health Comparison");
 	
 	ConVar_Register();
 

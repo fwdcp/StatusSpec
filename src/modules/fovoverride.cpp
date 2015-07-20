@@ -2,7 +2,7 @@
  *  fovoverride.cpp
  *  StatusSpec project
  *
- *  Copyright (c) 2014 thesupremecommander
+ *  Copyright (c) 2014-2015 Forward Command Post
  *  BSD 2-Clause License
  *  http://opensource.org/licenses/BSD-2-Clause
  *
@@ -10,42 +10,61 @@
 
 #include "fovoverride.h"
 
+#include "cbase.h"
+#include "c_baseplayer.h"
 #include "convar.h"
+#include "icliententity.h"
+#include "shareddefs.h"
 
 #include "../common.h"
 #include "../funcs.h"
 #include "../ifaces.h"
 #include "../player.h"
+#include "../tfdefs.h"
 
-FOVOverride::FOVOverride(std::string name) : Module(name) {
-	frameHook = 0;
-	getFOVHook = 0;
+FOVOverride::FOVOverride() {
+	inToolModeHook = 0;
+	setupEngineViewHook = 0;
 
-	enabled = new ConVar("statusspec_fovoverride_enabled", "0", FCVAR_NONE, "enable FOV override", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<FOVOverride>("FOV Override")->ToggleEnabled(var, pOldValue, flOldValue); });
+	enabled = new ConVar("statusspec_fovoverride_enabled", "0", FCVAR_NONE, "enable FOV override", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<FOVOverride>()->ToggleEnabled(var, pOldValue, flOldValue); });
 	fov = new ConVar("statusspec_fovoverride_fov", "90", FCVAR_NONE, "the FOV value used");
 	zoomed = new ConVar("statusspec_fovoverride_zoomed", "0", FCVAR_NONE, "enable FOV override even when sniper rifle is zoomed");
 }
 
-bool FOVOverride::CheckDependencies(std::string name) {
+bool FOVOverride::CheckDependencies() {
 	bool ready = true;
-	
-	if (!Interfaces::pClientDLL) {
+
+	if (!Interfaces::pClientEngineTools) {
 		PRINT_TAG();
-		Warning("Required interface IBaseClientDLL for module %s not available!\n", name.c_str());
+		Warning("Required interface IClientEngineTools for module %s not available!\n", g_ModuleManager->GetModuleName<FOVOverride>().c_str());
+
+		ready = false;
+	}
+	
+	if (!Interfaces::pEngineClient) {
+		PRINT_TAG();
+		Warning("Required interface IVEngineClient for module %s not available!\n", g_ModuleManager->GetModuleName<FOVOverride>().c_str());
+
+		ready = false;
+	}
+
+	if (!Interfaces::pEngineTool) {
+		PRINT_TAG();
+		Warning("Required interface IEngineTool for module %s not available!\n", g_ModuleManager->GetModuleName<FOVOverride>().c_str());
 
 		ready = false;
 	}
 
 	if (!Player::CheckDependencies()) {
 		PRINT_TAG();
-		Warning("Required player helper class for module %s not available!\n", name.c_str());
+		Warning("Required player helper class for module %s not available!\n", g_ModuleManager->GetModuleName<FOVOverride>().c_str());
 
 		ready = false;
 	}
 
 	if (!Player::conditionsRetrievalAvailable) {
 		PRINT_TAG();
-		Warning("Required player condition retrieval for module %s not available!\n", name.c_str());
+		Warning("Required player condition retrieval for module %s not available!\n", g_ModuleManager->GetModuleName<FOVOverride>().c_str());
 
 		ready = false;
 	}
@@ -53,64 +72,49 @@ bool FOVOverride::CheckDependencies(std::string name) {
 	return ready;
 }
 
-void FOVOverride::FrameHook(ClientFrameStage_t curStage) {
-	if (curStage == FRAME_NET_UPDATE_END) {
-		if (HookGetFOV()) {
-			Funcs::RemoveHook(frameHook);
-			frameHook = 0;
-		}
-	}
-
-	RETURN_META(MRES_IGNORED);
+bool FOVOverride::InToolModeOverride() {
+	RETURN_META_VALUE(MRES_OVERRIDE, true);
 }
 
-float FOVOverride::GetFOVOverride() {
-	if (!zoomed->GetBool()) {
-		Player player = (IClientEntity *) META_IFACEPTR(C_TFPlayer);
+bool FOVOverride::SetupEngineViewOverride(Vector &origin, QAngle &angles, float &fov) {
+	Player localPlayer = Interfaces::pEngineClient->GetLocalPlayer();
 
-		if (player && player.CheckCondition(TFCond_Zoomed)) {
-			RETURN_META_VALUE(MRES_IGNORED, 0.0f);
+	if (localPlayer) {
+		if (localPlayer.CheckCondition(TFCond_Zoomed)) {
+			RETURN_META_VALUE(MRES_IGNORED, false);
+		}
+		else if (localPlayer.GetObserverMode() == OBS_MODE_IN_EYE) {
+			Player targetPlayer = localPlayer.GetObserverTarget();
+
+			if (targetPlayer && targetPlayer.CheckCondition(TFCond_Zoomed)) {
+				RETURN_META_VALUE(MRES_IGNORED, false);
+			}
 		}
 	}
 
-	RETURN_META_VALUE(MRES_SUPERCEDE, fov->GetFloat());
-}
-
-bool FOVOverride::HookGetFOV() {
-	if (getFOVHook) {
-		return true;
-	}
-
-	for (auto iterator = Player::begin(); iterator != Player::end(); ++iterator) {
-		Player player = *iterator;
-
-		getFOVHook = Funcs::AddGlobalHook_C_TFPlayer_GetFOV((C_TFPlayer *)player.GetEntity(), SH_MEMBER(this, &FOVOverride::GetFOVOverride), false);
-
-		if (getFOVHook) {
-			return true;
-		}
-	}
-
-	return false;
+	fov = this->fov->GetFloat();
+	RETURN_META_VALUE(MRES_SUPERCEDE, true);
 }
 
 void FOVOverride::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
 	if (enabled->GetBool()) {
-		if (!HookGetFOV() && !frameHook) {
-			frameHook = Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, SH_MEMBER(this, &FOVOverride::FrameHook), true);
+		if (!inToolModeHook) {
+			inToolModeHook = Funcs::AddHook_IClientEngineTools_InToolMode(Interfaces::pClientEngineTools, SH_MEMBER(this, &FOVOverride::InToolModeOverride), false);
+		}
+
+		if (!setupEngineViewHook) {
+			setupEngineViewHook = Funcs::AddHook_IClientEngineTools_SetupEngineView(Interfaces::pClientEngineTools, SH_MEMBER(this, &FOVOverride::SetupEngineViewOverride), false);
 		}
 	}
 	else {
-		if (getFOVHook) {
-			if (Funcs::RemoveHook(getFOVHook)) {
-				getFOVHook = 0;
-			}
+		if (inToolModeHook) {
+			Funcs::RemoveHook(inToolModeHook);
+			inToolModeHook = 0;
 		}
 
-		if (frameHook) {
-			if (Funcs::RemoveHook(frameHook)) {
-				frameHook = 0;
-			}
+		if (setupEngineViewHook) {
+			Funcs::RemoveHook(setupEngineViewHook);
+			setupEngineViewHook = 0;
 		}
 	}
 }

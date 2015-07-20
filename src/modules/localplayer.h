@@ -2,7 +2,7 @@
  *  localplayer.h
  *  StatusSpec project
  *
- *  Copyright (c) 2014 thesupremecommander
+ *  Copyright (c) 2014-2015 Forward Command Post
  *  BSD 2-Clause License
  *  http://opensource.org/licenses/BSD-2-Clause
  *
@@ -12,27 +12,27 @@
 
 class ConCommand;
 class ConVar;
-
-#include "cdll_int.h"
+class IConVar;
 
 #include "../modules.h"
 
 class LocalPlayer : public Module {
 public:
-	LocalPlayer(std::string name);
+	LocalPlayer();
 
-	static bool CheckDependencies(std::string name);
-
-	void FrameHook(ClientFrameStage_t curStage);
-	int GetLocalPlayerIndexOverride();
+	static bool CheckDependencies();
 private:
-	int frameHook;
+	int GetLocalPlayerIndexOverride();
+
+	class Panel;
+	Panel *panel;
+
 	bool getLocalPlayerIndexDetoured;
 
 	ConVar *enabled;
 	ConVar *player;
-	ConVar *track_spec_target;
 	ConCommand *set_current_target;
+	ConVar *track_spec_target;
 	void SetToCurrentTarget();
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 	void ToggleTrackSpecTarget(IConVar *var, const char *pOldValue, float flOldValue);

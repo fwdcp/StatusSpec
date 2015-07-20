@@ -1,5 +1,5 @@
 /*
- *  teamhealthcomparison.h
+ *  freezeinfo.h
  *  StatusSpec project
  *
  *  Copyright (c) 2014-2015 Forward Command Post
@@ -10,22 +10,15 @@
 
 #pragma once
 
-#include "cdll_int.h"
-
 #include "../modules.h"
-#include "../tfdefs.h"
 
 class ConCommand;
 class ConVar;
 class IConVar;
 
-namespace vgui {
-	class Panel;
-}
-
-class TeamHealthComparison : public Module {
+class FreezeInfo : public Module {
 public:
-	TeamHealthComparison();
+	FreezeInfo();
 
 	static bool CheckDependencies();
 private:
@@ -34,6 +27,8 @@ private:
 
 	ConVar *enabled;
 	ConCommand *reload_settings;
+	ConVar *threshold;
+	void ChangeThreshold(IConVar *var, const char *pOldValue, float flOldValue);
 	void ReloadSettings();
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };

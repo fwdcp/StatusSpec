@@ -2,7 +2,7 @@
  *  projectileoutlines.h
  *  StatusSpec project
  *
- *  Copyright (c) 2014 thesupremecommander
+ *  Copyright (c) 2014-2015 Forward Command Post
  *  BSD 2-Clause License
  *  http://opensource.org/licenses/BSD-2-Clause
  *
@@ -19,18 +19,23 @@
 
 class ProjectileOutlines : public Module {
 public:
-	ProjectileOutlines(std::string name);
+	ProjectileOutlines();
 
-	static bool CheckDependencies(std::string name);
-
-	bool DoPostScreenSpaceEffectsHook(const CViewSetup *pSetup);
-	void FrameHook(ClientFrameStage_t curStage);
+	static bool CheckDependencies();
 private:
+	void UpdateGlowFades(Vector origin);
+	void UpdateGlows();
+
+	struct ColorConCommand {
+		Color color;
+		ConCommand *command;
+	};
+
 	std::map<std::string, ColorConCommand> colors;
-	int doPostScreenSpaceEffectsHook;
-	int frameHook;
 	std::map<EHANDLE, GlowManager::GlowObject *> glows;
-	GlowManager glowManager;
+
+	class Panel;
+	Panel *panel;
 
 	Color GetGlowColor(IClientEntity *entity);
 	void SetGlowEffect(IClientEntity *entity, bool enabled, Vector color = Vector(1.0f, 1.0f, 1.0f), float alpha = 1.0f);

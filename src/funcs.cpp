@@ -2,7 +2,7 @@
  *  funcs.cpp
  *  StatusSpec project
  *
- *  Copyright (c) 2014 thesupremecommander
+ *  Copyright (c) 2014-2015 Forward Command Post
  *  BSD 2-Clause License
  *  http://opensource.org/licenses/BSD-2-Clause
  *
@@ -16,7 +16,10 @@
 
 #include "engine/ivmodelinfo.h"
 #include "iclientmode.h"
+#include "icvar.h"
 #include "igameevents.h"
+#include "iprediction.h"
+#include "toolframework/iclientenginetools.h"
 #include "vgui/IPanel.h"
 
 #include "exceptions.h"
@@ -36,27 +39,33 @@ SourceHook::Impl::CSourceHookImpl g_SourceHook;
 SourceHook::ISourceHook *g_SHPtr = &g_SourceHook;
 int g_PLID = 0;
 
-SH_DECL_MANUALHOOK5_void(C_TFPlayer_CalcView, OFFSET_CALCVIEW, 0, 0, Vector &, QAngle &, float &, float &, float &);
 SH_DECL_MANUALHOOK0(C_TFPlayer_GetFOV, OFFSET_GETFOV, 0, 0, float);
 SH_DECL_MANUALHOOK3_void(C_TFPlayer_GetGlowEffectColor, OFFSET_GETGLOWEFFECTCOLOR, 0, 0, float *, float *, float *);
-SH_DECL_MANUALHOOK0(C_TFPlayer_GetHealth, OFFSET_GETHEALTH, 0, 0, int);
-SH_DECL_MANUALHOOK0(C_TFPlayer_GetMaxHealth, OFFSET_GETMAXHEALTH, 0, 0, int);
-SH_DECL_MANUALHOOK0(C_TFPlayer_GetObserverMode, OFFSET_GETOBSERVERMODE, 0, 0, int);
-SH_DECL_MANUALHOOK0(C_TFPlayer_GetObserverTarget, OFFSET_GETOBSERVERTARGET, 0, 0, C_BaseEntity *);
 SH_DECL_HOOK1_void(IBaseClientDLL, FrameStageNotify, SH_NOATTRIB, 0, ClientFrameStage_t);
+SH_DECL_HOOK0(IClientEngineTools, InToolMode, SH_NOATTRIB, 0, bool);
+SH_DECL_HOOK0(IClientEngineTools, IsThirdPersonCamera, SH_NOATTRIB, 0, bool);
+SH_DECL_HOOK3(IClientEngineTools, SetupEngineView, SH_NOATTRIB, 0, bool, Vector &, QAngle &, float &);
 SH_DECL_HOOK1(IClientMode, DoPostScreenSpaceEffects, SH_NOATTRIB, 0, bool, const CViewSetup *);
+SH_DECL_HOOK1_void_vafmt(ICvar, ConsoleColorPrintf, const FMTFUNCTION(3, 4), 0, const Color &);
+SH_DECL_HOOK0_void_vafmt(ICvar, ConsolePrintf, const FMTFUNCTION(2, 3), 0);
+SH_DECL_HOOK0_void_vafmt(ICvar, ConsoleDPrintf, const FMTFUNCTION(2, 3), 0);
 SH_DECL_HOOK1(IGameEventManager2, FireEventClientSide, SH_NOATTRIB, 0, bool, IGameEvent *);
 SH_DECL_HOOK4(IMaterialSystem, FindMaterial, SH_NOATTRIB, 0, IMaterial *, char const *, const char *, bool, const char *);
-SH_DECL_HOOK3_void(IPanel, SendMessage, SH_NOATTRIB, 0, VPANEL, KeyValues *, VPANEL);
-SH_DECL_HOOK3_void(IPanel, SetPos, SH_NOATTRIB, 0, VPANEL, int, int);
+SH_DECL_HOOK0_void(IPrediction, PostEntityPacketReceived, SH_NOATTRIB, 0);
 SH_DECL_HOOK2(IVEngineClient, GetPlayerInfo, SH_NOATTRIB, 0, bool, int, player_info_t *);
 
+int Funcs::setModeLastHookRegistered = 0;
+std::map<int, std::function<void(C_HLTVCamera *, int &)>> Funcs::setModeHooks;
 int Funcs::setModelLastHookRegistered = 0;
 std::map<int, std::function<void(C_BaseEntity *, const model_t *&)>> Funcs::setModelHooks;
+int Funcs::setPrimaryTargetLastHookRegistered = 0;
+std::map<int, std::function<void(C_HLTVCamera *, int &)>> Funcs::setPrimaryTargetHooks;
 
 GLPI_t Funcs::getLocalPlayerIndexOriginal = nullptr;
+SM_t Funcs::setModeOriginal = nullptr;
 SMI_t Funcs::setModelIndexOriginal = nullptr;
 SMP_t Funcs::setModelPointerOriginal = nullptr;
+SPT_t Funcs::setPrimaryTargetOriginal = nullptr;
 
 bool Funcs::AddDetour(void *target, void *detour, void *&original) {
 	MH_STATUS addHookResult = MH_CreateHook(target, detour, &original);
@@ -103,6 +112,28 @@ bool Funcs::AddDetour_C_BaseEntity_SetModelPointer(SMPH_t detour) {
 	return false;
 }
 
+bool Funcs::AddDetour_C_HLTVCamera_SetMode(SMH_t detour) {
+	void *original;
+
+	if (AddDetour(GetFunc_C_HLTVCamera_SetMode(), detour, original)) {
+		setModeOriginal = reinterpret_cast<SM_t>(original);
+		return true;
+	}
+
+	return false;
+}
+
+bool Funcs::AddDetour_C_HLTVCamera_SetPrimaryTarget(SPTH_t detour) {
+	void *original;
+
+	if (AddDetour(GetFunc_C_HLTVCamera_SetPrimaryTarget(), detour, original)) {
+		setPrimaryTargetOriginal = reinterpret_cast<SPT_t>(original);
+		return true;
+	}
+
+	return false;
+}
+
 int Funcs::AddGlobalHook_C_TFPlayer_GetFOV(C_TFPlayer *instance, fastdelegate::FastDelegate0<float> hook, bool post) {
 	return SH_ADD_MANUALHOOK(C_TFPlayer_GetFOV, instance, hook, post);
 }
@@ -118,12 +149,52 @@ int Funcs::AddHook_C_BaseEntity_SetModel(std::function<void(C_BaseEntity *, cons
 	return setModelLastHookRegistered;
 }
 
-int Funcs::AddHook_IBaseClientDLL_FrameStageNotify(IBaseClientDLL *instance, fastdelegate::FastDelegate1<ClientFrameStage_t> hook, bool post) {
-	return SH_ADD_HOOK(IBaseClientDLL, FrameStageNotify, instance, hook, post);
+int Funcs::AddHook_C_HLTVCamera_SetMode(std::function<void(C_HLTVCamera *, int &)> hook) {
+	if (setModeHooks.size() == 0) {
+		AddDetour_C_HLTVCamera_SetMode(Detour_C_HLTVCamera_SetMode);
+	}
+
+	setModeHooks[++setModeLastHookRegistered] = hook;
+
+	return setModeLastHookRegistered;
+}
+
+int Funcs::AddHook_C_HLTVCamera_SetPrimaryTarget(std::function<void(C_HLTVCamera *, int &)> hook) {
+	if (setPrimaryTargetHooks.size() == 0) {
+		AddDetour_C_HLTVCamera_SetPrimaryTarget(Detour_C_HLTVCamera_SetPrimaryTarget);
+	}
+
+	setPrimaryTargetHooks[++setPrimaryTargetLastHookRegistered] = hook;
+
+	return setPrimaryTargetLastHookRegistered;
+}
+
+int Funcs::AddHook_IClientEngineTools_InToolMode(IClientEngineTools *instance, fastdelegate::FastDelegate0<bool> hook, bool post) {
+	return SH_ADD_HOOK(IClientEngineTools, InToolMode, instance, hook, post);
+}
+
+int Funcs::AddHook_IClientEngineTools_IsThirdPersonCamera(IClientEngineTools *instance, fastdelegate::FastDelegate0<bool> hook, bool post) {
+	return SH_ADD_HOOK(IClientEngineTools, IsThirdPersonCamera, instance, hook, post);
+}
+
+int Funcs::AddHook_IClientEngineTools_SetupEngineView(IClientEngineTools *instance, fastdelegate::FastDelegate3<Vector &, QAngle &, float &, bool> hook, bool post) {
+	return SH_ADD_HOOK(IClientEngineTools, SetupEngineView, instance, hook, post);
 }
 
 int Funcs::AddHook_IClientMode_DoPostScreenSpaceEffects(IClientMode *instance, fastdelegate::FastDelegate1<const CViewSetup *, bool> hook, bool post) {
 	return SH_ADD_HOOK(IClientMode, DoPostScreenSpaceEffects, instance, hook, post);
+}
+
+int Funcs::AddHook_ICvar_ConsoleColorPrintf(ICvar *instance, fastdelegate::FastDelegate2<const Color &, const char *> hook, bool post) {
+	return SH_ADD_HOOK(ICvar, ConsoleColorPrintf, instance, hook, post);
+}
+
+int Funcs::AddHook_ICvar_ConsoleDPrintf(ICvar *instance, fastdelegate::FastDelegate1<const char *> hook, bool post) {
+	return SH_ADD_HOOK(ICvar, ConsoleDPrintf, instance, hook, post);
+}
+
+int Funcs::AddHook_ICvar_ConsolePrintf(ICvar *instance, fastdelegate::FastDelegate1<const char *> hook, bool post) {
+	return SH_ADD_HOOK(ICvar, ConsolePrintf, instance, hook, post);
 }
 
 int Funcs::AddHook_IGameEventManager2_FireEventClientSide(IGameEventManager2 *instance, fastdelegate::FastDelegate1<IGameEvent *, bool> hook, bool post) {
@@ -134,12 +205,8 @@ int Funcs::AddHook_IMaterialSystem_FindMaterial(IMaterialSystem *instance, fastd
 	return SH_ADD_HOOK(IMaterialSystem, FindMaterial, instance, hook, post);
 }
 
-int Funcs::AddHook_IPanel_SendMessage(vgui::IPanel *instance, fastdelegate::FastDelegate3<vgui::VPANEL, KeyValues *, vgui::VPANEL> hook, bool post) {
-	return SH_ADD_HOOK(IPanel, SendMessage, instance, hook, post);
-}
-
-int Funcs::AddHook_IPanel_SetPos(vgui::IPanel *instance, fastdelegate::FastDelegate3<vgui::VPANEL, int, int> hook, bool post) {
-	return SH_ADD_HOOK(IPanel, SetPos, instance, hook, post);
+int Funcs::AddHook_IPrediction_PostEntityPacketReceived(IPrediction *instance, fastdelegate::FastDelegate0<> hook, bool post) {
+	return SH_ADD_HOOK(IPrediction, PostEntityPacketReceived, instance, hook, post);
 }
 
 int Funcs::AddHook_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, fastdelegate::FastDelegate2<int, player_info_t *, bool> hook, bool post) {
@@ -173,8 +240,26 @@ void Funcs::CallFunc_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, const 
 	}
 }
 
+void Funcs::CallFunc_C_HLTVCamera_SetCameraAngle(C_HLTVCamera *instance, QAngle &targetAngle) {
+	GetFunc_C_HLTVCamera_SetCameraAngle()(instance, targetAngle);
+}
+
+void Funcs::CallFunc_C_HLTVCamera_SetMode(C_HLTVCamera *instance, int iMode) {
+	if (setModeOriginal) {
+		setModeOriginal(instance, iMode);
+	}
+	else {
+		GetFunc_C_HLTVCamera_SetMode()(instance, iMode);
+	}
+}
+
 void Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(C_HLTVCamera *instance, int nEntity) {
-	GetFunc_C_HLTVCamera_SetPrimaryTarget()(instance, nEntity);
+	if (setPrimaryTargetOriginal) {
+		setPrimaryTargetOriginal(instance, nEntity);
+	}
+	else {
+		GetFunc_C_HLTVCamera_SetPrimaryTarget()(instance, nEntity);
+	}
 }
 
 float Funcs::CallFunc_C_TFPlayer_GetFOV(C_TFPlayer *instance) {
@@ -185,22 +270,6 @@ void Funcs::CallFunc_C_TFPlayer_GetGlowEffectColor(C_TFPlayer *instance, float *
 	SH_MCALL(instance, C_TFPlayer_GetGlowEffectColor)(r, g, b);
 }
 
-int Funcs::CallFunc_C_TFPlayer_GetHealth(C_TFPlayer *instance) {
-	return SH_MCALL(instance, C_TFPlayer_GetHealth)();
-}
-
-int Funcs::CallFunc_C_TFPlayer_GetMaxHealth(C_TFPlayer *instance) {
-	return SH_MCALL(instance, C_TFPlayer_GetMaxHealth)();
-}
-
-int Funcs::CallFunc_C_TFPlayer_GetObserverMode(C_TFPlayer *instance) {
-	return SH_MCALL(instance, C_TFPlayer_GetObserverMode)();
-}
-
-C_BaseEntity *Funcs::CallFunc_C_TFPlayer_GetObserverTarget(C_TFPlayer *instance) {
-	return SH_MCALL(instance, C_TFPlayer_GetObserverTarget)();
-}
-
 bool Funcs::CallFunc_IVEngineClient_GetPlayerInfo(IVEngineClient *instance, int ent_num, player_info_t *pinfo) {
 	return SH_CALL(instance, &IVEngineClient::GetPlayerInfo)(ent_num, pinfo);
 }
@@ -209,8 +278,8 @@ void Funcs::Detour_C_BaseEntity_SetModelIndex(C_BaseEntity *instance, void *, in
 	const model_t *model = Interfaces::pModelInfoClient->GetModel(index);
 	const char *oldModelName = Interfaces::pModelInfoClient->GetModelName(model);
 
-	for (auto iterator = setModelHooks.begin(); iterator != setModelHooks.end(); ++iterator) {
-		iterator->second(instance, model);
+	for (auto iterator : setModelHooks) {
+		iterator.second(instance, model);
 	}
 
 	if (strcmp(oldModelName, Interfaces::pModelInfoClient->GetModelName(model)) == 0) {
@@ -223,11 +292,27 @@ void Funcs::Detour_C_BaseEntity_SetModelIndex(C_BaseEntity *instance, void *, in
 }
 
 void Funcs::Detour_C_BaseEntity_SetModelPointer(C_BaseEntity *instance, void *, const model_t *pModel) {
-	for (auto iterator = setModelHooks.begin(); iterator != setModelHooks.end(); ++iterator) {
-		iterator->second(instance, pModel);
+	for (auto iterator : setModelHooks) {
+		iterator.second(instance, pModel);
 	}
 
 	Funcs::CallFunc_C_BaseEntity_SetModelPointer(instance, pModel);
+}
+
+void Funcs::Detour_C_HLTVCamera_SetMode(C_HLTVCamera *instance, void *, int iMode) {
+	for (auto iterator : setModeHooks) {
+		iterator.second(instance, iMode);
+	}
+
+	Funcs::CallFunc_C_HLTVCamera_SetMode(instance, iMode);
+}
+
+void Funcs::Detour_C_HLTVCamera_SetPrimaryTarget(C_HLTVCamera *instance, void *, int nEntity) {
+	for (auto iterator : setPrimaryTargetHooks) {
+		iterator.second(instance, nEntity);
+	}
+
+	Funcs::CallFunc_C_HLTVCamera_SetPrimaryTarget(instance, nEntity);
 }
 
 GLPI_t Funcs::GetFunc_GetLocalPlayerIndex() {
@@ -290,6 +375,46 @@ SMP_t Funcs::GetFunc_C_BaseEntity_SetModelPointer() {
 #endif
 }
 
+SCA_t Funcs::GetFunc_C_HLTVCamera_SetCameraAngle() {
+#if defined _WIN32
+	static DWORD pointer = NULL;
+
+	if (!pointer) {
+		pointer = SignatureScan("client", SETCAMERAANGLE_SIG, SETCAMERAANGLE_MASK);
+
+		if (!pointer) {
+			throw bad_pointer("C_HLTVCamera::SetCameraAngle");
+		}
+	}
+
+	return (SCA_t)(pointer);
+#else
+	throw bad_pointer("C_HLTVCamera::SetCameraAngle");
+
+	return nullptr;
+#endif
+}
+
+SM_t Funcs::GetFunc_C_HLTVCamera_SetMode() {
+#if defined _WIN32
+	static DWORD pointer = NULL;
+
+	if (!pointer) {
+		pointer = SignatureScan("client", SETMODE_SIG, SETMODE_MASK);
+
+		if (!pointer) {
+			throw bad_pointer("C_HLTVCamera::SetMode");
+		}
+	}
+
+	return (SM_t)(pointer);
+#else
+	throw bad_pointer("C_HLTVCamera::SetMode");
+
+	return nullptr;
+#endif
+}
+
 SPT_t Funcs::GetFunc_C_HLTVCamera_SetPrimaryTarget() {
 #if defined _WIN32
 	static DWORD pointer = NULL;
@@ -337,6 +462,24 @@ bool Funcs::RemoveDetour_C_BaseEntity_SetModelPointer() {
 	return false;
 }
 
+bool Funcs::RemoveDetour_C_HLTVCamera_SetMode() {
+	if (RemoveDetour(GetFunc_C_HLTVCamera_SetMode())) {
+		setModeOriginal = nullptr;
+		return true;
+	}
+
+	return false;
+}
+
+bool Funcs::RemoveDetour_C_HLTVCamera_SetPrimaryTarget() {
+	if (RemoveDetour(GetFunc_C_HLTVCamera_SetPrimaryTarget())) {
+		setPrimaryTargetOriginal = nullptr;
+		return true;
+	}
+
+	return false;
+}
+
 bool Funcs::RemoveDetour(void *target) {
 	MH_STATUS disableHookResult = MH_DisableHook(target);
 
@@ -359,6 +502,22 @@ void Funcs::RemoveHook_C_BaseEntity_SetModel(int hookID) {
 	if (setModelHooks.size() == 0) {
 		RemoveDetour_C_BaseEntity_SetModelIndex();
 		RemoveDetour_C_BaseEntity_SetModelPointer();
+	}
+}
+
+void Funcs::RemoveHook_C_HLTVCamera_SetMode(int hookID) {
+	setModeHooks.erase(hookID);
+
+	if (setModeHooks.size() == 0) {
+		RemoveDetour_C_HLTVCamera_SetMode();
+	}
+}
+
+void Funcs::RemoveHook_C_HLTVCamera_SetPrimaryTarget(int hookID) {
+	setPrimaryTargetHooks.erase(hookID);
+
+	if (setPrimaryTargetHooks.size() == 0) {
+		RemoveDetour_C_HLTVCamera_SetPrimaryTarget();
 	}
 }
 

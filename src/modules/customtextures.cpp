@@ -2,7 +2,7 @@
  *  customtextures.cpp
  *  StatusSpec project
  *
- *  Copyright (c) 2014 thesupremecommander
+ *  Copyright (c) 2014-2015 Forward Command Post
  *  BSD 2-Clause License
  *  http://opensource.org/licenses/BSD-2-Clause
  *
@@ -17,28 +17,29 @@
 
 #include "../ifaces.h"
 
-CustomTextures::CustomTextures(std::string name) : Module(name) {
+CustomTextures::CustomTextures() {
 	textureConfig = new KeyValues("textures");
 	textureConfig->LoadFromFile(Interfaces::pFileSystem, "resource/customtextures.res", "mod");
 
-	enabled = new ConVar("statusspec_customtextures_enabled", "0", FCVAR_NONE, "enable custom materials", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CustomTextures>("Custom Textures")->ToggleEnabled(var, pOldValue, flOldValue); });
-	load_replacement_group = new ConCommand("statusspec_customtextures_load_replacement_group", [](const CCommand &command) { g_ModuleManager->GetModule<CustomTextures>("Custom Textures")->LoadReplacementGroup(command); }, "load a texture replacement group", FCVAR_NONE);
-	unload_replacement_group = new ConCommand("statusspec_customtextures_unload_replacement_group", [](const CCommand &command) { g_ModuleManager->GetModule<CustomTextures>("Custom Textures")->UnloadReplacementGroup(command); }, "unload a texture replacement group", FCVAR_NONE);
+	enabled = new ConVar("statusspec_customtextures_enabled", "0", FCVAR_NONE, "enable custom materials", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CustomTextures>()->ToggleEnabled(var, pOldValue, flOldValue); });
+	load_replacement_group = new ConCommand("statusspec_customtextures_load_replacement_group", [](const CCommand &command) { g_ModuleManager->GetModule<CustomTextures>()->LoadReplacementGroup(command); }, "load a texture replacement group", FCVAR_NONE);
+	reload_settings = new ConCommand("statusspec_customtextures_reload_settings", []() { g_ModuleManager->GetModule<CustomTextures>()->ReloadSettings(); }, "reload settings for the custom textures from the resource file", FCVAR_NONE);
+	unload_replacement_group = new ConCommand("statusspec_customtextures_unload_replacement_group", [](const CCommand &command) { g_ModuleManager->GetModule<CustomTextures>()->UnloadReplacementGroup(command); }, "unload a texture replacement group", FCVAR_NONE);
 }
 
-bool CustomTextures::CheckDependencies(std::string name) {
+bool CustomTextures::CheckDependencies() {
 	bool ready = true;
 
 	if (!Interfaces::pFileSystem) {
 		PRINT_TAG();
-		Warning("Required interface IFileSystem for module %s not available!\n", name.c_str());
+		Warning("Required interface IFileSystem for module %s not available!\n", g_ModuleManager->GetModuleName<CustomTextures>().c_str());
 
 		ready = false;
 	}
 
 	if (!g_pMaterialSystem) {
 		PRINT_TAG();
-		Warning("Required interface IMaterialSystem for module %s not available!\n", name.c_str());
+		Warning("Required interface IMaterialSystem for module %s not available!\n", g_ModuleManager->GetModuleName<CustomTextures>().c_str());
 
 		ready = false;
 	}
@@ -81,15 +82,20 @@ void CustomTextures::LoadReplacementGroup(const CCommand &command) {
 	}
 }
 
+void CustomTextures::ReloadSettings() {
+	textureConfig = new KeyValues("textures");
+	textureConfig->LoadFromFile(Interfaces::pFileSystem, "resource/customtextures.res", "mod");
+}
+
 void CustomTextures::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
 	if (enabled->GetBool()) {
-		for (auto iterator = textureReplacements.begin(); iterator != textureReplacements.end(); ++iterator) {
-			g_pMaterialSystem->AddTextureAlias(iterator->first.c_str(), iterator->second.replacement.c_str());
+		for (auto iterator : textureReplacements) {
+			g_pMaterialSystem->AddTextureAlias(iterator.first.c_str(), iterator.second.replacement.c_str());
 		}
 	}
 	else {
-		for (auto iterator = textureReplacements.begin(); iterator != textureReplacements.end(); ++iterator) {
-			g_pMaterialSystem->RemoveTextureAlias(iterator->first.c_str());
+		for (auto iterator : textureReplacements) {
+			g_pMaterialSystem->RemoveTextureAlias(iterator.first.c_str());
 		}
 	}
 }

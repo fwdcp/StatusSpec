@@ -2,7 +2,7 @@
  *  multipanel.h
  *  StatusSpec project
  *
- *  Copyright (c) 2014 thesupremecommander
+ *  Copyright (c) 2014-2015 Forward Command Post
  *  BSD 2-Clause License
  *  http://opensource.org/licenses/BSD-2-Clause
  *
@@ -20,9 +20,9 @@ class IConVar;
 
 class MultiPanel : public Module {
 public:
-	MultiPanel(std::string name);
+	MultiPanel();
 
-	static bool CheckDependencies(std::string name);
+	static bool CheckDependencies();
 private:
 	CGameConsoleDialog *consoleDialog;
 	vgui::HPanel scoreboardPanel;

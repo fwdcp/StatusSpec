@@ -2,7 +2,7 @@
  *  player.h
  *  StatusSpec project
  *
- *  Copyright (c) 2014 thesupremecommander
+ *  Copyright (c) 2014-2015 Forward Command Post
  *  BSD 2-Clause License
  *  http://opensource.org/licenses/BSD-2-Clause
  *
@@ -12,6 +12,7 @@
 
 #include "ehandle.h"
 
+class C_BaseCombatWeapon;
 class C_BaseEntity;
 class CSteamID;
 class IClientEntity;
@@ -69,6 +70,7 @@ public:
 	CSteamID GetSteamID() const;
 	TFTeam GetTeam() const;
 	int GetUserID() const;
+	C_BaseCombatWeapon *GetWeapon(int i) const;
 	bool IsAlive() const;
 
 	class Iterator {
@@ -96,6 +98,12 @@ public:
 
 	static Iterator begin();
 	static Iterator end();
+
+	class Iterable {
+	public:
+		Iterator begin();
+		Iterator end();
+	};
 
 	static bool CheckDependencies();
 	static bool classRetrievalAvailable;

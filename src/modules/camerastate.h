@@ -1,5 +1,5 @@
 /*
- *  teamhealthcomparison.h
+ *  camerastate.h
  *  StatusSpec project
  *
  *  Copyright (c) 2014-2015 Forward Command Post
@@ -10,30 +10,29 @@
 
 #pragma once
 
-#include "cdll_int.h"
-
 #include "../modules.h"
-#include "../tfdefs.h"
 
-class ConCommand;
 class ConVar;
 class IConVar;
 
-namespace vgui {
-	class Panel;
-}
-
-class TeamHealthComparison : public Module {
+class CameraState : public Module {
 public:
-	TeamHealthComparison();
+	CameraState();
 
 	static bool CheckDependencies();
 private:
+	void UpdateState();
+
 	class Panel;
 	Panel *panel;
 
+	bool currentlyUpdating;
+
+	class HLTVCameraOverride;
+
+	ConVar *change;
+	ConVar *current;
 	ConVar *enabled;
-	ConCommand *reload_settings;
-	void ReloadSettings();
+	void ChangeState(IConVar *var, const char *pOldValue, float flOldValue);
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };

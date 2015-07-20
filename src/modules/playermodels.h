@@ -2,7 +2,7 @@
  *  playermodels.h
  *  StatusSpec project
  *
- *  Copyright (c) 2014 thesupremecommander
+ *  Copyright (c) 2014-2015 Forward Command Post
  *  BSD 2-Clause License
  *  http://opensource.org/licenses/BSD-2-Clause
  *
@@ -21,14 +21,14 @@ struct model_t;
 
 class PlayerModels : public Module {
 public:
-	PlayerModels(std::string name);
+	PlayerModels();
 
-	static bool CheckDependencies(std::string name);
+	static bool CheckDependencies();
 private:
+	void SetModelOverride(C_BaseEntity *entity, const model_t *&model);
+
 	KeyValues *modelConfig;
 	int setModelHook;
-
-	void SetModelOverride(C_BaseEntity *entity, const model_t *&model);
 
 	ConVar *enabled;
 	ConCommand *reload_settings;

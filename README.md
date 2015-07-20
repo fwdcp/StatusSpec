@@ -3,25 +3,94 @@ StatusSpec
 
 a Team Fortress 2 client plugin that augments game spectating
 
-![screenshot](http://i.imgur.com/HliUKLk.png)
-
 Changelog
 ---------
 
-**0.24.0**
+### 0.25.0
+* general
+  * increased reliability
+  * optimized performance and size
+* antifreeze
+  * optimized module
+  * removed timer functionality
+  * moved freeze info to separate module
+* camera auto switch
+  * created new module
+  * added ability to automatically switch to killer on death (with configurable delay)
+* camera smooths
+  * created new module
+  * added ability to automatically smooth transitions between camera views
+* camera state
+  * created new module
+  * optimized camera state updates
+  * fixed issues with switching camera state
 * camera tools
-  * add command to spectate a player by index
-  * add exposure of SourceTV camera information
+  * added ability to force camera mode and target
+  * moved camera state into separate module
+* console tools
+  * created new module
+  * added ability to change CVar flags
+  * added ability to filter console by regular expressions
+* custom materials
+  * added reload settings command
+* custom models
+  * added reload settings command
+* custom textures
+  * added reload settings command
+* FOV override
+  * optimized and generalized module
+* freeze info
+  * created new module
+* killstreaks
+  * optimized module
+* loadout icons
+  * removed module
+* local player
+  * optimized module
+* medigun info
+  * optimized performance
+  * add support for multiple mediguns per team
+  * add direct support for dynamically switching HUD appearance
+  * revamped required HUD files
+  * removed redundant CVars
+  * removed advantage calculations
+  * removed custom animations
+* player aliases
+  * removed API-based (ESEA/ETF2L/Twitch) aliases
+* player models
+  * documented previously added reload settings command
+* player outlines
+  * removed module
+* projectile outlines
+  * optimized module
+  * fix color commands
+  * fix grenades and stickybombs not being highlighted
+* spec GUI order
+  * removed module
+* status icons
+  * removed module
+* Steam tools
+  * created new module
+  * added ability to set rich presence
+* team health comparison
+  * optimized performance
+* team overrides
+  * removed module
+
+### 0.24.0
 * general
   * fix issues with invalid models
   * fix compatibility with Source SDK
   * increase performance with exceptions
+* camera tools
+  * add command to spectate a player by index
+  * add exposure of SourceTV camera information
 
-**0.23.1**
+### 0.23.1
 * player aliases
   * fix infinite recursion
 
-**0.23.0**
+### 0.23.0
 * general
   * major modularization - modules check dependencies and fail separately
   * revamp support structures
@@ -31,25 +100,25 @@ Changelog
 * loadout icons
   * fixed recent issues
 
-**0.22.3**
+### 0.22.3
 * general
   * fix issues with multiple detours causing crashes
 
-**0.22.2**
+### 0.22.2
 * player models
   * add functionality to replace ragdolls
 
-**0.22.1**
+### 0.22.1
 * antifreeze
   * added feature to fix timer freezes
 
-**0.22.0**
+### 0.22.0
 * general
   * fixed issues with outlines (hopefully)
 * custom models
   * new module
 
-**0.21.0**
+### 0.21.0
 * general
   * optimized plugin
 * camera tools
@@ -65,7 +134,7 @@ Changelog
 * team health comparison
   * new module
 
-**0.20.1**
+### 0.20.1
 * general
   * fix crashing due to invalid entities
 * camera tools
@@ -73,7 +142,7 @@ Changelog
 * spec GUI order
   * fix gaps in between players
 
-**0.20.0**
+### 0.20.0
 * camera tools
   * new module
 * FOV override
@@ -86,11 +155,11 @@ Changelog
 * spec GUI order
   * added reverse ordering of players
 
-**0.19.2**
+### 0.19.2
 * general
   * fixed crashes
 
-**0.19.1**
+### 0.19.1
 * custom materials
   * removed module
 * custom textures
@@ -98,7 +167,7 @@ Changelog
 * spec GUI order
   * new module
 
-**0.19.0**
+### 0.19.0
 * custom materials
   * new module
 * player aliases
@@ -114,7 +183,7 @@ Changelog
 * team overrides
   * new module
 
-**0.18.0**
+### 0.18.0
 * general
   * added plugin glow system
   * fix issues caused by the 2014-09-10 update
@@ -124,29 +193,29 @@ Changelog
 * projectile outlines
   * new module
 
-**0.17.4**
+### 0.17.4
 * general
   * adjust paint method hooking so that we can draw at the correct location
 
-**0.17.3**
+### 0.17.3
 * general
   * update offsets for 2014-07-30 update
 
-**0.17.2**
+### 0.17.2
 * general
   * updated version of MinHook and changed build procedures
 
-**0.17.1**
+### 0.17.1
 * medigun info
   * fix issues with charge advantage info (thanks Bluee/MattMcNam)
 * player aliases
   * add Twitch API support
 
-**0.17.0**
+### 0.17.0
 * player aliases
   * add ETF2L API support
 
-**0.16.0**
+### 0.16.0
 * loadout icons
   * add ability to only show the active weapon
 * local player
@@ -156,7 +225,7 @@ Changelog
   * change how progress bars are set (requires changes to MedigunInfo.res)
   * add ability to have custom meter settings based on medigun type
 
-**0.15.0**
+### 0.15.0
 * antifreeze
   * now supports displaying a message when a freeze is occurring
 * killstreaks
@@ -170,119 +239,110 @@ Changelog
   * make player outline calculations more efficient
   * add option to disable health-based calculations
 
-**0.14.1**
+### 0.14.1
 * fix glitches with killstreaks on death
 * add command to help stop flickering issues with player outlines
 
-**0.14.0**
+### 0.14.0
 * add killstreaks module
 
-**0.13.1**
+### 0.13.1
 * fix bleed icons not showing up
 
-**0.13.0**
+### 0.13.0
 * add support for health-based team colored outlines
 
-**0.12.1**
+### 0.12.1
 * fix medigun info not disappearing properly
 * make unloading/pausing/unpausing cleaner and hopefully less error-prone
 
-**0.12.0**
+### 0.12.0
 * add support for HUD features required for casting HUDs
 * add ability to set progress direction via resource file and removed command
 * add setting to allow Vaccinator to have only one charge meter
 * add ability to view medigun charge advantage
 * fix issues with medigun finding
 
-**0.11.3**
+### 0.11.3
 * fix issues with player outlines not changing color after reloads
 
-**0.11.2**
+### 0.11.2
 * fix player outline issues with players not being hooked/unhooked properly
 
-**0.11.1**
+### 0.11.1
 * update offsets for TF2 update on 2014-06-11
 
-**0.11.0**
+### 0.11.0
 * reorganize entire plugin into modules (changing many console variables and commands)
 * add player outlines module
 
-**0.10.0**
+### 0.10.0
 * fix player alias incompatibility with Spec Tools
 * add utility command for setting the direction of a progress bar
 
-**0.9.0**
+### 0.9.0
 * implement medigun info box
 
-**0.8.0**
+### 0.8.0
 * implement player aliasing
 
-**0.7.0**
+### 0.7.0
 * implement loadout icons
 
-**0.6.0**
+### 0.6.0
 * implement status icons as part of spectator GUI
 
-**0.5.0**
+### 0.5.0
 * added option to force refreshing of spectator GUI (partially to fully fixes post-pause issues, YMMV)
 
-**0.4.0**
+### 0.4.0
 * added option (enabled by default) to have icon backgrounds adjust with icons rather than be static
 
-**0.3.0**
+### 0.3.0
 * scale HUD positioning values automatically
 
-**0.2.0**
+### 0.2.0
 * added Vaccinator resistances/Ubers, Soldier banners, Jarate, Mad Milk, bleeding, and on fire icons to display
 
-**0.1.0**
+### 0.1.0
 * initial version
 * Uber, Kritz, marked for death status icons
 * many CVars for customizing appearance
 
 Usage
 -----
-To install, place the `StatusSpec` folder within the `custom` folder in the `tf` directory. Because this plugin is not signed by Valve, you must launch TF2 with the `-insecure` option in order for this plugin to be active and will not be able to use this plugin on VAC-secured servers.
+To install, place the `StatusSpec` folder within the `custom` folder in the `tf` directory. Because this plugin is not signed by Valve, you will not be able to use this plugin on VAC-secured servers and must launch TF2 with the `-insecure` option in order for this plugin to be active.
 
 ### AntiFreeze
 *forces spectator GUI to refresh constantly, eliminating many HUD issues after game unpauses*
 
 #### Console Variables
-* `statusspec_antifreeze_display` - enables display of an info panel when a freeze is detected
-* `statusspec_antifreeze_display_threshold` - the time of a freeze (in seconds) before the info panel is displayed
 * `statusspec_antifreeze_enabled` - enable antifreeze (forces the spectator GUI to refresh)
-* `statusspec_antifreeze_timers` - enable forcing of timers to right values
 
-#### Console Commands
-* `statusspec_antifreeze_display_reload_settings` - reload settings for the freeze info panel from the resource file
+### Camera Auto Switch
+*automatically switches the camera based on game events*
 
-#### UI Resource Files
-The configuration file for the freeze info HUD is `Resource/UI/FreezeInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_antifreeze_display_reload_settings` is provided as a replacement.
+#### Console Variables
+* `statusspec_cameraautoswitch_enabled` - enable automatic switching of camera
+* `statusspec_cameraautoswitch_killer` - switch to killer upon spectated player death
+* `statusspec_cameraautoswitch_killer_delay` - delay before switching to killer
 
-To properly support forced correct timer values, you will also have to adjust `Resource/UI/HudObjectiveTimePanel.res` so that it includes something similar to the `RealTime` section, as demonstrated below.
-```
-"Resource/UI/HudObjectiveTimePanel.res"
-{	
-	...
-	
-	"RealTime"
-	{
-		"ControlName"	"CExLabel"
-		"fieldName"		"RealTime"
-		"font"			"NotoBold22"
-		"fgcolor"		"220 220 220 255"
-		"xpos"			"0"
-		"ypos"			"0"
-		"zpos"			"3"
-		"wide"			"110"
-		"tall"			"19"
-		"visible"		"0"
-		"enabled"		"0"
-		"textAlignment"	"center"
-		"labelText"		""
-	}
-}
-```
+### Camera Smooths
+*smooth transitions between camera positions*
+
+#### Console Variables
+* `statusspec_camerasmooths_enabled` - enable smooth transition between camera positions
+* `statusspec_camerasmooths_max_angle_difference` - max angle difference at which smoothing will be performed
+* `statusspec_camerasmooths_max_distance` - max distance at which smoothing will be performed
+* `statusspec_camerasmooths_move_speed` - speed to move view per second
+
+### Camera State
+*exposes the current SourceTV camera state*
+
+#### Console Variables
+* `statusspec_camerastate_change` - JSON to change camera state to
+* `statusspec_camerastate_current` - JSON of current camera state
+* `statusspec_camerastate_enabled` - enable exposure of camera state
 
 ### Camera Tools
 *allows more options for managing the camera*
@@ -290,20 +350,36 @@ To properly support forced correct timer values, you will also have to adjust `R
 #### Console Commands
 * `statusspec_cameratools_spec_player <index>` - spec a certain player by player index
 * `statusspec_cameratools_spec_player <team> <position>` - spec a certain player by position on spectator HUD
-* `statusspec_cameratools_spec_player_alive` - prevent speccing dead players
 * `statusspec_cameratools_spec_pos <x> <y> <z> <yaw> <pitch>` - spec a certain camera position
-* `statusspec_cameratools_state` - JSON of camera tools state
-* `statusspec_cameratools_state_enabled` - enable exposure of camera tools state
+
+#### Console Variables
+* `statusspec_cameratools_force_mode` - if a valid mode, force the camera mode to this
+* `statusspec_cameratools_force_target` - if a valid target, force the camera target to this
+* `statusspec_cameratools_force_valid_target` - forces the camera to only have valid targets
+* `statusspec_cameratools_spec_player_alive` - prevent speccing dead players
+
+### Console Tools
+*allows more options for managing the console*
+
+#### Console Commands
+* `statusspec_consoletools_filter_add <filter>` - add a console filter
+* `statusspec_consoletools_filter_remove <filter>` - remove a console filter
+* `statusspec_consoletools_flags_add <name> <flag1> [flag2 ...]` - add a flag to a console command or variable
+* `statusspec_consoletools_flags_remove <name> <flag1> [flag2 ...]` - remove a flag from a console command or variable
+
+#### Console Variables
+* `statusspec_consoletools_filter_enabled` - enable console filtering
 
 ### Custom Materials
 *allows materials to be swapped out*
 
-#### Console Variables
-* `statusspec_custommaterials_enabled` - enable custom materials
-
 #### Console Commands
 * `statusspec_custommaterials_load_replacement_group <group>` - load a material replacement group
+* `statusspec_custommaterials_reload_settings` - reload settings for the custom materials from the resource file
 * `statusspec_custommaterials_unload_replacement_group <group>` - unload a material replacement group
+
+#### Console Variables
+* `statusspec_custommaterials_enabled` - enable custom materials
 
 #### Resource Files
 Custom material configuration is loaded from the `Resource/CustomMaterials.res` file. Replacement groups should be configured as sections (whose names are used in the commands for this module). Material replacements should be specified by entries with the path of the old material from the `materials` folder as the key and the path of the new material from the `materials` folder as the value. An example of a configured file is given below:
@@ -321,12 +397,13 @@ Custom material configuration is loaded from the `Resource/CustomMaterials.res` 
 ### Custom Models
 *allows models to be swapped out*
 
-#### Console Variables
-* `statusspec_custommodels_enabled` - enable custom models
-
 #### Console Commands
 * `statusspec_custommodels_load_replacement_group <group>` - load a model replacement group
+* `statusspec_custommodels_reload_settings` - reload settings for the custom models from the resource file
 * `statusspec_custommodels_unload_replacement_group <group>` - unload a model replacement group
+
+#### Console Variables
+* `statusspec_custommodels_enabled` - enable custom models
 
 #### Resource Files
 Custom model configuration is loaded from the `Resource/CustomModels.res` file. Replacement groups should be configured as sections (whose names are used in the commands for this module). Material replacements should be specified by entries with the path of the old model as the key and the path of the new model as the value. An example of a configured file is given below:
@@ -352,12 +429,13 @@ Custom model configuration is loaded from the `Resource/CustomModels.res` file. 
 ### Custom Textures
 *allows textures to be swapped out*
 
-#### Console Variables
-* `statusspec_customtextures_enabled` - enable custom textures
-
 #### Console Commands
 * `statusspec_customtextures_load_replacement_group <group>` - load a texture replacement group
+* `statusspec_customtextures_reload_settings` - reload settings for the custom textures from the resource file
 * `statusspec_customtextures_unload_replacement_group <group>` - unload a texture replacement group
+
+#### Console Variables
+* `statusspec_customtextures_enabled` - enable custom textures
 
 #### Resource Files
 Custom texture configuration is loaded from the `Resource/CustomTextures.res` file. Replacement groups should be configured as sections (whose names are used in the commands for this module). Texture replacements should be specified by entries with the path of the old texture from the `materials` folder as the key and the path of the new texture from the `materials` folder as the value. An example of a configured file is given below:
@@ -380,88 +458,75 @@ Custom texture configuration is loaded from the `Resource/CustomTextures.res` fi
 * `statusspec_fovoverride_fov` - the FOV value used
 * `statusspec_fovoverride_zoomed` - enable FOV override even when sniper rifle is zoomed
 
+### Freeze Info
+*displays info when the game is frozen*
+
+#### Console Commands
+* `statusspec_freezeinfo_reload_settings` - reload settings for the freeze info panel from the resource file
+
+#### Console Variables
+* `statusspec_freezeinfo_enabled` - enables display of an info panel when a freeze is detected
+* `statusspec_freezeinfo_threshold` - the time of a freeze (in seconds) before the info panel is displayed
+
+#### UI Resource Files
+The configuration file for the freeze info HUD is `Resource/UI/FreezeInfo.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_freezeinfo_reload_settings` is provided as a replacement.
+
 ### Killstreaks
-*enables killstreak tracking for all weapons, all players*
+*enables killstreak tracking for all players*
 
 #### Console Variables
 * `statusspec_killstreaks_enabled` - enable killstreaks display
-* `statusspec_killstreaks_total_killfeed` - display total kills for player in killfeed instead of only kills with single weapon
-
-### Loadout Icons
-*displays icons to represent weapons in a player's loadout*
-
-#### Console Variables
-* `statusspec_loadouticons_enabled` - enable loadout icons
-* `statusspec_loadouticons_nonloadout` - enable loadout icons for nonloadout items
-* `statusspec_loadouticons_only_active` - only display loadout icons for the active weapon
-
-#### Console Commands
-* `statusspec_loadouticons_filter_active <red> <green> <blue> <alpha>` - the RGBA filter applied to the icon for an active item
-* `statusspec_loadouticons_filter_inactive <red> <green> <blue> <alpha>` - the RGBA filter applied to the icon for an inactive item
-
-#### UI Resource Files
-The configuration file for the loadout icons is `Resource/UI/LoadoutIcons.res`. To properly support loadout icons, you will also have to adjust `Resource/UI/SpectatorTournament.res` so that it includes something similar to the `LoadoutIcons` section below contained within the `playerpanels_kv` section of the `specgui` section, as demonstrated below.
-```
-"Resource/UI/SpectatorTournament.res"
-{
-	"specgui"
-	{
-		...
-		   
-		"playerpanels_kv"
-		{
-			...
-			
-			"LoadoutIcons"
-			{
-				"ControlName"   "EditablePanel"
-				"fieldName"	 "LoadoutIcons"
-				"xpos"		  "160"
-				"ypos"		  "0"
-				"zpos"		  "2"
-				"wide"		  "45"
-				"tall"		  "15"
-				"visible"	   "1"
-				"enabled"	   "1"
-			}
-		}
-	}
-	
-	...	
-}
-```
 
 ### Local Player
 *changes the local player locally to affect certain HUD elements like the killfeed*
 
+#### Console Commands
+* `statusspec_localplayer_set_current_target` - set the local player to the current spectator target
+
 #### Console Variables
 * `statusspec_localplayer_enabled` - enable local player override
 * `statusspec_localplayer_player` - player index to set as the local player
-
-#### Console Commands
-* `statusspec_localplayer_set_current_target` - set the local player to the current spectator target
+* `statusspec_localplayer_trac_spec_target` - have the local player value track the spectator target
 
 ### Medigun Info
 *displays info about mediguns for both teams*
 
-#### Console Variables
-* `statusspec_mediguninfo_dynamic_meters` - enable charge meters to change based on medigun
-* `statusspec_mediguninfo_enabled` - enable medigun info
-* `statusspec_mediguninfo_individual_charge_meters` - enable individual charge meters (for Vaccinator)
-
 #### Console Commands
 * `statusspec_mediguninfo_reload_settings` - reload settings for the medigun info HUD from the resource file
 
-#### UI Resource Files
-The configuration file for the medigun info HUD is `Resource/UI/MedigunInfo.res`. In addition, the `Resource/UI/MedigunInfoDynamicMeters.res` file is used for the dynamic meters feature, and contains empty sections for each medigun within which you can add progress bar options that will be applied when the specified medigun is being used. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_mediguninfo_reload_settings` is provided as a replacement.
+#### Console Variables
+* `statusspec_mediguninfo_enabled` - enable medigun info
 
-In addition, the following HUD animations are triggered by this plugin and may be used to show events on the HUD:
-* `MedigunInfoBluChargeReady` - triggered when a BLU medigun charge is ready for use
-* `MedigunInfoBluChargeReleased` - triggered when a BLU medigun charge has been released/popped
-* `MedigunInfoBluChargeStop` - triggered when the BLU medigun charge is no longer ready/released
-* `MedigunInfoRedChargeReady` - triggered when a RED medigun charge is ready for use
-* `MedigunInfoRedChargeReleased` - triggered when a RED medigun charge has been released/popped
-* `MedigunInfoRedChargeStop` - triggered when the RED medigun charge is no longer ready/released (after a charge is completed/dropped)
+#### UI Resource Files
+The configuration files for the medigun info HUD are `Resource/UI/MedigunInfo.res`, which controls the overall layout of the panel, and `Resource/UI/MedigunPanel.res`, which controls the display of each medigun. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_mediguninfo_reload_settings` is provided as a replacement.
+
+The medigun panel located in `Resource/UI/MedigunPanel.res` supports conditional sections. This allows the HUD to change based on certain conditions, such as the medigun type or player team, by putting relevant keys within a section named with the condition. Conditions can be stacked by placing one conditional section within another, which will only trigger the contained keys if both conditions are triggered. The following conditions are supported:
+* `charges-0` - no charges are ready
+* `charges-1` - one charge is ready
+* `charges-2` - two charges are ready
+* `charges-3` - three charges are ready
+* `charges-4` - four charges are ready
+* `resist-bullet` - current medigun resistance is bullet
+* `resist-explosive` - current medigun resistance is explosive
+* `resist-fire` - current medigun resistance is fire
+* `medigun-kritzkrieg` - medigun is the Kritzkrieg
+* `medigun-medigun` - medigun is the stock Medi Gun
+* `medigun-quickfix` - medigun is the Quick-Fix
+* `medigun-vaccinator` - medigun is the Vaccinator
+* `player-alive` - player using medigun is currently alive
+* `player-dead` - player using medigun is currently dead
+* `status-building` - charge is being built
+* `status-released` - charge is being used
+* `team-blu` - player using medigun is on the BLU team
+* `team-red` - player using medigun is on the RED team
+
+In addition, certain dialog variables will be set for each medigun panel. They are:
+* `charge` - total percentage of uber filled (out of 100)
+* `charges` - number of Vaccinator charges available
+* `charge1` - percentage of first Vaccinator charge filled (out of 100)
+* `charge2` - percentage of second Vaccinator charge filled (out of 100)
+* `charge3` - percentage of third Vaccinator charge filled (out of 100)
+* `charge4` - percentage of fourth Vaccinator charge filled (out of 100)
 
 ### Multipanel
 *displays panels on top of the main game*
@@ -473,22 +538,22 @@ In addition, the following HUD animations are triggered by this plugin and may b
 ### Player Aliases
 *substitutes in user-defined aliases for player names*
 
-#### Console Variables
-* `statusspec_playeraliases_enabled` - enable player aliases
-* `statusspec_playeraliases_esea` - enable player aliases from the ESEA API
-* `statusspec_playeraliases_etf2l` - enable player aliases from the ETF2L API
-* `statusspec_playeraliases_format_blu` - the name format for BLU players
-* `statusspec_playeraliases_format_red` - the name format for RED players
-* `statusspec_playeraliases_twitch` - enable player aliases from the Twitch API
-
 #### Console Commands
 * `statusspec_playeraliases_get <steamid>` - get an alias for a player
 * `statusspec_playeraliases_remove <steamid>` - remove an alias for a player
 * `statusspec_playeraliases_set <steamid> <alias>` - set an alias for a player
 * `statusspec_playeraliases_switch_teams` - switch name formats for both teams
 
+#### Console Variables
+* `statusspec_playeraliases_enabled` - enable player aliases
+* `statusspec_playeraliases_format_blu` - the name format for BLU players
+* `statusspec_playeraliases_format_red` - the name format for RED players
+
 ### Player Models
 *changes the model used based on the player*
+
+#### Console Commands
+* `statusspec_playermodels_reload_settings` - reload settings for the player models from the resource file
 
 #### Console Variables
 * `statusspec_playermodels_enabled` - enable custom player models
@@ -520,28 +585,12 @@ Player model configuration is loaded from the `Resource/PlayerModels.res` file. 
 }
 ```
 
-### Player Outlines
-*displays bright outlines around players that can be seen through walls*
-
-#### Console Variables
-* `statusspec_playeroutlines_enabled` - enable player outlines
-* `statusspec_playeroutlines_fade` - make outlines fade with distance
-* `statusspec_playeroutlines_fade_distance` - the distance (in Hammer units) at which outlines will fade
-* `statusspec_playeroutlines_health_adjusted_team_colors` - adjusts team colors depending on health of players
-* `statusspec_playeroutlines_team_colors` - override default health-based outline colors with team colors
-
-#### Console Commands
-* `statusspec_playeroutlines_color_blu_buff <red> <green> <blue> [alpha]` - the color used for outlines for BLU team players at max buffed health
-* `statusspec_playeroutlines_color_blu_full <red> <green> <blue> [alpha]` - the color used for outlines for BLU team players at full health
-* `statusspec_playeroutlines_color_blu_low <red> <green> <blue> [alpha]` - the color used for outlines for BLU team players at low health
-* `statusspec_playeroutlines_color_blu_medium <red> <green> <blue> [alpha]` - the color used for outlines for BLU team players at medium health
-* `statusspec_playeroutlines_color_red_buff <red> <green> <blue> [alpha]` - the color used for outlines for RED team players at max buffed health
-* `statusspec_playeroutlines_color_red_full <red> <green> <blue> [alpha]` - the color used for outlines for RED team players at full health
-* `statusspec_playeroutlines_color_red_low <red> <green> <blue> [alpha]` - the color used for outlines for RED team players at low health
-* `statusspec_playeroutlines_color_red_medium <red> <green> <blue> [alpha]` - the color used for outlines for RED team players at medium health
-
 ### Projectile Outlines
 *displays bright outlines around projectiles that can be seen through walls*
+
+#### Console Commands
+* `statusspec_projectileoutlines_color_blu <red> <green> <blue> [alpha]` - the color used for outlines for BLU projectiles
+* `statusspec_projectileoutlines_color_red <red> <green> <blue> [alpha]` - the color used for outlines for RED projectiles
 
 #### Console Variables
 * `statusspec_projectileoutlines_enabled` - enable projectile outlines
@@ -551,89 +600,30 @@ Player model configuration is loaded from the `Resource/PlayerModels.res` file. 
 * `statusspec_projectileoutlines_rockets` - enable outlines for rockets
 * `statusspec_projectileoutlines_stickybombs` - enable outlines for stickybombs
 
-#### Console Commands
-* `statusspec_projectileoutlines_color_blu <red> <green> <blue> [alpha]` - the color used for outlines for BLU projectiles
-* `statusspec_projectileoutlines_color_red <red> <green> <blue> [alpha]` - the color used for outlines for RED projectiles
-
-### Spec GUI Order
-*orders the spec GUI more logically than player indices*
+### Steam Tools
+*allows more options for interacting with Steam*
 
 #### Console Variables
-* `statusspec_specguiorder_enabled` - enable ordering of spec GUI
-* `statusspec_specguiorder_reverse_blu` - reverse order for BLU players
-* `statusspec_specguiorder_reverse_red` - reverse order for RED players
-
-### Status Icons
-*displays icons representing special statuses of a player*
-
-#### Console Variables
-* `statusspec_statusicons_delta_x` - change in the x direction for each icon
-* `statusspec_statusicons_delta_y` - change in the y direction for each icon
-* `statusspec_statusicons_enabled` - enable status icons
-
-#### UI Resource Files
-The configuration file for the status icons is `Resource/UI/StatusIcon.res`. A copy of the elements in that file will be created and configured for each icon. To properly support status icons, you will also have to adjust `Resource/UI/SpectatorTournament.res` so that it includes something similar to the `StatusIcons` section below contained within the `playerpanels_kv` section of the `specgui` section, as demonstrated below.
-```
-"Resource/UI/SpectatorTournament.res"
-{
-	"specgui"
-	{
-		...
-		   
-		"playerpanels_kv"
-		{
-			...
-			
-			"StatusIcons"
-			{
-				"ControlName"   "EditablePanel"
-				"fieldName"	 "StatusIcons"
-				"xpos"		  "160"
-				"ypos"		  "0"
-				"zpos"		  "8"
-				"wide"		  "45"
-				"tall"		  "15"
-				"visible"	   "1"
-				"enabled"	   "1"
-			}
-		}
-	}
-	
-	...	
-}
-```
+* `statusspec_steamtools_rich_presence_status` - the rich presence status displayed to Steam
 
 ### Team Health Comparison
 *displays a comparison of total health between the two teams*
 
-#### Console Variables
-* `statusspec_teamhealthcomparison_enabled` - enable team health comparison
-
 #### Console Commands
 * `statusspec_teamhealthcomparison_reload_settings` - reload settings for the team health comparison HUD from the resource file
+
+#### Console Variables
+* `statusspec_teamhealthcomparison_enabled` - enable team health comparison
 
 #### UI Resource Files
 The configuration file for the team health comparison HUD is `Resource/UI/TeamHealthComparison.res`. This HUD cannot be refreshed using the normal `hud_reloadscheme` because it isn't natively implemented into TF2, and thus the command `statusspec_teamhealthcomparison_reload_settings` is provided as a replacement.
 
-### Team Overrides
-*override team info in HUD*
-
-#### Console Variables
-* `statusspec_teamoverrides_enabled` - enable team overrides
-* `statusspec_teamoverrides_name_blu` - BLU team name
-* `statusspec_teamoverrides_name_red` - RED team name
-* `statusspec_teamoverrides_names` - enable overrides for team names
-* `statusspec_teamoverrides_score_blu` - BLU team score
-* `statusspec_teamoverrides_score_red` - RED team score
-* `statusspec_teamoverrides_scores` - enable overrides for team scores
-
-#### Console Commands
-* `statusspec_teamoverrides_switch_teams` - switch names and scores for both teams
-
 Thanks
 ------
-**bluee (MattMcNam)** - for the inspiration to do this project and for a lot of code reused from his [AdvSpec project](https://github.com/MattMcNam/advspec)
+**Matt McNamara** - for the inspiration to do this project and for a lot of code reused from his [AdvSpec project](https://github.com/MattMcNam/advspec)
 
 **AlliedModders** - for in-depth information about the internals of the Source Engine and for [SourceHook](https://github.com/alliedmodders/metamod-source/tree/master/core/sourcehook)
 
 **Tsuda Kageyu and other contributors** - for [MinHook](https://github.com/TsudaKageyu/minhook)
+
+**Milo Yip and other contributors** - for [RapidJSON](https://github.com/miloyip/rapidjson)

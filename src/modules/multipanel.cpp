@@ -2,7 +2,7 @@
  *  multipanel.cpp
  *  StatusSpec project
  *
- *  Copyright (c) 2014 thesupremecommander
+ *  Copyright (c) 2014-2015 Forward Command Post
  *  BSD 2-Clause License
  *  http://opensource.org/licenses/BSD-2-Clause
  *
@@ -16,40 +16,39 @@
 #include "iclientmode.h"
 #include "vgui/IVGui.h"
 #include "../vgui_controls/gameconsoledialog.h"
+#include "viewport_panel_names.h"
 
 #include "../common.h"
 #include "../ifaces.h"
 
-#define SCOREBOARD_PANEL_NAME "scores"
-
-MultiPanel::MultiPanel(std::string name) : Module(name) {
+MultiPanel::MultiPanel() {
 	consoleDialog = nullptr;
 	scoreboardPanel = vgui::INVALID_PANEL;
 
-	console = new ConVar("statusspec_multipanel_console", "0", FCVAR_NONE, "displays a console in the HUD", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<MultiPanel>("MultiPanel")->ToggleConsole(var, pOldValue, flOldValue); });
-	scoreboard = new ConVar("statusspec_multipanel_scoreboard", "0", FCVAR_NONE, "displays the scoreboard", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<MultiPanel>("MultiPanel")->ToggleScoreboard(var, pOldValue, flOldValue); });
+	console = new ConVar("statusspec_multipanel_console", "0", FCVAR_NONE, "displays a console in the HUD", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<MultiPanel>()->ToggleConsole(var, pOldValue, flOldValue); });
+	scoreboard = new ConVar("statusspec_multipanel_scoreboard", "0", FCVAR_NONE, "displays the scoreboard", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<MultiPanel>()->ToggleScoreboard(var, pOldValue, flOldValue); });
 }
 
-bool MultiPanel::CheckDependencies(std::string name) {
+bool MultiPanel::CheckDependencies() {
 	bool ready = true;
 
 	if (!Interfaces::vguiLibrariesAvailable) {
 		PRINT_TAG();
-		Warning("Required VGUI library for module %s not available!\n", name.c_str());
+		Warning("Required VGUI library for module %s not available!\n", g_ModuleManager->GetModuleName<MultiPanel>().c_str());
 
 		ready = false;
 	}
 
 	if (!g_pVGui) {
 		PRINT_TAG();
-		Warning("Required interface vgui::IVGui for module %s not available!\n", name.c_str());
+		Warning("Required interface vgui::IVGui for module %s not available!\n", g_ModuleManager->GetModuleName<MultiPanel>().c_str());
 
 		ready = false;
 	}
 
 	if (!g_pVGuiPanel) {
 		PRINT_TAG();
-		Warning("Required interface vgui::IPanel for module %s not available!\n", name.c_str());
+		Warning("Required interface vgui::IPanel for module %s not available!\n", g_ModuleManager->GetModuleName<MultiPanel>().c_str());
 
 		ready = false;
 	}
@@ -59,7 +58,7 @@ bool MultiPanel::CheckDependencies(std::string name) {
 	}
 	catch (bad_pointer) {
 		PRINT_TAG();
-		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", name.c_str());
+		Warning("Module %s requires IClientMode, which cannot be verified at this time!\n", g_ModuleManager->GetModuleName<MultiPanel>().c_str());
 	}
 
 	return ready;
@@ -83,7 +82,7 @@ void MultiPanel::InitHud() {
 				for (int i = 0; i < children; i++) {
 					vgui::VPANEL child = g_pVGuiPanel->GetChild(vpanel, i);
 
-					if (strcmp(g_pVGuiPanel->GetName(child), SCOREBOARD_PANEL_NAME) == 0) {
+					if (strcmp(g_pVGuiPanel->GetName(child), PANEL_SCOREBOARD) == 0) {
 						scoreboardPanel = g_pVGui->PanelToHandle(child);
 
 						break;
@@ -123,8 +122,8 @@ void MultiPanel::ToggleScoreboard(IConVar *var, const char *pOldValue, float flO
 			IViewPort *viewport = dynamic_cast<IViewPort *>(Interfaces::GetClientMode()->GetViewport());
 
 			if (viewport) {
-				viewport->ShowPanel(SCOREBOARD_PANEL_NAME, true);
-				viewport->ShowPanel(SCOREBOARD_PANEL_NAME, false);
+				viewport->ShowPanel(PANEL_SCOREBOARD, true);
+				viewport->ShowPanel(PANEL_SCOREBOARD, false);
 			}
 		}
 

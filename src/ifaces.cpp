@@ -2,7 +2,7 @@
  *  ifaces.cpp
  *  StatusSpec project
  *  
- *  Copyright (c) 2014 thesupremecommander
+ *  Copyright (c) 2014-2015 Forward Command Post
  *  BSD 2-Clause License
  *  http://opensource.org/licenses/BSD-2-Clause
  *
@@ -17,9 +17,12 @@
 #include "filesystem_init.h"
 #include "icliententitylist.h"
 #include "igameevents.h"
+#include "iprediction.h"
 #include "ivrenderview.h"
 #include "steam/steam_api.h"
 #include "teamplayroundbased_gamerules.h"
+#include "toolframework/iclientenginetools.h"
+#include "toolframework/ienginetool.h"
 #include "tier3/tier3.h"
 #include "vgui_controls/Controls.h"
 
@@ -27,11 +30,13 @@
 #include "gamedata.h"
 
 IBaseClientDLL *Interfaces::pClientDLL = nullptr;
+IClientEngineTools *Interfaces::pClientEngineTools = nullptr;
 IClientEntityList *Interfaces::pClientEntityList = nullptr;
-CDllDemandLoader *Interfaces::pClientModule = nullptr;
 IVEngineClient *Interfaces::pEngineClient = nullptr;
+IEngineTool *Interfaces::pEngineTool = nullptr;
 IFileSystem *Interfaces::pFileSystem = nullptr;
 IGameEventManager2 *Interfaces::pGameEventManager = nullptr;
+IPrediction *Interfaces::pPrediction = nullptr;
 IVModelInfoClient *Interfaces::pModelInfoClient = nullptr;
 IVRenderView *Interfaces::pRenderView = nullptr;
 CSteamAPIContext *Interfaces::pSteamAPIContext = nullptr;
@@ -65,57 +70,6 @@ IClientMode *Interfaces::GetClientMode() {
 #endif
 }
 
-IGameResources *Interfaces::GetGameResources() {
-#if defined _WIN32
-	static DWORD pointer = NULL;
-
-	if (!pointer) {
-		pointer = SignatureScan("client", GAMERESOURCES_SIG, GAMERESOURCES_MASK);
-
-		if (!pointer) {
-			throw bad_pointer("IGameResources");
-		}
-	}
-
-	GGR_t GGR = (GGR_t) pointer;
-	IGameResources *gr = GGR();
-
-	if (!gr) {
-		throw bad_pointer("IGameResources");
-	}
-
-	return gr;
-#else
-	throw bad_pointer("IGameResources");
-
-	return nullptr;
-#endif
-}
-
-CGlobalVarsBase *Interfaces::GetGlobalVars() {
-#if defined _WIN32
-	static DWORD pointer = NULL;
-
-	if (!pointer) {
-		pointer = SignatureScan("client", GPGLOBALS_SIG, GPGLOBALS_MASK) + GPGLOBALS_OFFSET;
-
-		if (!pointer) {
-			throw bad_pointer("CGlobalVarsBase");
-		}
-	}
-
-	if (!**(CGlobalVarsBase***)pointer) {
-		throw bad_pointer("CGlobalVarsBase");
-	}
-
-	return **(CGlobalVarsBase***)(pointer);
-#else
-	throw bad_pointer("CGlobalVarsBase");
-
-	return nullptr;
-#endif
-}
-
 C_HLTVCamera *Interfaces::GetHLTVCamera() {
 #if defined _WIN32
 	static DWORD pointer = NULL;
@@ -140,30 +94,6 @@ C_HLTVCamera *Interfaces::GetHLTVCamera() {
 #endif
 }
 
-C_TeamplayRoundBasedRules *Interfaces::GetTeamplayRoundBasedRules() {
-#if defined _WIN32
-	static DWORD pointer = NULL;
-
-	if (!pointer) {
-		pointer = SignatureScan("client", TEAMPLAYROUNDBASEDRULES_SIG, TEAMPLAYROUNDBASEDRULES_MASK) + TEAMPLAYROUNDBASEDRULES_OFFSET;
-
-		if (!pointer) {
-			throw bad_pointer("C_TeamplayRoundBasedRules");
-		}
-	}
-
-	if (!**(C_TeamplayRoundBasedRules***)pointer) {
-		throw bad_pointer("C_TeamplayRoundBasedRules");
-	}
-
-	return **(C_TeamplayRoundBasedRules***)(pointer);
-#else
-	throw bad_pointer("C_TeamplayRoundBasedRules");
-
-	return nullptr;
-#endif
-}
-
 void Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory) {
 	ConnectTier1Libraries(&interfaceFactory, 1);
 	ConnectTier2Libraries(&interfaceFactory, 1);
@@ -171,17 +101,19 @@ void Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 	
 	vguiLibrariesAvailable = vgui::VGui_InitInterfacesList("statusspec", &interfaceFactory, 1);
 	
+	pClientEngineTools = (IClientEngineTools *)interfaceFactory(VCLIENTENGINETOOLS_INTERFACE_VERSION, nullptr);
 	pEngineClient = (IVEngineClient *)interfaceFactory(VENGINE_CLIENT_INTERFACE_VERSION, nullptr);
+	pEngineTool = (IEngineTool *)interfaceFactory(VENGINETOOL_INTERFACE_VERSION, nullptr);
 	pGameEventManager = (IGameEventManager2 *)interfaceFactory(INTERFACEVERSION_GAMEEVENTSMANAGER2, nullptr);
 	pModelInfoClient = (IVModelInfoClient *)interfaceFactory(VMODELINFO_CLIENT_INTERFACE_VERSION, nullptr);
 	pRenderView = (IVRenderView *)interfaceFactory(VENGINE_RENDERVIEW_INTERFACE_VERSION, nullptr);
 	
-	pClientModule = new CDllDemandLoader(CLIENT_MODULE_FILE);
-
-	CreateInterfaceFn gameClientFactory = pClientModule->GetFactory();
+	CreateInterfaceFn gameClientFactory;
+	pEngineTool->GetClientFactory(gameClientFactory);
 	
 	pClientDLL = (IBaseClientDLL*)gameClientFactory(CLIENT_DLL_INTERFACE_VERSION, nullptr);
 	pClientEntityList = (IClientEntityList*)gameClientFactory(VCLIENTENTITYLIST_INTERFACE_VERSION, nullptr);
+	pPrediction = (IPrediction *)gameClientFactory(VCLIENT_PREDICTION_INTERFACE_VERSION, nullptr);
 
 	pSteamAPIContext = new CSteamAPIContext();
 	steamLibrariesAvailable = SteamAPI_InitSafe() && pSteamAPIContext->Init();
@@ -221,9 +153,6 @@ void Interfaces::Unload() {
 	DisconnectTier1Libraries();
 	
 	pSteamAPIContext->Clear();
-
-	pClientModule->Unload();
-	pClientModule = nullptr;
 	
 	pClientDLL = nullptr;
 	pClientEntityList = nullptr;

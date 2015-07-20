@@ -2,7 +2,7 @@
  *  common.h
  *  StatusSpec project
  *
- *  Copyright (c) 2014 thesupremecommander
+ *  Copyright (c) 2014-2015 Forward Command Post
  *  BSD 2-Clause License
  *  http://opensource.org/licenses/BSD-2-Clause
  *
@@ -18,43 +18,11 @@
 #include "Color.h"
 #include "dbg.h"
 #include "steam/steamclientpublic.h"
+#include "strtools.h"
 
 class ConCommand;
 
-#define TEXTURE_NULL "vgui/replay/thumbnails/null"
-#define TEXTURE_UBERCHARGE "vgui/replay/thumbnails/ubercharge"
-#define TEXTURE_CRITBOOST "vgui/replay/thumbnails/critboost"
-#define TEXTURE_MEGAHEALRED "vgui/replay/thumbnails/megaheal_red"
-#define TEXTURE_MEGAHEALBLU "vgui/replay/thumbnails/megaheal_blue"
-#define TEXTURE_RESISTSHIELDRED "vgui/replay/thumbnails/resist_shield"
-#define TEXTURE_RESISTSHIELDBLU "vgui/replay/thumbnails/resist_shield_blue"
-#define TEXTURE_BULLETRESISTRED "vgui/replay/thumbnails/defense_buff_bullet_red"
-#define TEXTURE_BLASTRESISTRED "vgui/replay/thumbnails/defense_buff_explosion_red"
-#define TEXTURE_FIRERESISTRED "vgui/replay/thumbnails/defense_buff_fire_red"
-#define TEXTURE_BULLETRESISTBLU "vgui/replay/thumbnails/defense_buff_bullet_blue"
-#define TEXTURE_BLASTRESISTBLU "vgui/replay/thumbnails/defense_buff_explosion_blue"
-#define TEXTURE_FIRERESISTBLU "vgui/replay/thumbnails/defense_buff_fire_blue"
-#define TEXTURE_BUFFBANNERRED "effects/soldier_buff_offense_red"
-#define TEXTURE_BUFFBANNERBLU "effects/soldier_buff_offense_blue"
-#define TEXTURE_BATTALIONSBACKUPRED "effects/soldier_buff_defense_red"
-#define TEXTURE_BATTALIONSBACKUPBLU "effects/soldier_buff_defense_blue"
-#define TEXTURE_CONCHERORRED "effects/soldier_buff_healonhit_red"
-#define TEXTURE_CONCHERORBLU "effects/soldier_buff_healonhit_blue"
-#define TEXTURE_JARATE "vgui/replay/thumbnails/jarated"
-#define TEXTURE_MADMILK "vgui/bleed_drop"
-#define TEXTURE_MARKFORDEATH "vgui/marked_for_death"
-#define TEXTURE_BLEEDING "vgui/bleed_drop"
-#define TEXTURE_FIRE "hud/leaderboard_class_pyro"
-
-typedef struct Replacement {
-	std::string group;
-	std::string replacement;
-} Replacement;
-
-typedef struct ColorConCommand {
-	Color color;
-	ConCommand *command;
-} ColorConCommand;
+#define GAME_PANEL_MODULE "ClientDLL"
 
 inline void FindAndReplaceInString(std::string &str, const std::string &find, const std::string &replace) {
 	if (find.empty())
@@ -66,14 +34,6 @@ inline void FindAndReplaceInString(std::string &str, const std::string &find, co
 		str.replace(start_pos, find.length(), replace);
 		start_pos += replace.length();
 	}
-}
-
-inline float ChangeScale(float currentValue, float currentMin, float currentMax, float newMin, float newMax) {
-	float deltaScaler = ((newMax - newMin) / (currentMax - currentMin));
-	float newDelta = ((currentValue - currentMin) * deltaScaler);
-	float newValue = newMin + newDelta;
-
-	return newValue;
 }
 
 inline int ColorRangeRestrict(int color) {
@@ -105,14 +65,18 @@ inline std::string ConvertTreeToString(std::vector<std::string> tree) {
 	std::stringstream ss;
 	std::string string;
 
-	for (auto iterator = tree.begin(); iterator != tree.end(); ++iterator) {
+	for (std::string branch : tree) {
 		ss << ">";
-		ss << *iterator;
+		ss << branch;
 	}
 
 	ss >> string;
 
 	return string;
+}
+
+inline void GetPropIndexString(int index, char string[]) {
+	V_snprintf(string, sizeof(string), "%03i", index);
 }
 
 inline std::string GetVGUITexturePath(std::string normalTexturePath) {
@@ -122,5 +86,5 @@ inline std::string GetVGUITexturePath(std::string normalTexturePath) {
 	return path;
 }
 
-#define PLUGIN_VERSION "0.24.0"
+#define PLUGIN_VERSION "0.25.0"
 #define PRINT_TAG() ConColorMsg(Color(0, 153, 153, 255), "[StatusSpec] ")

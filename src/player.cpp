@@ -2,7 +2,7 @@
  *  player.cpp
  *  StatusSpec project
  *
- *  Copyright (c) 2014 thesupremecommander
+ *  Copyright (c) 2014-2015 Forward Command Post
  *  BSD 2-Clause License
  *  http://opensource.org/licenses/BSD-2-Clause
  *
@@ -13,12 +13,14 @@
 #include <cstdint>
 
 #include "cbase.h"
+#include "c_basecombatcharacter.h"
 #include "c_baseentity.h"
 #include "cdll_int.h"
 #include "globalvars_base.h"
 #include "icliententity.h"
 #include "icliententitylist.h"
 #include "steam/steam_api.h"
+#include "toolframework/ienginetool.h"
 
 #include "common.h"
 #include "entities.h"
@@ -218,7 +220,7 @@ Player::operator bool() const {
 }
 
 bool Player::IsValid() const {
-	return playerEntity.IsValid() && playerEntity.Get() && playerEntity->entindex() >= 1 && playerEntity->entindex() <= Interfaces::GetGlobalVars()->maxClients && Entities::CheckEntityBaseclass(playerEntity, "TFPlayer");
+	return playerEntity.IsValid() && playerEntity.Get() && playerEntity->entindex() >= 1 && playerEntity->entindex() <= Interfaces::pEngineTool->GetMaxClients() && Entities::CheckEntityBaseclass(playerEntity, "TFPlayer");
 }
 
 Player::operator IClientEntity *() const {
@@ -376,6 +378,14 @@ int Player::GetUserID() const {
 	return 0;
 }
 
+C_BaseCombatWeapon *Player::GetWeapon(int i) const {
+	if (IsValid()) {
+		return dynamic_cast<C_BaseCombatCharacter *>(playerEntity.Get())->GetWeapon(i);
+	}
+
+	return nullptr;
+}
+
 bool Player::IsAlive() const {
 	if (IsValid()) {
 		return dynamic_cast<C_BaseEntity *>(playerEntity.Get())->IsAlive();
@@ -395,7 +405,7 @@ Player::Iterator& Player::Iterator::operator=(const Player::Iterator& old) {
 };
 
 Player::Iterator& Player::Iterator::operator++() {
-	for (int i = index + 1; i <= Interfaces::GetGlobalVars()->maxClients; i++) {
+	for (int i = index + 1; i <= Interfaces::pEngineTool->GetMaxClients(); i++) {
 		if (Player(i)) {
 			index = i;
 
@@ -403,7 +413,7 @@ Player::Iterator& Player::Iterator::operator++() {
 		}
 	}
 
-	index = Interfaces::GetGlobalVars()->maxClients + 1;
+	index = Interfaces::pEngineTool->GetMaxClients() + 1;
 
 	return *this;
 };
@@ -420,7 +430,7 @@ void swap(Player::Iterator& lhs, Player::Iterator& rhs) {
 Player::Iterator Player::Iterator::operator++(int) {
 	Player::Iterator current(*this);
 
-	for (int i = index + 1; i <= Interfaces::GetGlobalVars()->maxClients; i++) {
+	for (int i = index + 1; i <= Interfaces::pEngineTool->GetMaxClients(); i++) {
 		if (Player(i)) {
 			index = i;
 
@@ -428,7 +438,7 @@ Player::Iterator Player::Iterator::operator++(int) {
 		}
 	}
 
-	index = Interfaces::GetGlobalVars()->maxClients + 1;
+	index = Interfaces::pEngineTool->GetMaxClients() + 1;
 
 	return current;
 }
@@ -446,7 +456,7 @@ bool operator!=(const Player::Iterator& lhs, const Player::Iterator& rhs) {
 }
 
 Player::Iterator::Iterator() {
-	for (int i = 1; i <= Interfaces::GetGlobalVars()->maxClients; i++) {
+	for (int i = 1; i <= Interfaces::pEngineTool->GetMaxClients(); i++) {
 		if (Player(i)) {
 			index = i;
 
@@ -454,7 +464,7 @@ Player::Iterator::Iterator() {
 		}
 	}
 
-	index = Interfaces::GetGlobalVars()->maxClients + 1;
+	index = Interfaces::pEngineTool->GetMaxClients() + 1;
 
 	return;
 }
@@ -498,7 +508,15 @@ Player::Iterator Player::begin() {
 }
 
 Player::Iterator Player::end() {
-	return Player::Iterator(Interfaces::GetGlobalVars()->maxClients + 1);
+	return Player::Iterator(Interfaces::pEngineTool->GetMaxClients() + 1);
+}
+
+Player::Iterator Player::Iterable::begin() {
+	return Player::begin();
+}
+
+Player::Iterator Player::Iterable::end() {
+	return Player::end();
 }
 
 bool Player::classRetrievalAvailable = false;
@@ -518,12 +536,9 @@ bool Player::CheckDependencies() {
 		ready = false;
 	}
 
-	try {
-		Interfaces::GetGlobalVars();
-	}
-	catch (bad_pointer) {
+	if (!Interfaces::pEngineTool) {
 		PRINT_TAG();
-		Warning("Required interface CGlobalVarsBase for player helper class not available!\n");
+		Warning("Required interface IEngineTool for player helper class not available!\n");
 
 		ready = false;
 	}

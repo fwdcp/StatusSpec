@@ -1,6 +1,0 @@
-"UnlitGeneric"
-{
-	"$baseTexture" "dev/null"
-	$translucent 1
-	$vertexcolor 1
-}

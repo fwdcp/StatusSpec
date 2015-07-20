@@ -2,7 +2,7 @@
  *  killstreaks.h
  *  StatusSpec project
  *
- *  Copyright (c) 2014 thesupremecommander
+ *  Copyright (c) 2014-2015 Forward Command Post
  *  BSD 2-Clause License
  *  http://opensource.org/licenses/BSD-2-Clause
  *
@@ -15,37 +15,21 @@
 
 class C_BaseEntity;
 class ConVar;
-class IGameEvent;
+class IConVar;
 
-#include "cdll_int.h"
 #include "ehandle.h"
 
 #include "../modules.h"
 
 class Killstreaks : public Module {
 public:
-	Killstreaks(std::string name);
+	Killstreaks();
 
-	static bool CheckDependencies(std::string name);
-
-	bool FireEventClientSideOverride(IGameEvent *event);
-	void FrameHook(ClientFrameStage_t curStage);
+	static bool CheckDependencies();
 private:
-	int bluTopKillstreak;
-	int bluTopKillstreakPlayer;
-	std::map<int, std::map<std::string, int>> currentKillstreaks;
-	int fireEventClientSideHook;
-	int frameHook;
-	CHandle<C_BaseEntity> gameResourcesEntity;
-	int redTopKillstreak;
-	int redTopKillstreakPlayer;
-
-	int GetCurrentSlotKillstreak(int userid, int slot);
-	int GetCurrentPlayerKillstreak(int userid);
-	int GetKillTypeSlot(std::string killType);
-	bool IsAttributableKill(std::string killType);
+	class Panel;
+	Panel *panel;
 
 	ConVar *enabled;
-	ConVar *total_killfeed;
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);
 };

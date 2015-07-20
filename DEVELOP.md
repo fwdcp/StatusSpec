@@ -15,7 +15,7 @@ Requirements
 * Source SDK 2013 - https://github.com/ValveSoftware/source-sdk-2013
 * Metamod:Source - https://github.com/alliedmodders/metamod-source
 * MinHook - https://github.com/TsudaKageyu/minhook
-* JsonCpp - https://github.com/open-source-parsers/jsoncpp
+* RapidJSON - https://github.com/miloyip/rapidjson
 
 Setup
 -----
@@ -25,7 +25,7 @@ Setup
 4. Adjust the `MMSOURCE_DEV` macro in `statusspec.vpc` to the path of the Metamod:Source repository on disk.
 5. Adjust the `MINHOOK` macro in `statusspec.vpc` to the path of MinHook repository on disk.
 6. Adjust the `MINHOOK_BUILD` macro in `statusspec.vpc` to the path of the Visual Studio project directory you used to build MinHook in step #2.
-7. Adjust the `JSONCPP` macro in `statusspec.vpc` to the path of the directory containing the generated JsonCpp files from step #3 (usually the `dist` directory in the JsonCpp repository).
+7. Adjust the `RAPIDJSON` macro in `statusspec.vpc` to the path of the RapidJSON include directory (usually the `include` directory in the JsonCpp repository).
 8. Add the contents of this repository's `build_tools/project.vgc` to `mp/src/vpc_scripts/projects.vgc` within the Source SDK 2013 repository.
 9. Copy this repository's `build_tools/createstatusspec.bat` or `build_tools/createstatusspec` (depending on platform) to `mp/src` within the Source SDK 2013 repository.
 10. Run the script file you copied in the previous step to generate platform-appropriate project files.
