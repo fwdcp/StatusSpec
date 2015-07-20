@@ -10,21 +10,34 @@
 
 #include "localplayer.h"
 
+#include <functional>
 #include <string>
 
 #include "cbase.h"
 #include "c_baseplayer.h"
+#include "cdll_int.h"
 #include "convar.h"
 #include "shareddefs.h"
+#include "vgui/IVGui.h"
+#include "vgui_controls/Panel.h"
 
 #include "../common.h"
 #include "../funcs.h"
 #include "../ifaces.h"
 #include "../player.h"
 
+class LocalPlayer::Panel : public vgui::Panel {
+public:
+	Panel(vgui::Panel *parent, const char *panelName, std::function<void()> setFunction);
+
+	virtual void OnTick();
+private:
+	std::function<void()> setToCurrentTarget;
+};
+
 LocalPlayer::LocalPlayer() {
-	frameHook = 0;
 	getLocalPlayerIndexDetoured = false;
+	panel = nullptr;
 
 	enabled = new ConVar("statusspec_localplayer_enabled", "0", FCVAR_NONE, "enable local player override", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<LocalPlayer>()->ToggleEnabled(var, pOldValue, flOldValue); });
 	player = new ConVar("statusspec_localplayer_player", "0", FCVAR_NONE, "player index to set as the local player");
@@ -67,14 +80,6 @@ bool LocalPlayer::CheckDependencies() {
 	}
 
 	return ready;
-}
-
-void LocalPlayer::FrameHook(ClientFrameStage_t curStage) {
-	if (curStage == FRAME_START) {
-		if (track_spec_target->GetBool() && Interfaces::pEngineClient->IsInGame()) {
-			SetToCurrentTarget();
-		}
-	}
 }
 
 int LocalPlayer::GetLocalPlayerIndexOverride() {
@@ -121,16 +126,31 @@ void LocalPlayer::ToggleEnabled(IConVar *var, const char *pOldValue, float flOld
 }
 
 void LocalPlayer::ToggleTrackSpecTarget(IConVar *var, const char *pOldValue, float flOldValue) {
-	if (enabled->GetBool()) {
-		if (!frameHook) {
-			frameHook = Funcs::AddHook_IBaseClientDLL_FrameStageNotify(Interfaces::pClientDLL, SH_MEMBER(this, &LocalPlayer::FrameHook), true);
+	if (track_spec_target->GetBool()) {
+		if (!panel) {
+			panel = new Panel(nullptr, "LocalPlayer", std::bind(&LocalPlayer::SetToCurrentTarget, this));
+		}
+
+		if (panel) {
+			panel->SetEnabled(true);
 		}
 	}
 	else {
-		if (frameHook) {
-			if (Funcs::RemoveHook(frameHook)) {
-				frameHook = 0;
-			}
+		if (panel) {
+			delete panel;
+			panel = nullptr;
 		}
+	}
+}
+
+LocalPlayer::Panel::Panel(vgui::Panel *parent, const char *panelName, std::function<void()> setFunction) : vgui::Panel(parent, panelName) {
+	g_pVGui->AddTickSignal(GetVPanel());
+
+	setToCurrentTarget = setFunction;
+}
+
+void LocalPlayer::Panel::OnTick() {
+	if (Interfaces::pEngineClient->IsInGame()) {
+		setToCurrentTarget();
 	}
 }

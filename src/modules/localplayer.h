@@ -12,8 +12,7 @@
 
 class ConCommand;
 class ConVar;
-
-#include "cdll_int.h"
+class IConVar;
 
 #include "../modules.h"
 
@@ -23,10 +22,11 @@ public:
 
 	static bool CheckDependencies();
 private:
-	void FrameHook(ClientFrameStage_t curStage);
 	int GetLocalPlayerIndexOverride();
 
-	int frameHook;
+	class Panel;
+	Panel *panel;
+
 	bool getLocalPlayerIndexDetoured;
 
 	ConVar *enabled;
