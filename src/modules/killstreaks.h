@@ -15,9 +15,8 @@
 
 class C_BaseEntity;
 class ConVar;
-class IGameEvent;
+class IConVar;
 
-#include "cdll_int.h"
 #include "ehandle.h"
 
 #include "../modules.h"
@@ -28,17 +27,8 @@ public:
 
 	static bool CheckDependencies();
 private:
-	bool FireEventClientSideOverride(IGameEvent *event);
-	void FrameHook(ClientFrameStage_t curStage);
-
-	int bluTopKillstreak;
-	int bluTopKillstreakPlayer;
-	std::map<int, int> currentKillstreaks;
-	int fireEventClientSideHook;
-	int frameHook;
-	CHandle<C_BaseEntity> gameResourcesEntity;
-	int redTopKillstreak;
-	int redTopKillstreakPlayer;
+	class Panel;
+	Panel *panel;
 
 	ConVar *enabled;
 	void ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue);

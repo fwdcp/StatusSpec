@@ -18,6 +18,7 @@
 #include "Color.h"
 #include "dbg.h"
 #include "steam/steamclientpublic.h"
+#include "strtools.h"
 
 class ConCommand;
 
@@ -90,6 +91,10 @@ inline std::string ConvertTreeToString(std::vector<std::string> tree) {
 	ss >> string;
 
 	return string;
+}
+
+inline void GetPropIndexString(int index, char string[]) {
+	V_snprintf(string, sizeof(string), "%03i", index);
 }
 
 inline std::string GetVGUITexturePath(std::string normalTexturePath) {
