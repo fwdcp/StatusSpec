@@ -6,7 +6,7 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
-### WIP
+### 0.25.0
 * general
   * increased reliability
   * optimized performance and size
