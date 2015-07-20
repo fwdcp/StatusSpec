@@ -25,6 +25,11 @@ public:
 
 	static bool CheckDependencies();
 private:
+	struct Replacement {
+		std::string group;
+		std::string replacement;
+	};
+
 	KeyValues *textureConfig;
 	std::map<std::string, Replacement> textureReplacements;
 

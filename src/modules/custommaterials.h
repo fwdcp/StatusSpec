@@ -28,6 +28,11 @@ public:
 private:
 	IMaterial *FindMaterialOverride(char const *pMaterialName, const char *pTextureGroupName, bool complain = true, const char *pComplainPrefix = NULL);
 
+	struct Replacement {
+		std::string group;
+		std::string replacement;
+	};
+
 	int findMaterialHook;
 	KeyValues *materialConfig;
 	std::map<std::string, Replacement> materialReplacements;

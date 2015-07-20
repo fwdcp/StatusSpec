@@ -29,6 +29,11 @@ public:
 private:
 	void SetModelOverride(C_BaseEntity *entity, const model_t *&model);
 
+	struct Replacement {
+		std::string group;
+		std::string replacement;
+	};
+
 	KeyValues *modelConfig;
 	std::map<std::string, Replacement> modelReplacements;
 	int setModelHook;

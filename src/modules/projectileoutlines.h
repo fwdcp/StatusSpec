@@ -26,6 +26,11 @@ private:
 	void UpdateGlowFades(Vector origin);
 	void UpdateGlows();
 
+	struct ColorConCommand {
+		Color color;
+		ConCommand *command;
+	};
+
 	std::map<std::string, ColorConCommand> colors;
 	std::map<EHANDLE, GlowManager::GlowObject *> glows;
 

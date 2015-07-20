@@ -24,16 +24,6 @@ class ConCommand;
 
 #define GAME_PANEL_MODULE "ClientDLL"
 
-typedef struct Replacement {
-	std::string group;
-	std::string replacement;
-} Replacement;
-
-typedef struct ColorConCommand {
-	Color color;
-	ConCommand *command;
-} ColorConCommand;
-
 inline void FindAndReplaceInString(std::string &str, const std::string &find, const std::string &replace) {
 	if (find.empty())
 		return;
@@ -44,14 +34,6 @@ inline void FindAndReplaceInString(std::string &str, const std::string &find, co
 		str.replace(start_pos, find.length(), replace);
 		start_pos += replace.length();
 	}
-}
-
-inline float ChangeScale(float currentValue, float currentMin, float currentMax, float newMin, float newMax) {
-	float deltaScaler = ((newMax - newMin) / (currentMax - currentMin));
-	float newDelta = ((currentValue - currentMin) * deltaScaler);
-	float newValue = newMin + newDelta;
-
-	return newValue;
 }
 
 inline int ColorRangeRestrict(int color) {
