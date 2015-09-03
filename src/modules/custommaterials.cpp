@@ -21,7 +21,7 @@
 CustomMaterials::CustomMaterials() {
 	findMaterialHook = 0;
 	materialConfig = new KeyValues("materials");
-	materialConfig->LoadFromFile(Interfaces::pFileSystem, "resource/custommaterials.res", "mod");
+	materialConfig->LoadFromFile(g_pFullFileSystem, "resource/custommaterials.res", "mod");
 
 	enabled = new ConVar("statusspec_custommaterials_enabled", "0", FCVAR_NONE, "enable custom materials", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CustomMaterials>()->ToggleEnabled(var, pOldValue, flOldValue); });
 	load_replacement_group = new ConCommand("statusspec_custommaterials_load_replacement_group", [](const CCommand &command) { g_ModuleManager->GetModule<CustomMaterials>()->LoadReplacementGroup(command); }, "load a material replacement group", FCVAR_NONE);
@@ -32,7 +32,7 @@ CustomMaterials::CustomMaterials() {
 bool CustomMaterials::CheckDependencies() {
 	bool ready = true;
 
-	if (!Interfaces::pFileSystem) {
+	if (!g_pFullFileSystem) {
 		PRINT_TAG();
 		Warning("Required interface IFileSystem for module %s not available!\n", g_ModuleManager->GetModuleName<CustomMaterials>().c_str());
 
@@ -86,7 +86,7 @@ void CustomMaterials::LoadReplacementGroup(const CCommand &command) {
 
 void CustomMaterials::ReloadSettings() {
 	materialConfig = new KeyValues("materials");
-	materialConfig->LoadFromFile(Interfaces::pFileSystem, "resource/custommaterials.res", "mod");
+	materialConfig->LoadFromFile(g_pFullFileSystem, "resource/custommaterials.res", "mod");
 }
 
 void CustomMaterials::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {

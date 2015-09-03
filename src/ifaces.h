@@ -19,7 +19,6 @@ class IClientEngineTools;
 class IClientEntityList;
 class IClientMode;
 class IEngineTool;
-class IFileSystem;
 class IGameEventManager2;
 class IPrediction;
 class IVEngineClient;
@@ -36,7 +35,6 @@ class Interfaces {
 		static IClientEntityList *pClientEntityList;
 		static IVEngineClient *pEngineClient;
 		static IEngineTool *pEngineTool;
-		static IFileSystem *pFileSystem;
 		static IGameEventManager2 *pGameEventManager;
 		static IVModelInfoClient *pModelInfoClient;
 		static IPrediction *pPrediction;

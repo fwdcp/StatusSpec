@@ -14,7 +14,6 @@
 #include "cdll_int.h"
 #include "engine/ivmodelinfo.h"
 #include "entitylist_base.h"
-#include "filesystem_init.h"
 #include "icliententitylist.h"
 #include "igameevents.h"
 #include "iprediction.h"
@@ -34,7 +33,6 @@ IClientEngineTools *Interfaces::pClientEngineTools = nullptr;
 IClientEntityList *Interfaces::pClientEntityList = nullptr;
 IVEngineClient *Interfaces::pEngineClient = nullptr;
 IEngineTool *Interfaces::pEngineTool = nullptr;
-IFileSystem *Interfaces::pFileSystem = nullptr;
 IGameEventManager2 *Interfaces::pGameEventManager = nullptr;
 IPrediction *Interfaces::pPrediction = nullptr;
 IVModelInfoClient *Interfaces::pModelInfoClient = nullptr;
@@ -119,32 +117,6 @@ void Interfaces::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn game
 	steamLibrariesAvailable = SteamAPI_InitSafe() && pSteamAPIContext->Init();
 
 	g_pEntityList = dynamic_cast<CBaseEntityList *>(Interfaces::pClientEntityList);
-
-	char dll[MAX_PATH];
-	bool steam;
-	if (FileSystem_GetFileSystemDLLName(dll, sizeof(dll), steam) == FS_OK) {
-		CFSLoadModuleInfo fsLoadModuleInfo;
-		fsLoadModuleInfo.m_bSteam = steam;
-		fsLoadModuleInfo.m_pFileSystemDLLName = dll;
-		fsLoadModuleInfo.m_ConnectFactory = interfaceFactory;
-
-		if (FileSystem_LoadFileSystemModule(fsLoadModuleInfo) == FS_OK) {
-			CFSMountContentInfo fsMountContentInfo;
-			fsMountContentInfo.m_bToolsMode = fsLoadModuleInfo.m_bToolsMode;
-			fsMountContentInfo.m_pDirectoryName = fsLoadModuleInfo.m_GameInfoPath;
-			fsMountContentInfo.m_pFileSystem = fsLoadModuleInfo.m_pFileSystem;
-
-			if (FileSystem_MountContent(fsMountContentInfo) == FS_OK) {
-				CFSSearchPathsInit fsSearchPathsInit;
-				fsSearchPathsInit.m_pDirectoryName = fsLoadModuleInfo.m_GameInfoPath;
-				fsSearchPathsInit.m_pFileSystem = fsLoadModuleInfo.m_pFileSystem;
-
-				if (FileSystem_LoadSearchPaths(fsSearchPathsInit) == FS_OK) {
-					Interfaces::pFileSystem = fsLoadModuleInfo.m_pFileSystem;
-				}
-			}
-		}
-	}
 }
 
 void Interfaces::Unload() {
@@ -157,7 +129,6 @@ void Interfaces::Unload() {
 	pClientDLL = nullptr;
 	pClientEntityList = nullptr;
 	pEngineClient = nullptr;
-	pFileSystem = nullptr;
 	pGameEventManager = nullptr;
 	pRenderView = nullptr;
 }
