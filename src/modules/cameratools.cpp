@@ -241,12 +241,15 @@ void CameraTools::ReloadSpecPlayerSettings() {
 
 	if (settings) {
 		specguiSettings = settings->MakeCopy();
+
+		ConVarRef minmode("cl_hud_minmode", true);
+
+		if (minmode.IsValid() && minmode.GetBool()) {
+			specguiSettings->ProcessResolutionKeys("_minmode");
+		}
 	}
-
-	ConVarRef minmode("cl_hud_minmode", true);
-
-	if (minmode.IsValid() && minmode.GetBool()) {
-		specguiSettings->ProcessResolutionKeys("_minmode");
+	else {
+		specguiSettings = new KeyValues("specgui");
 	}
 }
 
