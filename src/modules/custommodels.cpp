@@ -21,7 +21,7 @@
 
 CustomModels::CustomModels() {
 	modelConfig = new KeyValues("models");
-	modelConfig->LoadFromFile(Interfaces::pFileSystem, "resource/custommodels.res", "mod");
+	modelConfig->LoadFromFile(g_pFullFileSystem, "resource/custommodels.res", "mod");
 	setModelHook = 0;
 
 	enabled = new ConVar("statusspec_custommodels_enabled", "0", FCVAR_NONE, "enable custom models", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CustomModels>()->ToggleEnabled(var, pOldValue, flOldValue); });
@@ -33,7 +33,7 @@ CustomModels::CustomModels() {
 bool CustomModels::CheckDependencies() {
 	bool ready = true;
 
-	if (!Interfaces::pFileSystem) {
+	if (!g_pFullFileSystem) {
 		PRINT_TAG();
 		Warning("Required interface IFileSystem for module %s not available!\n", g_ModuleManager->GetModuleName<CustomModels>().c_str());
 
@@ -107,7 +107,7 @@ void CustomModels::LoadReplacementGroup(const CCommand &command) {
 
 void CustomModels::ReloadSettings() {
 	modelConfig = new KeyValues("models");
-	modelConfig->LoadFromFile(Interfaces::pFileSystem, "resource/custommodels.res", "mod");
+	modelConfig->LoadFromFile(g_pFullFileSystem, "resource/custommodels.res", "mod");
 }
 
 void CustomModels::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {

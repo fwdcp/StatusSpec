@@ -30,7 +30,7 @@ VariableLabel::VariableLabel(Panel *parent, const char *panelName, const char *l
 }
 
 void VariableLabel::ApplySettings(KeyValues *inResourceData) {
-	m_sLabelText = inResourceData->GetString("labelText", NULL);
+	m_sLabelText = inResourceData->GetString("labelText");
 
 	BaseClass::ApplySettings(inResourceData);
 }

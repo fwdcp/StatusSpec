@@ -59,7 +59,7 @@ CameraTools::CameraTools() {
 	setModeHook = 0;
 	setPrimaryTargetHook = 0;
 	specguiSettings = new KeyValues("Resource/UI/SpectatorTournament.res");
-	specguiSettings->LoadFromFile(Interfaces::pFileSystem, "resource/ui/spectatortournament.res", "mod");
+	specguiSettings->LoadFromFile(g_pFullFileSystem, "resource/ui/spectatortournament.res", "mod");
 
 	force_mode = new ConVar("statusspec_cameratools_force_mode", "0", FCVAR_NONE, "if a valid mode, force the camera mode to this", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>()->ChangeForceMode(var, pOldValue, flOldValue); });
 	force_target = new ConVar("statusspec_cameratools_force_target", "-1", FCVAR_NONE, "if a valid target, force the camera target to this", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>()->ChangeForceTarget(var, pOldValue, flOldValue); });
@@ -79,7 +79,7 @@ bool CameraTools::CheckDependencies() {
 		ready = false;
 	}
 
-	if (!Interfaces::pFileSystem) {
+	if (!g_pFullFileSystem) {
 		PRINT_TAG();
 		Warning("Required interface IFileSystem for module %s not available!\n", g_ModuleManager->GetModuleName<CameraTools>().c_str());
 

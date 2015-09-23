@@ -26,6 +26,7 @@
 #include "modules/custommaterials.h"
 #include "modules/custommodels.h"
 #include "modules/customtextures.h"
+#include "modules/filesystemtools.h"
 #include "modules/fovoverride.h"
 #include "modules/freezeinfo.h"
 #include "modules/killstreaks.h"
@@ -68,6 +69,7 @@ bool StatusSpecPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceF
 	g_ModuleManager->RegisterAndLoadModule<CustomMaterials>("Custom Materials");
 	g_ModuleManager->RegisterAndLoadModule<CustomModels>("Custom Models");
 	g_ModuleManager->RegisterAndLoadModule<CustomTextures>("Custom Textures");
+	g_ModuleManager->RegisterAndLoadModule<FilesystemTools>("Filesystem Tools");
 	g_ModuleManager->RegisterAndLoadModule<FOVOverride>("FOV Override");
 	g_ModuleManager->RegisterAndLoadModule<FreezeInfo>("Freeze Info");
 	g_ModuleManager->RegisterAndLoadModule<Killstreaks>("Killstreaks");

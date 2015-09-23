@@ -19,7 +19,7 @@
 
 CustomTextures::CustomTextures() {
 	textureConfig = new KeyValues("textures");
-	textureConfig->LoadFromFile(Interfaces::pFileSystem, "resource/customtextures.res", "mod");
+	textureConfig->LoadFromFile(g_pFullFileSystem, "resource/customtextures.res", "mod");
 
 	enabled = new ConVar("statusspec_customtextures_enabled", "0", FCVAR_NONE, "enable custom materials", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CustomTextures>()->ToggleEnabled(var, pOldValue, flOldValue); });
 	load_replacement_group = new ConCommand("statusspec_customtextures_load_replacement_group", [](const CCommand &command) { g_ModuleManager->GetModule<CustomTextures>()->LoadReplacementGroup(command); }, "load a texture replacement group", FCVAR_NONE);
@@ -30,7 +30,7 @@ CustomTextures::CustomTextures() {
 bool CustomTextures::CheckDependencies() {
 	bool ready = true;
 
-	if (!Interfaces::pFileSystem) {
+	if (!g_pFullFileSystem) {
 		PRINT_TAG();
 		Warning("Required interface IFileSystem for module %s not available!\n", g_ModuleManager->GetModuleName<CustomTextures>().c_str());
 
@@ -84,7 +84,7 @@ void CustomTextures::LoadReplacementGroup(const CCommand &command) {
 
 void CustomTextures::ReloadSettings() {
 	textureConfig = new KeyValues("textures");
-	textureConfig->LoadFromFile(Interfaces::pFileSystem, "resource/customtextures.res", "mod");
+	textureConfig->LoadFromFile(g_pFullFileSystem, "resource/customtextures.res", "mod");
 }
 
 void CustomTextures::ToggleEnabled(IConVar *var, const char *pOldValue, float flOldValue) {
