@@ -6,6 +6,14 @@ a Team Fortress 2 client plugin that augments game spectating
 Changelog
 ---------
 
+### 0.25.1
+* general
+  * fixed crash related to custom variable label panel
+* filesystem tools
+  * new module
+* medigun info
+  * added support for Gun Mettle skins
+
 ### 0.25.0
 * general
   * increased reliability
@@ -449,6 +457,13 @@ Custom texture configuration is loaded from the `Resource/CustomTextures.res` fi
 	}
 }
 ```
+
+### Filesystem Tools
+*tools to manipulate the virtual filesystem*
+
+#### Console Commands
+* `statusspec_filesystemtools_searchpath_add <path> <id> [location]` - add a filesystem search path
+* `statusspec_filesystemtools_searchpath_remove <path> <id>` - remove a filesystem search path
 
 ### FOV Override
 *forces the FOV used to be consistent even if players have different FOVs*
