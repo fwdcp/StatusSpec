@@ -58,14 +58,14 @@ public:
 CameraTools::CameraTools() {
 	setModeHook = 0;
 	setPrimaryTargetHook = 0;
-	specguiSettings = new KeyValues("Resource/UI/SpectatorTournament.res");
-	specguiSettings->LoadFromFile(g_pFullFileSystem, "resource/ui/spectatortournament.res", "mod");
+	ReloadSpecPlayerSettings();
 
 	force_mode = new ConVar("statusspec_cameratools_force_mode", "0", FCVAR_NONE, "if a valid mode, force the camera mode to this", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>()->ChangeForceMode(var, pOldValue, flOldValue); });
 	force_target = new ConVar("statusspec_cameratools_force_target", "-1", FCVAR_NONE, "if a valid target, force the camera target to this", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>()->ChangeForceTarget(var, pOldValue, flOldValue); });
 	force_valid_target = new ConVar("statusspec_cameratools_force_valid_target", "0", FCVAR_NONE, "forces the camera to only have valid targets", [](IConVar *var, const char *pOldValue, float flOldValue) { g_ModuleManager->GetModule<CameraTools>()->ToggleForceValidTarget(var, pOldValue, flOldValue); });
 	spec_player = new ConCommand("statusspec_cameratools_spec_player", [](const CCommand &command) { g_ModuleManager->GetModule<CameraTools>()->SpecPlayer(command); }, "spec a certain player", FCVAR_NONE);
 	spec_player_alive = new ConVar("statusspec_cameratools_spec_player_alive", "1", FCVAR_NONE, "prevent speccing dead players");
+	spec_player_reload_settings = new ConCommand("statusspec_cameratools_spec_player_reload_settings", []() { g_ModuleManager->GetModule<CameraTools>()->ReloadSpecPlayerSettings(); }, "reload settings for spectating a player from the resource file", FCVAR_NONE);
 	spec_pos = new ConCommand("statusspec_cameratools_spec_pos", [](const CCommand &command) { g_ModuleManager->GetModule<CameraTools>()->SpecPosition(command); }, "spec a certain camera position", FCVAR_NONE);
 }
 
@@ -233,6 +233,23 @@ void CameraTools::ChangeForceTarget(IConVar *var, const char *pOldValue, float f
 	}
 }
 
+void CameraTools::ReloadSpecPlayerSettings() {
+	KeyValues *specTournamentSettings = new KeyValues("Resource/UI/SpectatorTournament.res");
+	specTournamentSettings->LoadFromFile(g_pFullFileSystem, "resource/ui/spectatortournament.res", "mod");
+
+	KeyValues *settings = specTournamentSettings->FindKey("specgui");
+
+	if (settings) {
+		specguiSettings = settings->MakeCopy();
+	}
+
+	ConVarRef minmode("cl_hud_minmode", true);
+
+	if (minmode.IsValid() && minmode.GetBool()) {
+		specguiSettings->ProcessResolutionKeys("_minmode");
+	}
+}
+
 void CameraTools::SpecPlayer(const CCommand &command) {
 	if (command.ArgC() >= 3 && IsInteger(command.Arg(1)) && IsInteger(command.Arg(2))) {
 		try {
@@ -267,20 +284,20 @@ void CameraTools::SpecPlayer(const CCommand &command) {
 														continue;
 													}
 
-													baseX = g_pVGuiSchemeManager->GetProportionalScaledValue(specguiSettings->FindKey("specgui")->GetInt("team2_player_base_offset_x"));
-													baseY = g_pVGuiSchemeManager->GetProportionalScaledValue(specguiSettings->FindKey("specgui")->GetInt("team2_player_base_y"));
-													deltaX = g_pVGuiSchemeManager->GetProportionalScaledValue(specguiSettings->FindKey("specgui")->GetInt("team2_player_delta_x"));
-													deltaY = g_pVGuiSchemeManager->GetProportionalScaledValue(specguiSettings->FindKey("specgui")->GetInt("team2_player_delta_y"));
+													baseX = g_pVGuiSchemeManager->GetProportionalScaledValue(specguiSettings->GetInt("team2_player_base_offset_x"));
+													baseY = g_pVGuiSchemeManager->GetProportionalScaledValue(specguiSettings->GetInt("team2_player_base_y"));
+													deltaX = g_pVGuiSchemeManager->GetProportionalScaledValue(specguiSettings->GetInt("team2_player_delta_x"));
+													deltaY = g_pVGuiSchemeManager->GetProportionalScaledValue(specguiSettings->GetInt("team2_player_delta_y"));
 												}
 												else if (player.GetTeam() == TFTeam_Blue) {
 													if (atoi(command.Arg(1)) != TFTeam_Blue) {
 														continue;
 													}
 
-													baseX = g_pVGuiSchemeManager->GetProportionalScaledValue(specguiSettings->FindKey("specgui")->GetInt("team1_player_base_offset_x"));
-													baseY = g_pVGuiSchemeManager->GetProportionalScaledValue(specguiSettings->FindKey("specgui")->GetInt("team1_player_base_y"));
-													deltaX = g_pVGuiSchemeManager->GetProportionalScaledValue(specguiSettings->FindKey("specgui")->GetInt("team1_player_delta_x"));
-													deltaY = g_pVGuiSchemeManager->GetProportionalScaledValue(specguiSettings->FindKey("specgui")->GetInt("team1_player_delta_y"));
+													baseX = g_pVGuiSchemeManager->GetProportionalScaledValue(specguiSettings->GetInt("team1_player_base_offset_x"));
+													baseY = g_pVGuiSchemeManager->GetProportionalScaledValue(specguiSettings->GetInt("team1_player_base_y"));
+													deltaX = g_pVGuiSchemeManager->GetProportionalScaledValue(specguiSettings->GetInt("team1_player_delta_x"));
+													deltaY = g_pVGuiSchemeManager->GetProportionalScaledValue(specguiSettings->GetInt("team1_player_delta_y"));
 												}
 
 												int position = atoi(command.Arg(2));

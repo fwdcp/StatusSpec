@@ -39,9 +39,11 @@ private:
 	ConVar *force_valid_target;
 	ConCommand *spec_player;
 	ConVar *spec_player_alive;
+	ConCommand *spec_player_reload_settings;
 	ConCommand *spec_pos;
 	void ChangeForceMode(IConVar *var, const char *pOldValue, float flOldValue);
 	void ChangeForceTarget(IConVar *var, const char *pOldValue, float flOldValue);
+	void ReloadSpecPlayerSettings();
 	void SpecPlayer(const CCommand &command);
 	void SpecPosition(const CCommand &command);
 	void ToggleForceValidTarget(IConVar *var, const char *pOldValue, float flOldValue);
